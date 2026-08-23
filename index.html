@@ -493,6 +493,16 @@
       const filtered = globalProcessData.filter(r => r.some(c => String(c).toLowerCase().includes(q)));
       renderProcessTable(filtered);
     }
+
+    // फोन के बैक बटन को हैंडल करने के लिए
+    window.addEventListener('popstate', function(event) {
+      // अगर कोई डैशबोर्ड खुला है तो उसे बंद करके होम पर ले आओ
+      if (document.getElementById('process-dashboard-view').style.display === 'block') {
+        closeProcessDashboard();
+        history.pushState(null, null, window.location.href);
+      }
+    });
+    history.pushState(null, null, window.location.href);
   </script>
 </body>
 </html>
