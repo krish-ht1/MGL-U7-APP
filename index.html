@@ -113,10 +113,12 @@
 
     /* मोबाइल के लिए फिक्स (हेडर, कंपनी का नाम, और About Us की तस्वीरें) */
     @media (max-width: 768px) {
-      body { padding-top: 115px; }
+      body { padding-top: 115px; }body { background: #0f172a; color: #e2e8f0; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; min-height: 100vh; display: flex; flex-direction: column; padding-top: 80px; }
       
-      .top-bar { padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; }
-      .header-left img.animated-logo { height: 38px; }
+      @media (max-width: 768px) {
+  body { padding-top: 95px; } /* इसे कम करके हेडर और बैनर को पास ले आएंगे */
+  .top-bar { padding: 4px 8px; }
+}
       
       /* कंपनी का नाम एक लाइन में और एकदम परफेक्ट साइज़ */
       .header-center { flex: 2; text-align: center; }
