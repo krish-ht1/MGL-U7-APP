@@ -475,4 +475,51 @@
   }
 </script>
 </body>
+<!-- Process Data Submission Form -->
+<div id="process-form-section" class="form-container" style="background: #1e293b; padding: 20px; border-radius: 12px; margin: 15px; color: white;">
+  <h3 style="color: #f97316; margin-bottom: 15px;">📊 Process Data Entry Form</h3>
+  
+  <form id="processDataForm">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+      <input type="date" id="pDate" required style="padding: 8px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: white;">
+      <input type="text" id="pCustomer" placeholder="Customer Name" required style="padding: 8px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: white;">
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+      <input type="text" id="pPartNo" placeholder="Part No" required style="padding: 8px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: white;">
+      <input type="text" id="pBatchNo" placeholder="Batch No" required style="padding: 8px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: white;">
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+      <input type="text" id="pHeatCode" placeholder="Heat Code" required style="padding: 8px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: white;">
+      <input type="text" id="pFcNo" placeholder="F/C No" style="padding: 8px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: white;">
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+      <input type="text" id="pQty" placeholder="Qty" style="padding: 8px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: white;">
+      <input type="text" id="pSh" placeholder="S.H" style="padding: 8px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: white;">
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+      <input type="text" id="pCarburising" placeholder="Carburising (Temp*Time*CP)" style="padding: 8px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: white;">
+      <input type="text" id="pQuenching" placeholder="Quenching (RPM*Oil Temp)" style="padding: 8px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: white;">
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <input type="text" id="pTempering" placeholder="Tempering (Temp*Time)" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: white; box-sizing: border-box;">
+    </div>
+
+    <button type="submit" style="width: 100%; background: #f97316; color: white; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer;">Submit for Admin Approval</button>
+  </form>
+</div>
+<!-- Admin Approval Panel (Hidden by default, opens with password) -->
+<div id="admin-panel-section" style="background: #0f172a; border: 2px solid #f97316; padding: 20px; border-radius: 12px; margin: 15px; color: white; display: none;">
+  <h3 style="color: #f97316; margin-bottom: 10px;">🔐 Admin Approval Panel</h3>
+  <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">Pending requests submitted by operators:</p>
+  
+  <!-- जहाँ पेंडिंग डेटा की लिस्ट दिखेगी -->
+  <div id="pendingListContainer">
+    <p style="font-style: italic; color: #64748b;">No pending approvals right now.</p>
+  </div>
+</div>
 </html>
