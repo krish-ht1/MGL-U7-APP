@@ -348,7 +348,14 @@
 
     function updateDateTime() {
       const now = new Date();
-      document.getElementById('live-datetime').innerHTML = `📅 ${now.toLocaleDateString('en-IN')} <br> ⏱️ ${now.toLocaleTimeString('en-IN')} <span class="highlight-weather">🌡️ Temp: ${currentTemp}</span>`;
+      const dateStr = now.toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
+      const timeStr = now.toLocaleTimeString('en-IN');
+      
+      document.getElementById('live-datetime').innerHTML = `
+        <div>📅 ${dateStr}</div>
+        <div>⏱️ ${timeStr}</div>
+        <div class="highlight-weather">🌡️ Temp: ${currentTemp}</div>
+      `;
     }
     setInterval(updateDateTime, 1000);
     updateDateTime();
