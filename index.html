@@ -11,15 +11,28 @@
     body { background: #0f172a; color: #e2e8f0; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; min-height: 100vh; display: flex; flex-direction: column; padding-top: 85px; }
 
     /* फिक्स हेडर */
-    .top-bar { position: fixed; top: 0; left: 0; width: 100%; box-sizing: border-box; background: #1e293b; border-bottom: 2px solid #f97316; display: flex; justify-content: space-between; align-items: center; padding: 8px 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.8); z-index: 1000; }
+    .top-bar { position: fixed; top: 0; left: 0; width: 100%; box-sizing: border-box; background: #1e293b; border-bottom: 2px solid #f97316; display: flex; justify-content: space-between; align-items: center; padding: 10px 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.8); z-index: 1000; }
     .header-left { flex: 1; text-align: left; }
     
     .header-left img.animated-logo {
-      height: 60px;
+      height: 65px; /* लोगो का सही बड़ा साइज़ */
       object-fit: contain;
       transition: 0.3s;
       animation: pulseGlow 2.5s infinite alternate;
     }
+
+    @keyframes pulseGlow {
+      0% { filter: drop-shadow(0 0 5px rgba(249,115,22,0.3)); transform: scale(1); }
+      100% { filter: drop-shadow(0 0 25px rgba(249,115,22,0.9)); transform: scale(1.08); }
+    }
+
+    .header-center { flex: 2; text-align: center; }
+    .header-center h1 { color: #f97316; font-size: 24px; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
+    .header-center h2 { color: #e2e8f0; font-size: 14px; margin: 4px 0 0 0; font-weight: 400; }
+    
+    /* दाहिना हिस्सा - डेट, टाइम और टेम्परेचर बिल्कुल सही लाइन में */
+    .header-right { flex: 1; text-align: right; font-size: 13px; color: #94a3b8; font-weight: 600; line-height: 1.4; }
+    .highlight-weather { color: #38bdf8; font-size: 15px; display: inline-block; margin-left: 8px; font-weight: 700; }
 
     @keyframes pulseGlow {
       0% { filter: drop-shadow(0 0 5px rgba(249,115,22,0.3)); transform: scale(1); }
@@ -336,9 +349,9 @@
     }
     fetchWeather();
 
-    function updateDateTime() {
+   function updateDateTime() {
       const now = new Date();
-      document.getElementById('live-datetime').innerHTML = `📅 ${now.toLocaleDateString('en-IN')} | ⏱️ ${now.toLocaleTimeString('en-IN')} <span class="highlight-weather">🌡️ Temp: ${currentTemp}</span>`;
+      document.getElementById('live-datetime').innerHTML = `📅 ${now.toLocaleDateString('en-IN')} &nbsp;|&nbsp; ⏱️ ${now.toLocaleTimeString('en-IN')} <span class="highlight-weather">🌡️ Temp: ${currentTemp}</span>`;
     }
     setInterval(updateDateTime, 1000);
     updateDateTime();
