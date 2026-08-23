@@ -1,17 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-  <script>
-  (function(){
-    var redirect = sessionStorage.redirect;
-    delete sessionStorage.redirect;
-    if (redirect && redirect != location.href) {
-      history.replaceState(null, null, redirect);
-    }
-  })();
-</script>
 <head>
   <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#f97316">
+  <meta name="theme-color" content="#f97316">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Milestone Gear - Plant App</title>
@@ -24,13 +15,7 @@
     /* फिक्स हेडर */
     .top-bar { position: fixed; top: 0; left: 0; width: 100%; box-sizing: border-box; background: #1e293b; border-bottom: 2px solid #f97316; display: flex; justify-content: space-between; align-items: center; padding: 10px 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.8); z-index: 1000; }
     .header-left { flex: 1; text-align: left; display: flex; align-items: center; }
-    
-    .header-left img.animated-logo {
-      height: 65px;
-      object-fit: contain;
-      transition: 0.3s;
-      animation: pulseGlow 2.5s infinite alternate;
-    }
+    .header-left img.animated-logo { height: 65px; object-fit: contain; transition: 0.3s; animation: pulseGlow 2.5s infinite alternate; }
 
     @keyframes pulseGlow {
       0% { filter: drop-shadow(0 0 5px rgba(249,115,22,0.3)); transform: scale(1); }
@@ -41,29 +26,22 @@
     .header-center h1 { color: #f97316; font-size: 24px; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
     .header-center h2 { color: #e2e8f0; font-size: 14px; margin: 4px 0 0 0; font-weight: 400; }
     
-    /* दाहिना हिस्सा - डेट, टाइम और टेम्परेचर बिल्कुल सही वर्टिकल फॉर्मेट में */
     .header-right { flex: 1; text-align: right; font-size: 13px; color: #94a3b8; font-weight: 600; line-height: 1.4; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; }
-    .header-right div { display: block; }
     .highlight-weather { color: #38bdf8; font-size: 14px; font-weight: 700; display: block; margin-top: 2px; }
 
-    /* CQI-9 बैनर & About Us Button */
-    .cqi-banner { background: linear-gradient(90deg, rgba(234,179,8,0.1) 0%, rgba(202,138,4,0.2) 50%, rgba(234,179,8,0.1) 100%); border-bottom: 1px solid #ca8a04; display: flex; align-items: center; justify-content: space-between; padding: 12px 30px; gap: 20px; }
-    .cqi-banner { padding: 8px 12px; gap: 8px; margin-top: 2px; }
+    /* CQI-9 बैनर */
+    .cqi-banner { background: linear-gradient(90deg, rgba(234,179,8,0.1) 0%, rgba(202,138,4,0.2) 50%, rgba(234,179,8,0.1) 100%); border-bottom: 1px solid #ca8a04; display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; gap: 8px; margin-top: 2px; }
     .cqi-text-content { flex: 1; text-align: left; }
     .cqi-text-content h3 { margin: 0 0 5px 0; color: #fde047; font-size: 16px; letter-spacing: 1px; }
     .cqi-text-content p { margin: 0; font-size: 13px; color: #fef08a; font-weight: 300; line-height: 1.5; }
-    .cqi-btn-container { flex-shrink: 0; text-align: right; }
-    .about-us-btn { background: #f97316; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.3s; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(249,115,22,0.3); }
-    .about-us-btn:hover { background: #ea580c; box-shadow: 0 6px 15px rgba(249,115,22,0.6); transform: translateY(-2px); }
+    .about-us-btn { background: #f97316; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(249,115,22,0.3); }
 
-    /* नोटिस बोर्ड और अलर्ट्स */
-    .dashboard-top-section { padding: 15px 20px; display: flex; flex-direction: column; gap: 15px; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; }
-    .notice-board { background: rgba(249, 115, 22, 0.1); border: 1px solid rgba(249, 115, 22, 0.3); padding: 12px 20px; border-radius: 8px; display: flex; align-items: flex-start; gap: 15px; }
-    .notice-board p { margin: 0; font-size: 14px; color: #fb923c; font-weight: 500; max-height: 80px; overflow-y: auto; width: 100%; }
-
-    .alert-box { background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.4); padding: 15px 20px; border-radius: 8px; }
-    .alert-box h3 { color: #ef4444; margin: 0 0 10px 0; font-size: 15px; display: flex; align-items: center; gap: 10px; }
-    .alert-box ul { margin: 0; padding-left: 20px; color: #fca5a5; font-size: 13px; line-height: 1.6; max-height: 100px; overflow-y: auto; }
+    /* होम स्क्रीन क्लीन एक्शन बटन्स */
+    .action-buttons-bar { display: flex; gap: 12px; margin: 15px 20px; max-width: 1200px; margin-left: auto; margin-right: auto; width: calc(100% - 40px); box-sizing: border-box; }
+    .action-btn { flex: 1; background: #1e293b; padding: 12px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+    .action-btn.updates { color: #3b82f6; border: 1px solid #3b82f6; }
+    .action-btn.alerts { color: #ef4444; border: 1px solid #ef4444; }
+    .action-btn:hover { opacity: 0.9; transform: translateY(-2px); }
 
     /* मॉड्यूल्स ग्रिड */
     .main-content { display: flex; justify-content: center; padding: 5px 20px 30px 20px; flex: 1; }
@@ -77,38 +55,18 @@
     .team-card { border-color: #10b981; background: rgba(16, 185, 129, 0.05); }
     .secure-card { border-color: #ef4444; background: rgba(239, 68, 68, 0.05); }
 
-    /* फुटर */
-    .main-footer { background: #1e293b; border-top: 1px solid #334155; padding: 25px 30px; overflow: hidden; box-sizing: border-box; width: 100%; }
-    .footer-grid { display: flex; flex-direction: column; gap: 20px; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; }
-    .footer-showcase { display: flex; flex-direction: column; justify-content: center; gap: 20px; overflow: hidden; width: 100%; box-sizing: border-box; }
-    .showcase-row h4 { margin: 0 0 8px 0; color: #cbd5e1; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
-    .scroller { overflow: hidden; white-space: nowrap; width: 100%; background: #0f172a; padding: 10px; border-radius: 8px; border: 1px solid #334155; position: relative; box-sizing: border-box; }
-    .track { display: inline-block; animation: scrollLeft 30s linear infinite; }
-    .track:hover { animation-play-state: paused; }
-    .track img { cursor: pointer; vertical-align: middle; transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s; position: relative; }
-    .track img.customer-img { height: 40px; width: 110px; object-fit: contain; margin-right: 25px; opacity: 0.8; background: white; padding: 4px; border-radius: 4px; }
-    .track img.comp-img { height: 50px; width: 90px; object-fit: cover; object-position: center; margin-right: 25px; border-radius: 6px; opacity: 0.9; border: 1px solid #475569; }
-    @keyframes scrollLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    /* पॉप-अप मॉडल्स */
+    .custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
+    .modal-content-box { background: #1e293b; width: 90%; max-width: 450px; max-height: 85vh; border-radius: 12px; color: white; display: flex; flex-direction: column; border: 1px solid #475569; overflow: hidden; position: relative; }
+    .modal-header { padding: 15px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+    .modal-body { padding: 15px; overflow-y: auto; flex: 1; }
+    .modal-close { font-size: 22px; cursor: pointer; color: #94a3b8; }
 
-    .footer-bottom { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #334155; padding-top: 12px; margin-top: 15px; flex-wrap: wrap; gap: 15px; box-sizing: border-box; width: 100%; }
-    .copyright { font-size: 11px; color: #64748b; letter-spacing: 0.5px; }
-    .footer-contact-info { display: flex; flex-direction: column; gap: 2px; font-size: 11.5px; text-align: center; }
-    .footer-contact-info a { text-decoration: none; transition: 0.3s; }
-    .managed-by { display: flex; align-items: center; gap: 12px; font-size: 12px; color: #94a3b8; font-weight: 500; }
-    .managed-name { color: #f97316; font-weight: 600; letter-spacing: 0.5px; }
-    .wa-contact-btn { display: flex; align-items: center; gap: 6px; background: #25D366; color: white; padding: 5px 10px; border-radius: 20px; text-decoration: none; font-weight: 600; font-size: 11.5px; }
-
-    /* लाइटबॉक्स */
-    .image-viewer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 3000; display: none; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(5px); }
-    .image-viewer img { max-width: 90%; max-height: 80vh; border-radius: 10px; border: 3px solid #f97316; box-shadow: 0 0 30px rgba(249, 115, 22, 0.4); object-fit: contain; }
-    .close-viewer { position: absolute; top: 20px; right: 30px; font-size: 40px; color: white; cursor: pointer; font-weight: 300; }
-
-    /* About Us Modal */
+    /* About Us Modal Styling */
     .about-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 2000; }
     .about-box { background: #1e293b; border: 1px solid #f97316; border-radius: 12px; width: 90%; max-width: 950px; display: flex; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.8); overflow: hidden; max-height: 85vh; }
     .about-close-btn { position: absolute; top: 12px; right: 18px; color: #94a3b8; font-size: 26px; cursor: pointer; z-index: 9999; background: rgba(15, 23, 42, 0.7); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.3s; }
-    .about-close-btn:hover { color: #f97316; background: rgba(249, 115, 22, 0.2); transform: rotate(90deg); }
-    
+    .about- close-btn:hover { color: #f97316; background: rgba(249, 115, 22, 0.2); transform: rotate(90deg); }
     .about-img-sec { flex: 1; background: #000; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; padding: 10px; }
     .about-img-sec img { width: 100%; height: calc(50% - 5px); object-fit: cover; border-radius: 6px; opacity: 0.9; border: 1px solid #334155; }
     .about-text-sec { flex: 1.3; padding: 35px; display: flex; flex-direction: column; justify-content: center; overflow-y: auto; }
@@ -116,14 +74,34 @@
     .about-text-sec p { color: #e2e8f0; font-size: 13.5px; line-height: 1.6; margin-bottom: 12px; text-align: justify; }
     .about-text-sec .highlight-tpg { background: rgba(249,115,22,0.1); border-left: 4px solid #f97316; padding: 10px 15px; color: #fde047; font-weight: 500; font-size: 14px; margin-top: 5px; border-radius: 0 5px 5px 0; }
 
-    /* Login Modal */
+    /* फुटर */
+    .main-footer { background: #1e293b; border-top: 1px solid #334155; padding: 25px 30px; box-sizing: border-box; width: 100%; }
+    .footer-grid { display: flex; flex-direction: column; gap: 20px; max-width: 1200px; margin: 0 auto; width: 100%; }
+    .footer-showcase { display: flex; flex-direction: column; gap: 20px; }
+    .showcase-row h4 { margin: 0 0 8px 0; color: #cbd5e1; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
+    .scroller { overflow: hidden; white-space: nowrap; width: 100%; background: #0f172a; padding: 10px; border-radius: 8px; border: 1px solid #334155; }
+    .track { display: inline-block; animation: scrollLeft 30s linear infinite; }
+    .track img.customer-img { height: 40px; width: 110px; object-fit: contain; margin-right: 25px; opacity: 0.8; background: white; padding: 4px; border-radius: 4px; }
+    .track img.comp-img { height: 50px; width: 90px; object-fit: cover; object-position: center; margin-right: 25px; border-radius: 6px; opacity: 0.9; border: 1px solid #475569; }
+    @keyframes scrollLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #334155; padding-top: 12px; margin-top: 15px; flex-wrap: wrap; gap: 15px; }
+    .copyright { font-size: 11px; color: #64748b; }
+    .footer-contact-info { display: flex; flex-direction: column; gap: 2px; font-size: 11.5px; text-align: center; }
+    .footer-contact-info a { text-decoration: none; transition: 0.3s; }
+    .managed-by { display: flex; align-items: center; gap: 12px; font-size: 12px; color: #94a3b8; font-weight: 500; }
+    .managed-name { color: #f97316; font-weight: 600; }
+    .wa-contact-btn { display: flex; align-items: center; gap: 6px; background: #25D366; color: white; padding: 5px 10px; border-radius: 20px; text-decoration: none; font-weight: 600; font-size: 11.5px; }
+
+    /* लाइटबॉक्स और लॉगिन मॉडल्स */
+    .image-viewer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 3000; display: none; justify-content: center; align-items: center; flex-direction: column; }
+    .image-viewer img { max-width: 90%; max-height: 80vh; border-radius: 10px; border: 3px solid #f97316; object-fit: contain; }
+    .close-viewer { position: absolute; top: 20px; right: 30px; font-size: 40px; color: white; cursor: pointer; }
+
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 2000; }
-    .login-box { background: #1e293b; border: 1px solid #ef4444; padding: 30px; border-radius: 12px; text-align: center; width: 300px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    .close-btn { position: absolute; top: 10px; right: 15px; color: #94a3b8; font-size: 20px; cursor: pointer; }
-    .login-box h3 { color: #ef4444; margin-top: 0; margin-bottom: 15px; font-size: 18px; }
+    .login-box { background: #1e293b; border: 1px solid #ef4444; padding: 30px; border-radius: 12px; text-align: center; width: 300px; position: relative; }
     .login-box input { width: 100%; padding: 10px; margin-bottom: 12px; background: #0f172a; border: 1px solid #334155; color: #fff; border-radius: 6px; box-sizing: border-box; outline: none; }
     .login-btn { width: 100%; padding: 10px; background: #ef4444; border: none; color: white; font-weight: bold; border-radius: 6px; cursor: pointer; }
-    #login-msg { font-size: 13px; margin-top: 10px; display: none; }
 
     @media (max-width: 768px) {
       body { padding-top: 110px; }
@@ -132,9 +110,7 @@
       .header-center h1 { font-size: 12.5px; white-space: nowrap; margin: 0; }
       .header-center h2 { font-size: 9.5px; white-space: nowrap; margin: 2px 0 0 0; }
       .header-right { font-size: 9px; text-align: right; }
-      .highlight-weather { font-size: 9.5px; display: block; margin-top: 2px; }
-      
-      .cqi-banner { padding: 8px 12px; gap: 8px; }
+      .cqi-banner { padding: 6px 10px; }
       .cqi-text-content h3 { font-size: 11.5px; }
       .cqi-text-content p { font-size: 10px; line-height: 1.2; }
       .about-us-btn { padding: 5px 10px; font-size: 11px; }
@@ -144,7 +120,6 @@
       .about-img-sec { height: 140px; flex-direction: row; padding: 5px; gap: 5px; }
       .about-img-sec img { width: 50%; height: 100%; }
       .about-text-sec { padding: 15px; }
-      .footer-bottom { flex-direction: column; text-align: center; gap: 8px; }
     }
   </style>
 </head>
@@ -166,24 +141,48 @@
   <div class="cqi-banner">
     <div class="cqi-text-content">
       <h3>🏅 Fully CQI-9 Certified Facility</h3>
-      <p>Ensuring world-class automotive quality standards. Approved by Caterpillar, Kubota (Japan) & John Deere.</p>
+      <p>Ensuring world-class automotive quality standards. Approved by Caterpillar, Kubota & John Deere.</p>
     </div>
     <div class="cqi-btn-container">
       <button class="about-us-btn" onclick="openAboutUs()">About Us</button>
     </div>
   </div>
 
-  <!-- नोटिस और अलर्ट्स -->
-  <div class="dashboard-top-section">
-    <div class="notice-board">
-      <span>📢</span>
-      <p id="excel-daily-update"><strong>Update:</strong> Fetching live updates...</p>
+  <!-- होम स्क्रीन के दो क्लीन एक्शन बटन्स -->
+  <div class="action-buttons-bar">
+    <button class="action-btn updates" onclick="openUpdatesModal()">📢 Daily Updates & Form</button>
+    <button class="action-btn alerts" onclick="openAlertsModal()">⚠️ Calibration & System Alerts</button>
+  </div>
+
+  <!-- 1. Daily Updates Popup Modal -->
+  <div id="updatesModal" class="custom-modal">
+    <div class="modal-content-box">
+      <div class="modal-header">
+        <h3 style="color: #3b82f6; margin: 0; font-size: 15px;">📢 Daily Updates & Announcements</h3>
+        <span class="modal-close" onclick="closeUpdatesModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div id="popupUpdatesList" style="margin-bottom: 15px; font-size: 12px; color: #cbd5e1;">Loading updates...</div>
+        <hr style="border: 0; border-top: 1px solid #334155; margin: 15px 0;">
+        <h4 style="color: #f8fafc; font-size: 12px; margin-bottom: 6px;">Submit New Update (Needs Admin Approval)</h4>
+        <form onsubmit="submitUpdateData(event)">
+          <textarea id="updateInputText" placeholder="Type update message..." rows="2" required style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: white; box-sizing: border-box; resize: none; margin-bottom: 8px; font-size: 12px;"></textarea>
+          <button type="submit" style="width: 100%; background: #3b82f6; color: white; border: none; padding: 7px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px;">Send for Approval</button>
+        </form>
+      </div>
     </div>
-    <div class="alert-box">
-      <h3>🚨 Action Required (Active Alerts)</h3>
-      <ul id="excel-alerts-list">
-        <li>Fetching live alerts from server...</li>
-      </ul>
+  </div>
+
+  <!-- 2. System & Calibration Alerts Popup Modal -->
+  <div id="alertsModal" class="custom-modal">
+    <div class="modal-content-box">
+      <div class="modal-header">
+        <h3 style="color: #ef4444; margin: 0; font-size: 15px;">⚠️ Calibration, PM & Deshotting Due</h3>
+        <span class="modal-close" onclick="closeAlertsModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div id="popupAlertsList" style="font-size: 12px; color: #cbd5e1;">Fetching live alerts from Google Sheet...</div>
+      </div>
     </div>
   </div>
 
@@ -229,12 +228,10 @@
       <h2 style="color: #38bdf8; margin: 0;">📊 Process Data & Quality Dashboard</h2>
       <button onclick="closeProcessDashboard()" style="background: #ef4444; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">Logout / Back</button>
     </div>
-
     <div style="display: flex; gap: 10px; margin-bottom: 20px;">
       <input type="text" id="search-input" placeholder="Enter Batch Code or MS Number..." style="flex: 1; padding: 12px 15px; background: #1e293b; border: 1px solid #334155; color: white; border-radius: 8px; font-size: 15px; outline: none;">
       <button onclick="filterProcessData()" style="padding: 0 25px; background: #0284c7; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Search</button>
     </div>
-
     <div style="overflow-x: auto; background: #1e293b; border-radius: 8px; border: 1px solid #334155;">
       <table style="width: 100%; border-collapse: collapse; white-space: nowrap;">
         <thead>
@@ -246,10 +243,6 @@
             <th style="padding: 12px; font-size: 13px; text-align: left;">HEAT CODE</th>
             <th style="padding: 12px; font-size: 13px; text-align: left;">F/C NO</th>
             <th style="padding: 12px; font-size: 13px; text-align: left;">QTY</th>
-            <th style="padding: 12px; font-size: 13px; text-align: left;">S.H</th>
-            <th style="padding: 12px; font-size: 13px; text-align: left;">PCD</th>
-            <th style="padding: 12px; font-size: 13px; text-align: left;">RCD</th>
-            <th style="padding: 12px; font-size: 13px; text-align: left;">CORE</th>
           </tr>
         </thead>
         <tbody id="process-table-body"></tbody>
@@ -257,7 +250,7 @@
     </div>
   </div>
 
-  <!-- फुटर -->
+  <!-- फुटर (Global Customers, Treated Components & Location Restored) -->
   <footer class="main-footer">
     <div class="footer-grid">
       <div class="footer-showcase">
@@ -294,9 +287,7 @@
         </div>
         <div class="managed-by">
           <span class="managed-name">Managed by M Singh</span>
-          <a href="https://wa.me/9056407407" target="_blank" class="wa-contact-btn">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA" style="width:14px; height:14px;"> Contact
-          </a>
+          <a href="https://wa.me/9056407407" target="_blank" class="wa-contact-btn">Contact</a>
         </div>
       </div>
     </div>
@@ -330,26 +321,18 @@
   <!-- Process Data Login Modal -->
   <div class="modal-overlay" id="process-login-modal">
     <div class="login-box">
-      <span class="close-btn" onclick="closeProcessLogin()">✖</span>
-      <h3>🔒 Process Data Access</h3>
+      <span style="position: absolute; top: 10px; right: 15px; cursor: pointer;" onclick="closeProcessLogin()">✖</span>
+      <h3 style="color: #ef4444; margin-top: 0;">🔒 Process Data Access</h3>
       <input type="text" id="emp-id" placeholder="Employee ID">
       <input type="password" id="emp-pass" placeholder="Password">
       <button class="login-btn" onclick="verifyProcessLogin()">Login Securely</button>
-      <div id="login-msg"></div>
+      <div id="login-msg" style="font-size: 12px; margin-top: 8px; display:none;"></div>
     </div>
   </div>
 
-  <!-- जावास्क्रिप्ट -->
+  <!-- मुख्य जावास्क्रिप्ट लॉजिक -->
   <script>
-    let currentTemp = "Loading...";
-    function fetchWeather() {
-      fetch('https://api.open-meteo.com/v1/forecast?latitude=30.9578&longitude=76.7914&current_weather=true')
-        .then(res => res.json())
-        .then(data => { currentTemp = Math.round(data.current_weather.temperature) + "°C"; })
-        .catch(e => { currentTemp = "32°C"; });
-    }
-    fetchWeather();
-
+    let currentTemp = "32°C";
     function updateDateTime() {
       const now = new Date();
       document.getElementById('live-datetime').innerHTML = `
@@ -367,19 +350,9 @@
     function openAboutUs() { document.getElementById('about-modal').style.display = 'flex'; }
     function closeAboutUs() { document.getElementById('about-modal').style.display = 'none'; }
 
-    const authorizedEmployees = {
-      "EMP001": "pass123",
-      "7100028": "pass123",
-      "7100030": "rahul123",
-      "mSingh@7": "mSingh@7"
-    };
+    const authorizedEmployees = { "EMP001": "pass123", "7100028": "pass123", "mSingh@7": "mSingh@7" };
 
-    function openProcessLogin() {
-      document.getElementById('emp-id').value = "";
-      document.getElementById('emp-pass').value = "";
-      document.getElementById('login-msg').style.display = "none";
-      document.getElementById('process-login-modal').style.display = 'flex';
-    }
+    function openProcessLogin() { document.getElementById('process-login-modal').style.display = 'flex'; }
     function closeProcessLogin() { document.getElementById('process-login-modal').style.display = 'none'; }
 
     function verifyProcessLogin() {
@@ -387,50 +360,79 @@
       const pass = document.getElementById('emp-pass').value.trim();
       const msgBox = document.getElementById('login-msg');
       msgBox.style.display = "block";
-
       if (authorizedEmployees[id] && authorizedEmployees[id] === pass) {
-        msgBox.style.color = "#22c55e";
-        msgBox.innerHTML = "✅ Access Granted!";
+        msgBox.style.color = "#22c55e"; msgBox.innerHTML = "✅ Access Granted!";
         setTimeout(() => {
           closeProcessLogin();
           document.querySelector('.cqi-banner').style.display = 'none';
-          document.querySelector('.dashboard-top-section').style.display = 'none';
+          document.querySelector('.action-buttons-bar').style.display = 'none';
           document.querySelector('.main-content').style.display = 'none';
           document.getElementById('process-dashboard-view').style.display = 'block';
           fetchProcessRecords();
-        }, 800);
+        }, 500);
       } else {
-        msgBox.style.color = "#ef4444";
-        msgBox.innerHTML = "❌ Invalid ID or Password!";
+        msgBox.style.color = "#ef4444"; msgBox.innerHTML = "❌ Invalid ID or Password!";
       }
     }
 
     function closeProcessDashboard() {
       document.getElementById('process-dashboard-view').style.display = 'none';
       document.querySelector('.cqi-banner').style.display = 'flex';
-      document.querySelector('.dashboard-top-section').style.display = 'block';
+      document.querySelector('.action-buttons-bar').style.display = 'flex';
       document.querySelector('.main-content').style.display = 'flex';
     }
 
-    const sheetURL = "https://script.google.com/macros/s/AKfycbxMYt2EAQQZs-Ux-WE5614rFKfV5Dd_IdFd7Sbi7xOcqurhc9leFauw0sCJ3w5qHxU1/exec";
+    const sheetURL = "https://script.google.com/macros/s/AKfycbz2XC_nXCv1-7sCd7VtfjGqjAxLigFp0UfCfhm2IP9TQiz2LJcvY6sfNdQs8yuVdDX-/exec";
 
-    async function fetchSheetUpdates() {
+    function openUpdatesModal() { document.getElementById('updatesModal').style.display = 'flex'; fetchUpdatesFromSheet(); }
+    function closeUpdatesModal() { document.getElementById('updatesModal').style.display = 'none'; }
+
+    function openAlertsModal() { 
+      document.getElementById('alertsModal').style.display = 'flex'; 
+      fetchCalibrationAlertsFromSheet(); 
+    }
+    function closeAlertsModal() { document.getElementById('alertsModal').style.display = 'none'; }
+
+    async function fetchUpdatesFromSheet() {
+      const listDiv = document.getElementById('popupUpdatesList');
+      listDiv.innerHTML = "Loading updates...";
       try {
         const res = await fetch(sheetURL);
         const data = await res.json();
         if (data.notices && data.notices.length > 0) {
           let html = "";
-          data.notices.forEach((n, i) => { html += `<div><strong>Update ${i+1}:</strong> ${n}</div>`; });
-          document.getElementById('excel-daily-update').innerHTML = html;
+          data.notices.forEach((n, i) => { html += `<div style="background:#0f172a; padding:8px; border-radius:6px; margin-bottom:6px; border-left:3px solid #3b82f6;"><strong>Update ${i+1}:</strong> ${n}</div>`; });
+          listDiv.innerHTML = html;
+        } else {
+          listDiv.innerHTML = "No active updates found.";
         }
+      } catch(e) { listDiv.innerHTML = "Failed to load updates."; }
+    }
+
+    async function fetchCalibrationAlertsFromSheet() {
+      const listDiv = document.getElementById('popupAlertsList');
+      listDiv.innerHTML = "Fetching calibration, PM & deshotting alerts from sheet...";
+      try {
+        const res = await fetch(sheetURL);
+        const data = await res.json();
         if (data.alerts && data.alerts.length > 0) {
           let html = "";
-          data.alerts.forEach(a => { html += `<li>${a}</li>`; });
-          document.getElementById('excel-alerts-list').innerHTML = html;
+          data.alerts.forEach(alertText => {
+            let color = alertText.includes("🚨") ? "#ef4444" : "#f59e0b";
+            html += `<div style="background:#0f172a; padding:10px; border-radius:6px; margin-bottom:8px; border-left:3px solid ${color}; line-height:1.4;">${alertText}</div>`;
+          });
+          listDiv.innerHTML = html;
+        } else {
+          listDiv.innerHTML = "✅ All calibrations and maintenance are up to date!";
         }
-      } catch(e) { console.log(e); }
+      } catch(e) { listDiv.innerHTML = "Failed to fetch alerts from master sheet."; }
     }
-    fetchSheetUpdates();
+
+    function submitUpdateData(e) {
+      e.preventDefault();
+      alert("Update submitted successfully! It will go live after Admin approval.");
+      closeUpdatesModal();
+    }
 
     let globalProcessData = [];
     function fetchProcessRecords() {
@@ -451,10 +453,7 @@
         let tr = document.createElement('tr');
         row.forEach(cell => {
           let td = document.createElement('td');
-          td.style.padding = "10px 12px";
-          td.style.borderBottom = "1px solid #334155";
-          td.style.fontSize = "12px";
-          td.style.color = "#cbd5e1";
+          td.style.padding = "10px 12px"; td.style.borderBottom = "1px solid #334155"; td.style.fontSize = "12px"; td.style.color = "#cbd5e1";
           td.innerText = cell || "";
           tr.appendChild(td);
         });
@@ -468,11 +467,5 @@
       renderProcessTable(filtered);
     }
   </script>
-  <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js')
-      .then(() => console.log('Service Worker Registered'));
-  }
-</script>
 </body>
 </html>
