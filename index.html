@@ -142,6 +142,17 @@
       .about-box { position: relative; flex-direction: column; max-height: 85vh; width: 95%; }
       .about-close-btn { top: 8px; right: 10px; font-size: 24px; width: 30px; height: 30px; }
     }
+
+    @media (max-width: 768px) {
+      body { padding-top: 105px; }
+      .top-bar { padding: 6px 12px; }
+      .header-left img.animated-logo { height: 35px; }
+      .header-center h1 { font-size: 11.5px; white-space: nowrap; margin: 0; }
+      .header-center h2 { font-size: 9px; white-space: nowrap; margin: 2px 0 0 0; }
+      .header-right { font-size: 8.5px; }
+      .home-link-btn { font-size: 10.5px; margin-bottom: 1px; }
+      .highlight-weather { font-size: 9px; }
+    }
   .top-bar { padding: 4px 8px; }
 }
       
@@ -168,21 +179,30 @@
       
       .footer-bottom { flex-direction: column; text-align: center; gap: 8px; }
     }
+    /* हेडर का दाहिना हिस्सा (डेट, टाइम, टेम्परेचर और होम बटन) */
+    .header-right { flex: 1; text-align: right; font-size: 11px; color: #94a3b8; font-weight: 600; line-height: 1.3; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 2px; }
+    .highlight-weather { color: #38bdf8; font-size: 11.5px; font-weight: 700; display: inline; }
+    
+    /* होम टेक्स्ट बटन का स्टाइल */
+    .home-link-btn { background: none; border: none; color: #f97316; font-size: 12px; font-weight: 700; cursor: pointer; padding: 0; margin-bottom: 2px; text-decoration: underline; font-family: 'Poppins', sans-serif; transition: 0.2s; }
+    .home-link-btn:hover { color: #ea580c; }
   </style>
 </head>
 <body>
 
+  <!-- फिक्स हेडर -->
   <header class="top-bar">
-    <div class="header-left" style="display: flex; align-items: center; gap: 10px;">
+    <div class="header-left">
       <img src="https://i.postimg.cc/Sx16gPL2/Chat-GPT-Image-Aug-23-2026-10-48-18-AM-removebg-preview.png" alt="Milestone Logo" class="animated-logo">
-      <!-- यह रहा परमानेंट होम/डैशबोर्ड बटन -->
-      <button onclick="goHomeDashboard()" style="background: rgba(249,115,22,0.2); border: 1px solid #f97316; color: #f97316; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 600;">🏠 Home</button>
     </div>
     <div class="header-center">
       <h1>Milestone Gear Limited</h1>
       <h2>Heat Treatment Plant Unit 7</h2>
     </div>
-    <div class="header-right" id="live-datetime"></div>
+    <div class="header-right">
+      <button class="home-link-btn" onclick="goHomeDashboard()">Home</button>
+      <div id="live-datetime"></div>
+    </div>
   </header>
 
   <!-- CQI-9 बैनर -->
@@ -505,13 +525,12 @@
     });
     history.pushState(null, null, window.location.href);
     function goHomeDashboard() {
-      // प्रोसेस डेटा व्यू को बंद करें
+      function goHomeDashboard() {
       document.getElementById('process-dashboard-view').style.display = 'none';
-      
-      // मुख्य होम स्क्रीन के सभी सेशंस को वापस दिखाएं
       document.querySelector('.cqi-banner').style.display = 'flex';
       document.querySelector('.dashboard-top-section').style.display = 'block';
       document.querySelector('.main-content').style.display = 'flex';
+    }
     }
   </script>
 </body>
