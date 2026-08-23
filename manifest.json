@@ -1,0 +1,20 @@
+{
+  "name": "Milestone Gear U-7",
+  "short_name": "MGL U-7",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#f97316",
+  "icons": [
+    {
+      "src": "https://i.postimg.cc/Sx16gPL2/Chat-GPT-Image-Aug-23-2026-10-48-18-AM-removebg-preview.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://i.postimg.cc/Sx16gPL2/Chat-GPT-Image-Aug-23-2026-10-48-18-AM-removebg-preview.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
