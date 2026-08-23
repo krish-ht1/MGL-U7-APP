@@ -172,10 +172,11 @@
 </head>
 <body>
 
-  <!-- फिक्स हेडर -->
   <header class="top-bar">
-    <div class="header-left">
+    <div class="header-left" style="display: flex; align-items: center; gap: 10px;">
       <img src="https://i.postimg.cc/Sx16gPL2/Chat-GPT-Image-Aug-23-2026-10-48-18-AM-removebg-preview.png" alt="Milestone Logo" class="animated-logo">
+      <!-- यह रहा परमानेंट होम/डैशबोर्ड बटन -->
+      <button onclick="goHomeDashboard()" style="background: rgba(249,115,22,0.2); border: 1px solid #f97316; color: #f97316; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 600;">🏠 Home</button>
     </div>
     <div class="header-center">
       <h1>Milestone Gear Limited</h1>
@@ -503,6 +504,15 @@
       }
     });
     history.pushState(null, null, window.location.href);
+    function goHomeDashboard() {
+      // प्रोसेस डेटा व्यू को बंद करें
+      document.getElementById('process-dashboard-view').style.display = 'none';
+      
+      // मुख्य होम स्क्रीन के सभी सेशंस को वापस दिखाएं
+      document.querySelector('.cqi-banner').style.display = 'flex';
+      document.querySelector('.dashboard-top-section').style.display = 'block';
+      document.querySelector('.main-content').style.display = 'flex';
+    }
   </script>
 </body>
 </html>
