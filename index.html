@@ -110,6 +110,37 @@
     .login-box input { width: 100%; padding: 10px; margin-bottom: 12px; background: #0f172a; border: 1px solid #334155; color: #fff; border-radius: 6px; box-sizing: border-box; outline: none; }
     .login-btn { width: 100%; padding: 10px; background: #ef4444; border: none; color: white; font-weight: bold; border-radius: 6px; cursor: pointer; }
     #login-msg { font-size: 13px; margin-top: 10px; display: none; }
+
+    /* मोबाइल के लिए फिक्स (हेडर, कंपनी का नाम, और About Us की तस्वीरें) */
+    @media (max-width: 768px) {
+      body { padding-top: 115px; }
+      
+      .top-bar { padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; }
+      .header-left img.animated-logo { height: 38px; }
+      
+      /* कंपनी का नाम एक लाइन में और एकदम परफेक्ट साइज़ */
+      .header-center { flex: 2; text-align: center; }
+      .header-center h1 { font-size: 12.5px; white-space: nowrap; margin: 0; }
+      .header-center h2 { font-size: 9.5px; white-space: nowrap; margin: 2px 0 0 0; }
+      
+      .header-right { font-size: 9px; text-align: right; }
+      .highlight-weather { font-size: 9.5px; display: inline; margin-top: 0; }
+      
+      .cqi-banner { padding: 8px 12px; gap: 8px; }
+      .cqi-text-content h3 { font-size: 11.5px; }
+      .cqi-text-content p { font-size: 10px; line-height: 1.2; }
+      .about-us-btn { padding: 5px 10px; font-size: 11px; }
+
+      /* About Us का बॉक्स और फोटो मोबाइल के लिए बिल्कुल सही */
+      .about-box { flex-direction: column; max-height: 85vh; width: 92%; }
+      .about-img-sec { height: 160px; flex-direction: row; padding: 6px; gap: 6px; }
+      .about-img-sec img { width: 50%; height: 100%; object-fit: cover; border-radius: 4px; }
+      .about-text-sec { padding: 15px; }
+      .about-text-sec h2 { font-size: 18px; margin-bottom: 6px; }
+      .about-text-sec p { font-size: 11px; line-height: 1.35; margin-bottom: 6px; }
+      
+      .footer-bottom { flex-direction: column; text-align: center; gap: 8px; }
+    }
   </style>
 </head>
 <body>
