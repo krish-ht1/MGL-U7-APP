@@ -3,539 +3,262 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MGL Heat Treatment Unit 7 - Process Dashboard</title>
+  <title>Process Data & SIPs - Milestone Gear</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #090d16;
-      color: #f8fafc;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      padding: 20px 10px;
-    }
-
-    .app-container {
-      width: 100%;
-      max-width: 1400px;
       background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      color: #e2e8f0;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
       padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
+      box-sizing: border-box;
+      min-height: 100vh;
     }
 
-    /* Header Bar */
     .top-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #1e293b;
-      padding: 14px 20px;
-      border-radius: 12px;
-      border: 1px solid #334155;
-    }
-    .header-title-group h1 { font-size: 1.2rem; color: #38bdf8; text-transform: uppercase; margin: 0; letter-spacing: 0.5px; }
-    .header-title-group p { font-size: 0.8rem; color: #94a3b8; margin-top: 3px; }
-    .btn-back-home {
-      background: #ef4444;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 0.85rem;
-      transition: 0.2s;
-    }
-    .btn-back-home:hover { background: #dc2626; }
-
-    /* Search & Multi Filters */
-    .search-filter-card {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 12px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
+      border-bottom: 2px solid #f97316;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
       gap: 12px;
     }
-    .search-row { display: flex; gap: 10px; }
-    .search-input {
-      flex: 1;
-      padding: 10px 14px;
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      color: white;
-      font-size: 0.95rem;
-      outline: none;
-    }
-    .search-input:focus { border-color: #38bdf8; }
-    .btn-search {
-      background: #38bdf8;
-      color: #0f172a;
-      border: none;
-      padding: 0 20px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
+
+    .title-area h2 {
+      margin: 0;
+      color: #f97316;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .filters-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
-    .fc-buttons-group { display: flex; gap: 6px; flex-wrap: wrap; }
-    .fc-chip {
-      background: #0f172a;
-      border: 1px solid #334155;
+    .title-area p {
+      margin: 4px 0 0 0;
+      font-size: 12px;
       color: #94a3b8;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 0.82rem;
-      font-weight: bold;
-      cursor: pointer;
-      user-select: none;
-    }
-    .fc-chip.active { background: #0284c7; color: white; border-color: #38bdf8; }
-
-    .filter-select {
-      background: #0f172a;
-      border: 1px solid #334155;
-      color: white;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      outline: none;
     }
 
-    /* Green Ribbon (KPI Banner) */
-    .green-ribbon {
-      background: linear-gradient(135deg, #15803d, #166534);
-      border: 1px solid #22c55e;
-      border-radius: 12px;
-      padding: 14px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 15px;
-    }
-    .ribbon-left { display: flex; flex-direction: column; gap: 3px; }
-    .ribbon-title { color: #dcfce7; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; }
-    .ribbon-sub { color: #f0fdf4; font-size: 1rem; font-weight: 800; }
-    
-    .ribbon-right { display: flex; gap: 25px; align-items: center; }
-    .ribbon-stat { text-align: right; }
-    .ribbon-val { font-size: 1.3rem; font-weight: 900; color: #86efac; }
-    .ribbon-label { font-size: 0.72rem; color: #dcfce7; font-weight: 700; text-transform: uppercase; }
-
-    /* SIP Card */
-    .sip-card {
-      background: #1e293b;
-      border: 1px solid #6366f1;
-      border-radius: 10px;
-      overflow: hidden;
-      display: none;
-    }
-    .sip-card-header {
-      background: #312e81;
-      padding: 10px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .sip-card-title { color: #e0e7ff; font-weight: 700; font-size: 0.9rem; }
-    .sip-pdf-btn {
-      background: #4f46e5;
+    .back-btn {
+      background: #f97316;
       color: white;
       text-decoration: none;
-      padding: 5px 12px;
+      padding: 8px 16px;
       border-radius: 6px;
-      font-size: 0.78rem;
-      font-weight: bold;
+      font-weight: 600;
+      font-size: 13px;
+      transition: 0.2s;
     }
-    .sip-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-    .sip-table th { background: #1e293b; color: #94a3b8; text-align: left; padding: 8px 16px; border-bottom: 1px solid #334155; }
-    .sip-table td { padding: 8px 16px; border-bottom: 1px solid #293548; color: #e2e8f0; }
 
-    /* Data Table View */
-    .table-wrapper {
+    .back-btn:hover {
+      background: #ea580c;
+    }
+
+    .search-filter-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 260px;
+      padding: 10px 14px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      color: white;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: #38bdf8;
+    }
+
+    .record-badge {
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #38bdf8;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+    }
+
+    .table-container {
       overflow-x: auto;
       background: #1e293b;
       border-radius: 10px;
       border: 1px solid #334155;
-      max-height: 520px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
     }
-    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; white-space: nowrap; text-align: left; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 12.5px;
+      white-space: nowrap;
+    }
+
     th {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      padding: 10px 12px;
-      font-weight: 700;
-      text-transform: uppercase;
       background: #0284c7;
       color: white;
+      padding: 12px 14px;
+      font-weight: 600;
+      border-right: 1px solid #0369a1;
     }
-    th.th-yellow { background: #d97706; }
-    td { padding: 8px 12px; border-bottom: 1px solid #293548; color: #cbd5e1; }
-    tbody tr:hover { background: #243247; }
-    
-    .view-more-btn {
-      width: 100%;
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: #38bdf8;
-      padding: 10px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      text-align: center;
+
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #334155;
+      border-right: 1px solid #334155;
+    }
+
+    tr:nth-child(even) {
+      background: #162032;
+    }
+
+    tr:hover {
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    .btn-view-pdf {
+      background: #ef4444;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 11.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: 0.2s;
+    }
+
+    .btn-view-pdf:hover {
+      background: #dc2626;
+      transform: scale(1.03);
+    }
+
+    .cust-badge {
+      background: rgba(249, 115, 22, 0.15);
+      color: #f97316;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 11px;
     }
   </style>
 </head>
 <body>
 
-<div class="app-container">
-  <!-- Header Bar -->
   <div class="top-header">
-    <div class="header-title-group">
-      <h1>Milestone Gear Limited &mdash; Unit 7</h1>
-      <p>Heat Treatment Quality &amp; Process Data Master Dashboard</p>
+    <div class="title-area">
+      <h2>📋 Process Data & Standard Inspection Procedures (SIPs)</h2>
+      <p>Instant Search across all Heat Treatment SIPs & Customer Drawings</p>
     </div>
-    <button onclick="window.location.href='index.html'" class="btn-back-home">&larr; Back to Home</button>
+    <a href="index.html" class="back-btn">⬅ Back to Dashboard</a>
   </div>
 
-  <!-- Search & Multi Filters -->
-  <div class="search-filter-card">
-    <div class="search-row">
-      <input type="text" id="searchInput" class="search-input" placeholder="Search by MS No, Part No, Batch Code, or Customer..." oninput="ProcessModule.applyFilter()">
-      <button class="btn-search" onclick="ProcessModule.applyFilter()">Search</button>
-    </div>
-    <div class="filters-grid">
-      <div class="fc-buttons-group" id="fcGroup">
-        <span class="fc-chip active" onclick="ProcessModule.toggleFC('ALL', this)">ALL F/C</span>
-        <span class="fc-chip" onclick="ProcessModule.toggleFC('1', this)">SQF 1</span>
-        <span class="fc-chip" onclick="ProcessModule.toggleFC('2', this)">SQF 2</span>
-        <span class="fc-chip" onclick="ProcessModule.toggleFC('3', this)">SQF 3</span>
-        <span class="fc-chip" onclick="ProcessModule.toggleFC('4', this)">SQF 4</span>
-      </div>
-      <select class="filter-select" id="custFilter" onchange="ProcessModule.applyFilter()">
-        <option value="">Customer: All</option>
-        <option value="JCB">JCB</option>
-        <option value="CNH">CNH</option>
-        <option value="KUBOTA">KUBOTA</option>
-        <option value="TAFE">TAFE</option>
-        <option value="ESCORTS">ESCORTS</option>
-        <option value="TMTL">TMTL</option>
-        <option value="KESSLER">KESSLER+CO</option>
-        <option value="UGA">UGA</option>
-        <option value="JOHN DEERE">JOHN DEERE</option>
-      </select>
-      <input type="date" class="filter-select" id="dateFilter" onchange="ProcessModule.applyFilter()">
-    </div>
+  <div class="search-filter-bar">
+    <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search by Part No, Part Name, Customer, Drawing No..." onkeyup="filterSips()">
+    <div class="record-badge" id="recordCount">Loading records...</div>
   </div>
 
-  <!-- Green Ribbon (KPI Banner) -->
-  <div class="green-ribbon">
-    <div class="ribbon-left">
-      <div class="ribbon-title" id="ribbonTitle">TOTAL PRODUCTION SUMMARY</div>
-      <div class="ribbon-sub" id="ribbonSub">Total Hardened: 0 pcs</div>
-    </div>
-    <div class="ribbon-right">
-      <div class="ribbon-stat">
-        <div class="ribbon-val" id="weightVal">-- kg</div>
-        <div class="ribbon-label">WT / PC</div>
-      </div>
-      <div class="ribbon-stat">
-        <div class="ribbon-val" id="lotQtyVal">--</div>
-        <div class="ribbon-label">LOT QTY</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SIP Inspection Card -->
-  <div class="sip-card" id="sipCard">
-    <div class="sip-card-header">
-      <div class="sip-card-title" id="sipTitle">📋 Inspection Standard (SIP)</div>
-      <a href="#" target="_blank" id="sipPdfLink" class="sip-pdf-btn">Open SIP PDF</a>
-    </div>
-    <table class="sip-table">
+  <div class="table-container">
+    <table>
       <thead>
-        <tr><th>Inspection Parameter</th><th>Standard Specification</th></tr>
+        <tr>
+          <th style="width: 50px; text-align: center;">SR</th>
+          <th>PART NUMBER</th>
+          <th>PART / PROCESS NAME</th>
+          <th>CUSTOMER</th>
+          <th>DRAWING NO</th>
+          <th>REVISION</th>
+          <th style="text-align: center;">ACTION</th>
+        </tr>
       </thead>
       <tbody id="sipTableBody"></tbody>
     </table>
   </div>
 
-  <!-- Process Data Master Table -->
-  <div class="table-wrapper">
-    <table>
-      <thead>
-        <tr>
-          <th>DATE</th><th>CUSTOMER</th><th>PART NO</th><th>BATCH NO</th><th>HEAT CODE</th><th>F/C NO</th>
-          <th>QTY</th><th>S.H</th><th>PCD</th><th>RCD</th><th>CORE</th><th>ECD</th>
-          <th>REMARK/RETEMP</th><th>AFTER GRIND</th>
-          <th class="th-yellow">EQUALISE</th><th class="th-yellow">CARBURISING</th><th class="th-yellow">DIFFUSION</th>
-          <th class="th-yellow">HARDENING</th><th class="th-yellow">QUENCHING</th><th class="th-yellow">TEMPERING</th>
-          <th class="th-yellow">REMARKS/LOADING</th>
-        </tr>
-      </thead>
-      <tbody id="processTableBody">
-        <tr><td colspan="21" style="text-align:center; padding: 25px;">Loading process records...</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <button id="viewMoreBtn" class="view-more-btn" onclick="ProcessModule.showMoreRecords()" style="display: none;">🔽 View More Records</button>
-</div>
+  <!-- Master Data Source File -->
+  <script src="data.js"></script>
 
-<!-- Extra weight / SIP Data Scripts (If existing locally) -->
-<script src="weightData.js"></script>
-<script src="sipData.js"></script>
+  <script>
+    let allSips = [];
 
-<script>
-  const sheetURL = "https://script.google.com/macros/s/AKfycbwLTtuxqMhRaDnnKQ_DC8rRsogKD5sgZf86oH101ivDgI3fkiBUzuRAKaRMcMzrUJnk/exec";
-  const CACHE_KEY = "mgl_plant_offline_master_data";
-
-  const ProcessModule = (() => {
-    let masterRecords = [];
-    let displayedRecords = [];
-    let limit = 50;
-    let selectedFC = "ALL";
-    let weightMap = {};
-    let sipMap = {};
-
-    function formatOnlyDate(val) {
-      if (!val || val === '-' || val === 'N/A') return '-';
-      let str = String(val).trim();
-      if (str.includes('T')) str = str.split('T')[0];
-      let parts = str.split(/[-/]/);
-      if (parts.length === 3 && parts[0].length === 4) {
-        return `${parts[2].padStart(2, '0')}-${parts[1].padStart(2, '0')}-${parts[0]}`;
-      }
-      if (parts.length === 3 && parts[2].length === 4) {
-        return `${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}-${parts[2]}`;
-      }
-      return str;
-    }
-
-    function parseUniversalDate(dateStr) {
-      if (!dateStr) return new Date(0);
-      let str = String(dateStr).trim();
-      if (str.includes('T') || (str.indexOf('-') === 4)) {
-        let d = new Date(str);
-        if (!isNaN(d.getTime())) return d;
-      }
-      let parts = str.split(/[-/]/);
-      if (parts.length === 3) {
-        let p1 = parseInt(parts[0], 10);
-        let p2 = parseInt(parts[1], 10) - 1;
-        let p3 = parseInt(parts[2], 10);
-        if (parts[0].length === 4) return new Date(p1, p2, p3);
-        if (p3 < 100) p3 += 2000;
-        return new Date(p3, p2, p1);
-      }
-      let fallback = new Date(str);
-      return isNaN(fallback.getTime()) ? new Date(0) : fallback;
-    }
-
-    async function init() {
-      // 1. Instant Cache Load
-      const cached = localStorage.getItem(CACHE_KEY);
-      if (cached) {
-        try { processIncomingData(JSON.parse(cached)); } catch(e) {}
-      }
-
-      // 2. Silent Background Sync
-      if (navigator.onLine) {
-        try {
-          const res = await fetch(sheetURL);
-          const liveData = await res.json();
-          localStorage.setItem(CACHE_KEY, JSON.stringify(liveData));
-          processIncomingData(liveData);
-        } catch(e) {
-          console.warn("Offline: Serving records from local cache.");
-        }
-      }
-    }
-
-    function processIncomingData(data) {
-      if (!data) return;
-
-      // Weight Map Sync
-      let wRows = data.WEIGHTLIST || data.weightList || [];
-      if (wRows.length > 1) {
-        weightMap = Object.fromEntries(wRows.slice(1).map(w => [String(w[0]).trim(), w[1]]));
-      } else if (typeof weightData !== 'undefined') {
-        weightMap = Object.fromEntries(weightData.map(w => [w.MS_NO, w.WT_PC]));
-      }
-
-      // SIP Map Sync
-      if (typeof sipData !== 'undefined') {
-        sipMap = sipData;
-      }
-
-      // Process Rows Sync
-      let pRows = data.process || data.processData || [];
-      if (pRows.length > 1) {
-        masterRecords = pRows.slice(1).map(r => ({
-          dateObj: parseUniversalDate(r[0]),
-          date: formatOnlyDate(r[0]),
-          customer: r[1] || '',
-          partNo: r[2] || '',
-          batch: r[3] || '',
-          heat: r[4] || '',
-          fc: String(r[5] || '').replace('SQF-', '').replace('.0', ''),
-          qty: parseInt(r[6], 10) || 0,
-          sh: r[7] || '', pcd: r[8] || '', rcd: r[9] || '', core: r[10] || '', ecd: r[11] || '',
-          remRetemp: r[12] || '', afterGrind: r[13] || '', equalise: r[14] || '',
-          carb: r[15] || '', diff: r[16] || '', hard: r[17] || '', quench: r[18] || '',
-          temp: r[19] || '', remarks: r[20] || ''
-        }));
-
-        // Recent Date on Top (Descending Sort)
-        masterRecords.sort((a, b) => b.dateObj - a.dateObj);
-        applyFilter();
-      }
-    }
-
-    function toggleFC(fc, btn) {
-      selectedFC = fc;
-      document.querySelectorAll('.fc-chip').forEach(c => c.classList.remove('active'));
-      btn.classList.add('active');
-      applyFilter();
-    }
-
-    function applyFilter() {
-      const q = document.getElementById('searchInput').value.toLowerCase().trim();
-      const cust = document.getElementById('custFilter').value.toLowerCase();
-      const dateVal = document.getElementById('dateFilter').value;
-
-      displayedRecords = masterRecords.filter(r => {
-        const matchesQuery = !q || Object.values(r).some(v => String(v).toLowerCase().includes(q));
-        const matchesCust = !cust || r.customer.toLowerCase().includes(cust);
-        const matchesFC = selectedFC === "ALL" || r.fc === selectedFC;
-        
-        let matchesDate = true;
-        if (dateVal) {
-          let formattedFilterDate = formatOnlyDate(dateVal);
-          matchesDate = r.date === formattedFilterDate;
-        }
-
-        return matchesQuery && matchesCust && matchesFC && matchesDate;
-      });
-
-      limit = 50;
-      renderTable();
-      updateRibbonAndSIP();
-    }
-
-    function updateRibbonAndSIP() {
-      let totalQty = displayedRecords.reduce((sum, r) => sum + r.qty, 0);
-      document.getElementById('ribbonSub').innerText = `Total Hardened: ${totalQty.toLocaleString('en-IN')} pcs`;
-
-      if (displayedRecords.length > 0) {
-        let first = displayedRecords[0];
-        let partKey = String(first.partNo).trim();
-        
-        document.getElementById('ribbonTitle').innerText = `PART NO: ${partKey} · CUSTOMER: ${first.customer}`;
-        document.getElementById('weightVal').innerText = (weightMap[partKey] || "4.5") + " kg";
-        document.getElementById('lotQtyVal').innerText = first.qty || "--";
-
-        // SIP Card Render
-        const sipCard = document.getElementById('sipCard');
-        const sipTableBody = document.getElementById('sipTableBody');
-        let sipMatchKey = Object.keys(sipMap).find(k => partKey.includes(k));
-
-        if (sipMatchKey && sipMap[sipMatchKey]) {
-          let sipObj = sipMap[sipMatchKey];
-          document.getElementById('sipTitle').innerText = `📋 SIP Standard: ${sipObj.sip} (${sipObj.part || partKey})`;
-          document.getElementById('sipPdfLink').href = sipObj.url || "#";
-
-          let sHtml = "";
-          if (sipObj.rows) {
-            sipObj.rows.forEach(row => {
-              sHtml += `<tr><td><strong>${row.p}</strong></td><td>${row.v}</td></tr>`;
-            });
-          }
-          sipTableBody.innerHTML = sHtml;
-          sipCard.style.display = "block";
-        } else {
-          sipCard.style.display = "none";
-        }
+    function initSipModule() {
+      if (typeof plantMasterData !== 'undefined' && plantMasterData.sips) {
+        allSips = plantMasterData.sips;
+        renderSipRows(allSips);
       } else {
-        document.getElementById('ribbonTitle').innerText = "NO MATCHING RECORDS";
-        document.getElementById('weightVal').innerText = "-- kg";
-        document.getElementById('lotQtyVal').innerText = "--";
-        document.getElementById('sipCard').style.display = "none";
+        document.getElementById('sipTableBody').innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px; color: #ef4444;">No SIP records found in data.js</td></tr>`;
       }
     }
 
-    function renderTable() {
-      const tbody = document.getElementById('processTableBody');
-      const viewMoreBtn = document.getElementById('viewMoreBtn');
-      tbody.innerHTML = "";
+    function renderSipRows(rows) {
+      const tbody = document.getElementById('sipTableBody');
+      document.getElementById('recordCount').innerText = `Total SIPs: ${rows.length}`;
 
-      if (displayedRecords.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="21" style="text-align:center; padding: 25px; color:#94a3b8;">No matching process records found.</td></tr>`;
-        viewMoreBtn.style.display = "none";
+      if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px; color: #94a3b8;">No matching SIPs found.</td></tr>`;
         return;
       }
 
-      let slice = displayedRecords.slice(0, limit);
       let html = "";
+      rows.forEach((r, idx) => {
+        const partNo = r[0] || '-';
+        const partName = r[1] || '-';
+        const customer = r[2] || '-';
+        const dwgNo = r[3] || '-';
+        const rev = r[4] || '-';
+        const driveLink = r[5] || '#';
 
-      slice.forEach(r => {
         html += `
           <tr>
-            <td style="color:#38bdf8; font-weight:bold;">${r.date}</td>
-            <td>${r.customer}</td>
-            <td style="font-weight:600;">${r.partNo}</td>
-            <td>${r.batch}</td>
-            <td>${r.heat}</td>
-            <td><span style="background:#0f172a; padding:2px 6px; border-radius:4px; color:#38bdf8;">SQF-${r.fc}</span></td>
-            <td style="color:#4ade80; font-weight:bold;">${r.qty}</td>
-            <td>${r.sh}</td><td>${r.pcd}</td><td>${r.rcd}</td><td>${r.core}</td><td>${r.ecd}</td>
-            <td>${r.remRetemp}</td><td>${r.afterGrind}</td>
-            <td>${r.equalise}</td><td>${r.carb}</td><td>${r.diff}</td>
-            <td>${r.hard}</td><td>${r.quench}</td><td>${r.temp}</td><td>${r.remarks}</td>
+            <td style="text-align: center; color: #94a3b8; font-weight: 500;">${idx + 1}</td>
+            <td style="font-weight: 700; color: #38bdf8;">${partNo}</td>
+            <td style="font-weight: 600; color: #f8fafc;">${partName}</td>
+            <td><span class="cust-badge">${customer}</span></td>
+            <td style="color: #cbd5e1;">${dwgNo}</td>
+            <td><span style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 2px 7px; border-radius: 4px; font-weight: bold; font-size: 11px;">${rev}</span></td>
+            <td style="text-align: center;">
+              <a href="${driveLink}" target="_blank" class="btn-view-pdf">📄 Open SIP</a>
+            </td>
           </tr>
         `;
       });
-
       tbody.innerHTML = html;
+    }
 
-      if (displayedRecords.length > limit) {
-        viewMoreBtn.style.display = "block";
-      } else {
-        viewMoreBtn.style.display = "none";
+    function filterSips() {
+      const q = document.getElementById('searchInput').value.toLowerCase().trim();
+      if (!q) {
+        renderSipRows(allSips);
+        return;
       }
+
+      const filtered = allSips.filter(r => 
+        (r[0] && r[0].toLowerCase().includes(q)) ||
+        (r[1] && r[1].toLowerCase().includes(q)) ||
+        (r[2] && r[2].toLowerCase().includes(q)) ||
+        (r[3] && r[3].toLowerCase().includes(q))
+      );
+      renderSipRows(filtered);
     }
 
-    function showMoreRecords() {
-      limit += 50;
-      renderTable();
-    }
-
-    return {
-      init,
-      toggleFC,
-      applyFilter,
-      showMoreRecords
-    };
-  })();
-
-  window.addEventListener('DOMContentLoaded', () => {
-    ProcessModule.init();
-  });
-</script>
+    window.addEventListener('DOMContentLoaded', initSipModule);
+  </script>
 </body>
 </html>
