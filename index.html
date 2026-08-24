@@ -36,7 +36,7 @@
     .cqi-text-content p { margin: 0; font-size: 13px; color: #fef08a; font-weight: 300; line-height: 1.5; }
     .about-us-btn { background: #f97316; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(249,115,22,0.3); }
 
-    /* होम स्क्रीन क्लीन एक्शन बटन्स */
+    /* एक्शन बटन्स */
     .action-buttons-bar { display: flex; gap: 12px; margin: 15px 20px; max-width: 1200px; margin-left: auto; margin-right: auto; width: calc(100% - 40px); box-sizing: border-box; }
     .action-btn { flex: 1; background: #1e293b; padding: 12px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
     .action-btn.updates { color: #3b82f6; border: 1px solid #3b82f6; }
@@ -66,7 +66,7 @@
     .about-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 2000; }
     .about-box { background: #1e293b; border: 1px solid #f97316; border-radius: 12px; width: 90%; max-width: 950px; display: flex; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.8); overflow: hidden; max-height: 85vh; }
     .about-close-btn { position: absolute; top: 12px; right: 18px; color: #94a3b8; font-size: 26px; cursor: pointer; z-index: 9999; background: rgba(15, 23, 42, 0.7); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.3s; }
-    .about- close-btn:hover { color: #f97316; background: rgba(249, 115, 22, 0.2); transform: rotate(90deg); }
+    .about-close-btn:hover { color: #f97316; background: rgba(249, 115, 22, 0.2); transform: rotate(90deg); }
     .about-img-sec { flex: 1; background: #000; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; padding: 10px; }
     .about-img-sec img { width: 100%; height: calc(50% - 5px); object-fit: cover; border-radius: 6px; opacity: 0.9; border: 1px solid #334155; }
     .about-text-sec { flex: 1.3; padding: 35px; display: flex; flex-direction: column; justify-content: center; overflow-y: auto; }
@@ -93,7 +93,7 @@
     .managed-name { color: #f97316; font-weight: 600; }
     .wa-contact-btn { display: flex; align-items: center; gap: 6px; background: #25D366; color: white; padding: 5px 10px; border-radius: 20px; text-decoration: none; font-weight: 600; font-size: 11.5px; }
 
-    /* लाइटबॉक्स और लॉगिन मॉडल्स */
+    /* लाइटबॉक्स और लॉगिन */
     .image-viewer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 3000; display: none; justify-content: center; align-items: center; flex-direction: column; }
     .image-viewer img { max-width: 90%; max-height: 80vh; border-radius: 10px; border: 3px solid #f97316; object-fit: contain; }
     .close-viewer { position: absolute; top: 20px; right: 30px; font-size: 40px; color: white; cursor: pointer; }
@@ -148,7 +148,7 @@
     </div>
   </div>
 
-  <!-- होम स्क्रीन के दो क्लीन एक्शन बटन्स -->
+  <!-- होम स्क्रीन एक्शन बटन्स -->
   <div class="action-buttons-bar">
     <button class="action-btn updates" onclick="openUpdatesModal()">📢 Daily Updates & Form</button>
     <button class="action-btn alerts" onclick="openAlertsModal()">⚠️ Calibration & System Alerts</button>
@@ -174,7 +174,7 @@
   </div>
 
  <!-- D-shooting & Calibration Full Popup Modal -->
-<div id="alertsModal" class="custom-modal">
+ <div id="alertsModal" class="custom-modal">
   <div class="modal-content-box" style="max-width: 900px; width: 95%; max-height: 90vh;">
     <div class="modal-header">
       <h3 style="color: #ef4444; margin: 0; font-size: 16px;">⚙️ D-shooting Status & Calibration Alerts</h3>
@@ -183,7 +183,7 @@
     
     <div class="modal-body" style="padding: 20px; overflow-y: auto;">
       
-      <!-- 1. D-shooting सुंदर टेबल (ऊपर की तरफ) -->
+      <!-- 1. D-shooting सुंदर टेबल -->
       <div style="margin-bottom: 25px;">
         <h4 style="color: #38bdf8; border-bottom: 2px solid #38bdf8; padding-bottom: 6px; margin-bottom: 12px; font-size: 14px;">📊 D-shooting Schedule & Machine Status</h4>
         <div style="overflow-x: auto; background: #0f172a; border-radius: 8px; border: 1px solid #334155;">
@@ -198,13 +198,13 @@
               </tr>
             </thead>
             <tbody id="dShootingTableBody">
-              <tr><td colspan="5" style="padding: 15px; color: #94a3b8; text-align: center;">Loading D-shooting data from sheet...</td></tr>
+              <tr><td colspan="5" style="padding: 15px; color: #94a3b8; text-align: center;">Loading D-shooting data...</td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- 2. Calibration Due & Overdue List (नीचे की तरफ) -->
+      <!-- 2. Calibration Due & Overdue List -->
       <div>
         <h4 style="color: #f59e0b; border-bottom: 2px solid #f59e0b; padding-bottom: 6px; margin-bottom: 12px; font-size: 14px;">🔔 Calibration Due & Overdue Alerts</h4>
         <div id="popupAlertsList" style="font-size: 12px; color: #cbd5e1;">Loading calibration alerts...</div>
@@ -212,7 +212,8 @@
 
     </div>
   </div>
-</div>
+ </div>
+
   <!-- मॉड्यूल्स ग्रिड -->
   <main class="main-content">
     <div class="grid-container">
@@ -249,35 +250,7 @@
     </div>
   </main>
 
-  <!-- Process Data Full Dashboard View -->
-  <div id="process-dashboard-view" style="display:none; padding: 20px; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-      <h2 style="color: #38bdf8; margin: 0;">📊 Process Data & Quality Dashboard</h2>
-      <button onclick="closeProcessDashboard()" style="background: #ef4444; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">Logout / Back</button>
-    </div>
-    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-      <input type="text" id="search-input" placeholder="Enter Batch Code or MS Number..." style="flex: 1; padding: 12px 15px; background: #1e293b; border: 1px solid #334155; color: white; border-radius: 8px; font-size: 15px; outline: none;">
-      <button onclick="filterProcessData()" style="padding: 0 25px; background: #0284c7; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Search</button>
-    </div>
-    <div style="overflow-x: auto; background: #1e293b; border-radius: 8px; border: 1px solid #334155;">
-      <table style="width: 100%; border-collapse: collapse; white-space: nowrap;">
-        <thead>
-          <tr style="background: #0891b2; color: white;">
-            <th style="padding: 12px; font-size: 13px; text-align: left;">DATE</th>
-            <th style="padding: 12px; font-size: 13px; text-align: left;">CUSTOMER NAME</th>
-            <th style="padding: 12px; font-size: 13px; text-align: left;">PART NO</th>
-            <th style="padding: 12px; font-size: 13px; text-align: left;">BATCH NO</th>
-            <th style="padding: 12px; font-size: 13px; text-align: left;">HEAT CODE</th>
-            <th style="padding: 12px; font-size: 13px; text-align: left;">F/C NO</th>
-            <th style="padding: 12px; font-size: 13px; text-align: left;">QTY</th>
-          </tr>
-        </thead>
-        <tbody id="process-table-body"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- फुटर (Global Customers, Treated Components & Location Restored) -->
+  <!-- फुटर -->
   <footer class="main-footer">
     <div class="footer-grid">
       <div class="footer-showcase">
@@ -357,8 +330,8 @@
     </div>
   </div>
 
-  <!-- मुख्य जावास्क्रिप्ट लॉजिक -->
-   <script>
+  <!-- मास्टर जावास्क्रिप्ट लॉजिक (Offline-First Superfast Engine) -->
+  <script>
     let currentTemp = "32°C";
     function updateDateTime() {
       const now = new Date();
@@ -382,157 +355,229 @@
     function openProcessLogin() { document.getElementById('process-login-modal').style.display = 'flex'; }
     function closeProcessLogin() { document.getElementById('process-login-modal').style.display = 'none'; }
 
-  function verifyProcessLogin() {
-  const id = document.getElementById('emp-id').value.trim();
-  const pass = document.getElementById('emp-pass').value.trim();
-  const msgBox = document.getElementById('login-msg');
-  msgBox.style.display = "block";
-  
-  if (authorizedEmployees[id] && authorizedEmployees[id] === pass) {
-    msgBox.style.color = "#22c55e"; 
-    msgBox.innerHTML = "✅ Access Granted!";
-    setTimeout(() => {
-      closeProcessLogin();
-      // यहाँ सीधे नए डैशबोर्ड वाली फाइल पर रीडायरेक्ट कर देगा
-      window.location.href = "process.html"; 
-    }, 500);
-  } else {
-    msgBox.style.color = "#ef4444"; 
-    msgBox.innerHTML = "❌ Invalid ID or Password!";
-  }
-}
-
-    function closeProcessDashboard() {
-      document.getElementById('process-dashboard-view').style.display = 'none';
-      document.querySelector('.cqi-banner').style.display = 'flex';
-      document.querySelector('.action-buttons-bar').style.display = 'flex';
-      document.querySelector('.main-content').style.display = 'flex';
+    function verifyProcessLogin() {
+      const id = document.getElementById('emp-id').value.trim();
+      const pass = document.getElementById('emp-pass').value.trim();
+      const msgBox = document.getElementById('login-msg');
+      msgBox.style.display = "block";
+      
+      if (authorizedEmployees[id] && authorizedEmployees[id] === pass) {
+        msgBox.style.color = "#22c55e"; 
+        msgBox.innerHTML = "✅ Access Granted!";
+        setTimeout(() => {
+          closeProcessLogin();
+          window.location.href = "process.html"; 
+        }, 500);
+      } else {
+        msgBox.style.color = "#ef4444"; 
+        msgBox.innerHTML = "❌ Invalid ID or Password!";
+      }
     }
 
-    const sheetURL = "https://script.google.com/macros/s/AKfycbyNn7YoW87zJeXyFejqOK122FscGeAKi0b-eTXVgybUtnXR8Ots4YvNxQhzn2uicwo0/exec";
+    const sheetURL = "https://script.google.com/macros/s/AKfycbwLTtuxqMhRaDnnKQ_DC8rRsogKD5sgZf86oH101ivDgI3fkiBUzuRAKaRMcMzrUJnk/exec";
+    const CACHE_KEY = "mgl_plant_offline_master_data";
 
-    function openUpdatesModal() { document.getElementById('updatesModal').style.display = 'flex'; fetchUpdatesFromSheet(); }
+    // 🎯 सुपर स्ट्रॉन्ग डेट फॉर्मेटर (बिना किसी टाइम/ISO के सिर्फ DD-MM-YYYY)
+    function formatOnlyDate(val) {
+      if (!val || val === '-' || val === 'N/A') return '-';
+      let str = String(val).trim();
+      if (str.includes('T')) str = str.split('T')[0];
+      
+      let parts = str.split(/[-/]/);
+      if (parts.length === 3 && parts[0].length === 4) {
+        let y = parts[0], m = parts[1].padStart(2, '0'), d = parts[2].padStart(2, '0');
+        return `${d}-${m}-${y}`;
+      }
+      if (parts.length === 3 && parts[2].length === 4) {
+        let d = parts[0].padStart(2, '0'), m = parts[1].padStart(2, '0'), y = parts[2];
+        return `${d}-${m}-${y}`;
+      }
+      
+      let parsed = new Date(str);
+      if (!isNaN(parsed.getTime()) && parsed.getFullYear() > 2000) {
+        let d = String(parsed.getDate()).padStart(2, '0');
+        let m = String(parsed.getMonth() + 1).padStart(2, '0');
+        let y = parsed.getFullYear();
+        return `${d}-${m}-${y}`;
+      }
+      return str;
+    }
+
+    // ⚡ 1. Stale-While-Revalidate Engine (Instant Cache Load + Background Live Sync)
+    async function getOfflineFirstData() {
+      // कैशे से तुरंत डेटा उठाकर दिखाओ (0 मिलीसेकंड)
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        try {
+          renderUIFromData(JSON.parse(cached));
+        } catch(e) { console.error("Cache parsing error", e); }
+      }
+
+      // बैकग्राउंड में साइलेंट लाइव फेच
+      if (navigator.onLine) {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 9000);
+          const res = await fetch(sheetURL, { signal: controller.signal });
+          clearTimeout(timeoutId);
+          const liveData = await res.json();
+          localStorage.setItem(CACHE_KEY, JSON.stringify(liveData));
+          renderUIFromData(liveData);
+        } catch (e) {
+          console.warn("Background fetch skipped/failed, app running on cached data.");
+        }
+      }
+    }
+
+    // ⚡ 2. डेटा को UI में रेंडर करने का मास्टर फंक्शन
+    function renderUIFromData(data) {
+      if (!data) return;
+
+      // --- D-Shooting Render (Machine Name = SQF-1, SQF-2...) ---
+      let dShootingRows = [];
+      for (let key in data) {
+        if (key.toLowerCase().includes('d-shooting') || key.toLowerCase().includes('dshooting')) {
+          dShootingRows = data[key];
+          break;
+        }
+      }
+      const dShootingTbody = document.getElementById('dShootingTableBody');
+      if (dShootingTbody && dShootingRows && dShootingRows.length > 1) {
+        let rows = dShootingRows.slice(1);
+        let dHtml = "";
+        rows.forEach((row, index) => {
+          let bgStyle = index % 2 === 0 ? "background: #1e293b;" : "background: #0f172a;";
+          let machineName = row[1] || row[0] || 'N/A';
+          let junVal = formatOnlyDate(row[2]);
+          let julVal = formatOnlyDate(row[3]);
+          let augVal = formatOnlyDate(row[4]);
+          let dueVal = formatOnlyDate(row[5] || row[4]);
+
+          dHtml += `
+            <tr style="${bgStyle} border-bottom: 1px solid #334155;">
+              <td style="padding: 10px 12px; text-align: left; color: #f8fafc; font-weight: 600; border-right: 1px solid #334155;">${machineName}</td>
+              <td style="padding: 10px 12px; color: #cbd5e1; border-right: 1px solid #334155;">${junVal}</td>
+              <td style="padding: 10px 12px; color: #cbd5e1; border-right: 1px solid #334155;">${julVal}</td>
+              <td style="padding: 10px 12px; color: #cbd5e1; border-right: 1px solid #334155;">${augVal}</td>
+              <td style="padding: 10px 12px; color: #38bdf8; font-weight: bold;">${dueVal}</td>
+            </tr>
+          `;
+        });
+        dShootingTbody.innerHTML = dHtml;
+      }
+
+      // --- Calibration 45-Days Alert Render ---
+      let calibrationRows = [];
+      for (let key in data) {
+        if (key.toLowerCase().includes('calibration')) {
+          calibrationRows = data[key];
+          break;
+        }
+      }
+      const alertContainer = document.getElementById('popupAlertsList');
+      if (alertContainer && calibrationRows && calibrationRows.length > 1) {
+        let rows = calibrationRows.slice(1);
+        let today = new Date();
+        let alertItems = [];
+
+        rows.forEach(r => {
+          let instrumentId = r[0] ? `ID: ${r[0]}` : '';
+          let instrumentName = r[1] || r[0] || 'Instrument';
+          let targetDueDate = null;
+          let originalDateStr = '';
+
+          for (let i = 2; i < r.length; i++) {
+            let cellVal = String(r[i]).trim();
+            if (cellVal.includes('T') || cellVal.includes('-') || cellVal.includes('/')) {
+              let parsed = new Date(cellVal.split('T')[0]);
+              if (!isNaN(parsed.getTime()) && parsed.getFullYear() >= 2024) {
+                targetDueDate = parsed;
+                originalDateStr = cellVal;
+                break;
+              }
+            }
+          }
+
+          if (targetDueDate) {
+            let diffTime = targetDueDate - today;
+            let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays <= 45) {
+              alertItems.push({
+                id: instrumentId,
+                name: instrumentName,
+                dueDateFormatted: formatOnlyDate(originalDateStr),
+                diffDays: diffDays
+              });
+            }
+          }
+        });
+
+        if (alertItems.length > 0) {
+          alertItems.sort((a, b) => a.diffDays - b.diffDays);
+          let html = "";
+          alertItems.forEach(item => {
+            let isOverdue = item.diffDays < 0;
+            let badgeColor = isOverdue ? "#ef4444" : "#f59e0b";
+            let statusText = isOverdue ? `🚨 Overdue by ${Math.abs(item.diffDays)} days` : `⏳ Due in ${item.diffDays} days`;
+
+            html += `
+              <div style="background:#1e293b; padding:10px 14px; border-radius:6px; margin-bottom:8px; border-left:4px solid ${badgeColor}; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <strong style="color: #f8fafc;">${item.name}</strong> <span style="color: #94a3b8; font-size: 11px;">(${item.id})</span>
+                  <div style="font-size: 11px; color: #38bdf8; margin-top: 2px;">Due: ${item.dueDateFormatted}</div>
+                </div>
+                <span style="color: ${badgeColor}; font-weight: bold; font-size: 12px;">${statusText}</span>
+              </div>
+            `;
+          });
+          alertContainer.innerHTML = html;
+        } else {
+          alertContainer.innerHTML = "<div style='color: #34d399; padding: 8px;'>✅ All calibrations are up to date!</div>";
+        }
+      }
+
+      // --- Daily Updates Render ---
+      let updatesRows = [];
+      for (let key in data) {
+        if (key.toLowerCase().includes('update')) {
+          updatesRows = data[key];
+          break;
+        }
+      }
+      const listDiv = document.getElementById('popupUpdatesList');
+      if (listDiv && updatesRows && updatesRows.length > 1) {
+        let rows = updatesRows.slice(1);
+        let html = "";
+        rows.forEach((r, i) => {
+          let msg = r[0] || r[1] || "";
+          if (msg) {
+            html += `<div style="background:#0f172a; padding:8px; border-radius:6px; margin-bottom:6px; border-left:3px solid #3b82f6;"><strong>Update ${i+1}:</strong> ${msg}</div>`;
+          }
+        });
+        listDiv.innerHTML = html || "No active updates found.";
+      }
+    }
+
+    // पेज लोड होते ही और पॉप-अप खुलते ही 0 सेकंड में डेटा लोड
+    window.addEventListener('DOMContentLoaded', getOfflineFirstData);
+
+    function openUpdatesModal() { 
+      document.getElementById('updatesModal').style.display = 'flex'; 
+      getOfflineFirstData(); 
+    }
     function closeUpdatesModal() { document.getElementById('updatesModal').style.display = 'none'; }
 
     function openAlertsModal() { 
       document.getElementById('alertsModal').style.display = 'flex'; 
-      fetchCalibrationAlertsFromSheet(); 
+      getOfflineFirstData(); 
     }
     function closeAlertsModal() { document.getElementById('alertsModal').style.display = 'none'; }
-
-    async function fetchUpdatesFromSheet() {
-      const listDiv = document.getElementById('popupUpdatesList');
-      listDiv.innerHTML = "Loading updates...";
-      try {
-        const res = await fetch(sheetURL);
-        const data = await res.json();
-        if (data.notices && data.notices.length > 0) {
-          let html = "";
-          data.notices.forEach((n, i) => { html += `<div style="background:#0f172a; padding:8px; border-radius:6px; margin-bottom:6px; border-left:3px solid #3b82f6;"><strong>Update ${i+1}:</strong> ${n}</div>`; });
-          listDiv.innerHTML = html;
-        } else {
-          listDiv.innerHTML = "No active updates found.";
-        }
-      } catch(e) { listDiv.innerHTML = "Failed to load updates."; }
-    }
-
-async function fetchCalibrationAlertsFromSheet() {
-  const alertContainer = document.getElementById('popupAlertsList');
-  const dShootingTbody = document.getElementById('dShootingTableBody');
-  
-  alertContainer.innerHTML = "Fetching calibration alerts...";
-  dShootingTbody.innerHTML = `<tr><td colspan="5" style="padding: 15px; text-align: center; color: #94a3b8;">Fetching D-shooting data...</td></tr>`;
-
-  try {
-    const res = await fetch(sheetURL);
-    const data = await res.json();
-    
-    // D-shooting सुंदर टेबल भरना
-    if (data.dShooting && data.dShooting.length > 0) {
-      let dHtml = "";
-      data.dShooting.forEach((row, index) => {
-        let bgStyle = index % 2 === 0 ? "background: #1e293b;" : "background: #0f172a;";
-        
-        // मान लेते हैं: row[0] = Serial/Extra, row[1] = Machine Name, row[2] = Jun, row[3] = Jul, row[4] = Aug, row[5] = Due Date
-        // अगर तुम्हारी शीट में मशीन का नाम सीधे पहले कॉलम (row[0]) पर है, तो इसे row[0] कर देना। 
-        // स्क्रीनशॉट के हिसाब से मशीन का नाम row[1] पर है और सीरियल नंबर row[0] पर है:
-        let machineName = row[1] || row[0] || 'N/A';
-        let junVal = row[2] || '-';
-        let julVal = row[3] || '-';
-        let augVal = row[4] || '-';
-        let dueVal = row[5] || row[4] || 'N/A';
-
-        dHtml += `
-          <tr style="${bgStyle} border-bottom: 1px solid #334155;">
-            <td style="padding: 10px 12px; text-align: left; color: #f8fafc; font-weight: 600; border-right: 1px solid #334155;">${machineName}</td>
-            <td style="padding: 10px 12px; color: #cbd5e1; border-right: 1px solid #334155;">${junVal}</td>
-            <td style="padding: 10px 12px; color: #cbd5e1; border-right: 1px solid #334155;">${julVal}</td>
-            <td style="padding: 10px 12px; color: #cbd5e1; border-right: 1px solid #334155;">${augVal}</td>
-            <td style="padding: 10px 12px; color: #38bdf8; font-weight: bold;">${dueVal}</td>
-          </tr>
-        `;
-      });
-      dShootingTbody.innerHTML = dHtml;
-    } else {
-      dShootingTbody.innerHTML = `<tr><td colspan="5" style="padding: 15px; text-align: center; color: #f59e0b;">No D-shooting records found.</td></tr>`;
-    }
-
-    // Calibration Alerts भरना (नीचे वाला हिस्सा)
-    if (data.alerts && data.alerts.length > 0) {
-      let html = "";
-      data.alerts.forEach(alertText => {
-        let color = alertText.includes("🚨") ? "#ef4444" : "#f59e0b";
-        html += `<div style="background:#1e293b; padding:8px 12px; border-radius:6px; margin-bottom:6px; border-left:3px solid ${color}; line-height:1.4;">${alertText}</div>`;
-      });
-      alertContainer.innerHTML = html;
-    } else {
-      alertContainer.innerHTML = "<div style='color: #34d399;'>✅ All calibrations are up to date!</div>";
-    }
-
-  } catch(e) {
-    console.error(e);
-    alertContainer.innerHTML = "<span style='color: #ef4444;'>Failed to load calibration alerts.</span>";
-    dShootingTbody.innerHTML = `<tr><td colspan="5" style="padding: 15px; text-align: center; color: #ef4444;">Failed to load D-shooting data.</td></tr>`;
-  }
-}
 
     function submitUpdateData(e) {
       e.preventDefault();
       alert("Update submitted successfully! It will go live after Admin approval.");
       closeUpdatesModal();
-    }
-
-    let globalProcessData = [];
-    function fetchProcessRecords() {
-      fetch(sheetURL)
-        .then(res => res.json())
-        .then(data => {
-          if(data.processData) {
-            globalProcessData = data.processData.slice(1);
-            renderProcessTable(globalProcessData);
-          }
-        });
-    }
-
-    function renderProcessTable(rows) {
-      const tbody = document.getElementById('process-table-body');
-      tbody.innerHTML = "";
-      rows.forEach(row => {
-        let tr = document.createElement('tr');
-        row.forEach(cell => {
-          let td = document.createElement('td');
-          td.style.padding = "10px 12px"; td.style.borderBottom = "1px solid #334155"; td.style.fontSize = "12px"; td.style.color = "#cbd5e1";
-          td.innerText = cell || "";
-          tr.appendChild(td);
-        });
-        tbody.appendChild(tr);
-      });
-    }
-
-    function filterProcessData() {
-      const q = document.getElementById('search-input').value.toLowerCase();
-      const filtered = globalProcessData.filter(r => r.some(c => String(c).toLowerCase().includes(q)));
-      renderProcessTable(filtered);
     }
   </script>
 </body>

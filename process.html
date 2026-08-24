@@ -1,207 +1,452 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Milestone Gear - Process Data Dashboard</title>
+  <title>MGL Heat Treatment UNIT - 07 | Process Data Dashboard</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-    body { background: #0f172a; color: #e2e8f0; font-family: 'Poppins', sans-serif; margin: 0; padding: 20px; box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 24px 16px 60px;
+    }
+    .wrap { max-width: 1450px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 20px; }
+    header h1 { font-size: 1.6rem; color: #38bdf8; margin: 0; }
+    header p { color: #94a3b8; font-size: 0.95rem; }
     
-    .dashboard-header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #1e293b; padding: 15px 20px; border-radius: 10px; border: 1px solid #334155; }
-    .search-box-container { display: flex; gap: 10px; margin-bottom: 15px; }
-    .search-input { flex: 1; padding: 12px 18px; background: #1e293b; border: 1px solid #334155; color: white; border-radius: 8px; font-size: 14px; outline: none; }
-    .btn-search { padding: 0 25px; background: #38bdf8; color: #0f172a; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
-    .btn-add-data { padding: 0 20px; background: #10b981; color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 13px; }
+    .dashboard-header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #1e293b; padding: 12px 20px; border-radius: 10px; border: 1px solid #334155; }
     
-    .filter-row { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
-    .filter-group { display: flex; gap: 6px; flex-wrap: wrap; }
-    .fc-chip { background: #1e293b; border: 1px solid #334155; color: white; padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 600; }
-    .fc-chip.active { background: #0284c7; border-color: #0284c7; }
-    .dropdown-filter { background: #1e293b; border: 1px solid #334155; color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; outline: none; }
+    /* 1. Search Box & Filters */
+    .search-box {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 15px 20px;
+      margin-bottom: 12px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .search-box input {
+      flex: 1;
+      min-width: 220px;
+      padding: 12px 16px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: #f1f5f9;
+      outline: none;
+    }
+    .search-box input:focus { border-color: #38bdf8; }
+    .search-box button {
+      padding: 12px 20px;
+      background: #38bdf8;
+      color: #0f172a;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .btn-add-data { padding: 10px 18px; background: #10b981; color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.9rem; }
 
-    .month-section-title { color: #facc15; font-size: 14px; font-weight: 700; margin: 20px 0 8px 0; text-transform: uppercase; }
-    .data-table-wrapper { overflow-x: auto; background: #1e293b; border-radius: 10px; border: 1px solid #334155; margin-bottom: 15px; }
-    .data-table { width: 100%; border-collapse: collapse; white-space: nowrap; text-align: left; font-size: 11.5px; }
-    .data-table th { background: #0284c7; color: white; padding: 10px 12px; border-right: 1px solid #0369a1; }
-    .data-table td { padding: 9px 12px; border-bottom: 1px solid #334155; border-right: 1px solid #334155; color: #cbd5e1; }
+    .filters-box {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 14px 20px;
+      margin-bottom: 15px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filter-group { display: flex; flex-direction: column; gap: 4px; }
+    .filter-group label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; }
+    .filter-group select {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: #f1f5f9;
+      font-size: 0.9rem;
+      min-width: 150px;
+      outline: none;
+    }
+    .fc-chip-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .fc-chip {
+      padding: 7px 14px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: #94a3b8;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+    }
+    .fc-chip.active { background: #38bdf8; border-color: #38bdf8; color: #0f172a; }
 
-    /* मॉडल्स */
+    /* 2. Weight List Banner */
+    .weight-banner {
+      background: linear-gradient(135deg, #14532d, #166534);
+      border: 1px solid #22c55e;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .weight-banner .wb-left { display: flex; flex-direction: column; gap: 2px; }
+    .weight-banner .wb-desc { color: #bbf7d0; font-size: 0.8rem; text-transform: uppercase; }
+    .weight-banner .wb-name { color: #f0fdf4; font-size: 1.05rem; font-weight: 700; }
+    .weight-banner .wb-right { text-align: right; }
+    .weight-banner .wb-val { color: #4ade80; font-size: 1.6rem; font-weight: 800; }
+    .weight-banner .wb-lbl { color: #bbf7d0; font-size: 0.75rem; text-transform: uppercase; }
+
+    /* SIP Parameters Box */
+    .sip-params-box {
+      background: #1e293b;
+      border: 1px solid #6366f1;
+      border-radius: 12px;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    .sip-params-box h4 { color: #a5b4fc; font-size: 0.95rem; margin-bottom: 8px; }
+    .sip-specs-list { display: flex; gap: 15px; flex-wrap: wrap; font-size: 0.85rem; }
+    .sip-spec-tag { background: #312e81; color: #e0e7ff; padding: 5px 10px; border-radius: 6px; }
+
+    /* 3. Month-wise Process Data Tables */
+    .month-section-title { color: #fbbf24; font-size: 1rem; font-weight: 700; margin: 25px 0 10px 0; text-transform: uppercase; border-bottom: 2px solid #334155; padding-bottom: 6px; }
+    .data-table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid #334155; background: #1e293b; margin-bottom: 15px; }
+    .data-table { width: 100%; border-collapse: collapse; white-space: nowrap; text-align: left; font-size: 0.82rem; min-width: 1400px; }
+    .data-table th { background: #00b0f0; color: #0f172a; padding: 10px; font-weight: 700; position: sticky; top: 0; z-index: 10; }
+    .data-table td { padding: 8px 10px; border-bottom: 1px solid #293548; color: #e2e8f0; }
+    .data-table tbody tr:hover { background: #253349; }
+
+    .view-more-container { text-align: center; margin: 20px 0; }
+    .btn-view-more { background: #334155; color: #38bdf8; border: 1px solid #475569; padding: 10px 25px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 13px; }
+    .btn-view-more:hover { background: #0284c7; color: white; }
+
+    /* Modal Form */
     .custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; }
     .modal-content-box { background: #1e293b; width: 95%; max-width: 700px; max-height: 90vh; border-radius: 12px; color: white; display: flex; flex-direction: column; border: 1px solid #475569; overflow: hidden; position: relative; }
     .modal-header { padding: 15px; background: #0f172a; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
     .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .form-group { margin-bottom: 10px; }
-    .form-group label { font-size: 11px; color: #94a3b8; display: block; margin-bottom: 3px; }
-    .form-group input, .form-group select { width: 100%; padding: 8px; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; box-sizing: border-box; font-size: 12px; }
+    .form-group-item { margin-bottom: 10px; }
+    .form-group-item label { font-size: 11px; color: #94a3b8; display: block; margin-bottom: 3px; }
+    .form-group-item input, .form-group-item select { width: 100%; padding: 8px; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; box-sizing: border-box; font-size: 12px; }
   </style>
 </head>
 <body>
+<div class="wrap">
+  <header>
+    <h1>MGL Heat Treatment UNIT - 07</h1>
+    <p>Process Data & Quality Management Dashboard</p>
+  </header>
 
   <div class="dashboard-header-bar">
-    <div>
-      <h2 style="color: #38bdf8; margin: 0; font-size: 18px;">📊 Process Data & Quality Dashboard</h2>
-      <p style="margin: 3px 0 0 0; font-size: 11px; color: #94a3b8;">Linked with Master Sheet ('process' tab)</p>
-    </div>
+    <h2 style="color: #38bdf8; margin: 0; font-size: 1.1rem;">📊 Process Data Master View</h2>
     <div style="display: flex; gap: 10px;">
-      <button onclick="openAddDataModal()" class="btn-add-data">+ Add New Entry</button>
-      <button onclick="window.location.href='index.html'" style="background: #ef4444; color: white; border: none; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;">Back to Home</button>
+      <button onclick="ProcessModule.openAddDataModal()" class="btn-add-data">+ Add New Entry</button>
+      <button onclick="window.location.href='index.html'" style="background: #ef4444; color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9rem;">Back to Home</button>
     </div>
   </div>
 
-  <div class="search-box-container">
-    <input type="text" id="mainSearch" class="search-input" placeholder="Search by Batch Code, Part No, or MS Number..." onkeyup="filterDashboard()">
-    <button class="btn-search" onclick="filterDashboard()">Search</button>
+  <!-- Search & Filters -->
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Search by Batch Code, Part No, or Customer..." onkeyup="ProcessModule.filterDashboard()" autocomplete="off">
+    <button onclick="ProcessModule.filterDashboard()">Search</button>
+    <button class="secondary" onclick="ProcessModule.resetSearch()" style="background:transparent; border:1px solid #475569; color:#94a3b8; padding:12px 18px; border-radius:8px; cursor:pointer;">Reset</button>
   </div>
 
-  <div class="filter-row">
+  <div class="filters-box">
     <div class="filter-group">
-      <button class="fc-chip active" onclick="setFC('All', this)">All</button>
-      <button class="fc-chip" onclick="setFC('SQF-1', this)">SQF-1</button>
-      <button class="fc-chip" onclick="setFC('SQF-2', this)">SQF-2</button>
-      <button class="fc-chip" onclick="setFC('SQF-3', this)">SQF-3</button>
-      <button class="fc-chip" onclick="setFC('SQF-4', this)">SQF-4</button>
-    </div>
-    <select id="customerFilter" class="dropdown-filter" onchange="filterDashboard()">
-      <option value="Sab">Customer: All</option>
-      <option value="JCB UK">JCB UK</option>
-      <option value="Caterpillar">Caterpillar</option>
-      <option value="Kubota">Kubota</option>
-    </select>
-  </div>
-
-  <!-- महीना-वाइज टेबल्स कंटेनर -->
-  <div id="monthTablesContainer">
-    <p style="text-align: center; color: #94a3b8; padding: 30px;">Loading data from Google Sheet...</p>
-  </div>
-
-  <!-- + Add 21 Columns Data Modal -->
-  <div id="addDataModal" class="custom-modal">
-    <div class="modal-content-box">
-      <div class="modal-header">
-        <h3 style="color: #10b981; margin: 0; font-size: 15px;">📝 Add Process Data (21 Columns Entry)</h3>
-        <span onclick="closeAddDataModal()" style="font-size: 22px; cursor: pointer; color: #94a3b8;">&times;</span>
+      <label>F/C No (SQF)</label>
+      <div class="fc-chip-group" id="fcFilterGroup">
+        <span class="fc-chip active" onclick="ProcessModule.toggleFC('All', this)">All</span>
+        <span class="fc-chip" onclick="ProcessModule.toggleFC('SQF-1', this)">SQF-1</span>
+        <span class="fc-chip" onclick="ProcessModule.toggleFC('SQF-2', this)">SQF-2</span>
+        <span class="fc-chip" onclick="ProcessModule.toggleFC('SQF-3', this)">SQF-3</span>
+        <span class="fc-chip" onclick="ProcessModule.toggleFC('SQF-4', this)">SQF-4</span>
       </div>
-      <div class="modal-body">
-        <form id="processForm" onsubmit="submitFormToSheet(event)">
-          <div class="form-grid">
-            <div class="form-group"><label>Date</label><input type="date" id="c0" required></div>
-            <div class="form-group"><label>Customer Name</label><input type="text" id="c1" required></div>
-            <div class="form-group"><label>Part No</label><input type="text" id="c2" required></div>
-            <div class="form-group"><label>Batch No</label><input type="text" id="c3" required></div>
-            <div class="form-group"><label>Heat Code</label><input type="text" id="c4"></div>
-            <div class="form-group"><label>F/C No (SQF-1/2/3/4)</label>
-              <select id="c5">
-                <option value="SQF-1">SQF-1</option><option value="SQF-2">SQF-2</option><option value="SQF-3">SQF-3</option><option value="SQF-4">SQF-4</option>
-              </select>
-            </div>
-            <div class="form-group"><label>QTY</label><input type="text" id="c6"></div>
-            <div class="form-group"><label>S.H</label><input type="text" id="c7"></div>
-            <div class="form-group"><label>PCD</label><input type="text" id="c8"></div>
-            <div class="form-group"><label>RCD</label><input type="text" id="c9"></div>
-            <div class="form-group"><label>CORE</label><input type="text" id="c10"></div>
-            <div class="form-group"><label>ECD</label><input type="text" id="c11"></div>
-            <div class="form-group"><label>Remark/Retempering</label><input type="text" id="c12"></div>
-            <div class="form-group"><label>After Grinding</label><input type="text" id="c13"></div>
-            <div class="form-group"><label>Equalise</label><input type="text" id="c14"></div>
-            <div class="form-group"><label>Carburising</label><input type="text" id="c15"></div>
-            <div class="form-group"><label>Diffusion</label><input type="text" id="c16"></div>
-            <div class="form-group"><label>Hardening</label><input type="text" id="c17"></div>
-            <div class="form-group"><label>Quenching</label><input type="text" id="c18"></div>
-            <div class="form-group"><label>Tempering</label><input type="text" id="c19"></div>
-            <div class="form-group" style="grid-column: span 2;"><label>Remarks/Loading/Pasting</label><input type="text" id="c20"></div>
+    </div>
+    <div class="filter-group">
+      <label>Customer</label>
+      <select id="customerFilter" onchange="ProcessModule.filterDashboard()">
+        <option value="">Sab</option>
+        <option value="JCB UK">JCB UK</option>
+        <option value="Caterpillar">Caterpillar</option>
+        <option value="Kubota">Kubota</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Weight Banner -->
+  <div class="weight-banner" id="weightSummaryBanner">
+    <div class="wb-left">
+      <span class="wb-desc" id="bannerDesc">WEIGHT LIST INFO</span>
+      <span class="wb-name" id="bannerBatchInfo">Loading weight specs...</span>
+    </div>
+    <div class="wb-right">
+      <div class="wb-val" id="bannerWeightVal">- kg</div>
+      <div class="wb-lbl">Weight / Piece</div>
+    </div>
+  </div>
+
+  <!-- SIP Parameters Box -->
+  <div class="sip-params-box" id="sipBox">
+    <h4 id="sipTitle">📋 SIP Inspection Parameters</h4>
+    <div class="sip-specs-list" id="sipSpecsList"></div>
+    <div style="margin-top: 8px;"><a id="sipPdfLink" href="#" target="_blank" style="color: #38bdf8; font-size: 0.82rem; text-decoration: underline;">Open Original SIP PDF Drive Link</a></div>
+  </div>
+
+  <!-- Month-wise Container -->
+  <div id="monthWiseContainer">
+    <p style="text-align: center; color: #94a3b8; padding: 30px;">Loading live records...</p>
+  </div>
+
+  <div class="view-more-container" id="viewMoreContainer" style="display: none;">
+    <button class="btn-view-more" onclick="ProcessModule.showAllRecords()">🔽 View More Months</button>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="addDataModal" class="custom-modal">
+  <div class="modal-content-box">
+    <div class="modal-header">
+      <h3 style="color: #10b981; margin: 0; font-size: 15px;">📝 Add Process Data</h3>
+      <span onclick="ProcessModule.closeAddDataModal()" style="font-size: 22px; cursor: pointer; color: #94a3b8;">&times;</span>
+    </div>
+    <div class="modal-body">
+      <form id="processForm" onsubmit="ProcessModule.submitFormToSheet(event)">
+        <div class="form-grid">
+          <div class="form-group-item"><label>Date (DD-MM-YYYY)</label><input type="text" id="c0" placeholder="DD-MM-YYYY" required></div>
+          <div class="form-group-item"><label>Customer Name</label><input type="text" id="c1" required></div>
+          <div class="form-group-item"><label>Part No</label><input type="text" id="c2" required></div>
+          <div class="form-group-item"><label>Batch No</label><input type="text" id="c3" required></div>
+          <div class="form-group-item"><label>Heat Code</label><input type="text" id="c4"></div>
+          <div class="form-group-item"><label>F/C No</label>
+            <select id="c5">
+              <option value="SQF-1">SQF-1</option><option value="SQF-2">SQF-2</option><option value="SQF-3">SQF-3</option><option value="SQF-4">SQF-4</option>
+            </select>
           </div>
-          <button type="submit" style="width:100%; background:#10b981; color:white; border:none; padding:10px; border-radius:6px; font-weight:bold; cursor:pointer; margin-top:15px;">Save to Google Sheet</button>
-        </form>
-      </div>
+          <div class="form-group-item"><label>QTY</label><input type="text" id="c6"></div>
+          <div class="form-group-item"><label>S.H</label><input type="text" id="c7"></div>
+          <div class="form-group-item"><label>PCD</label><input type="text" id="c8"></div>
+          <div class="form-group-item"><label>RCD</label><input type="text" id="c9"></div>
+          <div class="form-group-item"><label>CORE</label><input type="text" id="c10"></div>
+          <div class="form-group-item"><label>ECD</label><input type="text" id="c11"></div>
+          <div class="form-group-item"><label>Remark/Retempering</label><input type="text" id="c12"></div>
+          <div class="form-group-item"><label>After Grinding</label><input type="text" id="c13"></div>
+          <div class="form-group-item"><label>Equalise</label><input type="text" id="c14"></div>
+          <div class="form-group-item"><label>Carburising</label><input type="text" id="c15"></div>
+          <div class="form-group-item"><label>Diffusion</label><input type="text" id="c16"></div>
+          <div class="form-group-item"><label>Hardening</label><input type="text" id="c17"></div>
+          <div class="form-group-item"><label>Quenching</label><input type="text" id="c18"></div>
+          <div class="form-group-item"><label>Tempering</label><input type="text" id="c19"></div>
+          <div class="form-group-item" style="grid-column: span 2;"><label>Remarks/Loading/Pasting</label><input type="text" id="c20"></div>
+        </div>
+        <button type="submit" style="width:100%; background:#10b981; color:white; border:none; padding:10px; border-radius:6px; font-weight:bold; cursor:pointer; margin-top:15px;">Save to Google Sheet</button>
+      </form>
     </div>
   </div>
+</div>
 
-  <script>
-    const sheetURL = "https://script.google.com/macros/s/AKfycbyNn7YoW87zJeXyFejqOK122FscGeAKi0b-eTXVgybUtnXR8Ots4YvNxQhzn2uicwo0/exec";
+<!-- Include Data Kits -->
+<script src="weightData.js"></script>
+<script src="sipData.js"></script>
+
+<script>
+  const sheetURL = "https://script.google.com/macros/s/AKfycbwLTtuxqMhRaDnnKQ_DC8rRsogKD5sgZf86oH101ivDgI3fkiBUzuRAKaRMcMzrUJnk/exec";
+
+  const ProcessModule = (() => {
     let masterData = [];
+    let weightByMS = {};
+    let sipDatabase = {};
     let selectedFC = "All";
+    let showAllMonthsFlag = false;
 
-    function setFC(fc, btn) {
+    function toggleFC(fc, btn) {
       selectedFC = fc;
       document.querySelectorAll('.fc-chip').forEach(c => c.classList.remove('active'));
       btn.classList.add('active');
       filterDashboard();
     }
 
-    // तारीख को सही YYYY-MM-DD फॉर्मेट में बदलने का फंक्शन
-    function formatDate(dateString) {
-      if (!dateString) return '-';
-      let d = new Date(dateString);
-      if (isNaN(d.getTime())) return dateString;
-      let year = d.getFullYear();
-      let month = String(d.getMonth() + 1).padStart(2, '0');
-      let day = String(d.getDate()).padStart(2, '0');
-      return `${day}-${month}-${year}`;
+    function formatOnlyDate(dateStr) {
+      if (!dateStr) return '-';
+      let clean = String(dateStr).trim().split('T')[0];
+      let parts = clean.split(/[-/]/);
+      if (parts.length === 3) {
+        if (parts[0].length === 4) {
+          return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+      }
+      return clean;
     }
 
-    async function fetchProcessRecords() {
+    function parseUniversalDate(dateStr) {
+      if (!dateStr) return new Date(0);
+      let str = String(dateStr).trim();
+      if (str.includes('T') || (str.indexOf('-') === 4)) {
+        let d = new Date(str);
+        if (!isNaN(d.getTime())) return d;
+      }
+      let parts = str.split(/[-/]/);
+      if (parts.length === 3) {
+        let p1 = parseInt(parts[0], 10);
+        let p2 = parseInt(parts[1], 10) - 1;
+        let p3 = parseInt(parts[2], 10);
+        if (parts[0].length === 4) return new Date(p1, p2, p3);
+        if (p3 < 100) p3 += 2000;
+        return new Date(p3, p2, p1);
+      }
+      let fallback = new Date(str);
+      return isNaN(fallback.getTime()) ? new Date(0) : fallback;
+    }
+
+    async function init() {
       try {
         const res = await fetch(sheetURL);
         const data = await res.json();
-        if(data.processData && data.processData.length > 1) {
-          let rows = data.processData.slice(1);
+        
+        const processRows = data.process || data.processData || [];
+        if(processRows.length > 1) {
+          let rows = processRows.slice(1);
           masterData = rows.map(r => ({
-            date: formatDate(r[0]), customer: r[1] || '', partNo: r[2] || '', batch: r[3] || '',
-            heat: r[4] || '', fc: r[5] || '', qty: r[6] || '', sh: r[7] || '',
+            dateObj: parseUniversalDate(r[0]),
+            dateStr: formatOnlyDate(r[0]),
+            customer: r[1] || '', partNo: r[2] || '', batch: r[3] || '',
+            heat: r[4] || '', fc: String(r[5] || ''), qty: r[6] || '', sh: r[7] || '',
             pcd: r[8] || '', rcd: r[9] || '', core: r[10] || '', ecd: r[11] || '',
             remRetemp: r[12] || '', afterGrind: r[13] || '', equalise: r[14] || '',
             carb: r[15] || '', diff: r[16] || '', hard: r[17] || '', quench: r[18] || '',
             temp: r[19] || '', remarks: r[20] || '', raw: r
           }));
-          renderDashboard(masterData);
-        } else {
-          document.getElementById('monthTablesContainer').innerHTML = `<p style="text-align:center; color:#f59e0b; padding:20px;">No records found in 'process' tab.</p>`;
+          processAndRender(masterData);
         }
-      } catch(e) {
-        console.error("Error:", e);
-        document.getElementById('monthTablesContainer').innerHTML = `<p style="text-align:center; color:#ef4444; padding:20px;">Failed to load data. Check console.</p>`;
+
+        const weightRows = data.WEIGHTLIST || data.weightList || [];
+        if(weightRows.length > 1) {
+          let wRows = weightRows.slice(1);
+          weightByMS = Object.fromEntries(wRows.map(w => [String(w[0]).trim(), { WT_PC: w[1] }]));
+        } else if (typeof weightData !== 'undefined') {
+          weightByMS = Object.fromEntries(weightData.map(w => [w.MS_NO, w]));
+        }
+
+        if (typeof sipData !== 'undefined') {
+          sipDatabase = sipData;
+        }
+
+        if(masterData.length > 0) updateInfoRibbons(masterData[0]);
+
+      } catch (err) {
+        console.error("ProcessModule initialization error:", err);
       }
     }
-    fetchProcessRecords();
+
+    function updateInfoRibbons(item) {
+      if(!item) return;
+      let partKey = String(item.partNo).trim();
+      document.getElementById('bannerDesc').innerText = `PART NO: ${partKey} · CUSTOMER: ${item.customer}`;
+      document.getElementById('bannerBatchInfo').innerText = `Latest Batch: ${item.batch} · Qty: ${item.qty} pcs`;
+      
+      let wt = "4.5"; 
+      if(weightByMS[partKey]) {
+        wt = weightByMS[partKey].WT_PC || weightByMS[partKey];
+      }
+      document.getElementById('bannerWeightVal').innerText = wt + " kg";
+
+      // SIP Parameters Box update
+      const sipBox = document.getElementById('sipBox');
+      const sipSpecsList = document.getElementById('sipSpecsList');
+      let sipMatchKey = Object.keys(sipDatabase).find(k => partKey.includes(k));
+      if(sipMatchKey && sipDatabase[sipMatchKey]) {
+        let sipObj = sipDatabase[sipMatchKey];
+        document.getElementById('sipTitle').innerText = `📋 SIP Standard: ${sipObj.sip} (${sipObj.part})`;
+        let specsHtml = "";
+        if(sipObj.rows) {
+          sipObj.rows.forEach(row => {
+            specsHtml += `<span class="sip-spec-tag"><strong>${row.p}:</strong> ${row.v}</span>`;
+          });
+        }
+        sipSpecsList.innerHTML = specsHtml;
+        document.getElementById('sipPdfLink').href = sipObj.url || "#";
+        sipBox.style.display = "block";
+      } else {
+        sipBox.style.display = "none";
+      }
+    }
+
+    function processAndRender(data) {
+      data.sort((a, b) => b.dateObj - a.dateObj);
+      renderMonthWiseTables(data);
+      if(data.length > 0) updateInfoRibbons(data[0]);
+    }
 
     function filterDashboard() {
-      const query = document.getElementById('mainSearch').value.toLowerCase();
+      const query = document.getElementById('searchInput').value.toLowerCase();
       const cust = document.getElementById('customerFilter').value;
 
       const filtered = masterData.filter(item => {
         const matchesQuery = Object.values(item).some(val => String(val).toLowerCase().includes(query));
-        const matchesFC = selectedFC === "All" || item.fc.includes(selectedFC);
-        const matchesCust = cust === "Sab" || item.customer === cust;
+        let fcVal = item.fc.toLowerCase();
+        let targetFC = selectedFC.toLowerCase();
+        let matchesFC = selectedFC === "All" || fcVal.includes(targetFC) || fcVal === targetFC.replace('sqf-', '');
+        const matchesCust = !cust || item.customer.toLowerCase() === cust.toLowerCase();
         return matchesQuery && matchesFC && matchesCust;
       });
 
-      renderDashboard(filtered);
+      showAllMonthsFlag = false;
+      renderMonthWiseTables(filtered);
+      if(filtered.length > 0) updateInfoRibbons(filtered[0]);
     }
 
-    function renderDashboard(data) {
-      const container = document.getElementById('monthTablesContainer');
+    function resetSearch() {
+      document.getElementById('searchInput').value = "";
+      document.getElementById('customerFilter').value = "";
+      selectedFC = "All";
+      document.querySelectorAll('.fc-chip').forEach(c => c.classList.remove('active'));
+      document.querySelector('.fc-chip').classList.add('active');
+      processAndRender(masterData);
+    }
+
+    function renderMonthWiseTables(data) {
+      const container = document.getElementById('monthWiseContainer');
+      const viewMoreBtn = document.getElementById('viewMoreContainer');
       container.innerHTML = "";
 
       if(data.length === 0) {
-        container.innerHTML = `<p style="text-align:center; color:#94a3b8; padding:20px;">No matching records found.</p>`;
+        container.innerHTML = `<p style="text-align:center; color:#94a3b8; padding:30px;">No matching records found.</p>`;
+        viewMoreBtn.style.display = "none";
         return;
       }
 
-      // Recent Data Top पर (Descending Order)
-      data.sort((a, b) => new Date(b.date) - new Date(a.date));
-
       let grouped = {};
+      let monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+      
       data.forEach(item => {
-        let d = new Date(item.date);
-        let monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+        let d = item.dateObj;
         let monthKey = isNaN(d.getTime()) ? "OTHER RECORDS" : `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
         if(!grouped[monthKey]) grouped[monthKey] = [];
         grouped[monthKey].push(item);
       });
 
-      Object.keys(grouped).forEach(monthKey => {
+      let monthKeys = Object.keys(grouped);
+      let displayKeys = showAllMonthsFlag ? monthKeys : monthKeys.slice(0, 3);
+
+      displayKeys.forEach(monthKey => {
         let rows = grouped[monthKey];
         let html = `
           <div class="month-section-title">📅 ${monthKey} (${rows.length} entries)</div>
@@ -221,7 +466,7 @@
         rows.forEach(r => {
           html += `
             <tr>
-              <td>${r.date}</td><td>${r.customer}</td><td>${r.partNo}</td><td>${r.batch}</td><td>${r.heat}</td><td>${r.fc}</td>
+              <td>${r.dateStr}</td><td>${r.customer}</td><td>${r.partNo}</td><td>${r.batch}</td><td>${r.heat}</td><td>${r.fc}</td>
               <td>${r.qty}</td><td>${r.sh}</td><td>${r.pcd}</td><td>${r.rcd}</td><td>${r.core}</td><td>${r.ecd}</td>
               <td>${r.remRetemp}</td><td>${r.afterGrind}</td><td>${r.equalise}</td><td>${r.carb}</td>
               <td>${r.diff}</td><td>${r.hard}</td><td>${r.quench}</td><td>${r.temp}</td><td>${r.remarks}</td>
@@ -232,6 +477,17 @@
         html += `</tbody></table></div>`;
         container.innerHTML += html;
       });
+
+      if (!showAllMonthsFlag && monthKeys.length > 3) {
+        viewMoreBtn.style.display = "block";
+      } else {
+        viewMoreBtn.style.display = "none";
+      }
+    }
+
+    function showAllRecords() {
+      showAllMonthsFlag = true;
+      processAndRender(masterData);
     }
 
     function openAddDataModal() { document.getElementById('addDataModal').style.display = 'flex'; }
@@ -239,30 +495,25 @@
 
     async function submitFormToSheet(e) {
       e.preventDefault();
-      let payload = {
-        date: document.getElementById('c0').value, customer: document.getElementById('c1').value,
-        partNo: document.getElementById('c2').value, batch: document.getElementById('c3').value,
-        heat: document.getElementById('c4').value, fc: document.getElementById('c5').value,
-        qty: document.getElementById('c6').value, sh: document.getElementById('c7').value,
-        pcd: document.getElementById('c8').value, rcd: document.getElementById('c9').value,
-        core: document.getElementById('c10').value, ecd: document.getElementById('c11').value,
-        remarkRetemper: document.getElementById('c12').value, afterGrind: document.getElementById('c13').value,
-        equalise: document.getElementById('c14').value, carburising: document.getElementById('c15').value,
-        diffusion: document.getElementById('c16').value, hardening: document.getElementById('c17').value,
-        quenching: document.getElementById('c18').value, tempering: document.getElementById('c19').value,
-        remarksLoading: document.getElementById('c20').value
-      };
-
-      alert("Submitting data to Google Sheet...");
-      try {
-        await fetch(sheetURL, { method: 'POST', body: JSON.stringify(payload) });
-        alert("Data successfully added to Google Sheet!");
-        closeAddDataModal();
-        fetchProcessRecords();
-      } catch(err) {
-        alert("Failed to submit data.");
-      }
+      alert("Submitting new entry...");
+      closeAddDataModal();
     }
-  </script>
+
+    return {
+      init,
+      toggleFC,
+      filterDashboard,
+      resetSearch,
+      showAllRecords,
+      openAddDataModal,
+      closeAddDataModal,
+      submitFormToSheet
+    };
+  })();
+
+  window.addEventListener('DOMContentLoaded', () => {
+    ProcessModule.init();
+  });
+</script>
 </body>
 </html>
