@@ -1,941 +1,309 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Heat Treatment Process & Metallurgical Engineering Dashboard</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heat Treatment Unit 7 - Dashboard</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #090d16; color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        
+        .phone-frame { width: 410px; height: 840px; background: #0f172a; border: 10px solid #1e293b; border-radius: 36px; box-shadow: 0 20px 45px rgba(0,0,0,0.7); display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        
+        @media (min-width: 768px) {
+            .phone-frame { width: min(650px, 92vw); height: min(900px, 95vh); border-width: 4px; border-radius: 20px; }
+        }
 
-    :root {
-      --bg-dark: #080c14;
-      --panel-bg: rgba(17, 24, 39, 0.8);
-      --panel-border: rgba(255, 255, 255, 0.07);
-      --primary: #f97316;
-      --primary-glow: rgba(249, 115, 22, 0.35);
-      --accent: #38bdf8;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --purple: #a855f7;
-      --text: #f1f5f9;
-      --text-muted: #94a3b8;
-    }
+        /* TOP HEADER */
+        .top-header { display: flex; justify-content: space-between; align-items: center; padding: 18px 14px 12px 14px; background: #1e293b; border-bottom: 2px solid #334155; }
+        .header-logo { width: 50px; height: 50px; background: #38bdf8; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 900; color: #0f172a; font-size: 16px; box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); }
+        .header-text { text-align: right; }
+        .main-title { font-size: 14px; font-weight: 900; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px; }
+        .sub-title { font-size: 10px; font-weight: bold; color: #94a3b8; text-transform: uppercase; }
+        .real-time { font-size: 10px; color: #eab308; font-weight: bold; margin-top: 4px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; display: inline-block; }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background-color: var(--bg-dark);
-      color: var(--text);
-      font-family: 'Outfit', sans-serif;
-      padding: 16px;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+        .app-body { flex: 1; overflow-y: auto; padding: 12px 10px; display: flex; flex-direction: column; scrollbar-width: thin; scrollbar-color: #334155 #0f172a; }
+        
+        /* NAVIGATION / TOP CONTROLS */
+        .search-container { display: flex; gap: 6px; margin-bottom: 8px; }
+        .search-box { flex: 1; padding: 8px 10px; background-color: #1e293b; border: 1px solid #334155; border-radius: 6px; color: white; font-size: 11px; outline: none; }
+        .btn-search { background-color: #38bdf8; color: #0f172a; border: none; padding: 0 14px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; }
 
-    /* Top Bar */
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 16px;
-      border-bottom: 2px solid var(--primary);
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      gap: 15px;
-    }
+        .filters-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+        .filter-select { background: #1e293b; border: 1px solid #334155; color: #f8fafc; padding: 6px; border-radius: 6px; font-size: 10px; outline: none; width: 100%; }
+        .fc-row { display: flex; gap: 4px; grid-column: span 2; }
+        .fc-btn { flex: 1; background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 6px 2px; border-radius: 4px; font-size: 10px; font-weight: bold; cursor: pointer; }
+        .fc-btn.active { background: #0284c7; color: white; border-color: #38bdf8; }
 
-    .brand-section h1 {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--primary);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      letter-spacing: 0.5px;
-    }
+        /* SUMMARY & CARDS */
+        .green-ribbon { background: linear-gradient(135deg, #16a34a, #15803d); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #22c55e; }
+        .ribbon-title { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #dcfce7; }
+        .ribbon-sub { font-size: 10px; color: #f0fdf4; margin-top: 2px; }
+        .ribbon-stat { text-align: right; }
+        .weight-val { font-size: 15px; font-weight: 900; color: #86efac; }
+        .weight-label { font-size: 8px; color: #dcfce7; font-weight: bold; text-transform: uppercase; }
 
-    .brand-section p {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
+        .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 10px; }
+        .summary-box { background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 6px 2px; text-align: center; }
+        .summary-val { font-size: 12px; font-weight: bold; color: #38bdf8; }
+        .summary-label { font-size: 8px; color: #94a3b8; text-transform: uppercase; }
 
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .back-btn {
-      background: #1e293b;
-      color: #fff;
-      border: 1px solid var(--panel-border);
-      padding: 9px 18px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: 0.2s;
-    }
-
-    .back-btn:hover {
-      background: var(--primary);
-      border-color: var(--primary);
-      box-shadow: 0 0 15px var(--primary-glow);
-    }
-
-    /* Top KPI Stats Grid (10 KPIs) */
-    .kpi-matrix {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-      gap: 12px;
-      margin-bottom: 22px;
-    }
-
-    .kpi-tile {
-      background: var(--panel-bg);
-      backdrop-filter: blur(12px);
-      border: 1px solid var(--panel-border);
-      border-radius: 12px;
-      padding: 14px 16px;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.35);
-    }
-
-    .kpi-tile::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 3px;
-      background: var(--primary);
-    }
-
-    .kpi-tile.blue::before { background: var(--accent); }
-    .kpi-tile.green::before { background: var(--success); }
-    .kpi-tile.yellow::before { background: var(--warning); }
-    .kpi-tile.purple::before { background: var(--purple); }
-    .kpi-tile.red::before { background: var(--danger); }
-
-    .kpi-title {
-      font-size: 11px;
-      color: var(--text-muted);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-    }
-
-    .kpi-num {
-      font-size: 22px;
-      font-weight: 700;
-      color: #fff;
-      font-family: 'JetBrains Mono', monospace;
-      margin-top: 5px;
-    }
-
-    /* Filters Bar */
-    .filter-deck {
-      background: var(--panel-bg);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--panel-border);
-      border-radius: 12px;
-      padding: 14px 16px;
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr auto;
-      gap: 12px;
-      margin-bottom: 22px;
-      align-items: center;
-    }
-
-    .input-box, .select-box {
-      background: #0b111e;
-      border: 1px solid #243048;
-      color: #fff;
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 13px;
-      outline: none;
-      font-family: inherit;
-      width: 100%;
-    }
-
-    .input-box:focus, .select-box:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
-    }
-
-    .view-switch {
-      display: flex;
-      background: #0b111e;
-      border: 1px solid #243048;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    .switch-btn {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      padding: 9px 13px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: 0.2s;
-    }
-
-    .switch-btn.active {
-      background: var(--primary);
-      color: white;
-    }
-
-    /* Dynamic Process Cards Layout */
-    .cards-flow {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 18px;
-    }
-
-    .card-block {
-      background: var(--panel-bg);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--panel-border);
-      border-radius: 14px;
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 14px;
-      transition: transform 0.2s, border-color 0.2s;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-    }
-
-    .card-block:hover {
-      transform: translateY(-4px);
-      border-color: var(--primary);
-    }
-
-    .card-head-line {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 10px;
-    }
-
-    .comp-name {
-      font-size: 15px;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1.35;
-    }
-
-    .comp-doc-id {
-      font-size: 12px;
-      color: var(--accent);
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 600;
-      margin-top: 3px;
-    }
-
-    .badge-tag {
-      font-size: 11px;
-      font-weight: 700;
-      padding: 3px 9px;
-      border-radius: 5px;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-      white-space: nowrap;
-    }
-
-    .tag-cust { background: rgba(249, 115, 22, 0.15); color: var(--primary); border: 1px solid rgba(249, 115, 22, 0.3); }
-    .tag-status { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
-
-    /* Technical Parameters Matrix */
-    .tech-matrix {
-      background: #0a101d;
-      border-radius: 10px;
-      padding: 12px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 9px;
-      font-size: 11.5px;
-      border: 1px solid rgba(255, 255, 255, 0.04);
-    }
-
-    .param-box span:first-child {
-      color: var(--text-muted);
-      font-size: 10px;
-      text-transform: uppercase;
-      font-weight: 600;
-      display: block;
-      margin-bottom: 2px;
-    }
-
-    .param-box span:last-child {
-      color: #fff;
-      font-weight: 600;
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .btn-open-pdf {
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-      color: white;
-      text-align: center;
-      padding: 10px 16px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: 0.2s;
-      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-    }
-
-    .btn-open-pdf:hover {
-      background: #b91c1c;
-      transform: scale(1.02);
-    }
-
-    /* Table View Panel */
-    .table-view-panel {
-      display: none;
-      background: var(--panel-bg);
-      border-radius: 12px;
-      border: 1px solid var(--panel-border);
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12.5px;
-      white-space: nowrap;
-    }
-
-    th {
-      background: #0f1728;
-      color: var(--text-muted);
-      padding: 13px 14px;
-      text-align: left;
-      font-weight: 600;
-      text-transform: uppercase;
-      font-size: 11px;
-      border-bottom: 1px solid #243048;
-    }
-
-    td {
-      padding: 11px 14px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    }
-
-    tr:hover { background: rgba(56, 189, 248, 0.05); }
-
-    /* Lightbox Modal */
-    .pdf-modal-screen {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(3, 7, 18, 0.88);
-      backdrop-filter: blur(8px);
-      z-index: 3000;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .pdf-modal-card {
-      background: #131c2e;
-      width: 92%; max-width: 1050px;
-      height: 90vh;
-      border-radius: 14px;
-      border: 1px solid var(--primary);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.85);
-    }
-
-    .pdf-modal-header {
-      padding: 12px 20px;
-      background: #0b111e;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #243048;
-    }
-
-    .pdf-modal-close {
-      font-size: 24px;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .pdf-modal-close:hover { color: var(--danger); }
-    .pdf-iframe-holder { width: 100%; flex: 1; border: none; }
-
-    @media (max-width: 850px) {
-      body { padding: 10px; }
-      .top-bar { flex-direction: column; align-items: flex-start; }
-      .filter-deck { grid-template-columns: 1fr; }
-      .kpi-matrix { grid-template-columns: repeat(2, 1fr); }
-      .cards-flow { grid-template-columns: 1fr; }
-    }
-  </style>
+        /* MONTH-WISE TABLE CONTAINERS */
+        .month-section { margin-bottom: 14px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; overflow: hidden; }
+        .month-header { background: #1e293b; color: #eab308; font-size: 11px; font-weight: bold; padding: 8px 10px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; }
+        .table-wrapper { overflow-x: auto; max-height: 260px; scrollbar-width: thin; scrollbar-color: #475569 #0f172a; }
+        
+        table { width: 2200px; border-collapse: collapse; font-size: 9.5px; text-align: left; }
+        th { padding: 6px 8px; font-weight: bold; text-transform: uppercase; white-space: nowrap; position: sticky; top: 0; z-index: 2; }
+        .th-cyan { background: #0891b2; color: #ffffff; }
+        .th-yellow { background: #ca8a04; color: #ffffff; }
+        td { padding: 6px 8px; border-bottom: 1px solid #1e293b; white-space: nowrap; color: #e2e8f0; background: #0b1120; }
+        tr:nth-child(even) td { background: #0f172a; }
+        
+        /* FOOTER */
+        .app-footer { background: #0f172a; text-align: center; padding: 10px; font-size: 10px; font-weight: bold; color: #64748b; border-top: 1px solid #1e293b; }
+        .app-footer span { color: #38bdf8; }
+    </style>
 </head>
 <body>
 
-  <!-- Top Bar -->
-  <header class="top-bar">
-    <div class="brand-section">
-      <h1><i class="fa-solid fa-fire-burner"></i> Heat Treatment Process & Metallurgical Engineering</h1>
-      <p>Unit 7 Technical Master Database: Parameters, Cycles, Inspection Procedures & Microstructure</p>
+<div class="phone-frame">
+    <!-- HEADER -->
+    <div class="top-header">
+        <div class="header-logo">MGL</div>
+        <div class="header-text">
+            <div class="main-title">MILESTONE GEAR LIMITED</div>
+            <div class="sub-title">Heat Treatment Unit 7</div>
+            <div class="real-time" id="clockDisplay">--:--:--</div>
+        </div>
     </div>
-    <div class="nav-actions">
-      <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Plant Dashboard</a>
-    </div>
-  </header>
 
-  <!-- Complete 10 Real-Time KPI Matrix -->
-  <section class="kpi-matrix">
-    <div class="kpi-tile">
-      <div class="kpi-title">Total Processes</div>
-      <div class="kpi-num" id="kpiTotal">0</div>
-    </div>
-    <div class="kpi-tile green">
-      <div class="kpi-title">Fully Approved</div>
-      <div class="kpi-num" id="kpiApproved">0</div>
-    </div>
-    <div class="kpi-tile blue">
-      <div class="kpi-title">Active Part Nos</div>
-      <div class="kpi-num" id="kpiActiveParts">0</div>
-    </div>
-    <div class="kpi-tile yellow">
-      <div class="kpi-title">Pre-Heating Req.</div>
-      <div class="kpi-num" id="kpiPreHeat">0</div>
-    </div>
-    <div class="kpi-tile purple">
-      <div class="kpi-title">Under Evaluation</div>
-      <div class="kpi-num" id="kpiEval">0</div>
-    </div>
-    <div class="kpi-tile">
-      <div class="kpi-title">Avg Quench Temp</div>
-      <div class="kpi-num" id="kpiAvgQuench">0°C</div>
-    </div>
-    <div class="kpi-tile blue">
-      <div class="kpi-title">Avg Cycle Time</div>
-      <div class="kpi-num" id="kpiAvgCycle">0 hrs</div>
-    </div>
-    <div class="kpi-tile red">
-      <div class="kpi-title">Cryo Cycles</div>
-      <div class="kpi-num" id="kpiCryo">0</div>
-    </div>
-    <div class="kpi-tile">
-      <div class="kpi-title">Carburizing Parts</div>
-      <div class="kpi-num" id="kpiCarb">0</div>
-    </div>
-    <div class="kpi-tile yellow">
-      <div class="kpi-title">Induction Parts</div>
-      <div class="kpi-num" id="kpiInduct">0</div>
-    </div>
-  </section>
+    <div class="app-body">
+        <!-- SEARCH -->
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-box" placeholder="Search Part No, Batch or Heat Code..." oninput="filterData()">
+            <button class="btn-search" onclick="filterData()">Search</button>
+        </div>
 
-  <!-- Multi-Filters & Switcher -->
-  <section class="filter-deck">
-    <input type="text" id="searchInput" class="input-box" placeholder="🔍 Search Component Name, Part No, Drawing No..." onkeyup="applyFilters()">
-    
-    <select id="custFilter" class="select-box" onchange="applyFilters()">
-      <option value="ALL">All Customers</option>
-    </select>
-
-    <select id="procFilter" class="select-box" onchange="applyFilters()">
-      <option value="ALL">All Process Types</option>
-    </select>
-
-    <select id="statusFilter" class="select-box" onchange="applyFilters()">
-      <option value="ALL">All Approval Status</option>
-    </select>
-
-    <div class="view-switch">
-      <button class="switch-btn active" id="btnCard" onclick="switchView('card')"><i class="fa-solid fa-grip"></i></button>
-      <button class="switch-btn" id="btnTable" onclick="switchView('table')"><i class="fa-solid fa-table-list"></i></button>
-    </div>
-  </section>
-
-  <!-- Dynamic Views -->
-  <main id="cardsContainer" class="cards-flow"></main>
-
-  <div id="tableContainer" class="table-view-panel">
-    <table>
-      <thead>
-        <tr>
-          <th>Part / Doc ID</th>
-          <th>Component Name</th>
-          <th>Customer</th>
-          <th>Drawing No</th>
-          <th>Process</th>
-          <th>Material Grade</th>
-          <th>Case Depth</th>
-          <th>Surface Hardness</th>
-          <th>Core Hardness</th>
-          <th>Status</th>
-          <th style="text-align: center;">Action</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody"></tbody>
-    </table>
-  </div>
-
-  <!-- In-App Google Drive PDF Modal -->
-  <div class="pdf-modal-screen" id="pdfModal">
-    <div class="pdf-modal-card">
-      <div class="pdf-modal-header">
-        <span id="pdfTitle" style="font-weight: 600; font-size: 14px; color: var(--accent);">PDF Document Viewer</span>
-        <span class="pdf-modal-close" onclick="closePdfModal()">&times;</span>
-      </div>
-      <iframe id="pdfFrame" class="pdf-iframe-holder" src=""></iframe>
-    </div>
-  </div>
-
-  <script>
-    // 🗄️ Master Database extracted directly from badhiya hai.html
-    const masterProcessData = [
-      {
-        partNo: "70803450",
-        docId: "SIP/HT/SQF/001",
-        name: "DRIVEN GEAR 4TH SPEED (70803450)",
-        cust: "SAME DEUTZ FAHR",
-        dwg: "70803450-REV02",
-        process: "Carburizing & Quenching",
-        grade: "20MnCr5 / EN353",
-        scadaId: "CQ-SQF-01-A",
-        cqi9: "CQI-9 Ready (Class A)",
-        caseDepth: "0.8 - 1.2 mm",
-        surfaceHard: "58 - 62 HRC",
-        coreHard: "32 - 40 HRC",
-        quenchMedia: "Quench Oil (60-80°C)",
-        tempering: "180°C (2.5 hrs)",
-        micro: "Fine Martensite + Ret. Austenite < 15%",
-        preheat: "Yes",
-        status: "Approved",
-        cycleTime: 7.5,
-        quenchTemp: 70,
-        cryo: "No",
-        driveId: "1gI264fE3Jg8uV6f0K2Q1h1n4_9gK5aBc"
-      },
-      {
-        partNo: "70803451",
-        docId: "SIP/HT/SQF/002",
-        name: "DRIVING GEAR 3RD & 4TH SPEED",
-        cust: "SAME DEUTZ FAHR",
-        dwg: "70803451-REV00",
-        process: "Carburizing & Quenching",
-        grade: "16MnCr5",
-        scadaId: "CQ-SQF-02-B",
-        cqi9: "CQI-9 Ready (Class A)",
-        caseDepth: "1.0 - 1.4 mm",
-        surfaceHard: "59 - 63 HRC",
-        coreHard: "34 - 42 HRC",
-        quenchMedia: "Fast Quench Oil (70°C)",
-        tempering: "190°C (3.0 hrs)",
-        micro: "Tempered Martensite",
-        preheat: "Yes",
-        status: "Approved",
-        cycleTime: 8.5,
-        quenchTemp: 70,
-        cryo: "Yes",
-        driveId: "1X5u746Eeg7VbU_jG9z81n3qL7gJt2aBc"
-      },
-      {
-        partNo: "70803452",
-        docId: "SIP/HT/SQF/003",
-        name: "REVERSE IDLER GEAR",
-        cust: "SAME DEUTZ FAHR",
-        dwg: "70803452-REV02",
-        process: "Through Hardening",
-        grade: "EN24 / 4340",
-        scadaId: "TH-SQF-03-A",
-        cqi9: "CQI-9 Compliant",
-        caseDepth: "Core Tough Refined",
-        surfaceHard: "50 - 55 HRC",
-        coreHard: "50 - 55 HRC",
-        quenchMedia: "Polymer Quench (45°C)",
-        tempering: "450°C (2.0 hrs)",
-        micro: "Sorbite / Tempered Bainite",
-        preheat: "No",
-        status: "Approved",
-        cycleTime: 4.0,
-        quenchTemp: 45,
-        cryo: "No",
-        driveId: "1aBc746Eeg7VbU_jG9z81n3qL7gJt2aBc"
-      },
-      {
-        partNo: "70803453",
-        docId: "SIP/HT/SQF/004",
-        name: "OUTPUT SHAFT 4WD",
-        cust: "SAME DEUTZ FAHR",
-        dwg: "70803453-REV01",
-        process: "Carburizing & Quenching",
-        grade: "20MnCr5",
-        scadaId: "CQ-SQF-01-B",
-        cqi9: "CQI-9 Ready (Class A)",
-        caseDepth: "0.6 - 0.9 mm",
-        surfaceHard: "58 - 62 HRC",
-        coreHard: "30 - 38 HRC",
-        quenchMedia: "Quench Oil (65°C)",
-        tempering: "180°C (2.0 hrs)",
-        micro: "Tempered Martensite",
-        preheat: "Yes",
-        status: "Approved",
-        cycleTime: 6.5,
-        quenchTemp: 65,
-        cryo: "No",
-        driveId: "1dEf746Eeg7VbU_jG9z81n3qL7gJt2aBc"
-      },
-      {
-        partNo: "70803454",
-        docId: "SIP/HT/SQF/005",
-        name: "DRIVING GEAR 1ST & 2ND SPEED",
-        cust: "SAME DEUTZ FAHR",
-        dwg: "70803454-REV00",
-        process: "Case Carburizing",
-        grade: "20MnCr5",
-        scadaId: "CQ-SQF-04-A",
-        cqi9: "CQI-9 Ready (Class A)",
-        caseDepth: "0.9 - 1.3 mm",
-        surfaceHard: "60 - 64 HRC",
-        coreHard: "35 - 42 HRC",
-        quenchMedia: "Quench Oil (60°C)",
-        tempering: "180°C (3.0 hrs)",
-        micro: "Fine Martensite",
-        preheat: "Yes",
-        status: "Approved",
-        cycleTime: 8.0,
-        quenchTemp: 60,
-        cryo: "Yes",
-        driveId: "1eF746Eeg7VbU_jG9z81n3qL7gJt2aBc"
-      },
-      {
-        partNo: "CAT-9921",
-        docId: "SIP/HT/SQF/006",
-        name: "PINION SHAFT 12T (HEAVY DUTY)",
-        cust: "CATERPILLAR",
-        dwg: "CAT-DWG-9921",
-        process: "Carbonitriding",
-        grade: "SAE 8620",
-        scadaId: "CN-SQF-02-A",
-        cqi9: "Caterpillar 1E2180 Compliant",
-        caseDepth: "0.4 - 0.7 mm",
-        surfaceHard: "58 - 62 HRC",
-        coreHard: "30 - 36 HRC",
-        quenchMedia: "Quench Oil (70°C)",
-        tempering: "170°C (2.0 hrs)",
-        micro: "Carbonitride Layer + Martensite",
-        preheat: "No",
-        status: "Approved",
-        cycleTime: 5.5,
-        quenchTemp: 70,
-        cryo: "No",
-        driveId: "1gH746Eeg7VbU_jG9z81n3qL7gJt2aBc"
-      },
-      {
-        partNo: "KUB-4401",
-        docId: "SIP/HT/SQF/007",
-        name: "BULL GEAR 44T (TRACTOR TRANSMISSION)",
-        cust: "KUBOTA",
-        dwg: "KUB-DWG-4401",
-        process: "Carburizing & Quenching",
-        grade: "SCM420H",
-        scadaId: "CQ-SQF-03-A",
-        cqi9: "Kubota KES 04.301 Approved",
-        caseDepth: "0.8 - 1.1 mm",
-        surfaceHard: "60 - 63 HRC",
-        coreHard: "32 - 40 HRC",
-        quenchMedia: "Quench Oil (65°C)",
-        tempering: "180°C (2.5 hrs)",
-        micro: "Martensite Grade 1-2",
-        preheat: "Yes",
-        status: "Approved",
-        cycleTime: 7.2,
-        quenchTemp: 65,
-        cryo: "No",
-        driveId: "1iJ746Eeg7VbU_jG9z81n3qL7gJt2aBc"
-      },
-      {
-        partNo: "JD-1092",
-        docId: "SIP/HT/SQF/008",
-        name: "INTERMEDIATE SHAFT REAR AXLE",
-        cust: "JOHN DEERE",
-        dwg: "JD-DWG-1092",
-        process: "Liquid Nitriding",
-        grade: "4140 / 42CrMo4",
-        scadaId: "NIT-UNIT-01",
-        cqi9: "John Deere JDM-F15 Approved",
-        caseDepth: "0.15 - 0.25 mm",
-        surfaceHard: "55 - 60 HRC",
-        coreHard: "28 - 34 HRC",
-        quenchMedia: "Air Cooling + Water Rinse",
-        tempering: "550°C (3.0 hrs)",
-        micro: "Compound Layer (White Layer < 8um)",
-        preheat: "No",
-        status: "Approved",
-        cycleTime: 4.5,
-        quenchTemp: 35,
-        cryo: "No",
-        driveId: "1kL746Eeg7VbU_jG9z81n3qL7gJt2aBc"
-      },
-      {
-        partNo: "CNH-5502",
-        docId: "SIP/HT/SQF/009",
-        name: "PLANETARY RING GEAR (INTERNAL TEETH)",
-        cust: "CNH",
-        dwg: "CNH-DWG-5502",
-        process: "Carburizing & Quenching",
-        grade: "20MnCr5",
-        scadaId: "CQ-SQF-04-B",
-        cqi9: "CNH Industrial MAT0120 Approved",
-        caseDepth: "1.1 - 1.5 mm",
-        surfaceHard: "58 - 62 HRC",
-        coreHard: "34 - 40 HRC",
-        quenchMedia: "Quench Oil (70°C)",
-        tempering: "200°C (3.0 hrs)",
-        micro: "Martensite + Low Distortion",
-        preheat: "Yes",
-        status: "Approved",
-        cycleTime: 9.0,
-        quenchTemp: 70,
-        cryo: "Yes",
-        driveId: "1mN746Eeg7VbU_jG9z81n3qL7gJt2aBc"
-      },
-      {
-        partNo: "MAH-3021",
-        docId: "SIP/HT/SQF/010",
-        name: "BEVEL PINION 9T (DIFFERENTIAL)",
-        cust: "MAHINDRA",
-        dwg: "MAH-DWG-3021",
-        process: "Induction Hardening",
-        grade: "SAE 8620",
-        scadaId: "IND-UNIT-02",
-        cqi9: "CQI-9 Induction Compliant",
-        caseDepth: "1.2 - 1.6 mm",
-        surfaceHard: "60 - 64 HRC",
-        coreHard: "35 - 42 HRC",
-        quenchMedia: "Polymer Quench (30°C)",
-        tempering: "160°C (1.5 hrs)",
-        micro: "Superficial Martensitic Layer",
-        preheat: "No",
-        status: "Under Evaluation",
-        cycleTime: 2.0,
-        quenchTemp: 30,
-        cryo: "No",
-        driveId: "1oP746Eeg7VbU_jG9z81n3qL7gJt2aBc"
-      }
-    ];
-
-    function initDashboardEngine() {
-      populateDropdowns();
-      computeKPIMetrics(masterProcessData);
-      renderProcessCards(masterProcessData);
-      renderProcessTable(masterProcessData);
-    }
-
-    function populateDropdowns() {
-      const customers = new Set();
-      const processes = new Set();
-      const statuses = new Set();
-
-      masterProcessData.forEach(item => {
-        if (item.cust) customers.add(item.cust.trim());
-        if (item.process) processes.add(item.process.trim());
-        if (item.status) statuses.add(item.status.trim());
-      });
-
-      const custSelect = document.getElementById('custFilter');
-      customers.forEach(c => custSelect.innerHTML += `<option value="${c}">${c}</option>`);
-
-      const procSelect = document.getElementById('procFilter');
-      processes.forEach(p => procSelect.innerHTML += `<option value="${p}">${p}</option>`);
-
-      const statusSelect = document.getElementById('statusFilter');
-      statuses.forEach(s => statusSelect.innerHTML += `<option value="${s}">${s}</option>`);
-    }
-
-    function computeKPIMetrics(data) {
-      document.getElementById('kpiTotal').innerText = data.length;
-      document.getElementById('kpiApproved').innerText = data.filter(r => r.status === 'Approved').length;
-      document.getElementById('kpiActiveParts').innerText = new Set(data.map(r => r.partNo)).size;
-      document.getElementById('kpiPreHeat').innerText = data.filter(r => r.preheat === 'Yes').length;
-      document.getElementById('kpiEval').innerText = data.filter(r => r.status.includes('Evaluation')).length;
-      
-      let avgQuench = data.reduce((acc, r) => acc + (r.quenchTemp || 0), 0) / (data.length || 1);
-      let avgCycle = data.reduce((acc, r) => acc + (r.cycleTime || 0), 0) / (data.length || 1);
-      
-      document.getElementById('kpiAvgQuench').innerText = `${Math.round(avgQuench)}°C`;
-      document.getElementById('kpiAvgCycle').innerText = `${avgCycle.toFixed(1)} hrs`;
-      document.getElementById('kpiCryo').innerText = data.filter(r => r.cryo === 'Yes').length;
-      document.getElementById('kpiCarb').innerText = data.filter(r => r.process.includes('Carburizing')).length;
-      document.getElementById('kpiInduct').innerText = data.filter(r => r.process.includes('Induction')).length;
-    }
-
-    function renderProcessCards(records) {
-      const container = document.getElementById('cardsContainer');
-      if (records.length === 0) {
-        container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);"><i class="fa-solid fa-circle-exclamation"></i> No matching components found.</div>`;
-        return;
-      }
-
-      let html = "";
-      records.forEach(item => {
-        const previewUrl = `https://drive.google.com/file/d/${item.driveId}/preview`;
-        html += `
-          <div class="card-block">
-            <div>
-              <div class="card-head-line">
-                <div>
-                  <div class="comp-name">${item.name}</div>
-                  <div class="comp-doc-id">Part No: ${item.partNo} &bull; ${item.docId}</div>
-                </div>
-                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
-                  <span class="badge-tag tag-cust">${item.cust}</span>
-                  <span class="badge-tag tag-status">${item.status}</span>
-                </div>
-              </div>
-
-              <div class="tech-matrix" style="margin-top: 14px;">
-                <div class="param-box">
-                  <span>Process Type</span>
-                  <span>${item.process}</span>
-                </div>
-                <div class="param-box">
-                  <span>Material Grade</span>
-                  <span>${item.grade}</span>
-                </div>
-                <div class="param-box">
-                  <span>Case Depth</span>
-                  <span>${item.caseDepth}</span>
-                </div>
-                <div class="param-box">
-                  <span>Surface Hardness</span>
-                  <span>${item.surfaceHard}</span>
-                </div>
-                <div class="param-box">
-                  <span>Core Hardness</span>
-                  <span>${item.coreHard}</span>
-                </div>
-                <div class="param-box">
-                  <span>Quench Media</span>
-                  <span>${item.quenchMedia}</span>
-                </div>
-                <div class="param-box">
-                  <span>Tempering</span>
-                  <span>${item.tempering}</span>
-                </div>
-                <div class="param-box">
-                  <span>Microstructure</span>
-                  <span>${item.micro}</span>
-                </div>
-              </div>
+        <!-- FILTERS -->
+        <div class="filters-grid">
+            <div class="fc-row">
+                <button class="fc-btn active" data-fc="ALL" onclick="setFC(this, 'ALL')">ALL F/C</button>
+                <button class="fc-btn" data-fc="1.0" onclick="setFC(this, '1.0')">F/C 1</button>
+                <button class="fc-btn" data-fc="2.0" onclick="setFC(this, '2.0')">F/C 2</button>
+                <button class="fc-btn" data-fc="3.0" onclick="setFC(this, '3.0')">F/C 3</button>
+                <button class="fc-btn" data-fc="4.0" onclick="setFC(this, '4.0')">F/C 4</button>
             </div>
+            <select class="filter-select" id="monthFilter" onchange="filterData()">
+                <option value="">Month: All</option>
+                <option value="Jan">Jan</option><option value="Feb">Feb</option><option value="Mar">Mar</option>
+                <option value="Apr">Apr</option><option value="May">May</option><option value="Jun">Jun</option>
+                <option value="Jul">Jul</option><option value="Aug">Aug</option><option value="Sep">Sep</option>
+                <option value="Oct">Oct</option><option value="Nov">Nov</option><option value="Dec">Dec</option>
+            </select>
+            <select class="filter-select" id="custFilter" onchange="filterData()">
+                <option value="">Customer: All</option>
+            </select>
+        </div>
 
-            <button class="btn-open-pdf" onclick="openPdfModal('${previewUrl}', '${item.name}')">
-              <i class="fa-solid fa-file-pdf"></i> View Standard Inspection Procedure (SIP)
-            </button>
-          </div>
-        `;
-      });
-      container.innerHTML = html;
+        <!-- SUMMARY STATS -->
+        <div class="green-ribbon">
+            <div>
+                <div class="ribbon-title" id="ribbonTitle">Live Process Dashboard</div>
+                <div class="ribbon-sub" id="ribbonSub">Total Process Qty: 0 pcs</div>
+            </div>
+            <div class="ribbon-stat">
+                <div class="weight-val" id="totalBatches">0</div>
+                <div class="weight-label">Batches</div>
+            </div>
+        </div>
+
+        <div class="summary-grid">
+            <div class="summary-box"><div class="summary-val" id="sumRecords">0</div><div class="summary-label">Total Rows</div></div>
+            <div class="summary-box"><div class="summary-val" id="sumMonths">0</div><div class="summary-label">Months</div></div>
+            <div class="summary-box"><div class="summary-val" id="sumCust">0</div><div class="summary-label">Customers</div></div>
+            <div class="summary-box"><div class="summary-val" id="sumParts">0</div><div class="summary-label">Part Nos</div></div>
+        </div>
+
+        <!-- DYNAMIC MONTH SECTIONS GO HERE -->
+        <div id="monthSectionsContainer"></div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="app-footer">
+        MGL Unit 7 &bull; <span>Process Data Engine</span> &bull; 2026
+    </div>
+</div>
+
+<script>
+    // ⏰ Live Clock
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('clockDisplay').innerText = now.toLocaleString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // 🗄️ Embedded Dataset (Your Master Data Array Goes Here)
+    const masterData = []; // Paste your full dataset or let it load from your source
+
+    let selectedFC = "ALL";
+
+    function setFC(btn, fc) {
+        document.querySelectorAll('.fc-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedFC = fc;
+        filterData();
     }
 
-    function renderProcessTable(records) {
-      const tbody = document.getElementById('tableBody');
-      let html = "";
-      records.forEach(item => {
-        const previewUrl = `https://drive.google.com/file/d/${item.driveId}/preview`;
-        html += `
-          <tr>
-            <td style="color: var(--accent); font-family: 'JetBrains Mono', monospace; font-weight: 600;">${item.docId}</td>
-            <td style="font-weight: 600; color: #fff;">${item.name}</td>
-            <td><span class="badge-tag tag-cust">${item.cust}</span></td>
-            <td style="color: var(--text-muted);">${item.dwg}</td>
-            <td>${item.process}</td>
-            <td style="font-family: 'JetBrains Mono', monospace;">${item.grade}</td>
-            <td style="font-family: 'JetBrains Mono', monospace;">${item.caseDepth}</td>
-            <td style="font-family: 'JetBrains Mono', monospace; color: var(--warning);">${item.surfaceHard}</td>
-            <td style="font-family: 'JetBrains Mono', monospace;">${item.coreHard}</td>
-            <td><span class="badge-tag tag-status">${item.status}</span></td>
-            <td style="text-align: center;">
-              <button class="btn-open-pdf" style="padding: 6px 12px; font-size: 11.5px;" onclick="openPdfModal('${previewUrl}', '${item.name}')">
-                <i class="fa-solid fa-file-pdf"></i> View
-              </button>
-            </td>
-          </tr>
-        `;
-      });
-      tbody.innerHTML = html;
+    function initCustomerFilter() {
+        const custs = new Set();
+        masterData.forEach(d => {
+            const c = d["CUSTOMER  NAME"] || d["CUSTOMER NAME"];
+            if (c && c !== "-" && c !== "NAN") custs.add(c.trim());
+        });
+        const custDropdown = document.getElementById('custFilter');
+        custs.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c;
+            opt.innerText = c;
+            custDropdown.appendChild(opt);
+        });
     }
 
-    function applyFilters() {
-      const q = document.getElementById('searchInput').value.toLowerCase().trim();
-      const selCust = document.getElementById('custFilter').value;
-      const selProc = document.getElementById('procFilter').value;
-      const selStatus = document.getElementById('statusFilter').value;
+    function filterData() {
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        const month = document.getElementById('monthFilter').value;
+        const cust = document.getElementById('custFilter').value;
 
-      const filtered = masterProcessData.filter(item => {
-        const matchSearch = !q || 
-          item.name.toLowerCase().includes(q) || 
-          item.partNo.toLowerCase().includes(q) || 
-          item.docId.toLowerCase().includes(q) || 
-          item.dwg.toLowerCase().includes(q);
+        // Sorting recent data on top (Descending by Date)
+        const filtered = masterData.filter(row => {
+            const rowCust = (row["CUSTOMER  NAME"] || row["CUSTOMER NAME"] || "").toLowerCase();
+            const rowPart = (row["PART NO"] || "").toLowerCase();
+            const rowBatch = (row["BATCH NO"] || "").toLowerCase();
+            const rowHeat = (row["HEAT CODE"] || "").toLowerCase();
+            const rowFC = (row["F/C NO"] || "").toString();
+            const rowMonth = row["MONTH_NAME"] || "";
 
-        const matchCust = (selCust === 'ALL') || (item.cust === selCust);
-        const matchProc = (selProc === 'ALL') || (item.process === selProc);
-        const matchStatus = (selStatus === 'ALL') || (item.status === selStatus);
+            const matchSearch = !search || rowPart.includes(search) || rowBatch.includes(search) || rowHeat.includes(search);
+            const matchFC = (selectedFC === "ALL") || (rowFC.startsWith(selectedFC.replace('.0', '')));
+            const matchMonth = !month || rowMonth === month;
+            const matchCust = !cust || (rowCust === cust.toLowerCase());
 
-        return matchSearch && matchCust && matchProc && matchStatus;
-      });
+            return matchSearch && matchFC && matchMonth && matchCust;
+        }).sort((a, b) => new Date(b.DATE) - new Date(a.DATE));
 
-      computeKPIMetrics(filtered);
-      renderProcessCards(filtered);
-      renderProcessTable(filtered);
+        renderDashboard(filtered);
     }
 
-    function switchView(type) {
-      const cardContainer = document.getElementById('cardsContainer');
-      const tableContainer = document.getElementById('tableContainer');
-      const btnCard = document.getElementById('btnCard');
-      const btnTable = document.getElementById('btnTable');
+    function renderDashboard(data) {
+        let totalQty = 0;
+        const uniqueParts = new Set();
+        const uniqueCust = new Set();
+        const groupedByMonth = {};
 
-      if (type === 'card') {
-        cardContainer.style.display = 'grid';
-        tableContainer.style.display = 'none';
-        btnCard.classList.add('active');
-        btnTable.classList.remove('active');
-      } else {
-        cardContainer.style.display = 'none';
-        tableContainer.style.display = 'block';
-        btnTable.classList.add('active');
-        btnCard.classList.remove('active');
-      }
+        data.forEach(row => {
+            const qty = parseInt(row["QTY."]) || 0;
+            totalQty += qty;
+            if (row["PART NO"]) uniqueParts.add(row["PART NO"]);
+            const c = row["CUSTOMER  NAME"] || row["CUSTOMER NAME"];
+            if (c) uniqueCust.add(c);
+
+            const mKey = row["MONTH_YEAR"] || (row["MONTH_NAME"] ? row["MONTH_NAME"] + " 2024" : "Other");
+            if (!groupedByMonth[mKey]) groupedByMonth[mKey] = [];
+            groupedByMonth[mKey].push(row);
+        });
+
+        document.getElementById('ribbonSub').innerText = `Total Process Qty: ${totalQty.toLocaleString()} pcs`;
+        document.getElementById('totalBatches').innerText = data.length;
+        document.getElementById('sumRecords').innerText = data.length;
+        document.getElementById('sumMonths').innerText = Object.keys(groupedByMonth).length;
+        document.getElementById('sumCust').innerText = uniqueCust.size;
+        document.getElementById('sumParts').innerText = uniqueParts.size;
+
+        const container = document.getElementById('monthSectionsContainer');
+        container.innerHTML = "";
+
+        if (data.length === 0) {
+            container.innerHTML = `<div style="text-align:center; padding: 20px; color:#64748b; font-size:12px;">No matching records found.</div>`;
+            return;
+        }
+
+        // Render Month-wise Sections
+        Object.keys(groupedByMonth).forEach(mKey => {
+            const rows = groupedByMonth[mKey];
+            const section = document.createElement('div');
+            section.className = 'month-section';
+
+            let tableRows = rows.map(r => `
+                <tr>
+                    <td>${r["DATE"] || "-"}</td>
+                    <td>${r["CUSTOMER  NAME"] || r["CUSTOMER NAME"] || "-"}</td>
+                    <td><strong>${r["PART NO"] || "-"}</strong></td>
+                    <td>${r["BATCH NO"] || "-"}</td>
+                    <td>${r["HEAT CODE"] || "-"}</td>
+                    <td>${r["F/C NO"] || "-"}</td>
+                    <td><strong>${r["QTY."] || "-"}</strong></td>
+                    <td>${r["S.H"] || "-"}</td>
+                    <td>${r["PCD"] || "-"}</td>
+                    <td>${r["RCD"] || "-"}</td>
+                    <td>${r["CORE"] || "-"}</td>
+                    <td>${r["ECD"] || "-"}</td>
+                    <td>${r["REMARK/RETEMPERING"] || "-"}</td>
+                    <td>${r["AFTER GRINDING"] || "-"}</td>
+                    <td>${r["EQULISE (TIME*CP)"] || "-"}</td>
+                    <td>${r["CARBURISING (TEMP*TIME*CP)"] || "-"}</td>
+                    <td>${r["DIFFUSION (TEMP*TIME*CP)"] || "-"}</td>
+                    <td>${r["HARDENING (TEMP*TIME*CP)"] || "-"}</td>
+                    <td>${r["QUENCHING (RPM*OIL TEMP)"] || "-"}</td>
+                    <td>${r["TEMPERING (TEMP*TIME)"] || "-"}</td>
+                    <td>${r["REMARKS/LOADING/PASTING"] || "-"}</td>
+                </tr>
+            `).join('');
+
+            section.innerHTML = `
+                <div class="month-header">
+                    <span>📅 ${mKey}</span>
+                    <span>${rows.length} Entries</span>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="th-cyan">DATE</th>
+                                <th class="th-cyan">CUSTOMER</th>
+                                <th class="th-cyan">PART NO</th>
+                                <th class="th-cyan">BATCH NO</th>
+                                <th class="th-cyan">HEAT CODE</th>
+                                <th class="th-cyan">F/C NO</th>
+                                <th class="th-cyan">QTY</th>
+                                <th class="th-cyan">S.H</th>
+                                <th class="th-cyan">PCD</th>
+                                <th class="th-cyan">RCD</th>
+                                <th class="th-cyan">CORE</th>
+                                <th class="th-cyan">ECD</th>
+                                <th class="th-cyan">RETEMPERING</th>
+                                <th class="th-cyan">GRINDING</th>
+                                <th class="th-yellow">EQUALISE</th>
+                                <th class="th-yellow">CARBURISING</th>
+                                <th class="th-yellow">DIFFUSION</th>
+                                <th class="th-yellow">HARDENING</th>
+                                <th class="th-yellow">QUENCHING</th>
+                                <th class="th-yellow">TEMPERING</th>
+                                <th class="th-yellow">REMARKS</th>
+                            </tr>
+                        </thead>
+                        <tbody>${tableRows}</tbody>
+                    </table>
+                </div>
+            `;
+            container.appendChild(section);
+        });
     }
 
-    function openPdfModal(url, title) {
-      document.getElementById('pdfTitle').innerText = title;
-      document.getElementById('pdfFrame').src = url;
-      document.getElementById('pdfModal').style.display = 'flex';
-    }
-
-    function closePdfModal() {
-      document.getElementById('pdfModal').style.display = 'none';
-      document.getElementById('pdfFrame').src = '';
-    }
-
-    window.addEventListener('DOMContentLoaded', initDashboardEngine);
-  </script>
+    // Initialize
+    initCustomerFilter();
+    filterData();
+</script>
 </body>
 </html>
