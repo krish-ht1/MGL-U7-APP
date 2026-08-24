@@ -34,17 +34,5 @@ const plantMasterData = {
     ["7100028", "M Singh", "Plant Head / Manager", "Heat Treatment Unit 7", "+91 9056407407"],
     ["EMP-102", "Quality Incharge", "Quality Lead", "Metallurgy Lab", "+91 98XXXXXXXX"],
     ["EMP-103", "Maintenance Lead", "Shift Engineer", "Maintenance", "+91 97XXXXXXXX"]
-  ],
-
-  // 5. Direct Google Drive SIPs Database
-  "sips": [
-    ["SIP-001", "DRIVEN GEAR 4TH SPEED", "SAME DEUTZ FAHR", "Carburizing & Hardening", "0.8 - 1.2 mm", "58 - 62 HRC", "Rev-01", "https://drive.google.com/file/d/1gI264fE3Jg8uV6f0K2Q1h1n4_9gK5aBc/view"],
-    ["SIP-002", "DRIVING GEAR 3RD & 4TH", "SAME DEUTZ FAHR", "Carburizing & Hardening", "1.0 - 1.4 mm", "59 - 63 HRC", "Rev-00", "https://drive.google.com/file/d/1X5u746Eeg7VbU_jG9z81n3qL7gJt2aBc/view"],
-    ["SIP-003", "REVERSE IDLER GEAR", "SAME DEUTZ FAHR", "Through Hardening", "Core Tough", "50 - 55 HRC", "Rev-02", "https://drive.google.com/file/d/1aBc746Eeg7VbU_jG9z81n3qL7gJt2aBc/view"],
-    ["SIP-004", "OUTPUT SHAFT 4WD", "SAME DEUTZ FAHR", "Carburizing & Hardening", "0.6 - 0.9 mm", "58 - 62 HRC", "Rev-01", "https://drive.google.com/file/d/1dEf746Eeg7VbU_jG9z81n3qL7gJt2aBc/view"],
-    ["SIP-005", "DRIVING GEAR 1ST & 2ND", "SAME DEUTZ FAHR", "Case Carburizing", "0.9 - 1.3 mm", "60 - 64 HRC", "Rev-00", "https://drive.google.com/file/d/1eF746Eeg7VbU_jG9z81n3qL7gJt2aBc/view"],
-    ["SIP-006", "PINION SHAFT 12T", "CATERPILLAR", "Carbonitriding", "0.4 - 0.7 mm", "58 - 62 HRC", "Rev-03", "https://drive.google.com/file/d/1gH746Eeg7VbU_jG9z81n3qL7gJt2aBc/view"],
-    ["SIP-007", "BULL GEAR 44T", "KUBOTA", "Carburizing & Hardening", "0.8 - 1.1 mm", "60 - 63 HRC", "Rev-02", "https://drive.google.com/file/d/1iJ746Eeg7VbU_jG9z81n3qL7gJt2aBc/view"],
-    ["SIP-008", "INTERMEDIATE SHAFT", "JOHN DEERE", "Liquid Nitriding", "0.15 - 0.25 mm", "55 - 60 HRC", "Rev-01", "https://drive.google.com/file/d/1kL746Eeg7VbU_jG9z81n3qL7gJt2aBc/view"]
   ]
 };

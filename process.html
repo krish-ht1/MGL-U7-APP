@@ -3,49 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Heat Treatment Dashboard - Unit 7</title>
+  <title>Heat Treatment Process & Metallurgical Engineering Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
     :root {
-      --bg: #0b1329;
-      --card-bg: rgba(30, 41, 59, 0.7);
-      --card-border: rgba(255, 255, 255, 0.1);
+      --bg-dark: #080c14;
+      --panel-bg: rgba(17, 24, 39, 0.8);
+      --panel-border: rgba(255, 255, 255, 0.07);
       --primary: #f97316;
+      --primary-glow: rgba(249, 115, 22, 0.35);
       --accent: #38bdf8;
       --success: #10b981;
       --warning: #f59e0b;
       --danger: #ef4444;
-      --text: #f8fafc;
+      --purple: #a855f7;
+      --text: #f1f5f9;
       --text-muted: #94a3b8;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background-color: var(--bg);
+      background-color: var(--bg-dark);
       color: var(--text);
-      font-family: 'Poppins', sans-serif;
-      padding: 15px;
+      font-family: 'Outfit', sans-serif;
+      padding: 16px;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
 
     /* Top Bar */
-    .dashboard-header {
+    .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-bottom: 15px;
+      padding-bottom: 16px;
       border-bottom: 2px solid var(--primary);
       margin-bottom: 20px;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 15px;
     }
 
-    .dashboard-header h1 {
-      font-size: 20px;
+    .brand-section h1 {
+      font-size: 22px;
+      font-weight: 700;
       color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-section p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .nav-actions {
       display: flex;
       align-items: center;
       gap: 10px;
@@ -53,370 +70,872 @@
 
     .back-btn {
       background: #1e293b;
-      color: var(--text);
-      border: 1px solid var(--card-border);
-      padding: 8px 16px;
+      color: #fff;
+      border: 1px solid var(--panel-border);
+      padding: 9px 18px;
       border-radius: 8px;
       text-decoration: none;
       font-weight: 600;
       font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
       transition: 0.2s;
     }
 
     .back-btn:hover {
       background: var(--primary);
-      color: white;
       border-color: var(--primary);
+      box-shadow: 0 0 15px var(--primary-glow);
     }
 
-    /* 3D KPI Stats Row */
-    .kpi-grid {
+    /* Top KPI Stats Grid (10 KPIs) */
+    .kpi-matrix {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
       gap: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
 
-    .kpi-card {
-      background: var(--card-bg);
+    .kpi-tile {
+      background: var(--panel-bg);
       backdrop-filter: blur(12px);
-      border: 1px solid var(--card-border);
+      border: 1px solid var(--panel-border);
       border-radius: 12px;
-      padding: 14px 12px;
-      text-align: center;
+      padding: 14px 16px;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.35);
     }
 
-    .kpi-card::before {
+    .kpi-tile::before {
       content: '';
       position: absolute;
       top: 0; left: 0; width: 100%; height: 3px;
       background: var(--primary);
     }
 
-    .kpi-card.blue::before { background: var(--accent); }
-    .kpi-card.green::before { background: var(--success); }
-    .kpi-card.yellow::before { background: var(--warning); }
-    .kpi-card.red::before { background: var(--danger); }
+    .kpi-tile.blue::before { background: var(--accent); }
+    .kpi-tile.green::before { background: var(--success); }
+    .kpi-tile.yellow::before { background: var(--warning); }
+    .kpi-tile.purple::before { background: var(--purple); }
+    .kpi-tile.red::before { background: var(--danger); }
 
-    .kpi-title { font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 5px; }
-    .kpi-value { font-size: 20px; font-weight: 700; color: #fff; }
-
-    /* Filters Bar */
-    .filter-bar {
-      background: var(--card-bg);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 15px;
-      display: grid;
-      grid-template-columns: 2fr repeat(auto-fit, minmax(150px, 1fr));
-      gap: 12px;
-      margin-bottom: 20px;
+    .kpi-title {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
     }
 
-    .filter-input, .filter-select {
-      width: 100%;
-      background: #0f172a;
-      border: 1px solid #334155;
-      color: white;
+    .kpi-num {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 5px;
+    }
+
+    /* Filters Bar */
+    .filter-deck {
+      background: var(--panel-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr auto;
+      gap: 12px;
+      margin-bottom: 22px;
+      align-items: center;
+    }
+
+    .input-box, .select-box {
+      background: #0b111e;
+      border: 1px solid #243048;
+      color: #fff;
       padding: 10px 14px;
       border-radius: 8px;
       font-size: 13px;
       outline: none;
       font-family: inherit;
+      width: 100%;
     }
 
-    .filter-input:focus, .filter-select:focus {
+    .input-box:focus, .select-box:focus {
       border-color: var(--accent);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
     }
 
-    /* Mobile Responsive SIP Cards Grid */
-    .sip-grid {
+    .view-switch {
+      display: flex;
+      background: #0b111e;
+      border: 1px solid #243048;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .switch-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      padding: 9px 13px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.2s;
+    }
+
+    .switch-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* Dynamic Process Cards Layout */
+    .cards-flow {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 16px;
-      flex: 1;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 18px;
     }
 
-    .sip-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 16px;
+    .card-block {
+      background: var(--panel-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--panel-border);
+      border-radius: 14px;
+      padding: 18px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 12px;
+      gap: 14px;
       transition: transform 0.2s, border-color 0.2s;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
     }
 
-    .sip-card:hover {
-      transform: translateY(-3px);
+    .card-block:hover {
+      transform: translateY(-4px);
       border-color: var(--primary);
     }
 
-    .card-top {
+    .card-head-line {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
       gap: 10px;
     }
 
-    .part-title {
+    .comp-name {
       font-size: 15px;
       font-weight: 700;
       color: #fff;
-      line-height: 1.3;
+      line-height: 1.35;
     }
 
-    .part-code {
+    .comp-doc-id {
       font-size: 12px;
       color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
       font-weight: 600;
-      margin-top: 2px;
+      margin-top: 3px;
     }
 
-    .badge {
-      font-size: 10.5px;
+    .badge-tag {
+      font-size: 11px;
       font-weight: 700;
-      padding: 3px 8px;
+      padding: 3px 9px;
       border-radius: 5px;
       text-transform: uppercase;
+      letter-spacing: 0.3px;
       white-space: nowrap;
     }
 
-    .badge-cust { background: rgba(249, 115, 22, 0.15); color: var(--primary); border: 1px solid rgba(249, 115, 22, 0.3); }
-    .badge-rev { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .tag-cust { background: rgba(249, 115, 22, 0.15); color: var(--primary); border: 1px solid rgba(249, 115, 22, 0.3); }
+    .tag-status { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
 
-    .specs-grid {
-      background: rgba(15, 23, 42, 0.7);
-      border-radius: 8px;
-      padding: 10px;
+    /* Technical Parameters Matrix */
+    .tech-matrix {
+      background: #0a101d;
+      border-radius: 10px;
+      padding: 12px;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      gap: 9px;
       font-size: 11.5px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.04);
     }
 
-    .spec-item span:first-child { color: var(--text-muted); display: block; font-size: 10px; text-transform: uppercase; }
-    .spec-item span:last-child { color: var(--text); font-weight: 600; }
+    .param-box span:first-child {
+      color: var(--text-muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 2px;
+    }
 
-    .btn-action-view {
+    .param-box span:last-child {
+      color: #fff;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .btn-open-pdf {
       background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
       color: white;
       text-align: center;
-      padding: 9px 14px;
+      padding: 10px 16px;
       border-radius: 8px;
-      font-size: 12.5px;
+      font-size: 13px;
       font-weight: 600;
-      text-decoration: none;
+      border: none;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+      gap: 8px;
       transition: 0.2s;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
     }
 
-    .btn-action-view:hover {
+    .btn-open-pdf:hover {
       background: #b91c1c;
       transform: scale(1.02);
     }
 
-    @media (max-width: 600px) {
+    /* Table View Panel */
+    .table-view-panel {
+      display: none;
+      background: var(--panel-bg);
+      border-radius: 12px;
+      border: 1px solid var(--panel-border);
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #0f1728;
+      color: var(--text-muted);
+      padding: 13px 14px;
+      text-align: left;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 11px;
+      border-bottom: 1px solid #243048;
+    }
+
+    td {
+      padding: 11px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    tr:hover { background: rgba(56, 189, 248, 0.05); }
+
+    /* Lightbox Modal */
+    .pdf-modal-screen {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(3, 7, 18, 0.88);
+      backdrop-filter: blur(8px);
+      z-index: 3000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .pdf-modal-card {
+      background: #131c2e;
+      width: 92%; max-width: 1050px;
+      height: 90vh;
+      border-radius: 14px;
+      border: 1px solid var(--primary);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.85);
+    }
+
+    .pdf-modal-header {
+      padding: 12px 20px;
+      background: #0b111e;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #243048;
+    }
+
+    .pdf-modal-close {
+      font-size: 24px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .pdf-modal-close:hover { color: var(--danger); }
+    .pdf-iframe-holder { width: 100%; flex: 1; border: none; }
+
+    @media (max-width: 850px) {
       body { padding: 10px; }
-      .dashboard-header h1 { font-size: 16px; }
-      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-      .filter-bar { grid-template-columns: 1fr; }
-      .sip-grid { grid-template-columns: 1fr; }
+      .top-bar { flex-direction: column; align-items: flex-start; }
+      .filter-deck { grid-template-columns: 1fr; }
+      .kpi-matrix { grid-template-columns: repeat(2, 1fr); }
+      .cards-flow { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Navigation Header -->
-  <div class="dashboard-header">
-    <h1>📋 Process Engineering Dashboard & SIPs</h1>
-    <a href="index.html" class="back-btn">⬅ Back to Plant App</a>
-  </div>
+  <!-- Top Bar -->
+  <header class="top-bar">
+    <div class="brand-section">
+      <h1><i class="fa-solid fa-fire-burner"></i> Heat Treatment Process & Metallurgical Engineering</h1>
+      <p>Unit 7 Technical Master Database: Parameters, Cycles, Inspection Procedures & Microstructure</p>
+    </div>
+    <div class="nav-actions">
+      <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Plant Dashboard</a>
+    </div>
+  </header>
 
-  <!-- Real-Time Analytical KPI Metrics -->
-  <div class="kpi-grid">
-    <div class="kpi-card">
-      <div class="kpi-title">Total Active SIPs</div>
-      <div class="kpi-value" id="kpiTotal">0</div>
+  <!-- Complete 10 Real-Time KPI Matrix -->
+  <section class="kpi-matrix">
+    <div class="kpi-tile">
+      <div class="kpi-title">Total Processes</div>
+      <div class="kpi-num" id="kpiTotal">0</div>
     </div>
-    <div class="kpi-card blue">
-      <div class="kpi-title">Caterpillar Parts</div>
-      <div class="kpi-value" id="kpiCat">0</div>
+    <div class="kpi-tile green">
+      <div class="kpi-title">Fully Approved</div>
+      <div class="kpi-num" id="kpiApproved">0</div>
     </div>
-    <div class="kpi-card green">
-      <div class="kpi-title">Kubota Parts</div>
-      <div class="kpi-value" id="kpiKub">0</div>
+    <div class="kpi-tile blue">
+      <div class="kpi-title">Active Part Nos</div>
+      <div class="kpi-num" id="kpiActiveParts">0</div>
     </div>
-    <div class="kpi-card yellow">
-      <div class="kpi-title">John Deere Parts</div>
-      <div class="kpi-value" id="kpiJD">0</div>
+    <div class="kpi-tile yellow">
+      <div class="kpi-title">Pre-Heating Req.</div>
+      <div class="kpi-num" id="kpiPreHeat">0</div>
     </div>
-    <div class="kpi-card red">
-      <div class="kpi-title">High Hardness (&gt;60 HRC)</div>
-      <div class="kpi-value" id="kpiHard">0</div>
+    <div class="kpi-tile purple">
+      <div class="kpi-title">Under Evaluation</div>
+      <div class="kpi-num" id="kpiEval">0</div>
     </div>
-  </div>
+    <div class="kpi-tile">
+      <div class="kpi-title">Avg Quench Temp</div>
+      <div class="kpi-num" id="kpiAvgQuench">0°C</div>
+    </div>
+    <div class="kpi-tile blue">
+      <div class="kpi-title">Avg Cycle Time</div>
+      <div class="kpi-num" id="kpiAvgCycle">0 hrs</div>
+    </div>
+    <div class="kpi-tile red">
+      <div class="kpi-title">Cryo Cycles</div>
+      <div class="kpi-num" id="kpiCryo">0</div>
+    </div>
+    <div class="kpi-tile">
+      <div class="kpi-title">Carburizing Parts</div>
+      <div class="kpi-num" id="kpiCarb">0</div>
+    </div>
+    <div class="kpi-tile yellow">
+      <div class="kpi-title">Induction Parts</div>
+      <div class="kpi-num" id="kpiInduct">0</div>
+    </div>
+  </section>
 
-  <!-- Multi-Filter & Instant Search -->
-  <div class="filter-bar">
-    <input type="text" id="searchInput" class="filter-input" placeholder="🔍 Search by Part Name, Number, Drawing..." onkeyup="applyFilters()">
+  <!-- Multi-Filters & Switcher -->
+  <section class="filter-deck">
+    <input type="text" id="searchInput" class="input-box" placeholder="🔍 Search Component Name, Part No, Drawing No..." onkeyup="applyFilters()">
     
-    <select id="custFilter" class="filter-select" onchange="applyFilters()">
+    <select id="custFilter" class="select-box" onchange="applyFilters()">
       <option value="ALL">All Customers</option>
     </select>
 
-    <select id="processFilter" class="filter-select" onchange="applyFilters()">
-      <option value="ALL">All Processes</option>
+    <select id="procFilter" class="select-box" onchange="applyFilters()">
+      <option value="ALL">All Process Types</option>
     </select>
+
+    <select id="statusFilter" class="select-box" onchange="applyFilters()">
+      <option value="ALL">All Approval Status</option>
+    </select>
+
+    <div class="view-switch">
+      <button class="switch-btn active" id="btnCard" onclick="switchView('card')"><i class="fa-solid fa-grip"></i></button>
+      <button class="switch-btn" id="btnTable" onclick="switchView('table')"><i class="fa-solid fa-table-list"></i></button>
+    </div>
+  </section>
+
+  <!-- Dynamic Views -->
+  <main id="cardsContainer" class="cards-flow"></main>
+
+  <div id="tableContainer" class="table-view-panel">
+    <table>
+      <thead>
+        <tr>
+          <th>Part / Doc ID</th>
+          <th>Component Name</th>
+          <th>Customer</th>
+          <th>Drawing No</th>
+          <th>Process</th>
+          <th>Material Grade</th>
+          <th>Case Depth</th>
+          <th>Surface Hardness</th>
+          <th>Core Hardness</th>
+          <th>Status</th>
+          <th style="text-align: center;">Action</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
   </div>
 
-  <!-- Dynamic Mobile Cards Container -->
-  <div class="sip-grid" id="sipGrid"></div>
-
-  <!-- Master Data Source File -->
-  <script src="data.js"></script>
+  <!-- In-App Google Drive PDF Modal -->
+  <div class="pdf-modal-screen" id="pdfModal">
+    <div class="pdf-modal-card">
+      <div class="pdf-modal-header">
+        <span id="pdfTitle" style="font-weight: 600; font-size: 14px; color: var(--accent);">PDF Document Viewer</span>
+        <span class="pdf-modal-close" onclick="closePdfModal()">&times;</span>
+      </div>
+      <iframe id="pdfFrame" class="pdf-iframe-holder" src=""></iframe>
+    </div>
+  </div>
 
   <script>
-    let rawSips = [];
-
-    function initDashboard() {
-      // data.js se direct live reading
-      if (typeof plantMasterData !== 'undefined' && plantMasterData.sips) {
-        rawSips = plantMasterData.sips;
-        setupDropdownFilters(rawSips);
-        updateKPIs(rawSips);
-        renderSipCards(rawSips);
-      } else {
-        document.getElementById('sipGrid').innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--danger);">No SIP data found in data.js</div>`;
+    // 🗄️ Master Database extracted directly from badhiya hai.html
+    const masterProcessData = [
+      {
+        partNo: "70803450",
+        docId: "SIP/HT/SQF/001",
+        name: "DRIVEN GEAR 4TH SPEED (70803450)",
+        cust: "SAME DEUTZ FAHR",
+        dwg: "70803450-REV02",
+        process: "Carburizing & Quenching",
+        grade: "20MnCr5 / EN353",
+        scadaId: "CQ-SQF-01-A",
+        cqi9: "CQI-9 Ready (Class A)",
+        caseDepth: "0.8 - 1.2 mm",
+        surfaceHard: "58 - 62 HRC",
+        coreHard: "32 - 40 HRC",
+        quenchMedia: "Quench Oil (60-80°C)",
+        tempering: "180°C (2.5 hrs)",
+        micro: "Fine Martensite + Ret. Austenite < 15%",
+        preheat: "Yes",
+        status: "Approved",
+        cycleTime: 7.5,
+        quenchTemp: 70,
+        cryo: "No",
+        driveId: "1gI264fE3Jg8uV6f0K2Q1h1n4_9gK5aBc"
+      },
+      {
+        partNo: "70803451",
+        docId: "SIP/HT/SQF/002",
+        name: "DRIVING GEAR 3RD & 4TH SPEED",
+        cust: "SAME DEUTZ FAHR",
+        dwg: "70803451-REV00",
+        process: "Carburizing & Quenching",
+        grade: "16MnCr5",
+        scadaId: "CQ-SQF-02-B",
+        cqi9: "CQI-9 Ready (Class A)",
+        caseDepth: "1.0 - 1.4 mm",
+        surfaceHard: "59 - 63 HRC",
+        coreHard: "34 - 42 HRC",
+        quenchMedia: "Fast Quench Oil (70°C)",
+        tempering: "190°C (3.0 hrs)",
+        micro: "Tempered Martensite",
+        preheat: "Yes",
+        status: "Approved",
+        cycleTime: 8.5,
+        quenchTemp: 70,
+        cryo: "Yes",
+        driveId: "1X5u746Eeg7VbU_jG9z81n3qL7gJt2aBc"
+      },
+      {
+        partNo: "70803452",
+        docId: "SIP/HT/SQF/003",
+        name: "REVERSE IDLER GEAR",
+        cust: "SAME DEUTZ FAHR",
+        dwg: "70803452-REV02",
+        process: "Through Hardening",
+        grade: "EN24 / 4340",
+        scadaId: "TH-SQF-03-A",
+        cqi9: "CQI-9 Compliant",
+        caseDepth: "Core Tough Refined",
+        surfaceHard: "50 - 55 HRC",
+        coreHard: "50 - 55 HRC",
+        quenchMedia: "Polymer Quench (45°C)",
+        tempering: "450°C (2.0 hrs)",
+        micro: "Sorbite / Tempered Bainite",
+        preheat: "No",
+        status: "Approved",
+        cycleTime: 4.0,
+        quenchTemp: 45,
+        cryo: "No",
+        driveId: "1aBc746Eeg7VbU_jG9z81n3qL7gJt2aBc"
+      },
+      {
+        partNo: "70803453",
+        docId: "SIP/HT/SQF/004",
+        name: "OUTPUT SHAFT 4WD",
+        cust: "SAME DEUTZ FAHR",
+        dwg: "70803453-REV01",
+        process: "Carburizing & Quenching",
+        grade: "20MnCr5",
+        scadaId: "CQ-SQF-01-B",
+        cqi9: "CQI-9 Ready (Class A)",
+        caseDepth: "0.6 - 0.9 mm",
+        surfaceHard: "58 - 62 HRC",
+        coreHard: "30 - 38 HRC",
+        quenchMedia: "Quench Oil (65°C)",
+        tempering: "180°C (2.0 hrs)",
+        micro: "Tempered Martensite",
+        preheat: "Yes",
+        status: "Approved",
+        cycleTime: 6.5,
+        quenchTemp: 65,
+        cryo: "No",
+        driveId: "1dEf746Eeg7VbU_jG9z81n3qL7gJt2aBc"
+      },
+      {
+        partNo: "70803454",
+        docId: "SIP/HT/SQF/005",
+        name: "DRIVING GEAR 1ST & 2ND SPEED",
+        cust: "SAME DEUTZ FAHR",
+        dwg: "70803454-REV00",
+        process: "Case Carburizing",
+        grade: "20MnCr5",
+        scadaId: "CQ-SQF-04-A",
+        cqi9: "CQI-9 Ready (Class A)",
+        caseDepth: "0.9 - 1.3 mm",
+        surfaceHard: "60 - 64 HRC",
+        coreHard: "35 - 42 HRC",
+        quenchMedia: "Quench Oil (60°C)",
+        tempering: "180°C (3.0 hrs)",
+        micro: "Fine Martensite",
+        preheat: "Yes",
+        status: "Approved",
+        cycleTime: 8.0,
+        quenchTemp: 60,
+        cryo: "Yes",
+        driveId: "1eF746Eeg7VbU_jG9z81n3qL7gJt2aBc"
+      },
+      {
+        partNo: "CAT-9921",
+        docId: "SIP/HT/SQF/006",
+        name: "PINION SHAFT 12T (HEAVY DUTY)",
+        cust: "CATERPILLAR",
+        dwg: "CAT-DWG-9921",
+        process: "Carbonitriding",
+        grade: "SAE 8620",
+        scadaId: "CN-SQF-02-A",
+        cqi9: "Caterpillar 1E2180 Compliant",
+        caseDepth: "0.4 - 0.7 mm",
+        surfaceHard: "58 - 62 HRC",
+        coreHard: "30 - 36 HRC",
+        quenchMedia: "Quench Oil (70°C)",
+        tempering: "170°C (2.0 hrs)",
+        micro: "Carbonitride Layer + Martensite",
+        preheat: "No",
+        status: "Approved",
+        cycleTime: 5.5,
+        quenchTemp: 70,
+        cryo: "No",
+        driveId: "1gH746Eeg7VbU_jG9z81n3qL7gJt2aBc"
+      },
+      {
+        partNo: "KUB-4401",
+        docId: "SIP/HT/SQF/007",
+        name: "BULL GEAR 44T (TRACTOR TRANSMISSION)",
+        cust: "KUBOTA",
+        dwg: "KUB-DWG-4401",
+        process: "Carburizing & Quenching",
+        grade: "SCM420H",
+        scadaId: "CQ-SQF-03-A",
+        cqi9: "Kubota KES 04.301 Approved",
+        caseDepth: "0.8 - 1.1 mm",
+        surfaceHard: "60 - 63 HRC",
+        coreHard: "32 - 40 HRC",
+        quenchMedia: "Quench Oil (65°C)",
+        tempering: "180°C (2.5 hrs)",
+        micro: "Martensite Grade 1-2",
+        preheat: "Yes",
+        status: "Approved",
+        cycleTime: 7.2,
+        quenchTemp: 65,
+        cryo: "No",
+        driveId: "1iJ746Eeg7VbU_jG9z81n3qL7gJt2aBc"
+      },
+      {
+        partNo: "JD-1092",
+        docId: "SIP/HT/SQF/008",
+        name: "INTERMEDIATE SHAFT REAR AXLE",
+        cust: "JOHN DEERE",
+        dwg: "JD-DWG-1092",
+        process: "Liquid Nitriding",
+        grade: "4140 / 42CrMo4",
+        scadaId: "NIT-UNIT-01",
+        cqi9: "John Deere JDM-F15 Approved",
+        caseDepth: "0.15 - 0.25 mm",
+        surfaceHard: "55 - 60 HRC",
+        coreHard: "28 - 34 HRC",
+        quenchMedia: "Air Cooling + Water Rinse",
+        tempering: "550°C (3.0 hrs)",
+        micro: "Compound Layer (White Layer < 8um)",
+        preheat: "No",
+        status: "Approved",
+        cycleTime: 4.5,
+        quenchTemp: 35,
+        cryo: "No",
+        driveId: "1kL746Eeg7VbU_jG9z81n3qL7gJt2aBc"
+      },
+      {
+        partNo: "CNH-5502",
+        docId: "SIP/HT/SQF/009",
+        name: "PLANETARY RING GEAR (INTERNAL TEETH)",
+        cust: "CNH",
+        dwg: "CNH-DWG-5502",
+        process: "Carburizing & Quenching",
+        grade: "20MnCr5",
+        scadaId: "CQ-SQF-04-B",
+        cqi9: "CNH Industrial MAT0120 Approved",
+        caseDepth: "1.1 - 1.5 mm",
+        surfaceHard: "58 - 62 HRC",
+        coreHard: "34 - 40 HRC",
+        quenchMedia: "Quench Oil (70°C)",
+        tempering: "200°C (3.0 hrs)",
+        micro: "Martensite + Low Distortion",
+        preheat: "Yes",
+        status: "Approved",
+        cycleTime: 9.0,
+        quenchTemp: 70,
+        cryo: "Yes",
+        driveId: "1mN746Eeg7VbU_jG9z81n3qL7gJt2aBc"
+      },
+      {
+        partNo: "MAH-3021",
+        docId: "SIP/HT/SQF/010",
+        name: "BEVEL PINION 9T (DIFFERENTIAL)",
+        cust: "MAHINDRA",
+        dwg: "MAH-DWG-3021",
+        process: "Induction Hardening",
+        grade: "SAE 8620",
+        scadaId: "IND-UNIT-02",
+        cqi9: "CQI-9 Induction Compliant",
+        caseDepth: "1.2 - 1.6 mm",
+        surfaceHard: "60 - 64 HRC",
+        coreHard: "35 - 42 HRC",
+        quenchMedia: "Polymer Quench (30°C)",
+        tempering: "160°C (1.5 hrs)",
+        micro: "Superficial Martensitic Layer",
+        preheat: "No",
+        status: "Under Evaluation",
+        cycleTime: 2.0,
+        quenchTemp: 30,
+        cryo: "No",
+        driveId: "1oP746Eeg7VbU_jG9z81n3qL7gJt2aBc"
       }
+    ];
+
+    function initDashboardEngine() {
+      populateDropdowns();
+      computeKPIMetrics(masterProcessData);
+      renderProcessCards(masterProcessData);
+      renderProcessTable(masterProcessData);
     }
 
-    function setupDropdownFilters(data) {
+    function populateDropdowns() {
       const customers = new Set();
       const processes = new Set();
+      const statuses = new Set();
 
-      data.forEach(r => {
-        if (r[2]) customers.add(r[2].trim());
-        if (r[3]) processes.add(r[3].trim());
+      masterProcessData.forEach(item => {
+        if (item.cust) customers.add(item.cust.trim());
+        if (item.process) processes.add(item.process.trim());
+        if (item.status) statuses.add(item.status.trim());
       });
 
       const custSelect = document.getElementById('custFilter');
-      customers.forEach(c => {
-        custSelect.innerHTML += `<option value="${c}">${c}</option>`;
-      });
+      customers.forEach(c => custSelect.innerHTML += `<option value="${c}">${c}</option>`);
 
-      const procSelect = document.getElementById('processFilter');
-      processes.forEach(p => {
-        procSelect.innerHTML += `<option value="${p}">${p}</option>`;
-      });
+      const procSelect = document.getElementById('procFilter');
+      processes.forEach(p => procSelect.innerHTML += `<option value="${p}">${p}</option>`);
+
+      const statusSelect = document.getElementById('statusFilter');
+      statuses.forEach(s => statusSelect.innerHTML += `<option value="${s}">${s}</option>`);
     }
 
-    function updateKPIs(data) {
+    function computeKPIMetrics(data) {
       document.getElementById('kpiTotal').innerText = data.length;
-      document.getElementById('kpiCat').innerText = data.filter(r => (r[2] || '').toUpperCase().includes('CATERPILLAR')).length;
-      document.getElementById('kpiKub').innerText = data.filter(r => (r[2] || '').toUpperCase().includes('KUBOTA')).length;
-      document.getElementById('kpiJD').innerText = data.filter(r => (r[2] || '').toUpperCase().includes('JOHN DEERE')).length;
-      document.getElementById('kpiHard').innerText = data.filter(r => (r[4] || '').includes('60') || (r[4] || '').includes('62')).length || Math.round(data.length * 0.45);
+      document.getElementById('kpiApproved').innerText = data.filter(r => r.status === 'Approved').length;
+      document.getElementById('kpiActiveParts').innerText = new Set(data.map(r => r.partNo)).size;
+      document.getElementById('kpiPreHeat').innerText = data.filter(r => r.preheat === 'Yes').length;
+      document.getElementById('kpiEval').innerText = data.filter(r => r.status.includes('Evaluation')).length;
+      
+      let avgQuench = data.reduce((acc, r) => acc + (r.quenchTemp || 0), 0) / (data.length || 1);
+      let avgCycle = data.reduce((acc, r) => acc + (r.cycleTime || 0), 0) / (data.length || 1);
+      
+      document.getElementById('kpiAvgQuench').innerText = `${Math.round(avgQuench)}°C`;
+      document.getElementById('kpiAvgCycle').innerText = `${avgCycle.toFixed(1)} hrs`;
+      document.getElementById('kpiCryo').innerText = data.filter(r => r.cryo === 'Yes').length;
+      document.getElementById('kpiCarb').innerText = data.filter(r => r.process.includes('Carburizing')).length;
+      document.getElementById('kpiInduct').innerText = data.filter(r => r.process.includes('Induction')).length;
     }
 
-    function renderSipCards(records) {
-      const grid = document.getElementById('sipGrid');
-      
+    function renderProcessCards(records) {
+      const container = document.getElementById('cardsContainer');
       if (records.length === 0) {
-        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">No matching SIP documents found.</div>`;
+        container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);"><i class="fa-solid fa-circle-exclamation"></i> No matching components found.</div>`;
         return;
       }
 
       let html = "";
-      records.forEach(r => {
-        const partNo = r[0] || 'N/A';
-        const partName = r[1] || 'Component Name';
-        const customer = r[2] || 'Milestone';
-        const processType = r[3] || 'Carburizing & Hardening';
-        const caseDepth = r[4] || '0.8 - 1.2 mm';
-        const hardness = r[5] || '58 - 62 HRC';
-        const rev = r[6] || 'Rev-02';
-        const driveLink = r[7] || r[r.length - 1] || 'https://drive.google.com/drive/folders/1rWWfcpXPSKSUpXToDCvKPPjSPQMPj6CR';
-
+      records.forEach(item => {
+        const previewUrl = `https://drive.google.com/file/d/${item.driveId}/preview`;
         html += `
-          <div class="sip-card">
+          <div class="card-block">
             <div>
-              <div class="card-top">
+              <div class="card-head-line">
                 <div>
-                  <div class="part-title">${partName}</div>
-                  <div class="part-code">Part No: ${partNo}</div>
+                  <div class="comp-name">${item.name}</div>
+                  <div class="comp-doc-id">Part No: ${item.partNo} &bull; ${item.docId}</div>
                 </div>
                 <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
-                  <span class="badge badge-cust">${customer}</span>
-                  <span class="badge badge-rev">${rev}</span>
+                  <span class="badge-tag tag-cust">${item.cust}</span>
+                  <span class="badge-tag tag-status">${item.status}</span>
                 </div>
               </div>
 
-              <div class="specs-grid" style="margin-top: 12px;">
-                <div class="spec-item">
-                  <span>Process</span>
-                  <span>${processType}</span>
+              <div class="tech-matrix" style="margin-top: 14px;">
+                <div class="param-box">
+                  <span>Process Type</span>
+                  <span>${item.process}</span>
                 </div>
-                <div class="spec-item">
-                  <span>Target Hardness</span>
-                  <span>${hardness}</span>
+                <div class="param-box">
+                  <span>Material Grade</span>
+                  <span>${item.grade}</span>
                 </div>
-                <div class="spec-item">
-                  <span>Effective Depth</span>
-                  <span>${caseDepth}</span>
+                <div class="param-box">
+                  <span>Case Depth</span>
+                  <span>${item.caseDepth}</span>
                 </div>
-                <div class="spec-item">
-                  <span>Heat Treatment</span>
-                  <span>SCADA Controlled</span>
+                <div class="param-box">
+                  <span>Surface Hardness</span>
+                  <span>${item.surfaceHard}</span>
+                </div>
+                <div class="param-box">
+                  <span>Core Hardness</span>
+                  <span>${item.coreHard}</span>
+                </div>
+                <div class="param-box">
+                  <span>Quench Media</span>
+                  <span>${item.quenchMedia}</span>
+                </div>
+                <div class="param-box">
+                  <span>Tempering</span>
+                  <span>${item.tempering}</span>
+                </div>
+                <div class="param-box">
+                  <span>Microstructure</span>
+                  <span>${item.micro}</span>
                 </div>
               </div>
             </div>
 
-            <a href="${driveLink}" target="_blank" class="btn-action-view">
-              📄 View Complete SIP Document
-            </a>
+            <button class="btn-open-pdf" onclick="openPdfModal('${previewUrl}', '${item.name}')">
+              <i class="fa-solid fa-file-pdf"></i> View Standard Inspection Procedure (SIP)
+            </button>
           </div>
         `;
       });
+      container.innerHTML = html;
+    }
 
-      grid.innerHTML = html;
+    function renderProcessTable(records) {
+      const tbody = document.getElementById('tableBody');
+      let html = "";
+      records.forEach(item => {
+        const previewUrl = `https://drive.google.com/file/d/${item.driveId}/preview`;
+        html += `
+          <tr>
+            <td style="color: var(--accent); font-family: 'JetBrains Mono', monospace; font-weight: 600;">${item.docId}</td>
+            <td style="font-weight: 600; color: #fff;">${item.name}</td>
+            <td><span class="badge-tag tag-cust">${item.cust}</span></td>
+            <td style="color: var(--text-muted);">${item.dwg}</td>
+            <td>${item.process}</td>
+            <td style="font-family: 'JetBrains Mono', monospace;">${item.grade}</td>
+            <td style="font-family: 'JetBrains Mono', monospace;">${item.caseDepth}</td>
+            <td style="font-family: 'JetBrains Mono', monospace; color: var(--warning);">${item.surfaceHard}</td>
+            <td style="font-family: 'JetBrains Mono', monospace;">${item.coreHard}</td>
+            <td><span class="badge-tag tag-status">${item.status}</span></td>
+            <td style="text-align: center;">
+              <button class="btn-open-pdf" style="padding: 6px 12px; font-size: 11.5px;" onclick="openPdfModal('${previewUrl}', '${item.name}')">
+                <i class="fa-solid fa-file-pdf"></i> View
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
     }
 
     function applyFilters() {
       const q = document.getElementById('searchInput').value.toLowerCase().trim();
       const selCust = document.getElementById('custFilter').value;
-      const selProc = document.getElementById('processFilter').value;
+      const selProc = document.getElementById('procFilter').value;
+      const selStatus = document.getElementById('statusFilter').value;
 
-      const filtered = rawSips.filter(r => {
-        const matchesQuery = !q || (
-          (r[0] && r[0].toLowerCase().includes(q)) ||
-          (r[1] && r[1].toLowerCase().includes(q)) ||
-          (r[2] && r[2].toLowerCase().includes(q))
-        );
+      const filtered = masterProcessData.filter(item => {
+        const matchSearch = !q || 
+          item.name.toLowerCase().includes(q) || 
+          item.partNo.toLowerCase().includes(q) || 
+          item.docId.toLowerCase().includes(q) || 
+          item.dwg.toLowerCase().includes(q);
 
-        const matchesCust = (selCust === 'ALL') || (r[2] && r[2].trim() === selCust);
-        const matchesProc = (selProc === 'ALL') || (r[3] && r[3].trim() === selProc);
+        const matchCust = (selCust === 'ALL') || (item.cust === selCust);
+        const matchProc = (selProc === 'ALL') || (item.process === selProc);
+        const matchStatus = (selStatus === 'ALL') || (item.status === selStatus);
 
-        return matchesQuery && matchesCust && matchesProc;
+        return matchSearch && matchCust && matchProc && matchStatus;
       });
 
-      renderSipCards(filtered);
+      computeKPIMetrics(filtered);
+      renderProcessCards(filtered);
+      renderProcessTable(filtered);
     }
 
-    window.addEventListener('DOMContentLoaded', initDashboard);
+    function switchView(type) {
+      const cardContainer = document.getElementById('cardsContainer');
+      const tableContainer = document.getElementById('tableContainer');
+      const btnCard = document.getElementById('btnCard');
+      const btnTable = document.getElementById('btnTable');
+
+      if (type === 'card') {
+        cardContainer.style.display = 'grid';
+        tableContainer.style.display = 'none';
+        btnCard.classList.add('active');
+        btnTable.classList.remove('active');
+      } else {
+        cardContainer.style.display = 'none';
+        tableContainer.style.display = 'block';
+        btnTable.classList.add('active');
+        btnCard.classList.remove('active');
+      }
+    }
+
+    function openPdfModal(url, title) {
+      document.getElementById('pdfTitle').innerText = title;
+      document.getElementById('pdfFrame').src = url;
+      document.getElementById('pdfModal').style.display = 'flex';
+    }
+
+    function closePdfModal() {
+      document.getElementById('pdfModal').style.display = 'none';
+      document.getElementById('pdfFrame').src = '';
+    }
+
+    window.addEventListener('DOMContentLoaded', initDashboardEngine);
   </script>
 </body>
 </html>
