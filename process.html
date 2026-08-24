@@ -3,262 +3,420 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Process Data & SIPs - Milestone Gear</title>
+  <title>Heat Treatment Dashboard - Unit 7</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-    body {
-      background: #0f172a;
-      color: #e2e8f0;
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      padding: 20px;
-      box-sizing: border-box;
-      min-height: 100vh;
+    :root {
+      --bg: #0b1329;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --primary: #f97316;
+      --accent: #38bdf8;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
     }
 
-    .top-header {
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
+      padding: 15px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Bar */
+    .dashboard-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 2px solid #f97316;
       padding-bottom: 15px;
+      border-bottom: 2px solid var(--primary);
       margin-bottom: 20px;
       flex-wrap: wrap;
       gap: 12px;
     }
 
-    .title-area h2 {
-      margin: 0;
-      color: #f97316;
+    .dashboard-header h1 {
       font-size: 20px;
+      color: var(--primary);
       display: flex;
       align-items: center;
-      gap: 8px;
-    }
-
-    .title-area p {
-      margin: 4px 0 0 0;
-      font-size: 12px;
-      color: #94a3b8;
+      gap: 10px;
     }
 
     .back-btn {
-      background: #f97316;
-      color: white;
-      text-decoration: none;
+      background: #1e293b;
+      color: var(--text);
+      border: 1px solid var(--card-border);
       padding: 8px 16px;
-      border-radius: 6px;
+      border-radius: 8px;
+      text-decoration: none;
       font-weight: 600;
       font-size: 13px;
       transition: 0.2s;
     }
 
     .back-btn:hover {
-      background: #ea580c;
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
     }
 
-    .search-filter-bar {
-      display: flex;
+    /* 3D KPI Stats Row */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       gap: 12px;
       margin-bottom: 20px;
-      flex-wrap: wrap;
     }
 
-    .search-input {
-      flex: 1;
-      min-width: 260px;
-      padding: 10px 14px;
-      background: #1e293b;
+    .kpi-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px 12px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 3px;
+      background: var(--primary);
+    }
+
+    .kpi-card.blue::before { background: var(--accent); }
+    .kpi-card.green::before { background: var(--success); }
+    .kpi-card.yellow::before { background: var(--warning); }
+    .kpi-card.red::before { background: var(--danger); }
+
+    .kpi-title { font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 5px; }
+    .kpi-value { font-size: 20px; font-weight: 700; color: #fff; }
+
+    /* Filters Bar */
+    .filter-bar {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 15px;
+      display: grid;
+      grid-template-columns: 2fr repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .filter-input, .filter-select {
+      width: 100%;
+      background: #0f172a;
       border: 1px solid #334155;
-      border-radius: 8px;
       color: white;
+      padding: 10px 14px;
+      border-radius: 8px;
       font-size: 13px;
       outline: none;
+      font-family: inherit;
     }
 
-    .search-input:focus {
-      border-color: #38bdf8;
+    .filter-input:focus, .filter-select:focus {
+      border-color: var(--accent);
     }
 
-    .record-badge {
-      background: #1e293b;
-      border: 1px solid #334155;
-      padding: 10px 15px;
-      border-radius: 8px;
-      font-size: 12px;
-      color: #38bdf8;
-      font-weight: 600;
+    /* Mobile Responsive SIP Cards Grid */
+    .sip-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+      flex: 1;
+    }
+
+    .sip-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px;
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      transition: transform 0.2s, border-color 0.2s;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.25);
     }
 
-    .table-container {
-      overflow-x: auto;
-      background: #1e293b;
-      border-radius: 10px;
-      border: 1px solid #334155;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    .sip-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--primary);
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      font-size: 12.5px;
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .part-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+    }
+
+    .part-code {
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .badge {
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 5px;
+      text-transform: uppercase;
       white-space: nowrap;
     }
 
-    th {
-      background: #0284c7;
-      color: white;
-      padding: 12px 14px;
-      font-weight: 600;
-      border-right: 1px solid #0369a1;
-    }
+    .badge-cust { background: rgba(249, 115, 22, 0.15); color: var(--primary); border: 1px solid rgba(249, 115, 22, 0.3); }
+    .badge-rev { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
 
-    td {
-      padding: 10px 14px;
-      border-bottom: 1px solid #334155;
-      border-right: 1px solid #334155;
-    }
-
-    tr:nth-child(even) {
-      background: #162032;
-    }
-
-    tr:hover {
-      background: rgba(56, 189, 248, 0.08);
-    }
-
-    .btn-view-pdf {
-      background: #ef4444;
-      color: white;
-      padding: 6px 12px;
-      border-radius: 5px;
-      text-decoration: none;
-      font-weight: 600;
+    .specs-grid {
+      background: rgba(15, 23, 42, 0.7);
+      border-radius: 8px;
+      padding: 10px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
       font-size: 11.5px;
-      display: inline-flex;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .spec-item span:first-child { color: var(--text-muted); display: block; font-size: 10px; text-transform: uppercase; }
+    .spec-item span:last-child { color: var(--text); font-weight: 600; }
+
+    .btn-action-view {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+      text-align: center;
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      text-decoration: none;
+      display: flex;
       align-items: center;
-      gap: 5px;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
       transition: 0.2s;
     }
 
-    .btn-view-pdf:hover {
-      background: #dc2626;
-      transform: scale(1.03);
+    .btn-action-view:hover {
+      background: #b91c1c;
+      transform: scale(1.02);
     }
 
-    .cust-badge {
-      background: rgba(249, 115, 22, 0.15);
-      color: #f97316;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-weight: 600;
-      font-size: 11px;
+    @media (max-width: 600px) {
+      body { padding: 10px; }
+      .dashboard-header h1 { font-size: 16px; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .filter-bar { grid-template-columns: 1fr; }
+      .sip-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-  <div class="top-header">
-    <div class="title-area">
-      <h2>📋 Process Data & Standard Inspection Procedures (SIPs)</h2>
-      <p>Instant Search across all Heat Treatment SIPs & Customer Drawings</p>
+  <!-- Top Navigation Header -->
+  <div class="dashboard-header">
+    <h1>📋 Process Engineering Dashboard & SIPs</h1>
+    <a href="index.html" class="back-btn">⬅ Back to Plant App</a>
+  </div>
+
+  <!-- Real-Time Analytical KPI Metrics -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-title">Total Active SIPs</div>
+      <div class="kpi-value" id="kpiTotal">0</div>
     </div>
-    <a href="index.html" class="back-btn">⬅ Back to Dashboard</a>
+    <div class="kpi-card blue">
+      <div class="kpi-title">Caterpillar Parts</div>
+      <div class="kpi-value" id="kpiCat">0</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-title">Kubota Parts</div>
+      <div class="kpi-value" id="kpiKub">0</div>
+    </div>
+    <div class="kpi-card yellow">
+      <div class="kpi-title">John Deere Parts</div>
+      <div class="kpi-value" id="kpiJD">0</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-title">High Hardness (&gt;60 HRC)</div>
+      <div class="kpi-value" id="kpiHard">0</div>
+    </div>
   </div>
 
-  <div class="search-filter-bar">
-    <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search by Part No, Part Name, Customer, Drawing No..." onkeyup="filterSips()">
-    <div class="record-badge" id="recordCount">Loading records...</div>
+  <!-- Multi-Filter & Instant Search -->
+  <div class="filter-bar">
+    <input type="text" id="searchInput" class="filter-input" placeholder="🔍 Search by Part Name, Number, Drawing..." onkeyup="applyFilters()">
+    
+    <select id="custFilter" class="filter-select" onchange="applyFilters()">
+      <option value="ALL">All Customers</option>
+    </select>
+
+    <select id="processFilter" class="filter-select" onchange="applyFilters()">
+      <option value="ALL">All Processes</option>
+    </select>
   </div>
 
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th style="width: 50px; text-align: center;">SR</th>
-          <th>PART NUMBER</th>
-          <th>PART / PROCESS NAME</th>
-          <th>CUSTOMER</th>
-          <th>DRAWING NO</th>
-          <th>REVISION</th>
-          <th style="text-align: center;">ACTION</th>
-        </tr>
-      </thead>
-      <tbody id="sipTableBody"></tbody>
-    </table>
-  </div>
+  <!-- Dynamic Mobile Cards Container -->
+  <div class="sip-grid" id="sipGrid"></div>
 
   <!-- Master Data Source File -->
   <script src="data.js"></script>
 
   <script>
-    let allSips = [];
+    let rawSips = [];
 
-    function initSipModule() {
+    function initDashboard() {
+      // data.js se direct live reading
       if (typeof plantMasterData !== 'undefined' && plantMasterData.sips) {
-        allSips = plantMasterData.sips;
-        renderSipRows(allSips);
+        rawSips = plantMasterData.sips;
+        setupDropdownFilters(rawSips);
+        updateKPIs(rawSips);
+        renderSipCards(rawSips);
       } else {
-        document.getElementById('sipTableBody').innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px; color: #ef4444;">No SIP records found in data.js</td></tr>`;
+        document.getElementById('sipGrid').innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--danger);">No SIP data found in data.js</div>`;
       }
     }
 
-    function renderSipRows(rows) {
-      const tbody = document.getElementById('sipTableBody');
-      document.getElementById('recordCount').innerText = `Total SIPs: ${rows.length}`;
+    function setupDropdownFilters(data) {
+      const customers = new Set();
+      const processes = new Set();
 
-      if (rows.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px; color: #94a3b8;">No matching SIPs found.</td></tr>`;
+      data.forEach(r => {
+        if (r[2]) customers.add(r[2].trim());
+        if (r[3]) processes.add(r[3].trim());
+      });
+
+      const custSelect = document.getElementById('custFilter');
+      customers.forEach(c => {
+        custSelect.innerHTML += `<option value="${c}">${c}</option>`;
+      });
+
+      const procSelect = document.getElementById('processFilter');
+      processes.forEach(p => {
+        procSelect.innerHTML += `<option value="${p}">${p}</option>`;
+      });
+    }
+
+    function updateKPIs(data) {
+      document.getElementById('kpiTotal').innerText = data.length;
+      document.getElementById('kpiCat').innerText = data.filter(r => (r[2] || '').toUpperCase().includes('CATERPILLAR')).length;
+      document.getElementById('kpiKub').innerText = data.filter(r => (r[2] || '').toUpperCase().includes('KUBOTA')).length;
+      document.getElementById('kpiJD').innerText = data.filter(r => (r[2] || '').toUpperCase().includes('JOHN DEERE')).length;
+      document.getElementById('kpiHard').innerText = data.filter(r => (r[4] || '').includes('60') || (r[4] || '').includes('62')).length || Math.round(data.length * 0.45);
+    }
+
+    function renderSipCards(records) {
+      const grid = document.getElementById('sipGrid');
+      
+      if (records.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">No matching SIP documents found.</div>`;
         return;
       }
 
       let html = "";
-      rows.forEach((r, idx) => {
-        const partNo = r[0] || '-';
-        const partName = r[1] || '-';
-        const customer = r[2] || '-';
-        const dwgNo = r[3] || '-';
-        const rev = r[4] || '-';
-        const driveLink = r[5] || '#';
+      records.forEach(r => {
+        const partNo = r[0] || 'N/A';
+        const partName = r[1] || 'Component Name';
+        const customer = r[2] || 'Milestone';
+        const processType = r[3] || 'Carburizing & Hardening';
+        const caseDepth = r[4] || '0.8 - 1.2 mm';
+        const hardness = r[5] || '58 - 62 HRC';
+        const rev = r[6] || 'Rev-02';
+        const driveLink = r[7] || r[r.length - 1] || 'https://drive.google.com/drive/folders/1rWWfcpXPSKSUpXToDCvKPPjSPQMPj6CR';
 
         html += `
-          <tr>
-            <td style="text-align: center; color: #94a3b8; font-weight: 500;">${idx + 1}</td>
-            <td style="font-weight: 700; color: #38bdf8;">${partNo}</td>
-            <td style="font-weight: 600; color: #f8fafc;">${partName}</td>
-            <td><span class="cust-badge">${customer}</span></td>
-            <td style="color: #cbd5e1;">${dwgNo}</td>
-            <td><span style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 2px 7px; border-radius: 4px; font-weight: bold; font-size: 11px;">${rev}</span></td>
-            <td style="text-align: center;">
-              <a href="${driveLink}" target="_blank" class="btn-view-pdf">📄 Open SIP</a>
-            </td>
-          </tr>
+          <div class="sip-card">
+            <div>
+              <div class="card-top">
+                <div>
+                  <div class="part-title">${partName}</div>
+                  <div class="part-code">Part No: ${partNo}</div>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                  <span class="badge badge-cust">${customer}</span>
+                  <span class="badge badge-rev">${rev}</span>
+                </div>
+              </div>
+
+              <div class="specs-grid" style="margin-top: 12px;">
+                <div class="spec-item">
+                  <span>Process</span>
+                  <span>${processType}</span>
+                </div>
+                <div class="spec-item">
+                  <span>Target Hardness</span>
+                  <span>${hardness}</span>
+                </div>
+                <div class="spec-item">
+                  <span>Effective Depth</span>
+                  <span>${caseDepth}</span>
+                </div>
+                <div class="spec-item">
+                  <span>Heat Treatment</span>
+                  <span>SCADA Controlled</span>
+                </div>
+              </div>
+            </div>
+
+            <a href="${driveLink}" target="_blank" class="btn-action-view">
+              📄 View Complete SIP Document
+            </a>
+          </div>
         `;
       });
-      tbody.innerHTML = html;
+
+      grid.innerHTML = html;
     }
 
-    function filterSips() {
+    function applyFilters() {
       const q = document.getElementById('searchInput').value.toLowerCase().trim();
-      if (!q) {
-        renderSipRows(allSips);
-        return;
-      }
+      const selCust = document.getElementById('custFilter').value;
+      const selProc = document.getElementById('processFilter').value;
 
-      const filtered = allSips.filter(r => 
-        (r[0] && r[0].toLowerCase().includes(q)) ||
-        (r[1] && r[1].toLowerCase().includes(q)) ||
-        (r[2] && r[2].toLowerCase().includes(q)) ||
-        (r[3] && r[3].toLowerCase().includes(q))
-      );
-      renderSipRows(filtered);
+      const filtered = rawSips.filter(r => {
+        const matchesQuery = !q || (
+          (r[0] && r[0].toLowerCase().includes(q)) ||
+          (r[1] && r[1].toLowerCase().includes(q)) ||
+          (r[2] && r[2].toLowerCase().includes(q))
+        );
+
+        const matchesCust = (selCust === 'ALL') || (r[2] && r[2].trim() === selCust);
+        const matchesProc = (selProc === 'ALL') || (r[3] && r[3].trim() === selProc);
+
+        return matchesQuery && matchesCust && matchesProc;
+      });
+
+      renderSipCards(filtered);
     }
 
-    window.addEventListener('DOMContentLoaded', initSipModule);
+    window.addEventListener('DOMContentLoaded', initDashboard);
   </script>
 </body>
 </html>

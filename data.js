@@ -1,4 +1,4 @@
-// 📁 data.js - Central Plant Database
+// 📁 data.js - Master Central Database
 const plantMasterData = {
   // 1. D-Shooting Schedule
   "dShooting": [
@@ -9,7 +9,7 @@ const plantMasterData = {
     ["SQF-4", "01-06-2026", "03-07-2026", "06-08-2026", "06-08-2026"]
   ],
 
-  // 2. Calibration Alerts (Overdue & 30 Days Due)
+  // 2. Calibration Alerts (Due & Overdue)
   "calibration": [
     ["ID", "INSTRUMENT NAME", "LOCATION", "DUE DATE"],
     ["TUS-SQF4", "SQF-4 Thermal Uniformity Survey (TUS)", "SQF-4 Chamber", "2026-08-10"],
@@ -36,12 +36,15 @@ const plantMasterData = {
     ["EMP-103", "Maintenance Lead", "Shift Engineer", "Maintenance", "+91 97XXXXXXXX"]
   ],
 
-  // 5. Live Google Drive SIP Database (Part No, Customer, Drawing No, Rev, Direct Drive View Link)
+  // 5. Direct Google Drive SIPs Database
   "sips": [
-    ["MGL-001", "PINION GEAR 14T", "CATERPILLAR", "DWG-CAT-104", "Rev-02", "https://drive.google.com/file/d/1W5u746Eeg7VbU_jG9z81n3qL7gJt2aBc/view"],
-    ["MGL-002", "BULL GEAR 42T", "KUBOTA", "DWG-KUB-552", "Rev-03", "https://drive.google.com/file/d/1rWWfcpXPSKSUpXToDCvKPPjSPQMPj6CR/view"],
-    ["MGL-003", "TRANSMISSION SHAFT", "JOHN DEERE", "DWG-JD-881", "Rev-01", "https://drive.google.com/file/d/1XyZ994Eeg7VbU_jG9z81n3qL7gJt2aBc/view"],
-    ["MGL-004", "INTERMEDIATE PINION", "CNH", "DWG-CNH-302", "Rev-04", "https://drive.google.com/file/d/1aBc746Eeg7VbU_jG9z81n3qL7gJt2aBc/view"],
-    ["MGL-005", "BEVEL GEAR SET", "MAHINDRA", "DWG-MAH-119", "Rev-02", "https://drive.google.com/file/d/1dEf746Eeg7VbU_jG9z81n3qL7gJt2aBc/view"]
+    ["SIP-001", "DRIVEN GEAR 4TH SPEED", "SAME DEUTZ FAHR", "Carburizing & Hardening", "0.8 - 1.2 mm", "58 - 62 HRC", "Rev-01", "https://drive.google.com/file/d/1gI264fE3Jg8uV6f0K2Q1h1n4_9gK5aBc/view"],
+    ["SIP-002", "DRIVING GEAR 3RD & 4TH", "SAME DEUTZ FAHR", "Carburizing & Hardening", "1.0 - 1.4 mm", "59 - 63 HRC", "Rev-00", "https://drive.google.com/file/d/1X5u746Eeg7VbU_jG9z81n3qL7gJt2aBc/view"],
+    ["SIP-003", "REVERSE IDLER GEAR", "SAME DEUTZ FAHR", "Through Hardening", "Core Tough", "50 - 55 HRC", "Rev-02", "https://drive.google.com/file/d/1aBc746Eeg7VbU_jG9z81n3qL7gJt2aBc/view"],
+    ["SIP-004", "OUTPUT SHAFT 4WD", "SAME DEUTZ FAHR", "Carburizing & Hardening", "0.6 - 0.9 mm", "58 - 62 HRC", "Rev-01", "https://drive.google.com/file/d/1dEf746Eeg7VbU_jG9z81n3qL7gJt2aBc/view"],
+    ["SIP-005", "DRIVING GEAR 1ST & 2ND", "SAME DEUTZ FAHR", "Case Carburizing", "0.9 - 1.3 mm", "60 - 64 HRC", "Rev-00", "https://drive.google.com/file/d/1eF746Eeg7VbU_jG9z81n3qL7gJt2aBc/view"],
+    ["SIP-006", "PINION SHAFT 12T", "CATERPILLAR", "Carbonitriding", "0.4 - 0.7 mm", "58 - 62 HRC", "Rev-03", "https://drive.google.com/file/d/1gH746Eeg7VbU_jG9z81n3qL7gJt2aBc/view"],
+    ["SIP-007", "BULL GEAR 44T", "KUBOTA", "Carburizing & Hardening", "0.8 - 1.1 mm", "60 - 63 HRC", "Rev-02", "https://drive.google.com/file/d/1iJ746Eeg7VbU_jG9z81n3qL7gJt2aBc/view"],
+    ["SIP-008", "INTERMEDIATE SHAFT", "JOHN DEERE", "Liquid Nitriding", "0.15 - 0.25 mm", "55 - 60 HRC", "Rev-01", "https://drive.google.com/file/d/1kL746Eeg7VbU_jG9z81n3qL7gJt2aBc/view"]
   ]
 };
