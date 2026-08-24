@@ -358,7 +358,7 @@
   </div>
 
   <!-- मुख्य जावास्क्रिप्ट लॉजिक -->
-  <script>
+   <script>
     let currentTemp = "32°C";
     function updateDateTime() {
       const now = new Date();
@@ -382,25 +382,25 @@
     function openProcessLogin() { document.getElementById('process-login-modal').style.display = 'flex'; }
     function closeProcessLogin() { document.getElementById('process-login-modal').style.display = 'none'; }
 
-    function verifyProcessLogin() {
-      const id = document.getElementById('emp-id').value.trim();
-      const pass = document.getElementById('emp-pass').value.trim();
-      const msgBox = document.getElementById('login-msg');
-      msgBox.style.display = "block";
-      if (authorizedEmployees[id] && authorizedEmployees[id] === pass) {
-        msgBox.style.color = "#22c55e"; msgBox.innerHTML = "✅ Access Granted!";
-        setTimeout(() => {
-          closeProcessLogin();
-          document.querySelector('.cqi-banner').style.display = 'none';
-          document.querySelector('.action-buttons-bar').style.display = 'none';
-          document.querySelector('.main-content').style.display = 'none';
-          document.getElementById('process-dashboard-view').style.display = 'block';
-          fetchProcessRecords();
-        }, 500);
-      } else {
-        msgBox.style.color = "#ef4444"; msgBox.innerHTML = "❌ Invalid ID or Password!";
-      }
-    }
+  function verifyProcessLogin() {
+  const id = document.getElementById('emp-id').value.trim();
+  const pass = document.getElementById('emp-pass').value.trim();
+  const msgBox = document.getElementById('login-msg');
+  msgBox.style.display = "block";
+  
+  if (authorizedEmployees[id] && authorizedEmployees[id] === pass) {
+    msgBox.style.color = "#22c55e"; 
+    msgBox.innerHTML = "✅ Access Granted!";
+    setTimeout(() => {
+      closeProcessLogin();
+      // यहाँ सीधे नए डैशबोर्ड वाली फाइल पर रीडायरेक्ट कर देगा
+      window.location.href = "process.html"; 
+    }, 500);
+  } else {
+    msgBox.style.color = "#ef4444"; 
+    msgBox.innerHTML = "❌ Invalid ID or Password!";
+  }
+}
 
     function closeProcessDashboard() {
       document.getElementById('process-dashboard-view').style.display = 'none';
@@ -409,7 +409,7 @@
       document.querySelector('.main-content').style.display = 'flex';
     }
 
-    const sheetURL = "https://script.google.com/macros/s/AKfycbxuPpTVoYM47T6InSuzrlBlHL-yeUa5r3VCW0j1Mrww-v0cJJeqBFySq2v5s5PbPa1v/exec";
+    const sheetURL = "https://script.google.com/macros/s/AKfycbyNn7YoW87zJeXyFejqOK122FscGeAKi0b-eTXVgybUtnXR8Ots4YvNxQhzn2uicwo0/exec";
 
     function openUpdatesModal() { document.getElementById('updatesModal').style.display = 'flex'; fetchUpdatesFromSheet(); }
     function closeUpdatesModal() { document.getElementById('updatesModal').style.display = 'none'; }
