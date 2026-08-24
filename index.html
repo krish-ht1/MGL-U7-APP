@@ -36,7 +36,7 @@
     .cqi-text-content p { margin: 0; font-size: 13px; color: #fef08a; font-weight: 300; line-height: 1.5; }
     .about-us-btn { background: #f97316; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(249,115,22,0.3); }
 
-    /* एक्शन बटन्स */
+    /* होम स्क्रीन क्लीन एक्शन बटन्स */
     .action-buttons-bar { display: flex; gap: 12px; margin: 15px 20px; max-width: 1200px; margin-left: auto; margin-right: auto; width: calc(100% - 40px); box-sizing: border-box; }
     .action-btn { flex: 1; background: #1e293b; padding: 12px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
     .action-btn.updates { color: #3b82f6; border: 1px solid #3b82f6; }
@@ -93,7 +93,7 @@
     .managed-name { color: #f97316; font-weight: 600; }
     .wa-contact-btn { display: flex; align-items: center; gap: 6px; background: #25D366; color: white; padding: 5px 10px; border-radius: 20px; text-decoration: none; font-weight: 600; font-size: 11.5px; }
 
-    /* लाइटबॉक्स और लॉगिन */
+    /* लाइटबॉक्स और लॉगिन मॉडल्स */
     .image-viewer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 3000; display: none; justify-content: center; align-items: center; flex-direction: column; }
     .image-viewer img { max-width: 90%; max-height: 80vh; border-radius: 10px; border: 3px solid #f97316; object-fit: contain; }
     .close-viewer { position: absolute; top: 20px; right: 30px; font-size: 40px; color: white; cursor: pointer; }
@@ -148,7 +148,7 @@
     </div>
   </div>
 
-  <!-- होम स्क्रीन एक्शन बटन्स -->
+  <!-- होम स्क्रीन के दो क्लीन एक्शन बटन्स -->
   <div class="action-buttons-bar">
     <button class="action-btn updates" onclick="openUpdatesModal()">📢 Daily Updates & Form</button>
     <button class="action-btn alerts" onclick="openAlertsModal()">⚠️ Calibration & System Alerts</button>
@@ -183,7 +183,7 @@
     
     <div class="modal-body" style="padding: 20px; overflow-y: auto;">
       
-      <!-- 1. D-shooting सुंदर टेबल -->
+      <!-- 1. D-shooting टेबल -->
       <div style="margin-bottom: 25px;">
         <h4 style="color: #38bdf8; border-bottom: 2px solid #38bdf8; padding-bottom: 6px; margin-bottom: 12px; font-size: 14px;">📊 D-shooting Schedule & Machine Status</h4>
         <div style="overflow-x: auto; background: #0f172a; border-radius: 8px; border: 1px solid #334155;">
@@ -204,9 +204,9 @@
         </div>
       </div>
 
-      <!-- 2. Calibration Due & Overdue List -->
+      <!-- 2. Calibration Due Alerts (Next 30 Days) -->
       <div>
-        <h4 style="color: #f59e0b; border-bottom: 2px solid #f59e0b; padding-bottom: 6px; margin-bottom: 12px; font-size: 14px;">🔔 Calibration Due & Overdue Alerts</h4>
+        <h4 style="color: #f59e0b; border-bottom: 2px solid #f59e0b; padding-bottom: 6px; margin-bottom: 12px; font-size: 14px;">🔔 Calibration Due Alerts (Next 30 Days)</h4>
         <div id="popupAlertsList" style="font-size: 12px; color: #cbd5e1;">Loading calibration alerts...</div>
       </div>
 
@@ -230,7 +230,7 @@
       <div class="card secure-card" onclick="openProcessLogin()">
         <div class="card-icon">📊</div>
         <div class="card-title">Process Data</div>
-        <div class="card-desc">🔒 Confidential lab results & batch cycles.</div>
+        <div class="card-desc">🔒 Fast Dashboard, Multi-Filter & SIP Inspection.</div>
       </div>
       <div class="card" onclick="alert('Opening SAP Module...')">
         <div class="card-icon">📦</div>
@@ -330,7 +330,7 @@
     </div>
   </div>
 
-  <!-- मास्टर जावास्क्रिप्ट लॉजिक (Offline-First Superfast Engine) -->
+  <!-- जावास्क्रिप्ट लॉजिक -->
   <script>
     let currentTemp = "32°C";
     function updateDateTime() {
@@ -367,7 +367,7 @@
         setTimeout(() => {
           closeProcessLogin();
           window.location.href = "process.html"; 
-        }, 500);
+        }, 300);
       } else {
         msgBox.style.color = "#ef4444"; 
         msgBox.innerHTML = "❌ Invalid ID or Password!";
@@ -377,7 +377,6 @@
     const sheetURL = "https://script.google.com/macros/s/AKfycbwLTtuxqMhRaDnnKQ_DC8rRsogKD5sgZf86oH101ivDgI3fkiBUzuRAKaRMcMzrUJnk/exec";
     const CACHE_KEY = "mgl_plant_offline_master_data";
 
-    // 🎯 सुपर स्ट्रॉन्ग डेट फॉर्मेटर (बिना किसी टाइम/ISO के सिर्फ DD-MM-YYYY)
     function formatOnlyDate(val) {
       if (!val || val === '-' || val === 'N/A') return '-';
       let str = String(val).trim();
@@ -385,64 +384,39 @@
       
       let parts = str.split(/[-/]/);
       if (parts.length === 3 && parts[0].length === 4) {
-        let y = parts[0], m = parts[1].padStart(2, '0'), d = parts[2].padStart(2, '0');
-        return `${d}-${m}-${y}`;
+        return `${parts[2].padStart(2, '0')}-${parts[1].padStart(2, '0')}-${parts[0]}`;
       }
       if (parts.length === 3 && parts[2].length === 4) {
-        let d = parts[0].padStart(2, '0'), m = parts[1].padStart(2, '0'), y = parts[2];
-        return `${d}-${m}-${y}`;
-      }
-      
-      let parsed = new Date(str);
-      if (!isNaN(parsed.getTime()) && parsed.getFullYear() > 2000) {
-        let d = String(parsed.getDate()).padStart(2, '0');
-        let m = String(parsed.getMonth() + 1).padStart(2, '0');
-        let y = parsed.getFullYear();
-        return `${d}-${m}-${y}`;
+        return `${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}-${parts[2]}`;
       }
       return str;
     }
 
-    // ⚡ 1. Stale-While-Revalidate Engine (Instant Cache Load + Background Live Sync)
-    async function getOfflineFirstData() {
-      // कैशे से तुरंत डेटा उठाकर दिखाओ (0 मिलीसेकंड)
+    async function loadMasterData() {
       const cached = localStorage.getItem(CACHE_KEY);
       if (cached) {
-        try {
-          renderUIFromData(JSON.parse(cached));
-        } catch(e) { console.error("Cache parsing error", e); }
+        try { renderUIFromData(JSON.parse(cached)); } catch(e){}
       }
 
-      // बैकग्राउंड में साइलेंट लाइव फेच
       if (navigator.onLine) {
         try {
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 9000);
-          const res = await fetch(sheetURL, { signal: controller.signal });
-          clearTimeout(timeoutId);
+          const res = await fetch(sheetURL);
           const liveData = await res.json();
           localStorage.setItem(CACHE_KEY, JSON.stringify(liveData));
           renderUIFromData(liveData);
         } catch (e) {
-          console.warn("Background fetch skipped/failed, app running on cached data.");
+          console.warn("Serving from cache.");
         }
       }
     }
 
-    // ⚡ 2. डेटा को UI में रेंडर करने का मास्टर फंक्शन
     function renderUIFromData(data) {
       if (!data) return;
 
-      // --- D-Shooting Render (Machine Name = SQF-1, SQF-2...) ---
-      let dShootingRows = [];
-      for (let key in data) {
-        if (key.toLowerCase().includes('d-shooting') || key.toLowerCase().includes('dshooting')) {
-          dShootingRows = data[key];
-          break;
-        }
-      }
+      // 1. D-Shooting Table (मशीन SQF-1, SQF-2 और साफ़ DD-MM-YYYY)
+      let dShootingRows = data['D-shooting'] || data.dShooting || [];
       const dShootingTbody = document.getElementById('dShootingTableBody');
-      if (dShootingTbody && dShootingRows && dShootingRows.length > 1) {
+      if (dShootingTbody && dShootingRows.length > 1) {
         let rows = dShootingRows.slice(1);
         let dHtml = "";
         rows.forEach((row, index) => {
@@ -466,18 +440,13 @@
         dShootingTbody.innerHTML = dHtml;
       }
 
-      // --- Calibration 45-Days Alert Render ---
-      let calibrationRows = [];
-      for (let key in data) {
-        if (key.toLowerCase().includes('calibration')) {
-          calibrationRows = data[key];
-          break;
-        }
-      }
+      // 2. Calibration Due Alerts (Next 30 Days Only)
+      let calibrationRows = data['Calibration'] || data.calibration || [];
       const alertContainer = document.getElementById('popupAlertsList');
-      if (alertContainer && calibrationRows && calibrationRows.length > 1) {
+      if (alertContainer && calibrationRows.length > 1) {
         let rows = calibrationRows.slice(1);
         let today = new Date();
+        today.setHours(0, 0, 0, 0);
         let alertItems = [];
 
         rows.forEach(r => {
@@ -492,6 +461,7 @@
               let parsed = new Date(cellVal.split('T')[0]);
               if (!isNaN(parsed.getTime()) && parsed.getFullYear() >= 2024) {
                 targetDueDate = parsed;
+                targetDueDate.setHours(0, 0, 0, 0);
                 originalDateStr = cellVal;
                 break;
               }
@@ -499,10 +469,8 @@
           }
 
           if (targetDueDate) {
-            let diffTime = targetDueDate - today;
-            let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            if (diffDays <= 45) {
+            let diffDays = Math.ceil((targetDueDate - today) / (1000 * 60 * 60 * 24));
+            if (diffDays >= 0 && diffDays <= 30) {
               alertItems.push({
                 id: instrumentId,
                 name: instrumentName,
@@ -517,36 +485,29 @@
           alertItems.sort((a, b) => a.diffDays - b.diffDays);
           let html = "";
           alertItems.forEach(item => {
-            let isOverdue = item.diffDays < 0;
-            let badgeColor = isOverdue ? "#ef4444" : "#f59e0b";
-            let statusText = isOverdue ? `🚨 Overdue by ${Math.abs(item.diffDays)} days` : `⏳ Due in ${item.diffDays} days`;
+            let badgeColor = item.diffDays <= 7 ? "#ef4444" : "#f59e0b";
+            let statusText = item.diffDays === 0 ? "⚠️ Due Today" : `⏳ Due in ${item.diffDays} days`;
 
             html += `
               <div style="background:#1e293b; padding:10px 14px; border-radius:6px; margin-bottom:8px; border-left:4px solid ${badgeColor}; display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                  <strong style="color: #f8fafc;">${item.name}</strong> <span style="color: #94a3b8; font-size: 11px;">(${item.id})</span>
-                  <div style="font-size: 11px; color: #38bdf8; margin-top: 2px;">Due: ${item.dueDateFormatted}</div>
+                  <strong style="color: #f8fafc; font-size: 13px;">${item.name}</strong> <span style="color: #94a3b8; font-size: 11px;">(${item.id})</span>
+                  <div style="font-size: 11px; color: #38bdf8; margin-top: 3px;">Due Date: <strong>${item.dueDateFormatted}</strong></div>
                 </div>
-                <span style="color: ${badgeColor}; font-weight: bold; font-size: 12px;">${statusText}</span>
+                <span style="color: ${badgeColor}; font-weight: bold; font-size: 12px; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 4px;">${statusText}</span>
               </div>
             `;
           });
           alertContainer.innerHTML = html;
         } else {
-          alertContainer.innerHTML = "<div style='color: #34d399; padding: 8px;'>✅ All calibrations are up to date!</div>";
+          alertContainer.innerHTML = "<div style='color: #34d399; padding: 10px;'>✅ No calibrations due in the next 30 days!</div>";
         }
       }
 
-      // --- Daily Updates Render ---
-      let updatesRows = [];
-      for (let key in data) {
-        if (key.toLowerCase().includes('update')) {
-          updatesRows = data[key];
-          break;
-        }
-      }
+      // 3. Daily Updates
+      let updatesRows = data['Updates'] || data.updates || [];
       const listDiv = document.getElementById('popupUpdatesList');
-      if (listDiv && updatesRows && updatesRows.length > 1) {
+      if (listDiv && updatesRows.length > 1) {
         let rows = updatesRows.slice(1);
         let html = "";
         rows.forEach((r, i) => {
@@ -559,19 +520,10 @@
       }
     }
 
-    // पेज लोड होते ही और पॉप-अप खुलते ही 0 सेकंड में डेटा लोड
-    window.addEventListener('DOMContentLoaded', getOfflineFirstData);
-
-    function openUpdatesModal() { 
-      document.getElementById('updatesModal').style.display = 'flex'; 
-      getOfflineFirstData(); 
-    }
+    window.addEventListener('DOMContentLoaded', loadMasterData);
+    function openUpdatesModal() { document.getElementById('updatesModal').style.display = 'flex'; loadMasterData(); }
     function closeUpdatesModal() { document.getElementById('updatesModal').style.display = 'none'; }
-
-    function openAlertsModal() { 
-      document.getElementById('alertsModal').style.display = 'flex'; 
-      getOfflineFirstData(); 
-    }
+    function openAlertsModal() { document.getElementById('alertsModal').style.display = 'flex'; loadMasterData(); }
     function closeAlertsModal() { document.getElementById('alertsModal').style.display = 'none'; }
 
     function submitUpdateData(e) {
