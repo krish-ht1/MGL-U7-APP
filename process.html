@@ -608,7 +608,7 @@
       </div>
     </div>
 
-    <!-- 3. Dynamic Live SIP Specs Ribbon (Component Name + Part Name Separate) -->
+    <!-- 3. Dynamic Live SIP Specs Ribbon -->
     <div class="sip-card">
       <div class="sip-grid">
         <div class="sip-param-box comp-box">
@@ -761,7 +761,7 @@
     }
 
     // Direct / Proxy Multi-Pipeline Engine
-    async function fetchCSVData shamefully(url) {
+    async function fetchCSVData(url) {
       const endpoints = [
         url + (url.includes('?') ? '&' : '?') + '_ts=' + Date.now(),
         "https://api.allorigins.win/raw?url=" + encodeURIComponent(url),
@@ -1020,7 +1020,7 @@
       });
 
       filtered.sort((a, b) => parseCustomDate(b[m.date || 0]) - parseCustomDate(a[m.date || 0]));
-      updateKPIsAndSIP(filtered);
+      updateKPIsAndSIP(filtered, searchVal);
 
       if (isSectionUnlocked) {
         renderTable(filtered);
@@ -1104,7 +1104,7 @@
     }
 
     // Dynamic Live SIP & KPI Calculation from Real Rows
-    function updateKPIsAndSIP(rows) {
+    function updateKPIsAndSIP(rows, searchVal) {
       let totalProceedPiece = 0;
       let totalWeight = 0;
       const totalProceedLot = rows.length;
@@ -1128,9 +1128,9 @@
 
       if (rows.length > 0) {
         const activeRow = rows[0];
-        const custName = activeRow[m.cust || 1] || 'CUSTOMER';
-        const partName = activeRow[m.part || 2] || '-';
-        const rawLotQty = activeRow[m.qty || 6] || '0';
+        const custName = activeRow[m.cust !== undefined ? m.cust : 1] || 'CUSTOMER';
+        const partName = activeRow[m.part !== undefined ? m.part : 2] || (searchVal ? searchVal.toUpperCase() : '-');
+        const rawLotQty = activeRow[m.qty !== undefined ? m.qty : 6] || '0';
 
         currentActivePart = partName;
         currentActivePdfLink = getComponentPdfLink(partName);
@@ -1151,7 +1151,7 @@
         let liveECD = activeRow[m.ecd !== undefined ? m.ecd : 11] ? String(activeRow[m.ecd || 11]).trim() : '-';
         if (liveECD !== '-' && !liveECD.includes('mm')) liveECD += ' mm';
 
-        let liveBeforeGrind = activeRow[m.grind !== undefined ? m.grind : 13] ? String(activeRow[m.grind || 13]).trim() : (activeRow[m.pcd || 8] ? String(activeRow[m.pcd || 8]).trim() : '-');
+        let liveBeforeGrind = activeRow[m.grind !== undefined ? m.grind : 13] ? String(activeRow[m.grind || 13]).trim() : (activeRow[m.pcd !== undefined ? m.pcd : 8] ? String(activeRow[m.pcd || 8]).trim() : '-');
         if (liveBeforeGrind !== '-' && !liveBeforeGrind.includes('mm')) liveBeforeGrind += ' mm';
 
         document.getElementById('kpiLotQuantity').innerText = `${mappedBatchQty} Nos`;
@@ -1164,8 +1164,8 @@
         document.getElementById('sipECDBefore').innerText = liveBeforeGrind;
       } else {
         document.getElementById('kpiLotQuantity').innerText = `0 Nos`;
-        document.getElementById('sipCompName').innerText = `No Data`;
-        document.getElementById('sipPartNo').innerText = `-`;
+        document.getElementById('sipCompName').innerText = searchVal ? searchVal.toUpperCase() : `No Data`;
+        document.getElementById('sipPartNo').innerText = searchVal ? searchVal.toUpperCase() : `-`;
         document.getElementById('sipCustomer').innerText = `-`;
         document.getElementById('sipSH').innerText = `-`;
         document.getElementById('sipCore').innerText = `-`;
