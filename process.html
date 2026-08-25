@@ -199,7 +199,7 @@
       background: #172033;
       border: 1px solid #0284c7;
       border-radius: 8px;
-      padding: 8px 12px;
+      padding: 10px 14px;
       margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
@@ -209,16 +209,21 @@
     }
     .sip-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
+      grid-template-columns: 1.4fr repeat(5, 1fr);
       gap: 8px;
       flex: 1;
     }
     .sip-param-box {
       background: #0f172a;
       border: 1px solid #334155;
-      padding: 5px 8px;
-      border-radius: 5px;
+      padding: 6px 10px;
+      border-radius: 6px;
       text-align: center;
+    }
+    .sip-param-box.comp-box {
+      text-align: left;
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.05);
     }
     .sip-param-box span {
       display: block;
@@ -229,7 +234,7 @@
       white-space: nowrap;
     }
     .sip-param-box strong {
-      font-size: 11.5px;
+      font-size: 12px;
       color: #fde047;
       display: block;
       margin-top: 1px;
@@ -237,23 +242,33 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+    .part-sub-badge {
+      display: block;
+      font-size: 9.5px;
+      color: #38bdf8;
+      font-weight: 600;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     .view-sip-btn {
       background: #0284c7;
       color: white;
       border: none;
-      padding: 8px 14px;
+      padding: 10px 16px;
       border-radius: 6px;
-      font-size: 11.5px;
-      font-weight: 600;
+      font-size: 12px;
+      font-weight: 700;
       cursor: pointer;
       transition: 0.2s;
       white-space: nowrap;
       display: flex;
       align-items: center;
       gap: 6px;
-      text-decoration: none;
     }
-    .view-sip-btn:hover { background: #0369a1; }
+    .view-sip-btn:hover { background: #0369a1; transform: translateY(-1px); }
 
     /* Locked State Screen */
     .locked-section-box {
@@ -427,6 +442,11 @@
     }
     .no-data { padding: 30px; color: #94a3b8; font-size: 12.5px; text-align: center; }
 
+    @media (max-width: 900px) {
+      .sip-grid { grid-template-columns: 1fr 1fr; }
+      .sip-card { flex-direction: column; align-items: stretch; }
+      .view-sip-btn { width: 100%; justify-content: center; }
+    }
     @media (max-width: 768px) {
       .top-bar { padding: 8px 12px; }
       .nav-left h1 { font-size: 13.5px; }
@@ -462,10 +482,6 @@
       }
       .ribbon-meta h5 { font-size: 9px; }
       .ribbon-meta p { font-size: 12.5px; }
-
-      .sip-card { flex-direction: column; align-items: stretch; padding: 8px; }
-      .sip-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
-      .view-sip-btn { width: 100%; text-align: center; padding: 8px; justify-content: center; }
       .locked-section-box { padding: 18px 10px; }
       .login-form-wrap { width: 100%; }
       .table-top-meta { font-size: 11px; }
@@ -591,13 +607,13 @@
       </div>
     </div>
 
-    <!-- 3. Dynamic Live SIP Specs Ribbon with Direct PDF Button -->
+    <!-- 3. Dynamic Live SIP Specs Ribbon (Component Name + Part Name Separate) -->
     <div class="sip-card">
       <div class="sip-grid">
-        <div class="sip-param-box" style="border-color: #38bdf8; text-align: left; padding-left: 10px;">
+        <div class="sip-param-box comp-box">
           <span>Component Name</span>
-          <strong id="sipCompName" style="color: #38bdf8; font-size: 12px;">-</strong>
-          <span style="margin-top: 2px; font-size: 9px; color: #cbd5e1;">Part Name / No: <b id="sipPartNo" style="color: #fde047;">-</b></span>
+          <strong id="sipCompName">-</strong>
+          <span class="part-sub-badge">Part No: <b id="sipPartNo" style="color: #fde047;">-</b></span>
         </div>
 
         <div class="sip-param-box" style="border-color: #f97316;">
@@ -691,11 +707,10 @@
   </div>
 
   <script>
-    // Live Google Sheet CSV URLs
     const PROCESS_LOG_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=529980778&single=true&output=csv";
     const WEIGHT_LIST_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=373153751&single=true&output=csv";
 
-    // Dynamic Live Store
+    // Dynamic Master Dictionary
     let liveWeightMaster = {
       "33003": { desc: "COMPONENT 33003", weight: 1.20, batchQty: 500, pdfLink: "" },
       "3001": { desc: "COMPONENT 3001", weight: 1.50, batchQty: 400, pdfLink: "" }
@@ -746,7 +761,7 @@
       return r.map(cols => cols.map(col => (col || '').trim()));
     }
 
-    // Direct & Multi-Proxy Fetch (Guarantees connection in PC/Mobile)
+    // High-Speed Multi-Pipeline Fetcher
     async function fetchCSVWithFallback(rawUrl) {
       if (!rawUrl) return null;
 
@@ -840,7 +855,7 @@
       }
     }
 
-    // Process Log Sheet Column Headers
+    // Process Log Headers
     function processLogHeaders(headerRow) {
       logColMap = {
         date: 0, cust: 1, part: 2, batch: 3, heat: 4, fc: 5, qty: 6,
@@ -1210,7 +1225,7 @@
       applyAllFilters();
     }
 
-    // Direct Dynamic PDF Opener (No website reload loop)
+    // Direct Dynamic PDF Opener in New Tab
     function openSipPdfDirect() {
       if (!currentActivePart || currentActivePart === "-") {
         alert("Please search or select a component first.");
@@ -1219,11 +1234,12 @@
 
       let targetUrl = currentActivePdfLink;
       
-      // If no direct link in weight sheet, construct direct Google Drive Search or local path
+      // Fallback: If no direct Drive link found in sheet, check local sip/ folder
       if (!targetUrl) {
         targetUrl = `sip/${encodeURIComponent(currentActivePart)}.pdf`;
       }
 
+      // Directly open in new browser tab
       window.open(targetUrl, '_blank');
     }
 
