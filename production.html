@@ -68,66 +68,39 @@
       max-width: 1400px;
       width: 100%;
       margin: 0 auto;
-      padding: 12px;
+      padding: 10px;
       flex: 1;
-    }
-
-    /* 1. Clean Button-Type Top Modules (No Symbols) */
-    .top-modules-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    .prod-module-card {
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-      border: 1px solid #334155;
-      border-top: 3px solid #38bdf8;
-      border-radius: 10px;
-      padding: 14px 16px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.4);
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      cursor: pointer;
-      transition: transform 0.1s, background 0.2s;
+      gap: 14px;
     }
-    .prod-module-card:active { transform: scale(0.98); }
-    .prod-module-card:nth-child(1) { border-top-color: #38bdf8; } 
-    .prod-module-card:nth-child(2) { border-top-color: #f97316; } 
-    .prod-module-card:nth-child(3) { border-top-color: #ef4444; } 
 
-    .prod-module-card h4 { margin: 0; font-size: 11.5px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
-    .prod-module-card h2 { margin: 2px 0; font-size: 22px; color: #f8fafc; font-weight: 700; }
-    .prod-module-card span { font-size: 11px; color: #cbd5e1; font-weight: 500; }
-
-    /* 2. DWM Matrix Table */
+    /* 1. Daily DWM Matrix (Now on Top) */
     .dwm-section {
       background: #1e293b;
       border: 1px solid #334155;
       border-radius: 10px;
       padding: 12px;
       box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-      margin-bottom: 16px;
     }
     .dwm-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       padding-bottom: 8px;
       border-bottom: 1px solid #334155;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
     }
     .dwm-header h3 { margin: 0; font-size: 14px; color: #38bdf8; font-weight: 700; text-transform: uppercase; }
     
     .target-info-text {
-      font-size: 11px;
+      font-size: 10.5px;
       color: #94a3b8;
       background: rgba(15, 23, 42, 0.7);
-      padding: 6px 10px;
-      border-radius: 6px;
+      padding: 5px 8px;
+      border-radius: 4px;
       border: 1px dashed #475569;
     }
     .target-info-text span { color: #34d399; font-weight: 700; }
@@ -138,7 +111,7 @@
       color: #fde047;
       padding: 6px 10px;
       border-radius: 6px;
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 600;
       outline: none;
       cursor: pointer;
@@ -154,7 +127,7 @@
 
     table {
       border-collapse: collapse;
-      font-size: 11px;
+      font-size: 10.5px;
       white-space: nowrap;
       text-align: center;
       width: max-content;
@@ -170,21 +143,21 @@
     }
     th:first-child { z-index: 3; }
 
-    th, td { border: 1px solid #475569; padding: 5px 6px; }
+    th, td { border: 1px solid #475569; padding: 4px 6px; }
     th { background: #0f172a; color: #e2e8f0; font-weight: 600; }
 
     .vertical-text {
       writing-mode: vertical-rl;
       transform: rotate(180deg);
       white-space: nowrap;
-      height: 80px;
+      height: 75px;
       text-align: center;
       display: inline-block;
-      font-size: 9.5px;
+      font-size: 9px;
       color: #cbd5e1;
     }
 
-    .day-col { min-width: 24px; font-weight: 700; background: #1e293b; padding: 4px 1px; }
+    .day-col { min-width: 22px; font-weight: 700; background: #1e293b; padding: 3px 1px; }
 
     .cell-green { background: rgba(34, 197, 94, 0.15) !important; color: #4ade80 !important; font-weight: 700; }
     .cell-red { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; font-weight: 700; }
@@ -193,55 +166,74 @@
     .total-row td { background: #0f172a !important; font-weight: 700; color: #f8fafc; border-top: 2px solid #94a3b8; }
     .cumulative-row td { background: #1e293b !important; font-weight: 700; color: #f8fafc;}
 
-    /* 3. Bottom Layout */
-    .kpi-wrapper {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    @media (max-width: 1024px) {
-      .kpi-wrapper { grid-template-columns: 1fr; }
-    }
-
+    /* 2. Till Date Production (Synchronized & Compact for Phone) */
     .bottom-kpi-section {
       background: #1e293b;
       border: 1px solid #334155;
       border-radius: 10px;
-      padding: 14px;
+      padding: 12px;
       box-shadow: 0 8px 25px rgba(0,0,0,0.5);
     }
-    .bottom-kpi-section h3 { margin: 0 0 10px 0; color: #fde047; font-size: 13.5px; border-bottom: 1px solid #334155; padding-bottom: 6px; text-transform: uppercase; }
+    .bottom-kpi-section h3 { margin: 0 0 10px 0; color: #fde047; font-size: 13px; border-bottom: 1px solid #334155; padding-bottom: 6px; text-transform: uppercase; }
     
+    /* Enlist in a single row/grid optimized for phone */
     .kpi-till-date-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-      gap: 8px;
+      grid-template-columns: repeat(5, 1fr); /* Forces all 5 into one line */
+      gap: 6px;
     }
     .kpi-sqf-box {
       background: #0f172a;
       border: 1px solid #475569;
       border-radius: 6px;
-      padding: 10px;
+      padding: 8px 4px;
       text-align: center;
     }
-    .kpi-sqf-box span { display: block; font-size: 10.5px; color: #94a3b8; font-weight: 600; text-transform: uppercase; margin-bottom: 2px; }
-    .kpi-sqf-box strong { display: block; font-size: 16px; color: #f8fafc; font-weight: 700; }
-    .kpi-sqf-box small { color: #cbd5e1; font-size: 10px; }
+    .kpi-sqf-box span { display: block; font-size: 9.5px; color: #94a3b8; font-weight: 600; text-transform: uppercase; margin-bottom: 2px; }
+    .kpi-sqf-box strong { display: block; font-size: 13.5px; color: #f8fafc; font-weight: 700; }
+    .kpi-sqf-box small { color: #cbd5e1; font-size: 9px; }
 
+    /* 3. Analytics (Without Required Run-Rate) */
     .dwm-analytics-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 8px;
     }
     .analytics-card {
       background: #0f172a;
       border: 1px solid #475569;
       border-radius: 6px;
-      padding: 10px;
+      padding: 8px;
+      text-align: center;
     }
-    .analytics-card span { display: block; font-size: 10px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
-    .analytics-card strong { display: block; font-size: 13.5px; color: #38bdf8; font-weight: 700; margin-top: 2px; }
+    .analytics-card span { display: block; font-size: 9.5px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
+    .analytics-card strong { display: block; font-size: 13px; color: #38bdf8; font-weight: 700; margin-top: 2px; }
+
+    /* 4. Bottom 3 Navigation Buttons */
+    .bottom-nav-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .nav-card-btn {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 1px solid #334155;
+      border-top: 3px solid #f97316;
+      border-radius: 8px;
+      padding: 10px 6px;
+      text-align: center;
+      color: #f8fafc;
+      font-weight: 600;
+      font-size: 11.5px;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      transition: transform 0.1s;
+    }
+    .nav-card-btn:active { transform: scale(0.97); }
+    .nav-card-btn:nth-child(2) { border-top-color: #38bdf8; }
+    .nav-card-btn:nth-child(3) { border-top-color: #ef4444; }
 
     /* Modal Styling */
     .modal-overlay {
@@ -326,44 +318,23 @@
 
   <div class="dashboard-container">
     
-    <!-- 1. Clean Button-Type Top Modules (No Symbols) -->
-    <div class="top-modules-grid">
-      <div class="prod-module-card" onclick="window.location.href='monthly.html'">
-        <h4>Monthly Production</h4>
-        <h2 id="cardMonthlyVal">0.00</h2>
-        <span>Target: 260.00 Tons</span>
-      </div>
-      
-      <div class="prod-module-card">
-        <h4>Yearly Production</h4>
-        <h2>3,450.50</h2>
-        <span>Target: 4,000.00 Tons</span>
-      </div>
-
-      <div class="prod-module-card">
-        <h4>Total Breakdown</h4>
-        <h2>45 Hrs</h2>
-        <span>MTD Maintenance</span>
-      </div>
-    </div>
-
-    <!-- 2. Daily DWM Matrix -->
+    <!-- 1. Daily DWM Matrix (Now at the Top) -->
     <div class="dwm-section">
       <div class="dwm-header">
-        <h3>📊 Daily DWM</h3>
+        <h3>📊 Daily DWM (TWM)</h3>
         <div class="target-info-text">
-          Target: <span>2.25 ton/furnace</span> (FY:2026-2027)
+          Target: <span>2.25 ton/furnace</span>
         </div>
         <select id="monthSelector" class="month-filter" onchange="renderDWMTable()">
-          <option value="2026-12">December 2026</option>
-          <option value="2026-11">November 2026</option>
-          <option value="2026-10">October 2026</option>
-          <option value="2026-09">September 2026</option>
-          <option value="2026-08" selected>August 2026</option>
-          <option value="2026-07">July 2026</option>
-          <option value="2026-06">June 2026</option>
-          <option value="2026-05">May 2026</option>
-          <option value="2026-04">April 2026</option>
+          <option value="2026-12">December</option>
+          <option value="2026-11">November</option>
+          <option value="2026-10">October</option>
+          <option value="2026-09">September</option>
+          <option value="2026-08" selected>August</option>
+          <option value="2026-07">July</option>
+          <option value="2026-06">June</option>
+          <option value="2026-05">May</option>
+          <option value="2026-04">April</option>
         </select>
       </div>
 
@@ -384,43 +355,44 @@
       </div>
     </div>
 
-    <!-- 3. Bottom Live Auto-Calculated KPIs -->
-    <div class="kpi-wrapper">
-      <div class="bottom-kpi-section">
-        <h3>🏆 TILL DATE PRODUCTION (TD)</h3>
-        <div class="kpi-till-date-grid">
-          <div class="kpi-sqf-box"><span>SQF-1</span><strong id="kpi-sqf1">0.00</strong><small>Tons</small></div>
-          <div class="kpi-sqf-box"><span>SQF-2</span><strong id="kpi-sqf2">0.00</strong><small>Tons</small></div>
-          <div class="kpi-sqf-box"><span>SQF-3</span><strong id="kpi-sqf3">0.00</strong><small>Tons</small></div>
-          <div class="kpi-sqf-box"><span>SQF-4</span><strong id="kpi-sqf4">0.00</strong><small>Tons</small></div>
-          <div class="kpi-sqf-box" style="border-color: #fde047;">
-            <span style="color: #fde047;">TOTAL</span>
-            <strong id="kpi-total">0.00</strong><small>Tons</small>
-          </div>
+    <!-- 2. Till Date Production (Synchronized & Compact in a single line) -->
+    <div class="bottom-kpi-section">
+      <h3>🏆 Till Date Production (TD)</h3>
+      <div class="kpi-till-date-grid">
+        <div class="kpi-sqf-box"><span>SQF-1</span><strong id="kpi-sqf1">0.00</strong><small>T</small></div>
+        <div class="kpi-sqf-box"><span>SQF-2</span><strong id="kpi-sqf2">0.00</strong><small>T</small></div>
+        <div class="kpi-sqf-box"><span>SQF-3</span><strong id="kpi-sqf3">0.00</strong><small>T</small></div>
+        <div class="kpi-sqf-box"><span>SQF-4</span><strong id="kpi-sqf4">0.00</strong><small>T</small></div>
+        <div class="kpi-sqf-box" style="border-color: #fde047;">
+          <span style="color: #fde047;">TOTAL</span>
+          <strong id="kpi-total">0.00</strong><small>T</small>
         </div>
       </div>
+    </div>
 
-      <div class="bottom-kpi-section">
-        <h3>📈 Analytics</h3>
-        <div class="dwm-analytics-grid">
-          <div class="analytics-card">
-            <span>Target Variance</span>
-            <strong id="kpiGap" style="color:#fde047;">0.00 Tons</strong>
-          </div>
-          <div class="analytics-card">
-            <span>Daily Average</span>
-            <strong id="kpiAvg">0.00 Tons</strong>
-          </div>
-          <div class="analytics-card">
-            <span>Required Run-Rate</span>
-            <strong id="kpiReq" style="color:#34d399;">0.00 Tons</strong>
-          </div>
-          <div class="analytics-card">
-            <span>Status</span>
-            <strong id="kpiStatus">On Track</strong>
-          </div>
+    <!-- 3. Analytics (Without Required Run-Rate) -->
+    <div class="bottom-kpi-section" style="padding: 10px 12px;">
+      <div class="dwm-analytics-grid">
+        <div class="analytics-card">
+          <span>Target Variance</span>
+          <strong id="kpiGap" style="color:#fde047;">0.00 Tons</strong>
+        </div>
+        <div class="analytics-card">
+          <span>Daily Average</span>
+          <strong id="kpiAvg">0.00 Tons</strong>
+        </div>
+        <div class="analytics-card">
+          <span>Status</span>
+          <strong id="kpiStatus">On Track</strong>
         </div>
       </div>
+    </div>
+
+    <!-- 4. Bottom 3 Buttons (Monthly, Yearly, Breakdown) -->
+    <div class="bottom-nav-buttons">
+      <a href="monthly.html" class="nav-card-btn">Monthly Production</a>
+      <a href="#" onclick="alert('Yearly module coming soon')" class="nav-card-btn">Yearly Production</a>
+      <a href="#" onclick="alert('Breakdown module coming soon')" class="nav-card-btn">Total Breakdown</a>
     </div>
 
   </div>
@@ -549,11 +521,11 @@
         });
       }
 
-      document.getElementById('kpi-sqf1').innerHTML = `${totals[0].toFixed(2)} <small>Tons</small>`;
-      document.getElementById('kpi-sqf2').innerHTML = `${totals[1].toFixed(2)} <small>Tons</small>`;
-      document.getElementById('kpi-sqf3').innerHTML = `${totals[2].toFixed(2)} <small>Tons</small>`;
-      document.getElementById('kpi-sqf4').innerHTML = `${totals[3].toFixed(2)} <small>Tons</small>`;
-      document.getElementById('kpi-total').innerHTML = `${grandTotal.toFixed(2)} <small>Tons</small>`;
+      document.getElementById('kpi-sqf1').innerHTML = `${totals[0].toFixed(2)} <small>T</small>`;
+      document.getElementById('kpi-sqf2').innerHTML = `${totals[1].toFixed(2)} <small>T</small>`;
+      document.getElementById('kpi-sqf3').innerHTML = `${totals[2].toFixed(2)} <small>T</small>`;
+      document.getElementById('kpi-sqf4').innerHTML = `${totals[3].toFixed(2)} <small>T</small>`;
+      document.getElementById('kpi-total').innerHTML = `${grandTotal.toFixed(2)} <small>T</small>`;
     }
 
     function renderDWMTable() {
@@ -652,9 +624,6 @@
 
       tbody.innerHTML = html;
 
-      // Update Top Monthly Card
-      document.getElementById('cardMonthlyVal').innerHTML = `${grandActualMtd.toFixed(2)} <small style="font-size: 14px; color: #94a3b8;">Tons</small>`;
-
       let today = new Date();
       let activeDaysCount = totalDays;
       if(selectedMonth === "2026-08") {
@@ -663,15 +632,11 @@
 
       let gap = grandActualMtd - (data.targetMtd || 0);
       let currentAvg = activeDaysCount > 0 ? (grandActualMtd / activeDaysCount) : 0;
-      let remainingTarget = 260.00 - grandActualMtd; 
-      let remainingDays = totalDays - activeDaysCount;
-      let requiredRate = remainingDays > 0 ? (remainingTarget / remainingDays) : 0;
 
       document.getElementById('kpiGap').innerText = `${gap >= 0 ? '+' : ''}${gap.toFixed(2)} Tons`;
       document.getElementById('kpiGap').style.color = gap >= 0 ? '#34d399' : '#f87171';
       document.getElementById('kpiAvg').innerText = `${currentAvg.toFixed(2)} Tons`;
-      document.getElementById('kpiReq').innerText = `${requiredRate > 0 ? requiredRate.toFixed(2) : '0.00'} Tons`;
-      document.getElementById('kpiStatus').innerText = gap >= 0 ? 'Optimal & On Track' : 'Requires Acceleration';
+      document.getElementById('kpiStatus').innerText = gap >= 0 ? 'Optimal' : 'Lagging';
       document.getElementById('kpiStatus').style.color = gap >= 0 ? '#34d399' : '#f87171';
     }
 
