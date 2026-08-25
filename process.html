@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#f97316">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Process Master Dashboard - Milestone Gear</title>
@@ -715,16 +713,26 @@
     </div>
   </div>
 
-  <script src="data.js"></script>
-
   <script>
-    // Clean Direct Google Sheet Published CSV Link
+    // Direct Google Sheet Published CSV Link
     const CLEAN_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=529980778&single=true&output=csv";
+
+    // Embedded Offline Plant Master & Weight List (No external data.js required)
+    const fallbackMasterData = {
+      weightListMap: {
+        "2105": { desc: "BULL GEAR", grade: "20MnCr5", weight: 3.20, batchQty: 480, sh: "58-62 HRC", core: "32-40 HRC", ecd: "0.90-1.20 mm", ecdBg: "1.00-1.35 mm" },
+        "2106": { desc: "PINION SHAFT", grade: "16MnCr5", weight: 2.10, batchQty: 350, sh: "60-64 HRC", core: "30-38 HRC", ecd: "0.80-1.10 mm", ecdBg: "0.90-1.25 mm" },
+        "2107": { desc: "INPUT GEAR", grade: "20MnCr5", weight: 1.85, batchQty: 600, sh: "58-62 HRC", core: "30-40 HRC", ecd: "0.70-1.00 mm", ecdBg: "0.80-1.15 mm" }
+      },
+      processData: [
+        ["2026-02-24", "BAJAJ AUTO", "2105", "B-8821", "H-441", "1", "480", "60.5", "1.12", "0.98", "35", "1.05", "OK", "0.95", "30m*0.80", "930*180m*1.15", "880*45m*0.85", "840*30m*0.80", "1200*75C", "170*120m", "Standard Pasting OK"],
+        ["2026-02-23", "HERO MOTOCORP", "2106", "H-1049", "H-902", "2", "350", "61.0", "1.05", "0.92", "34", "0.98", "OK", "0.90", "30m*0.80", "920*150m*1.10", "880*40m*0.85", "840*30m*0.80", "1200*70C", "160*120m", "Loading Verified"]
+      ]
+    };
 
     let masterLogs = [];
     let isSectionUnlocked = false;
 
-    // Authorized User Access List
     const AUTHORIZED_USERS = {
       "ADMIN": "admin@123",
       "EMP101": "1234",
@@ -744,14 +752,10 @@
       return isNaN(fallback.getTime()) ? new Date(0) : fallback;
     }
 
-    // Advanced CSV Parser for accurate column mapping
     function parseCSVData(text) {
-      let p = '', c = '', r = [];
-      let q = false;
-      let row = [''];
+      let r = [], row = [''], q = false;
       for (let i = 0; i < text.length; i++) {
-        c = text[i];
-        let next = text[i + 1];
+        let c = text[i], next = text[i + 1];
         if (c === '"') {
           if (q && next === '"') { row[row.length - 1] += '"'; i++; }
           else { q = !q; }
@@ -759,19 +763,13 @@
           row.push('');
         } else if ((c === '\r' || c === '\n') && !q) {
           if (c === '\r' && next === '\n') { i++; }
-          if (row.length > 1 || (row.length === 1 && row[0] !== '')) {
-            r.push(row);
-          }
+          if (row.length > 1 || (row.length === 1 && row[0] !== '')) r.push(row);
           row = [''];
         } else {
           row[row.length - 1] += c;
         }
       }
-      if (row.length > 1 || (row.length === 1 && row[0] !== '')) {
-        r.push(row);
-      }
-      
-      // Auto-strip header
+      if (row.length > 1 || (row.length === 1 && row[0] !== '')) r.push(row);
       if (r.length > 0 && (r[0][0].toLowerCase().includes("date") || (r[0][1] && r[0][1].toLowerCase().includes("customer")))) {
         r.shift();
       }
@@ -781,89 +779,83 @@
     async function loadLiveGoogleSheetData(forceSync = false) {
       const badge = document.getElementById('dataSourceBadge');
       if (badge) {
-        badge.innerHTML = "⏳ Fetching Sheet...";
+        badge.innerHTML = "⏳ Syncing...";
         badge.style.color = "#fde047";
       }
 
       let csvText = "";
       let isLive = false;
 
-      // 1. Direct Fetch Attempt (Works online / hosted)
+      // Direct Request
       try {
         const resp = await fetch(CLEAN_CSV_URL, { cache: "no-store" });
         if (resp.ok) {
           const txt = await resp.text();
-          if (txt && txt.length > 100 && !txt.includes("<!DOCTYPE html>")) {
+          if (txt && txt.length > 80 && !txt.includes("<!DOCTYPE html>")) {
             csvText = txt;
             isLive = true;
           }
         }
       } catch (e) {
-        console.warn("Direct fetch unavailable. Connecting via secure CORS proxy...");
+        console.warn("Direct fetch bypass engaged...");
       }
 
-      // 2. High-speed Proxy Attempt (For local file:/// or restricted browser)
+      // Proxy 1 (For Phone WebView / Local Sandbox)
       if (!isLive) {
         try {
           const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(CLEAN_CSV_URL);
           const resp = await fetch(proxyUrl, { cache: "no-store" });
           if (resp.ok) {
             const txt = await resp.text();
-            if (txt && txt.length > 100 && !txt.includes("<!DOCTYPE html>")) {
+            if (txt && txt.length > 80 && !txt.includes("<!DOCTYPE html>")) {
               csvText = txt;
               isLive = true;
             }
           }
-        } catch (e) {
-          console.warn("Proxy 1 failed, trying fallback proxy...");
-        }
+        } catch (e) {}
       }
 
-      // 3. Secondary Proxy Attempt
+      // Proxy 2
       if (!isLive) {
         try {
           const proxyUrl2 = "https://api.allorigins.win/raw?url=" + encodeURIComponent(CLEAN_CSV_URL);
           const resp = await fetch(proxyUrl2, { cache: "no-store" });
           if (resp.ok) {
             const txt = await resp.text();
-            if (txt && txt.length > 100 && !txt.includes("<!DOCTYPE html>")) {
+            if (txt && txt.length > 80 && !txt.includes("<!DOCTYPE html>")) {
               csvText = txt;
               isLive = true;
             }
           }
-        } catch (e) {
-          console.warn("All proxy channels unavailable.");
-        }
+        } catch (e) {}
       }
 
-      // Parse and Apply
       if (isLive) {
         const parsed = parseCSVData(csvText);
         if (parsed.length > 0) {
           masterLogs = parsed;
           if (badge) {
-            badge.innerHTML = "🟢 Live (Google Sheet Connected)";
+            badge.innerHTML = "🟢 Live (Connected)";
             badge.style.color = "#34d399";
           }
           if (forceSync) alert("✅ Live Google Sheet data synced successfully!");
         } else {
-          fallbackToLocalData();
+          loadFallback();
         }
       } else {
-        fallbackToLocalData();
-        if (badge) {
-          badge.innerHTML = "🟠 Offline Mode (data.js)";
-          badge.style.color = "#f97316";
-        }
+        loadFallback();
       }
 
       masterLogs.sort((a, b) => parseCustomDate(b[0]) - parseCustomDate(a[0]));
       applyAllFilters();
     }
 
-    function fallbackToLocalData() {
-      if (typeof plantMasterData !== 'undefined' && plantMasterData.processData) {
-        masterLogs = [...plantMasterData.processData];
+    function loadFallback() {
+      const badge = document.getElementById('dataSourceBadge');
+      masterLogs = [...fallbackMasterData.processData];
+      if (badge) {
+        badge.innerHTML = "🟠 Local Cache";
+        badge.style.color = "#f97316";
       }
     }
 
@@ -901,7 +893,6 @@
       });
 
       filtered.sort((a, b) => parseCustomDate(b[0]) - parseCustomDate(a[0]));
-
       updateKPIsAndSIP(filtered);
 
       if (isSectionUnlocked) {
@@ -951,7 +942,7 @@
       let totalProceedPiece = 0;
       let totalWeight = 0;
       const totalProceedLot = rows.length;
-      let weightMap = (typeof plantMasterData !== 'undefined' && plantMasterData.weightListMap) ? plantMasterData.weightListMap : {};
+      let weightMap = fallbackMasterData.weightListMap;
 
       rows.forEach(r => {
         const qtyNum = parseFloat(r[6]) || 0;
@@ -977,7 +968,6 @@
         const masterBatchQty = mapEntry && mapEntry.batchQty ? mapEntry.batchQty : (first[6] || '0');
 
         document.getElementById('kpiLotQuantity').innerText = `${masterBatchQty} Nos`;
-
         document.getElementById('sipCompName').innerText = mapEntry ? mapEntry.desc : (part || 'BULL GEAR');
         document.getElementById('sipMatGrade').innerText = mapEntry ? (mapEntry.grade || '20MnCr5') : '20MnCr5';
         document.getElementById('sipSH').innerText = mapEntry ? mapEntry.sh : (first[7] ? `${first[7]} HRC` : '60 HRC');
