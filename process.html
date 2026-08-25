@@ -267,8 +267,9 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      text-decoration: none;
     }
-    .view-sip-btn:hover { background: #0369a1; transform: translateY(-1px); }
+    .view-sip-btn:hover { background: #0369a1; }
 
     /* Locked State Screen */
     .locked-section-box {
@@ -707,14 +708,12 @@
   </div>
 
   <script>
+    // Live Published CSV Links
     const PROCESS_LOG_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=529980778&single=true&output=csv";
     const WEIGHT_LIST_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=373153751&single=true&output=csv";
 
-    // Dynamic Master Dictionary
-    let liveWeightMaster = {
-      "33003": { desc: "COMPONENT 33003", weight: 1.20, batchQty: 500, pdfLink: "" },
-      "3001": { desc: "COMPONENT 3001", weight: 1.50, batchQty: 400, pdfLink: "" }
-    };
+    // 100% Pure Live Objects
+    let liveWeightMaster = {};
     let masterLogs = [];
     let logColMap = {};
     let isSectionUnlocked = false;
@@ -761,32 +760,20 @@
       return r.map(cols => cols.map(col => (col || '').trim()));
     }
 
-    // High-Speed Multi-Pipeline Fetcher
-    async function fetchCSVWithFallback(rawUrl) {
-      if (!rawUrl) return null;
-
-      // 1. Direct fetch
-      try {
-        const directUrl = rawUrl + (rawUrl.includes('?') ? '&' : '?') + '_ts=' + Date.now();
-        const resp = await fetch(directUrl, { cache: 'no-store' });
-        if (resp.ok) {
-          const txt = await resp.text();
-          if (txt && txt.length > 30 && !txt.includes("<!DOCTYPE html>")) return txt;
-        }
-      } catch (e) {}
-
-      // 2. High-speed proxies
-      const proxies = [
-        "https://api.allorigins.win/raw?url=" + encodeURIComponent(rawUrl),
-        "https://corsproxy.io/?" + encodeURIComponent(rawUrl),
-        "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(rawUrl)
+    // Direct / Proxy Multi-Pipeline Engine
+    async function fetchCSVData shamefully(url) {
+      const endpoints = [
+        url + (url.includes('?') ? '&' : '?') + '_ts=' + Date.now(),
+        "https://api.allorigins.win/raw?url=" + encodeURIComponent(url),
+        "https://corsproxy.io/?" + encodeURIComponent(url),
+        "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(url)
       ];
 
-      for (const p of proxies) {
+      for (const ep of endpoints) {
         try {
           const controller = new AbortController();
           const timer = setTimeout(() => controller.abort(), 6000);
-          const resp = await fetch(p, { signal: controller.signal, cache: 'no-store' });
+          const resp = await fetch(ep, { signal: controller.signal, cache: 'no-store' });
           clearTimeout(timer);
           if (resp.ok) {
             const txt = await resp.text();
@@ -797,12 +784,12 @@
       return null;
     }
 
-    // Process Weight List Sheet
+    // Parse Weight List Live
     function processWeightListSheet(parsedRows) {
       if (!parsedRows || parsedRows.length < 2) return;
 
       let headerIdx = 0;
-      let partCol = -1, weightCol = -1, batchCol = -1, descCol = -1, pdfCol = -1;
+      let partCol = 0, weightCol = 1, batchCol = 2, descCol = -1, pdfCol = -1;
 
       for (let i = 0; i < Math.min(parsedRows.length, 6); i++) {
         const rowStr = parsedRows[i].join(' ').toLowerCase();
@@ -819,10 +806,6 @@
           break;
         }
       }
-
-      if (partCol === -1) partCol = 0;
-      if (weightCol === -1) weightCol = 1;
-      if (batchCol === -1) batchCol = 2;
 
       for (let i = headerIdx + 1; i < parsedRows.length; i++) {
         const r = parsedRows[i];
@@ -848,14 +831,14 @@
 
         liveWeightMaster[pNo] = {
           desc: pDesc,
-          weight: pWt > 0 ? pWt : (pNo.includes('33003') ? 1.20 : 1.20),
+          weight: pWt,
           batchQty: pBatch,
           pdfLink: pPdf
         };
       }
     }
 
-    // Process Log Headers
+    // Parse Process Log Column Headers
     function processLogHeaders(headerRow) {
       logColMap = {
         date: 0, cust: 1, part: 2, batch: 3, heat: 4, fc: 5, qty: 6,
@@ -889,7 +872,7 @@
       });
     }
 
-    // Load All Live Sheets
+    // Load Live Sheets
     async function loadAllLiveSheets(forceSync = false) {
       const badge = document.getElementById('dataSourceBadge');
       if (badge) {
@@ -902,7 +885,7 @@
 
       // 1. Fetch Weight List
       try {
-        const wtCSV = await fetchCSVWithFallback(WEIGHT_LIST_CSV_URL);
+        const wtCSV = await fetchCSVData(WEIGHT_LIST_CSV_URL);
         if (wtCSV) {
           const parsedWt = parseCSVData(wtCSV);
           processWeightListSheet(parsedWt);
@@ -912,7 +895,7 @@
 
       // 2. Fetch Process Log
       try {
-        const logCSV = await fetchCSVWithFallback(PROCESS_LOG_CSV_URL);
+        const logCSV = await fetchCSVData(PROCESS_LOG_CSV_URL);
         if (logCSV) {
           const parsedLogs = parseCSVData(logCSV);
           if (parsedLogs.length > 0) {
@@ -932,7 +915,7 @@
           badge.innerHTML = "🟢 Live (Sheets Connected)";
           badge.style.color = "#34d399";
         }
-        if (forceSync) alert("✅ Live Sheets & Weight List successfully synced!");
+        if (forceSync) alert("✅ Both Process Sheet & Weight List synced!");
       } else if (logSuccess) {
         if (badge) {
           badge.innerHTML = "🟢 Live (Process Sheet OK)";
@@ -940,8 +923,8 @@
         }
       } else {
         if (badge) {
-          badge.innerHTML = "🟠 Local Active";
-          badge.style.color = "#f97316";
+          badge.innerHTML = "🔴 Connection Issue";
+          badge.style.color = "#ef4444";
         }
       }
 
@@ -950,7 +933,7 @@
     }
 
     function getComponentWeight(partNo) {
-      if (!partNo) return 1.20;
+      if (!partNo) return 0;
       const clean = String(partNo).trim().toUpperCase();
 
       if (liveWeightMaster[clean] && liveWeightMaster[clean].weight > 0) {
@@ -961,7 +944,7 @@
           if (liveWeightMaster[k].weight > 0) return liveWeightMaster[k].weight;
         }
       }
-      return 1.20;
+      return 0;
     }
 
     function getComponentBatchQty(partNo, fallbackQty) {
@@ -1234,12 +1217,10 @@
 
       let targetUrl = currentActivePdfLink;
       
-      // Fallback: If no direct Drive link found in sheet, check local sip/ folder
       if (!targetUrl) {
         targetUrl = `sip/${encodeURIComponent(currentActivePart)}.pdf`;
       }
 
-      // Directly open in new browser tab
       window.open(targetUrl, '_blank');
     }
 
