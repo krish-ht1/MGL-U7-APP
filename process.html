@@ -902,7 +902,7 @@
       for (const k in liveWeightMaster) {
         if (clean.includes(k) || k.includes(clean)) return liveWeightMaster[k].weight;
       }
-      return 1.20; // Default exact fallback for 33003
+      return ; // Default exact fallback for 3003
     }
 
     function getComponentBatchQty(partNo, fallbackQty) {
