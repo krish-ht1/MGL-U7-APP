@@ -762,7 +762,6 @@
 
     // Live Master Store
     let liveWeightMaster = {
-      "33003": { desc: "COMPONENT 33003", weight: 1.20, batchQty: 500, pdfLink: "" },
       "2105": { desc: "BULL GEAR", weight: 3.20, batchQty: 480, pdfLink: "" },
       "2106": { desc: "PINION SHAFT", weight: 2.10, batchQty: 350, pdfLink: "" },
       "2107": { desc: "INPUT GEAR", weight: 1.85, batchQty: 600, pdfLink: "" }
@@ -845,7 +844,7 @@
       }
 
       // 1. Fetch Weight List Sheet
-      const wtCSV = await fetchCSVWithProxy(WEIGHT_LIST_CSV_URL);
+      const wtCSV = await fetchCSVWithProxy("https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=373153751&single=true&output=csv");
       if (wtCSV) {
         const parsedWt = parseCSVData(wtCSV);
         if (parsedWt.length > 1) {
