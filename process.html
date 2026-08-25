@@ -591,37 +591,37 @@
       </div>
     </div>
 
-    <!-- 3. Compact SIP Specs Ribbon -->
+    <!-- 3. Dynamic Live SIP Specs Ribbon -->
     <div class="sip-card">
       <div class="sip-grid">
         <div class="sip-param-box" style="border-color: #38bdf8;">
-          <span>Component</span>
-          <strong id="sipCompName" style="color: #38bdf8;">BULL GEAR</strong>
+          <span>Active Component / Part</span>
+          <strong id="sipCompName" style="color: #38bdf8;">-</strong>
         </div>
 
         <div class="sip-param-box" style="border-color: #f97316;">
-          <span>Mat. Grade</span>
-          <strong id="sipMatGrade" style="color: #f97316;">20MnCr5</strong>
+          <span>Customer</span>
+          <strong id="sipCustomer" style="color: #f97316;">-</strong>
         </div>
 
         <div class="sip-param-box">
-          <span>Surface Hardness</span>
-          <strong id="sipSH">60 HRC</strong>
+          <span>Surface Hardness (S.H)</span>
+          <strong id="sipSH">-</strong>
         </div>
 
         <div class="sip-param-box">
           <span>Core Hardness</span>
-          <strong id="sipCore">30-40 HRC</strong>
+          <strong id="sipCore">-</strong>
         </div>
 
         <div class="sip-param-box">
           <span>ECD (Effective)</span>
-          <strong id="sipECD">0.80-1.20 mm</strong>
+          <strong id="sipECD">-</strong>
         </div>
 
         <div class="sip-param-box">
-          <span>ECD (Before Grind)</span>
-          <strong id="sipECDBefore">0.90-1.35 mm</strong>
+          <span>Before Grind (ECD/PCD)</span>
+          <strong id="sipECDBefore">-</strong>
         </div>
       </div>
 
@@ -698,12 +698,12 @@
       </div>
       <div class="modal-body">
         <table style="width: 100%; font-size: 11px; border-collapse: collapse; text-align: left; margin-bottom: 12px;">
-          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Active Component:</td><td id="modalComp" style="padding: 6px; font-weight: bold; color: #38bdf8;">BULL GEAR (Part: 2105)</td></tr>
-          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Material Grade:</td><td id="modalGrade" style="padding: 6px; font-weight: bold; color: #fde047;">20MnCr5 / Case Hardening Steel</td></tr>
-          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Surface Hardness:</td><td style="padding: 6px; font-weight: bold; color: #38bdf8;">58 - 62 HRC (Cut-off @ 50 HRC)</td></tr>
-          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Core Hardness:</td><td style="padding: 6px; font-weight: bold; color: #38bdf8;">30 - 40 HRC</td></tr>
-          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Effective Case Depth:</td><td style="padding: 6px; font-weight: bold; color: #38bdf8;">0.80 - 1.20 mm</td></tr>
-          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">ECD Before Grinding:</td><td style="padding: 6px; font-weight: bold; color: #38bdf8;">0.90 - 1.35 mm</td></tr>
+          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Active Component:</td><td id="modalComp" style="padding: 6px; font-weight: bold; color: #38bdf8;">-</td></tr>
+          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Customer:</td><td id="modalCust" style="padding: 6px; font-weight: bold; color: #fde047;">-</td></tr>
+          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Surface Hardness:</td><td id="modalSH" style="padding: 6px; font-weight: bold; color: #38bdf8;">-</td></tr>
+          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Core Hardness:</td><td id="modalCore" style="padding: 6px; font-weight: bold; color: #38bdf8;">-</td></tr>
+          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Effective Case Depth:</td><td id="modalECD" style="padding: 6px; font-weight: bold; color: #38bdf8;">-</td></tr>
+          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">ECD Before Grinding:</td><td id="modalECDBG" style="padding: 6px; font-weight: bold; color: #38bdf8;">-</td></tr>
         </table>
         
         <div style="background: #0f172a; border: 1px solid #334155; padding: 10px; border-radius: 6px; text-align: center;">
@@ -717,24 +717,18 @@
     // Direct Google Sheet Published CSV Link
     const CLEAN_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=529980778&single=true&output=csv";
 
-    // Embedded Offline Plant Master & Weight List (No external data.js required)
-    const fallbackMasterData = {
-      weightListMap: {
-        "2105": { desc: "BULL GEAR", grade: "20MnCr5", weight: 3.20, batchQty: 480, sh: "58-62 HRC", core: "32-40 HRC", ecd: "0.90-1.20 mm", ecdBg: "1.00-1.35 mm" },
-        "2106": { desc: "PINION SHAFT", grade: "16MnCr5", weight: 2.10, batchQty: 350, sh: "60-64 HRC", core: "30-38 HRC", ecd: "0.80-1.10 mm", ecdBg: "0.90-1.25 mm" },
-        "2107": { desc: "INPUT GEAR", grade: "20MnCr5", weight: 1.85, batchQty: 600, sh: "58-62 HRC", core: "30-40 HRC", ecd: "0.70-1.00 mm", ecdBg: "0.80-1.15 mm" }
-      },
-      processData: [
-        ["2026-02-24", "BAJAJ AUTO", "2105", "B-8821", "H-441", "1", "480", "60.5", "1.12", "0.98", "35", "1.05", "OK", "0.95", "30m*0.80", "930*180m*1.15", "880*45m*0.85", "840*30m*0.80", "1200*75C", "170*120m", "Standard Pasting OK"],
-        ["2026-02-23", "HERO MOTOCORP", "2106", "H-1049", "H-902", "2", "350", "61.0", "1.05", "0.92", "34", "0.98", "OK", "0.90", "30m*0.80", "920*150m*1.10", "880*40m*0.85", "840*30m*0.80", "1200*70C", "160*120m", "Loading Verified"]
-      ]
+    // Known Weight Map fallback
+    const weightMap = {
+      "2105": { desc: "BULL GEAR", weight: 3.20, batchQty: 480 },
+      "2106": { desc: "PINION SHAFT", weight: 2.10, batchQty: 350 },
+      "2107": { desc: "INPUT GEAR", weight: 1.85, batchQty: 600 }
     };
 
     let masterLogs = [];
     let isSectionUnlocked = false;
 
     const AUTHORIZED_USERS = {
-      "ADMIN": "admin@123",
+      "7100028": "pass123",
       "EMP101": "1234",
       "MET01": "cqi9",
       "SUPERVISOR": "ht2026"
@@ -770,10 +764,25 @@
         }
       }
       if (row.length > 1 || (row.length === 1 && row[0] !== '')) r.push(row);
+      
+      // Auto-strip header
       if (r.length > 0 && (r[0][0].toLowerCase().includes("date") || (r[0][1] && r[0][1].toLowerCase().includes("customer")))) {
         r.shift();
       }
       return r.map(cols => cols.map(col => (col || '').trim()));
+    }
+
+    async function fetchWithTimeout(url, timeout = 5000) {
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeout);
+      try {
+        const response = await fetch(url, { signal: controller.signal, cache: 'no-store' });
+        clearTimeout(id);
+        return response;
+      } catch (err) {
+        clearTimeout(id);
+        throw err;
+      }
     }
 
     async function loadLiveGoogleSheetData(forceSync = false) {
@@ -786,48 +795,28 @@
       let csvText = "";
       let isLive = false;
 
-      // Direct Request
-      try {
-        const resp = await fetch(CLEAN_CSV_URL, { cache: "no-store" });
-        if (resp.ok) {
-          const txt = await resp.text();
-          if (txt && txt.length > 80 && !txt.includes("<!DOCTYPE html>")) {
-            csvText = txt;
-            isLive = true;
+      // Multi-Proxy Pipeline for PC C-Drive & Mobile Phone
+      const urlsToTry = [
+        "https://api.allorigins.win/raw?url=" + encodeURIComponent(CLEAN_CSV_URL),
+        "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(CLEAN_CSV_URL),
+        "https://corsproxy.io/?" + encodeURIComponent(CLEAN_CSV_URL),
+        CLEAN_CSV_URL
+      ];
+
+      for (const targetUrl of urlsToTry) {
+        try {
+          const resp = await fetchWithTimeout(targetUrl, 6000);
+          if (resp.ok) {
+            const txt = await resp.text();
+            if (txt && txt.length > 80 && !txt.includes("<!DOCTYPE html>")) {
+              csvText = txt;
+              isLive = true;
+              break;
+            }
           }
+        } catch (e) {
+          // Try next proxy in list
         }
-      } catch (e) {
-        console.warn("Direct fetch bypass engaged...");
-      }
-
-      // Proxy 1 (For Phone WebView / Local Sandbox)
-      if (!isLive) {
-        try {
-          const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(CLEAN_CSV_URL);
-          const resp = await fetch(proxyUrl, { cache: "no-store" });
-          if (resp.ok) {
-            const txt = await resp.text();
-            if (txt && txt.length > 80 && !txt.includes("<!DOCTYPE html>")) {
-              csvText = txt;
-              isLive = true;
-            }
-          }
-        } catch (e) {}
-      }
-
-      // Proxy 2
-      if (!isLive) {
-        try {
-          const proxyUrl2 = "https://api.allorigins.win/raw?url=" + encodeURIComponent(CLEAN_CSV_URL);
-          const resp = await fetch(proxyUrl2, { cache: "no-store" });
-          if (resp.ok) {
-            const txt = await resp.text();
-            if (txt && txt.length > 80 && !txt.includes("<!DOCTYPE html>")) {
-              csvText = txt;
-              isLive = true;
-            }
-          }
-        } catch (e) {}
       }
 
       if (isLive) {
@@ -839,24 +828,16 @@
             badge.style.color = "#34d399";
           }
           if (forceSync) alert("✅ Live Google Sheet data synced successfully!");
-        } else {
-          loadFallback();
         }
       } else {
-        loadFallback();
+        if (badge) {
+          badge.innerHTML = "🟠 Local Cache";
+          badge.style.color = "#f97316";
+        }
       }
 
       masterLogs.sort((a, b) => parseCustomDate(b[0]) - parseCustomDate(a[0]));
       applyAllFilters();
-    }
-
-    function loadFallback() {
-      const badge = document.getElementById('dataSourceBadge');
-      masterLogs = [...fallbackMasterData.processData];
-      if (badge) {
-        badge.innerHTML = "🟠 Local Cache";
-        badge.style.color = "#f97316";
-      }
     }
 
     function applyAllFilters() {
@@ -938,11 +919,11 @@
       tbody.innerHTML = html;
     }
 
+    // Dynamic Live SIP & KPI Calculation from Real Google Sheet Data
     function updateKPIsAndSIP(rows) {
       let totalProceedPiece = 0;
       let totalWeight = 0;
       const totalProceedLot = rows.length;
-      let weightMap = fallbackMasterData.weightListMap;
 
       rows.forEach(r => {
         const qtyNum = parseFloat(r[6]) || 0;
@@ -961,24 +942,42 @@
       document.getElementById('kpiTotalWeight').innerText = `${totalWeight.toLocaleString('en-IN', {maximumFractionDigits: 1})} Kg`;
       document.getElementById('kpiWeightPerPiece').innerText = `${avgWeightPerPiece.toFixed(2)} Kg`;
 
+      // Live Read from the Latest/Top Filtered Row in Google Sheet
       if (rows.length > 0) {
-        const first = rows[0];
-        const part = String(first[2] || '').trim();
-        const mapEntry = weightMap[part];
-        const masterBatchQty = mapEntry && mapEntry.batchQty ? mapEntry.batchQty : (first[6] || '0');
+        const activeRow = rows[0];
+        const custName = activeRow[1] || 'MILESTONE CUSTOMER';
+        const partName = activeRow[2] || 'HEAT TREAT COMPONENT';
+        const lotQty = activeRow[6] || '0';
 
-        document.getElementById('kpiLotQuantity').innerText = `${masterBatchQty} Nos`;
-        document.getElementById('sipCompName').innerText = mapEntry ? mapEntry.desc : (part || 'BULL GEAR');
-        document.getElementById('sipMatGrade').innerText = mapEntry ? (mapEntry.grade || '20MnCr5') : '20MnCr5';
-        document.getElementById('sipSH').innerText = mapEntry ? mapEntry.sh : (first[7] ? `${first[7]} HRC` : '60 HRC');
-        document.getElementById('sipCore').innerText = mapEntry ? mapEntry.core : (first[10] ? `${first[10]} HRC` : '30-40 HRC');
-        document.getElementById('sipECD').innerText = mapEntry ? mapEntry.ecd : (first[11] ? `${first[11]} mm` : '0.80-1.20 mm');
-        document.getElementById('sipECDBefore').innerText = mapEntry ? mapEntry.ecdBg : (first[13] ? `${first[13]}` : '0.90-1.35 mm');
+        const liveSH = activeRow[7] ? `${activeRow[7]} HRC` : '-';
+        const liveCore = activeRow[10] ? `${activeRow[10]} HRC` : '-';
+        const liveECD = activeRow[11] ? `${activeRow[11]} mm` : '-';
+        const liveBeforeGrind = activeRow[13] ? `${activeRow[13]} mm` : (activeRow[8] ? `${activeRow[8]} mm` : '-');
 
-        document.getElementById('modalComp').innerText = `${mapEntry ? mapEntry.desc : 'Component'} (Part No: ${part})`;
-        document.getElementById('modalGrade').innerText = mapEntry ? (mapEntry.grade || '20MnCr5 / Case Hardening Steel') : '20MnCr5';
+        // Update Ribbon
+        document.getElementById('kpiLotQuantity').innerText = `${lotQty} Nos`;
+        document.getElementById('sipCompName').innerText = partName;
+        document.getElementById('sipCustomer').innerText = custName;
+        document.getElementById('sipSH').innerText = liveSH;
+        document.getElementById('sipCore').innerText = liveCore;
+        document.getElementById('sipECD').innerText = liveECD;
+        document.getElementById('sipECDBefore').innerText = liveBeforeGrind;
+
+        // Update Modal
+        document.getElementById('modalComp').innerText = partName;
+        document.getElementById('modalCust').innerText = custName;
+        document.getElementById('modalSH').innerText = liveSH;
+        document.getElementById('modalCore').innerText = liveCore;
+        document.getElementById('modalECD').innerText = liveECD;
+        document.getElementById('modalECDBG').innerText = liveBeforeGrind;
       } else {
         document.getElementById('kpiLotQuantity').innerText = `0 Nos`;
+        document.getElementById('sipCompName').innerText = `No Data`;
+        document.getElementById('sipCustomer').innerText = `-`;
+        document.getElementById('sipSH').innerText = `-`;
+        document.getElementById('sipCore').innerText = `-`;
+        document.getElementById('sipECD').innerText = `-`;
+        document.getElementById('sipECDBefore').innerText = `-`;
       }
     }
 
