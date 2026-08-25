@@ -4,12 +4,13 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#f97316">
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Process Master Dashboard - Milestone Gear</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
     body {
       background: #0b1120;
       color: #e2e8f0;
@@ -30,30 +31,31 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 24px;
+      padding: 10px 20px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.8);
       z-index: 1000;
     }
-    .nav-left { display: flex; align-items: center; gap: 14px; }
+    .nav-left { display: flex; align-items: center; gap: 12px; }
     .back-btn {
       background: #0f172a;
       border: 1px solid #334155;
       color: #f97316;
-      padding: 6px 14px;
+      padding: 6px 12px;
       border-radius: 6px;
       font-weight: 600;
       text-decoration: none;
-      font-size: 13px;
+      font-size: 12px;
+      white-space: nowrap;
       transition: 0.2s;
     }
     .back-btn:hover { background: #f97316; color: white; }
-    .nav-left h1 { font-size: 16px; margin: 0; color: #f8fafc; font-weight: 600; }
+    .nav-left h1 { font-size: 15px; margin: 0; color: #f8fafc; font-weight: 600; line-height: 1.3; }
 
     .dashboard-container {
       max-width: 1600px;
       width: 100%;
       margin: 0 auto;
-      padding: 14px 18px;
+      padding: 12px 16px;
       flex: 1;
     }
 
@@ -62,7 +64,7 @@
       background: #1e293b;
       border: 1px solid #334155;
       border-radius: 10px;
-      padding: 12px 16px;
+      padding: 12px 14px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.4);
       margin-bottom: 12px;
       display: flex;
@@ -111,41 +113,42 @@
 
     .filters-grid {
       display: grid;
-      grid-template-columns: 1.8fr 1fr 1fr 1fr;
+      grid-template-columns: 1.6fr 1fr 1fr 1fr;
       gap: 10px;
       align-items: center;
       background: #0f172a;
-      padding: 8px 12px;
+      padding: 10px 12px;
       border-radius: 6px;
       border: 1px solid #334155;
     }
     .furnace-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-    .furnace-label { font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
+    .furnace-label { font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; margin-right: 4px; }
     .furnace-chip {
       display: flex;
       align-items: center;
       gap: 4px;
       background: #1e293b;
       border: 1px solid #475569;
-      padding: 3px 6px;
+      padding: 4px 7px;
       border-radius: 4px;
       font-size: 11px;
       cursor: pointer;
       user-select: none;
     }
-    .furnace-chip input { cursor: pointer; accent-color: #f97316; }
+    .furnace-chip input { cursor: pointer; accent-color: #f97316; margin: 0; }
 
-    .filter-item { display: flex; flex-direction: column; gap: 2px; }
+    .filter-item { display: flex; flex-direction: column; gap: 3px; }
     .filter-item label { font-size: 10px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
     .filter-item select, .filter-item input {
       background: #1e293b;
       border: 1px solid #475569;
       color: #f8fafc;
-      padding: 5px 8px;
+      padding: 6px 8px;
       border-radius: 4px;
-      font-size: 11px;
+      font-size: 11.5px;
       outline: none;
       font-family: inherit;
+      width: 100%;
     }
 
     /* KPI Summary Ribbon */
@@ -154,53 +157,53 @@
       border: 1px solid #334155;
       border-left: 4px solid #f97316;
       border-radius: 8px;
-      padding: 8px 16px;
+      padding: 10px 14px;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-      gap: 12px;
-      margin-bottom: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
     }
     .ribbon-item { display: flex; align-items: center; gap: 8px; }
     .ribbon-icon {
       font-size: 16px;
       background: rgba(249, 115, 22, 0.1);
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 5px;
+      border-radius: 6px;
       color: #f97316;
+      flex-shrink: 0;
     }
-    .ribbon-meta h5 { margin: 0; font-size: 9.5px; color: #94a3b8; text-transform: uppercase; }
-    .ribbon-meta p { margin: 1px 0 0 0; font-size: 13.5px; font-weight: 700; color: #38bdf8; }
+    .ribbon-meta h5 { margin: 0; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.3px; }
+    .ribbon-meta p { margin: 2px 0 0 0; font-size: 13.5px; font-weight: 700; color: #38bdf8; }
 
     /* Compact SIP Specs Ribbon */
     .sip-card {
       background: #172033;
       border: 1px solid #0284c7;
       border-radius: 8px;
-      padding: 6px 14px;
+      padding: 8px 12px;
       margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 10px;
     }
     .sip-grid {
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
       gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
+      flex: 1;
     }
     .sip-param-box {
       background: #0f172a;
       border: 1px solid #334155;
-      padding: 4px 8px;
+      padding: 5px 8px;
       border-radius: 5px;
       text-align: center;
-      min-width: 105px;
     }
     .sip-param-box span {
       display: block;
@@ -208,16 +211,22 @@
       color: #94a3b8;
       text-transform: uppercase;
       font-weight: 600;
+      white-space: nowrap;
     }
     .sip-param-box strong {
       font-size: 11.5px;
       color: #fde047;
+      display: block;
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .btn-full-sip {
       background: #0284c7;
       color: white;
       border: none;
-      padding: 6px 12px;
+      padding: 8px 12px;
       border-radius: 5px;
       font-size: 11px;
       font-weight: 600;
@@ -232,23 +241,23 @@
       background: #1e293b;
       border: 1px dashed #f97316;
       border-radius: 10px;
-      padding: 30px 20px;
+      padding: 24px 16px;
       text-align: center;
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      margin-top: 10px;
+      margin-top: 8px;
     }
-    .locked-icon { font-size: 36px; margin-bottom: 8px; }
-    .locked-title { font-size: 16px; font-weight: 700; color: #f8fafc; margin: 0 0 6px 0; }
-    .locked-desc { font-size: 12px; color: #94a3b8; margin: 0 0 18px 0; }
+    .locked-icon { font-size: 32px; margin-bottom: 6px; }
+    .locked-title { font-size: 15px; font-weight: 700; color: #f8fafc; margin: 0 0 6px 0; }
+    .locked-desc { font-size: 11.5px; color: #94a3b8; margin: 0 0 16px 0; }
     
     .login-form-wrap {
-      max-width: 340px;
+      max-width: 320px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
       gap: 10px;
       background: #0f172a;
-      padding: 16px;
+      padding: 14px;
       border-radius: 8px;
       border: 1px solid #334155;
     }
@@ -269,51 +278,52 @@
       border: none;
       padding: 9px;
       border-radius: 6px;
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 600;
       cursor: pointer;
       transition: 0.2s;
     }
     .btn-login-submit:hover { background: #ea580c; }
-    .login-error-msg {
-      font-size: 11px;
-      color: #ef4444;
-      margin: 0;
-      display: none;
-    }
+    .login-error-msg { font-size: 11px; color: #ef4444; margin: 0; display: none; }
 
     /* Unlocked Table Container */
     .table-card {
-      display: none; /* Initially Hidden */
+      display: none;
       background: #1e293b;
       border: 1px solid #334155;
       border-radius: 10px;
       overflow: hidden;
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      margin-top: 10px;
+      margin-top: 8px;
     }
     .table-top-meta {
-      padding: 8px 14px;
+      padding: 8px 12px;
       background: #111827;
       border-bottom: 1px solid #334155;
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-size: 12px;
+      flex-wrap: wrap;
+      gap: 6px;
     }
     .btn-lock-again {
       background: #334155;
       color: #f87171;
       border: 1px solid #ef4444;
-      padding: 4px 10px;
-      border-radius: 5px;
-      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10.5px;
       font-weight: 600;
       cursor: pointer;
     }
     .btn-lock-again:hover { background: #ef4444; color: white; }
 
-    .table-scroll-wrap { overflow-x: auto; max-height: 540px; }
+    .table-scroll-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      max-height: 520px;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -324,7 +334,7 @@
     th {
       background: #0284c7;
       color: #ffffff;
-      padding: 7px 8px;
+      padding: 8px;
       font-weight: 600;
       position: sticky;
       top: 0;
@@ -363,7 +373,7 @@
       border-radius: 4px;
       font-weight: 600;
     }
-    .no-data { padding: 30px; color: #94a3b8; font-size: 13px; text-align: center; }
+    .no-data { padding: 30px; color: #94a3b8; font-size: 12.5px; text-align: center; }
 
     /* Modal for SIP */
     .modal-overlay {
@@ -375,26 +385,90 @@
       z-index: 2000;
       justify-content: center;
       align-items: center;
+      padding: 12px;
     }
     .modal-content {
       background: #1e293b;
       border: 1px solid #f97316;
       border-radius: 10px;
-      width: 90%;
-      max-width: 800px;
+      width: 100%;
+      max-width: 600px;
       color: white;
       overflow: hidden;
       box-shadow: 0 20px 50px rgba(0,0,0,0.8);
     }
     .modal-header {
-      padding: 10px 16px;
+      padding: 10px 14px;
       background: #0f172a;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid #334155;
     }
-    .modal-body { padding: 16px; font-size: 12px; }
+    .modal-body { padding: 14px; font-size: 11.5px; }
+
+    /* =========================================================
+       📱 MOBILE SPECIFIC RESPONSIVE CSS (Max Width: 768px)
+       ========================================================= */
+    @media (max-width: 768px) {
+      .top-bar { padding: 8px 12px; }
+      .nav-left h1 { font-size: 13.5px; }
+      .dashboard-container { padding: 8px 10px; }
+      
+      /* Search & Reset on Mobile */
+      .search-row { flex-direction: row; }
+      .search-input-wrap input { padding: 8px 10px 8px 32px; font-size: 12px; }
+      .btn-reset { padding: 8px 10px; font-size: 11px; }
+
+      /* Filters: Clean 2-Column Grid on Mobile */
+      .filters-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding: 8px;
+      }
+      .furnace-group {
+        grid-column: span 2;
+        justify-content: flex-start;
+        border-bottom: 1px solid #334155;
+        padding-bottom: 6px;
+      }
+      .filter-item select, .filter-item input { padding: 6px; font-size: 11px; }
+
+      /* KPI Ribbon: Neat 2-Column Balanced Grid */
+      .summary-ribbon {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding: 8px;
+      }
+      .summary-ribbon .ribbon-item:last-child {
+        grid-column: span 2;
+        justify-content: center;
+        background: rgba(15, 23, 42, 0.4);
+        padding: 4px;
+        border-radius: 6px;
+      }
+      .ribbon-meta h5 { font-size: 9px; }
+      .ribbon-meta p { font-size: 12.5px; }
+
+      /* SIP Ribbon: Clean Grid Layout */
+      .sip-card {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 8px;
+      }
+      .sip-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+      }
+      .btn-full-sip { width: 100%; text-align: center; padding: 7px; margin-top: 4px; }
+
+      /* Locked Box on Mobile */
+      .locked-section-box { padding: 18px 10px; }
+      .login-form-wrap { width: 100%; }
+
+      /* Table Header Sticky on Mobile */
+      .table-top-meta { font-size: 11px; }
+    }
   </style>
 </head>
 <body>
@@ -416,20 +490,20 @@
           <input 
             type="text" 
             id="searchBox" 
-            placeholder="Search by MS Number, Batch No, Part No, Heat Code, Customer..." 
+            placeholder="Search Part, Batch, Heat Code, Customer..." 
             oninput="applyAllFilters()"
           >
         </div>
-        <button class="btn-reset" onclick="resetAllFilters()">🔄 Reset Filters</button>
+        <button class="btn-reset" onclick="resetAllFilters()">🔄 Reset</button>
       </div>
 
       <div class="filters-grid">
         <div class="furnace-group">
-          <span class="furnace-label">F/C No:</span>
-          <label class="furnace-chip"><input type="checkbox" class="fc-filter" value="1" onchange="applyAllFilters()"> F/C 1</label>
-          <label class="furnace-chip"><input type="checkbox" class="fc-filter" value="2" onchange="applyAllFilters()"> F/C 2</label>
-          <label class="furnace-chip"><input type="checkbox" class="fc-filter" value="3" onchange="applyAllFilters()"> F/C 3</label>
-          <label class="furnace-chip"><input type="checkbox" class="fc-filter" value="4" onchange="applyAllFilters()"> F/C 4</label>
+          <span class="furnace-label">F/C:</span>
+          <label class="furnace-chip"><input type="checkbox" class="fc-filter" value="1" onchange="applyAllFilters()"> 1</label>
+          <label class="furnace-chip"><input type="checkbox" class="fc-filter" value="2" onchange="applyAllFilters()"> 2</label>
+          <label class="furnace-chip"><input type="checkbox" class="fc-filter" value="3" onchange="applyAllFilters()"> 3</label>
+          <label class="furnace-chip"><input type="checkbox" class="fc-filter" value="4" onchange="applyAllFilters()"> 4</label>
         </div>
 
         <div class="filter-item">
@@ -438,7 +512,7 @@
         </div>
 
         <div class="filter-item">
-          <label>Month Wise Tab</label>
+          <label>Month Wise</label>
           <select id="monthFilter" onchange="applyAllFilters()">
             <option value="">All Months</option>
             <option value="01">January</option>
@@ -468,7 +542,7 @@
       </div>
     </div>
 
-    <!-- 2. KPI Summary Ribbon (Exact Sequence) -->
+    <!-- 2. KPI Summary Ribbon -->
     <div class="summary-ribbon">
       <div class="ribbon-item">
         <div class="ribbon-icon">📦</div>
@@ -515,12 +589,12 @@
     <div class="sip-card">
       <div class="sip-grid">
         <div class="sip-param-box" style="border-color: #38bdf8;">
-          <span>Component Name</span>
+          <span>Component</span>
           <strong id="sipCompName" style="color: #38bdf8;">BULL GEAR</strong>
         </div>
 
         <div class="sip-param-box" style="border-color: #f97316;">
-          <span>Material Grade</span>
+          <span>Mat. Grade</span>
           <strong id="sipMatGrade" style="color: #f97316;">20MnCr5</strong>
         </div>
 
@@ -551,24 +625,24 @@
     <!-- 4. Hidden / Locked Section for Process Matrix -->
     <div class="locked-section-box" id="lockedSection">
       <div class="locked-icon">🔒</div>
-      <h3 class="locked-title">Restricted Access: Treatment & Metallurgy Process Matrix</h3>
-      <p class="locked-desc">Heat treatment cycle recipes and metallurgical parameters require employee authentication.</p>
+      <h3 class="locked-title">Treatment & Metallurgy Process Matrix</h3>
+      <p class="locked-desc">Heat treatment recipe parameters require employee verification.</p>
       
       <form class="login-form-wrap" onsubmit="handleEmployeeLogin(event)">
         <input type="text" id="loginEmpId" placeholder="Employee ID / Username" required autocomplete="off">
         <input type="password" id="loginPassword" placeholder="Password" required>
-        <button type="submit" class="btn-login-submit">🔐 Verify & Reveal Process Cycles</button>
-        <p class="login-error-msg" id="loginError">❌ Invalid Employee ID or Password. Try again.</p>
+        <button type="submit" class="btn-login-submit">🔐 Verify & Reveal Cycles</button>
+        <p class="login-error-msg" id="loginError">❌ Invalid Employee ID or Password.</p>
       </form>
     </div>
 
-    <!-- 5. Main 21-Column Data Table (Revealed after Login) -->
+    <!-- 5. Main 21-Column Data Table (Unlocked on Login) -->
     <div class="table-card" id="unlockedTableSection">
       <div class="table-top-meta">
-        <span style="color:#34d399; font-weight: 600;">🔓 Heat Treatment Cycle Matrix (Unlocked for: <span id="activeUserBadge">Authorized User</span>)</span>
-        <div style="display:flex; align-items:center; gap: 12px;">
-          <span id="recordStatus" style="color: #38bdf8; font-weight: 600;">Showing: 0 records</span>
-          <button class="btn-lock-again" onclick="handleLockout()">🔒 Lock Section</button>
+        <span style="color:#34d399; font-weight: 600;">🔓 Cycle Matrix (<span id="activeUserBadge">Authorized</span>)</span>
+        <div style="display:flex; align-items:center; gap: 8px;">
+          <span id="recordStatus" style="color: #38bdf8; font-weight: 600;">0 records</span>
+          <button class="btn-lock-again" onclick="handleLockout()">🔒 Lock</button>
         </div>
       </div>
       <div class="table-scroll-wrap">
@@ -600,7 +674,7 @@
           </thead>
           <tbody id="tableBody">
             <tr>
-              <td colspan="21" class="no-data">Loading process master logs...</td>
+              <td colspan="21" class="no-data">Loading process logs...</td>
             </tr>
           </tbody>
         </table>
@@ -609,26 +683,25 @@
 
   </div>
 
-  <!-- Full SIP Spec & Drive Viewer Modal -->
+  <!-- Full SIP Spec Modal -->
   <div class="modal-overlay" id="sipModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 style="margin: 0; color: #f97316; font-size: 14px;">📑 Standard Inspection Plan (SIP) Specifications</h3>
+        <h3 style="margin: 0; color: #f97316; font-size: 13.5px;">📑 Standard Inspection Plan (SIP)</h3>
         <span style="font-size: 20px; cursor: pointer; color: #94a3b8;" onclick="closeFullSIPModal()">&times;</span>
       </div>
       <div class="modal-body">
-        <table style="width: 100%; font-size: 11.5px; border-collapse: collapse; text-align: left; margin-bottom: 14px;">
+        <table style="width: 100%; font-size: 11px; border-collapse: collapse; text-align: left; margin-bottom: 12px;">
           <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Active Component:</td><td id="modalComp" style="padding: 6px; font-weight: bold; color: #38bdf8;">BULL GEAR (Part: 2105)</td></tr>
           <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Material Grade:</td><td id="modalGrade" style="padding: 6px; font-weight: bold; color: #fde047;">20MnCr5 / Case Hardening Steel</td></tr>
-          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Surface Hardness (S.H):</td><td style="padding: 6px; font-weight: bold; color: #38bdf8;">58 - 62 HRC (Cut-off @ 50 HRC)</td></tr>
+          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Surface Hardness:</td><td style="padding: 6px; font-weight: bold; color: #38bdf8;">58 - 62 HRC (Cut-off @ 50 HRC)</td></tr>
           <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Core Hardness:</td><td style="padding: 6px; font-weight: bold; color: #38bdf8;">30 - 40 HRC</td></tr>
-          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Effective Case Depth (ECD):</td><td style="padding: 6px; font-weight: bold; color: #38bdf8;">0.80 - 1.20 mm</td></tr>
-          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">ECD Before Gear Grinding:</td><td style="padding: 6px; font-weight: bold; color: #38bdf8;">0.90 - 1.35 mm (Grind Allowance: 0.15mm)</td></tr>
+          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Effective Case Depth:</td><td style="padding: 6px; font-weight: bold; color: #38bdf8;">0.80 - 1.20 mm</td></tr>
+          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">ECD Before Grinding:</td><td style="padding: 6px; font-weight: bold; color: #38bdf8;">0.90 - 1.35 mm</td></tr>
         </table>
         
-        <div style="background: #0f172a; border: 1px solid #334155; padding: 12px; border-radius: 6px; text-align: center;">
-          <p style="margin: 0 0 8px 0; font-size: 11.5px; color: #cbd5e1;">Google Drive PDF Viewer (Direct Access):</p>
-          <a href="https://drive.google.com/drive/folders/1rWWfcpXPSKSUpXToDCvKPPjSPQMPj6CR?usp=drive_link" target="_blank" style="display: inline-block; background: #f97316; color: white; text-decoration: none; padding: 7px 16px; border-radius: 5px; font-weight: 600; font-size: 12px;">🔗 Open SIP Folder in Google Drive ↗</a>
+        <div style="background: #0f172a; border: 1px solid #334155; padding: 10px; border-radius: 6px; text-align: center;">
+          <a href="https://drive.google.com/drive/folders/1rWWfcpXPSKSUpXToDCvKPPjSPQMPj6CR?usp=drive_link" target="_blank" style="display: inline-block; background: #f97316; color: white; text-decoration: none; padding: 7px 14px; border-radius: 5px; font-weight: 600; font-size: 11.5px;">🔗 Open Drive SIP Folder ↗</a>
         </div>
       </div>
     </div>
@@ -640,7 +713,7 @@
     let masterLogs = [];
     let isSectionUnlocked = false;
 
-    // Authorized User List (Add more as needed)
+    // Authorized User List
     const AUTHORIZED_USERS = {
       "7100028": "pass123",
       "EMP101": "1234",
@@ -703,10 +776,8 @@
 
       filtered.sort((a, b) => parseCustomDate(b[0]) - parseCustomDate(a[0]));
 
-      // 1. Always update KPIs and SIP Ribbon
       updateKPIsAndSIP(filtered);
 
-      // 2. Render table if unlocked
       if (isSectionUnlocked) {
         renderTable(filtered);
       }
@@ -714,10 +785,10 @@
 
     function renderTable(rows) {
       const tbody = document.getElementById('tableBody');
-      document.getElementById('recordStatus').innerText = `Showing: ${rows.length} records`;
+      document.getElementById('recordStatus').innerText = `${rows.length} records`;
 
       if (rows.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="21" class="no-data">🔍 No matching process records found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="21" class="no-data">🔍 No matching records found.</td></tr>`;
         return;
       }
 
@@ -768,19 +839,11 @@
 
       const avgWeightPerPiece = totalProceedPiece > 0 ? (totalWeight / totalProceedPiece) : 0;
 
-      // 1. Total Proceed Piece
       document.getElementById('kpiTotalQty').innerText = `${totalProceedPiece.toLocaleString('en-IN')} Pcs`;
-
-      // 2. Total Proceed Lot
       document.getElementById('kpiTotalLots').innerText = `${totalProceedLot} Lots`;
-
-      // 3. Estimated Weight
       document.getElementById('kpiTotalWeight').innerText = `${totalWeight.toLocaleString('en-IN', {maximumFractionDigits: 1})} Kg`;
-
-      // 4. Weight Per Piece
       document.getElementById('kpiWeightPerPiece').innerText = `${avgWeightPerPiece.toFixed(2)} Kg`;
 
-      // 5. Lot Quantity (Master Weightlist Batch Qty)
       if (rows.length > 0) {
         const first = rows[0];
         const part = String(first[2] || '').trim();
@@ -789,7 +852,6 @@
 
         document.getElementById('kpiLotQuantity').innerText = `${masterBatchQty} Nos`;
 
-        // SIP Ribbon
         document.getElementById('sipCompName').innerText = mapEntry ? mapEntry.desc : (part || 'BULL GEAR');
         document.getElementById('sipMatGrade').innerText = mapEntry ? (mapEntry.grade || '20MnCr5') : '20MnCr5';
         document.getElementById('sipSH').innerText = mapEntry ? mapEntry.sh : (first[7] ? `${first[7]} HRC` : '60 HRC');
@@ -804,7 +866,6 @@
       }
     }
 
-    /* Authentication & Lock Handlers */
     function handleEmployeeLogin(e) {
       e.preventDefault();
       const empId = document.getElementById('loginEmpId').value.trim().toUpperCase();
