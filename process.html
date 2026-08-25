@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <!-- Prevent the BROWSER itself from caching this HTML file -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Process Master Dashboard - Milestone Gear</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
@@ -49,7 +53,8 @@
     .back-btn:hover { background: #f97316; color: white; }
     .nav-left h1 { font-size: 15px; margin: 0; color: #f8fafc; font-weight: 600; }
 
-    .sync-badge-group { display: flex; align-items: center; gap: 8px; }
+    .sync-badge-group { display: flex; align-items: center; gap: 8px; flex-direction: column; align-items: flex-end; }
+    .sync-badge-row { display: flex; align-items: center; gap: 8px; }
     .live-sync-btn {
       background: #0f172a;
       border: 1px solid #34d399;
@@ -65,6 +70,7 @@
       transition: 0.2s;
     }
     .live-sync-btn:hover { background: #34d399; color: #0f172a; }
+    .last-sync-text { font-size: 9.5px; color: #64748b; }
 
     .dashboard-container {
       max-width: 1600px;
@@ -73,6 +79,19 @@
       padding: 12px 16px;
       flex: 1;
     }
+
+    .file-warning-banner {
+      display: none;
+      background: #451a03;
+      border: 1px solid #f97316;
+      color: #fed7aa;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+    .file-warning-banner b { color: #fdba74; }
 
     /* Filters Panel */
     .filter-panel {
@@ -449,7 +468,7 @@
       .view-sip-btn { width: 100%; justify-content: center; }
     }
     @media (max-width: 768px) {
-      .top-bar { padding: 8px 12px; }
+      .top-bar { padding: 8px 12px; flex-wrap: wrap; }
       .nav-left h1 { font-size: 13.5px; }
       .dashboard-container { padding: 8px 10px; }
       .search-row { flex-direction: row; }
@@ -498,13 +517,26 @@
       <h1>📊 Process & Metallurgical Master Dashboard</h1>
     </div>
     <div class="sync-badge-group">
-      <span id="dataSourceBadge" style="font-size: 11px; font-weight: 600; color: #38bdf8;">⏳ Connecting...</span>
-      <button class="live-sync-btn" onclick="loadAllLiveSheets(true)" title="Force sync latest entries">⚡ Sync All</button>
+      <div class="sync-badge-row">
+        <span id="dataSourceBadge" style="font-size: 11px; font-weight: 600; color: #38bdf8;">⏳ Connecting...</span>
+        <button class="live-sync-btn" onclick="loadAllLiveSheets(true)" title="Force sync latest entries">⚡ Sync All</button>
+      </div>
+      <span class="last-sync-text" id="lastSyncText">Not synced yet</span>
     </div>
   </header>
 
   <div class="dashboard-container">
-    
+
+    <!-- Warning shown automatically if page is opened directly from C: drive (file://) -->
+    <div class="file-warning-banner" id="fileModeWarning">
+      ⚠️ <b>Ye file abhi seedhe C: drive se (file://) khul rahi hai.</b> Is mode mein browser Google Sheet ka data
+      strongly cache kar leta hai aur baar-baar wahi purani copy dikhata hai — isiliye naya data/SIP update nahi
+      dikh raha tha. <b>Fix:</b> is folder ko ek chhoti si local web-server se open karo — Command Prompt mein
+      folder tak jaake <code>python -m http.server 8000</code> chalao, phir browser mein
+      <code>http://localhost:8000/index.html</code> kholo. Ya phir isi file ko GitHub Pages / Netlify jaise free
+      hosting par daal do — vaha ye problem bilkul nahi aayegi.
+    </div>
+
     <!-- 1. Search and Filters -->
     <div class="filter-panel">
       <div class="search-row">
@@ -644,6 +676,7 @@
       </div>
 
       <button id="viewSipBtn" class="view-sip-btn" onclick="openSipPdfDirect()">📑 View Full SIP (PDF)</button>
+      <span id="pdfLinkStatus" style="font-size: 10px; color: #94a3b8; white-space: nowrap;">-</span>
     </div>
 
     <!-- 4. Hidden / Locked Section for Process Matrix -->
@@ -712,6 +745,9 @@
     const PROCESS_LOG_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=529980778&single=true&output=csv";
     const WEIGHT_LIST_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=373153751&single=true&output=csv";
 
+    // How often to auto re-sync from the sheet in the background (ms). 3 minutes.
+    const AUTO_REFRESH_MS = 3 * 60 * 1000;
+
     // Dynamic Live Store
     let liveWeightMaster = {};
     let masterLogs = [];
@@ -726,6 +762,13 @@
       "MET01": "cqi9",
       "SUPERVISOR": "ht2026"
     };
+
+    // Warn the user visibly when this page is opened directly as a local file (file://),
+    // since that is the #1 reason live data/SIP looked "stuck on an old copy".
+    if (window.location.protocol === 'file:') {
+      const w = document.getElementById('fileModeWarning');
+      if (w) w.style.display = 'block';
+    }
 
     function parseCustomDate(dateStr) {
       if (!dateStr) return new Date(0);
@@ -760,20 +803,64 @@
       return r.map(cols => cols.map(col => (col || '').trim()));
     }
 
-    // Direct & Multi-Proxy Fetch Engine
+    // Google Drive PDF links get pasted in many different shapes
+    // (".../file/d/ID/view?usp=sharing", ".../open?id=ID", ".../uc?id=ID", or just the bare ID).
+    // Pull the file ID out of whatever shape it's in and rebuild a link that reliably opens
+    // in a new tab, so a mismatched/old link format never silently fails to open.
+    function normalizeDriveLink(raw) {
+      if (!raw) return "";
+      const link = String(raw).trim();
+      if (!link) return "";
+
+      // If it's not a Google Drive URL at all (e.g. some other direct PDF host), leave it as-is.
+      if (!link.includes('drive.google.com') && !/^[a-zA-Z0-9_-]{20,}$/.test(link)) {
+        return link;
+      }
+
+      let fileId = "";
+      let match = link.match(/\/d\/([a-zA-Z0-9_-]{15,})/);
+      if (match) fileId = match[1];
+      if (!fileId) {
+        match = link.match(/[?&]id=([a-zA-Z0-9_-]{15,})/);
+        if (match) fileId = match[1];
+      }
+      if (!fileId && /^[a-zA-Z0-9_-]{20,}$/.test(link)) fileId = link;
+
+      if (fileId) {
+        return `https://drive.google.com/file/d/${fileId}/view`;
+      }
+      return link;
+    }
+
+    // Build a fresh, uniquely cache-busted version of a URL every single call.
+    // Date.now() alone isn't always enough (some proxies round/ignore query params),
+    // so a random string is appended too.
+    function bustCache(url) {
+      const buster = 'nocache=' + Date.now() + '_' + Math.random().toString(36).slice(2);
+      return url + (url.includes('?') ? '&' : '?') + buster;
+    }
+
+    // Direct & Multi-Proxy Fetch Engine — every attempt (direct AND every proxy)
+    // now gets its OWN fresh cache-buster, so a stale proxy-side cache can no longer
+    // serve back yesterday's data.
     async function fetchCSVData(url) {
+      const freshUrl = bustCache(url);
       const endpoints = [
-        url + (url.includes('?') ? '&' : '?') + '_ts=' + Date.now(),
-        "https://api.allorigins.win/raw?url=" + encodeURIComponent(url),
-        "https://corsproxy.io/?" + encodeURIComponent(url),
-        "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(url)
+        freshUrl,
+        "https://api.allorigins.win/raw?url=" + encodeURIComponent(bustCache(url)),
+        "https://corsproxy.io/?" + encodeURIComponent(bustCache(url)),
+        "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(bustCache(url))
       ];
 
       for (const ep of endpoints) {
         try {
           const controller = new AbortController();
-          const timer = setTimeout(() => controller.abort(), 6000);
-          const resp = await fetch(ep, { signal: controller.signal, cache: 'no-store' });
+          const timer = setTimeout(() => controller.abort(), 8000);
+          const resp = await fetch(ep, {
+            signal: controller.signal,
+            cache: 'no-store',
+            headers: { 'Cache-Control': 'no-cache' }
+          });
           clearTimeout(timer);
           if (resp.ok) {
             const txt = await resp.text();
@@ -806,6 +893,9 @@
           break;
         }
       }
+
+      // Rebuild fresh each sync so removed/renamed rows in the sheet don't linger.
+      liveWeightMaster = {};
 
       for (let i = headerIdx + 1; i < parsedRows.length; i++) {
         const r = parsedRows[i];
@@ -872,6 +962,14 @@
       });
     }
 
+    function updateLastSyncText(ok) {
+      const el = document.getElementById('lastSyncText');
+      if (!el) return;
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      el.innerText = (ok ? 'Last synced: ' : 'Last attempt: ') + timeStr;
+    }
+
     // Load Live Sheets
     async function loadAllLiveSheets(forceSync = false) {
       const badge = document.getElementById('dataSourceBadge');
@@ -912,21 +1010,30 @@
 
       if (logSuccess && wtSuccess) {
         if (badge) {
-          badge.innerHTML = "🟢 Live (Sheets Connected)";
+          badge.innerHTML = "🟢 Live — Process + Weight/PDF List Merged";
           badge.style.color = "#34d399";
         }
-        if (forceSync) alert("✅ Both Process Sheet & Weight List synced!");
+        if (forceSync) alert("✅ Both sheets synced & merged — Process Log (" + masterLogs.length + " rows) + Weight/PDF List (" + Object.keys(liveWeightMaster).length + " parts).");
       } else if (logSuccess) {
         if (badge) {
-          badge.innerHTML = "🟢 Live (Process Sheet OK)";
-          badge.style.color = "#38bdf8";
+          badge.innerHTML = "🟡 Live — Process OK, Weight/PDF List NOT loaded";
+          badge.style.color = "#fbbf24";
+        }
+        if (forceSync) alert("⚠️ Process Sheet synced, lekin Weight/PDF List sheet load nahi hui — isliye PDF & weight abhi merge nahi honge. Us sheet ka 'Publish to web' CSV link check karo.");
+      } else if (wtSuccess) {
+        if (badge) {
+          badge.innerHTML = "🟡 Live — Weight/PDF List OK, Process log NOT loaded";
+          badge.style.color = "#fbbf24";
         }
       } else {
         if (badge) {
           badge.innerHTML = "🔴 Connection Issue";
           badge.style.color = "#ef4444";
         }
+        if (forceSync) alert("⚠️ Sync fail hua. Agar ye file seedhe C: drive se khuli hai (file://), to upar diya gaya local-server wala fix try karo.");
       }
+
+      updateLastSyncText(logSuccess || wtSuccess);
 
       masterLogs.sort((a, b) => parseCustomDate(b[logColMap.date || 0]) - parseCustomDate(a[logColMap.date || 0]));
       applyAllFilters();
@@ -974,11 +1081,11 @@
       if (!partNo) return "";
       const clean = String(partNo).trim().toUpperCase();
       if (liveWeightMaster[clean] && liveWeightMaster[clean].pdfLink) {
-        return liveWeightMaster[clean].pdfLink;
+        return normalizeDriveLink(liveWeightMaster[clean].pdfLink);
       }
       for (const k in liveWeightMaster) {
         if ((clean.includes(k) || k.includes(clean)) && liveWeightMaster[k].pdfLink) {
-          return liveWeightMaster[k].pdfLink;
+          return normalizeDriveLink(liveWeightMaster[k].pdfLink);
         }
       }
       return "";
@@ -1127,7 +1234,15 @@
       document.getElementById('kpiWeightPerPiece').innerText = `${avgWeightPerPiece.toFixed(2)} Kg`;
 
       if (rows.length > 0) {
-        const activeRow = rows[0];
+        // If the search box has text that exactly matches a part number among the
+        // currently filtered rows, show THAT part's details — not just the most
+        // recent row — so searching an MS/part number reliably surfaces its own SIP.
+        const typedSearch = document.getElementById('searchBox').value.trim().toUpperCase();
+        let activeRow = rows[0];
+        if (typedSearch) {
+          const exactMatch = rows.find(r => String(r[m.part || 2] || '').trim().toUpperCase() === typedSearch);
+          if (exactMatch) activeRow = exactMatch;
+        }
         const custName = activeRow[m.cust || 1] || 'CUSTOMER';
         const partName = activeRow[m.part || 2] || '-';
         const rawLotQty = activeRow[m.qty || 6] || '0';
@@ -1162,6 +1277,12 @@
         document.getElementById('sipCore').innerText = liveCore;
         document.getElementById('sipECD').innerText = liveECD;
         document.getElementById('sipECDBefore').innerText = liveBeforeGrind;
+
+        const pdfStatusEl = document.getElementById('pdfLinkStatus');
+        if (pdfStatusEl) {
+          pdfStatusEl.innerText = currentActivePdfLink ? '📄 PDF linked (Drive)' : '⚠️ No PDF link for this part in Weight List sheet';
+          pdfStatusEl.style.color = currentActivePdfLink ? '#34d399' : '#f87171';
+        }
       } else {
         document.getElementById('kpiLotQuantity').innerText = `0 Nos`;
         document.getElementById('sipCompName').innerText = `No Data`;
@@ -1171,6 +1292,8 @@
         document.getElementById('sipCore').innerText = `-`;
         document.getElementById('sipECD').innerText = `-`;
         document.getElementById('sipECDBefore').innerText = `-`;
+        const pdfStatusEl = document.getElementById('pdfLinkStatus');
+        if (pdfStatusEl) { pdfStatusEl.innerText = '-'; pdfStatusEl.style.color = '#94a3b8'; }
       }
     }
 
@@ -1208,7 +1331,8 @@
       applyAllFilters();
     }
 
-    // Direct Dynamic PDF Opener in New Tab
+    // Direct Dynamic PDF Opener in New Tab — cache-busted so it doesn't
+    // reopen the exact same cached PDF copy every time.
     function openSipPdfDirect() {
       if (!currentActivePart || currentActivePart === "-") {
         alert("Please search or select a component first.");
@@ -1216,15 +1340,20 @@
       }
 
       let targetUrl = currentActivePdfLink;
-      
+
       if (!targetUrl) {
         targetUrl = `sip/${encodeURIComponent(currentActivePart)}.pdf`;
       }
 
-      window.open(targetUrl, '_blank');
+      window.open(bustCache(targetUrl), '_blank');
     }
 
-    window.addEventListener('DOMContentLoaded', () => loadAllLiveSheets(false));
+    window.addEventListener('DOMContentLoaded', () => {
+      loadAllLiveSheets(false);
+      // Keep the dashboard fresh automatically in the background, without
+      // needing the user to click "Sync All" every time.
+      setInterval(() => loadAllLiveSheets(false), AUTO_REFRESH_MS);
+    });
   </script>
 </body>
 </html>
