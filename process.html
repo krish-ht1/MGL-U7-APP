@@ -1,309 +1,848 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Heat Treatment Unit 7 - Dashboard</title>
-    <style>
-        * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #090d16; color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        
-        .phone-frame { width: 410px; height: 840px; background: #0f172a; border: 10px solid #1e293b; border-radius: 36px; box-shadow: 0 20px 45px rgba(0,0,0,0.7); display: flex; flex-direction: column; overflow: hidden; position: relative; }
-        
-        @media (min-width: 768px) {
-            .phone-frame { width: min(650px, 92vw); height: min(900px, 95vh); border-width: 4px; border-radius: 20px; }
-        }
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#f97316">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Process Master Dashboard - Milestone Gear</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-        /* TOP HEADER */
-        .top-header { display: flex; justify-content: space-between; align-items: center; padding: 18px 14px 12px 14px; background: #1e293b; border-bottom: 2px solid #334155; }
-        .header-logo { width: 50px; height: 50px; background: #38bdf8; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 900; color: #0f172a; font-size: 16px; box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); }
-        .header-text { text-align: right; }
-        .main-title { font-size: 14px; font-weight: 900; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px; }
-        .sub-title { font-size: 10px; font-weight: bold; color: #94a3b8; text-transform: uppercase; }
-        .real-time { font-size: 10px; color: #eab308; font-weight: bold; margin-top: 4px; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; display: inline-block; }
+    * { box-sizing: border-box; }
+    body {
+      background: #0b1120;
+      color: #e2e8f0;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
-        .app-body { flex: 1; overflow-y: auto; padding: 12px 10px; display: flex; flex-direction: column; scrollbar-width: thin; scrollbar-color: #334155 #0f172a; }
-        
-        /* NAVIGATION / TOP CONTROLS */
-        .search-container { display: flex; gap: 6px; margin-bottom: 8px; }
-        .search-box { flex: 1; padding: 8px 10px; background-color: #1e293b; border: 1px solid #334155; border-radius: 6px; color: white; font-size: 11px; outline: none; }
-        .btn-search { background-color: #38bdf8; color: #0f172a; border: none; padding: 0 14px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; }
+    /* Top Bar */
+    .top-bar {
+      position: sticky;
+      top: 0;
+      background: #1e293b;
+      border-bottom: 2px solid #f97316;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 24px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+      z-index: 1000;
+    }
+    .nav-left { display: flex; align-items: center; gap: 14px; }
+    .back-btn {
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #f97316;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 13px;
+      transition: 0.2s;
+    }
+    .back-btn:hover { background: #f97316; color: white; }
+    .nav-left h1 { font-size: 16px; margin: 0; color: #f8fafc; font-weight: 600; }
 
-        .filters-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
-        .filter-select { background: #1e293b; border: 1px solid #334155; color: #f8fafc; padding: 6px; border-radius: 6px; font-size: 10px; outline: none; width: 100%; }
-        .fc-row { display: flex; gap: 4px; grid-column: span 2; }
-        .fc-btn { flex: 1; background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 6px 2px; border-radius: 4px; font-size: 10px; font-weight: bold; cursor: pointer; }
-        .fc-btn.active { background: #0284c7; color: white; border-color: #38bdf8; }
+    .dashboard-container {
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 14px 18px;
+      flex: 1;
+    }
 
-        /* SUMMARY & CARDS */
-        .green-ribbon { background: linear-gradient(135deg, #16a34a, #15803d); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #22c55e; }
-        .ribbon-title { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #dcfce7; }
-        .ribbon-sub { font-size: 10px; color: #f0fdf4; margin-top: 2px; }
-        .ribbon-stat { text-align: right; }
-        .weight-val { font-size: 15px; font-weight: 900; color: #86efac; }
-        .weight-label { font-size: 8px; color: #dcfce7; font-weight: bold; text-transform: uppercase; }
+    /* Filters Panel */
+    .filter-panel {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 12px 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .search-row { display: flex; gap: 10px; align-items: center; }
+    .search-input-wrap { flex: 1; position: relative; }
+    .search-input-wrap input {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid #475569;
+      color: #f8fafc;
+      padding: 9px 14px 9px 36px;
+      border-radius: 6px;
+      font-size: 13px;
+      outline: none;
+      transition: 0.2s;
+      font-family: inherit;
+    }
+    .search-input-wrap input:focus {
+      border-color: #f97316;
+      box-shadow: 0 0 0 2px rgba(249,115,22,0.25);
+    }
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      color: #94a3b8;
+    }
+    .btn-reset {
+      background: #334155;
+      color: #cbd5e1;
+      border: none;
+      padding: 9px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      white-space: nowrap;
+    }
+    .btn-reset:hover { background: #ef4444; color: white; }
 
-        .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 10px; }
-        .summary-box { background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 6px 2px; text-align: center; }
-        .summary-val { font-size: 12px; font-weight: bold; color: #38bdf8; }
-        .summary-label { font-size: 8px; color: #94a3b8; text-transform: uppercase; }
+    .filters-grid {
+      display: grid;
+      grid-template-columns: 1.8fr 1fr 1fr 1fr;
+      gap: 10px;
+      align-items: center;
+      background: #0f172a;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+    }
+    .furnace-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .furnace-label { font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
+    .furnace-chip {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: #1e293b;
+      border: 1px solid #475569;
+      padding: 3px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .furnace-chip input { cursor: pointer; accent-color: #f97316; }
 
-        /* MONTH-WISE TABLE CONTAINERS */
-        .month-section { margin-bottom: 14px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; overflow: hidden; }
-        .month-header { background: #1e293b; color: #eab308; font-size: 11px; font-weight: bold; padding: 8px 10px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; }
-        .table-wrapper { overflow-x: auto; max-height: 260px; scrollbar-width: thin; scrollbar-color: #475569 #0f172a; }
-        
-        table { width: 2200px; border-collapse: collapse; font-size: 9.5px; text-align: left; }
-        th { padding: 6px 8px; font-weight: bold; text-transform: uppercase; white-space: nowrap; position: sticky; top: 0; z-index: 2; }
-        .th-cyan { background: #0891b2; color: #ffffff; }
-        .th-yellow { background: #ca8a04; color: #ffffff; }
-        td { padding: 6px 8px; border-bottom: 1px solid #1e293b; white-space: nowrap; color: #e2e8f0; background: #0b1120; }
-        tr:nth-child(even) td { background: #0f172a; }
-        
-        /* FOOTER */
-        .app-footer { background: #0f172a; text-align: center; padding: 10px; font-size: 10px; font-weight: bold; color: #64748b; border-top: 1px solid #1e293b; }
-        .app-footer span { color: #38bdf8; }
-    </style>
+    .filter-item { display: flex; flex-direction: column; gap: 2px; }
+    .filter-item label { font-size: 10px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
+    .filter-item select, .filter-item input {
+      background: #1e293b;
+      border: 1px solid #475569;
+      color: #f8fafc;
+      padding: 5px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      outline: none;
+      font-family: inherit;
+    }
+
+    /* KPI Summary Ribbon */
+    .summary-ribbon {
+      background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%);
+      border: 1px solid #334155;
+      border-left: 4px solid #f97316;
+      border-radius: 8px;
+      padding: 8px 16px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .ribbon-item { display: flex; align-items: center; gap: 8px; }
+    .ribbon-icon {
+      font-size: 16px;
+      background: rgba(249, 115, 22, 0.1);
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 5px;
+      color: #f97316;
+    }
+    .ribbon-meta h5 { margin: 0; font-size: 9.5px; color: #94a3b8; text-transform: uppercase; }
+    .ribbon-meta p { margin: 1px 0 0 0; font-size: 13.5px; font-weight: 700; color: #38bdf8; }
+
+    /* Compact SIP Specs Ribbon */
+    .sip-card {
+      background: #172033;
+      border: 1px solid #0284c7;
+      border-radius: 8px;
+      padding: 6px 14px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .sip-grid {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .sip-param-box {
+      background: #0f172a;
+      border: 1px solid #334155;
+      padding: 4px 8px;
+      border-radius: 5px;
+      text-align: center;
+      min-width: 105px;
+    }
+    .sip-param-box span {
+      display: block;
+      font-size: 8.5px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .sip-param-box strong {
+      font-size: 11.5px;
+      color: #fde047;
+    }
+    .btn-full-sip {
+      background: #0284c7;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      white-space: nowrap;
+    }
+    .btn-full-sip:hover { background: #0369a1; }
+
+    /* Locked State Screen */
+    .locked-section-box {
+      background: #1e293b;
+      border: 1px dashed #f97316;
+      border-radius: 10px;
+      padding: 30px 20px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      margin-top: 10px;
+    }
+    .locked-icon { font-size: 36px; margin-bottom: 8px; }
+    .locked-title { font-size: 16px; font-weight: 700; color: #f8fafc; margin: 0 0 6px 0; }
+    .locked-desc { font-size: 12px; color: #94a3b8; margin: 0 0 18px 0; }
+    
+    .login-form-wrap {
+      max-width: 340px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: #0f172a;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+    }
+    .login-form-wrap input {
+      background: #1e293b;
+      border: 1px solid #475569;
+      color: #f8fafc;
+      padding: 9px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      outline: none;
+      font-family: inherit;
+    }
+    .login-form-wrap input:focus { border-color: #f97316; }
+    .btn-login-submit {
+      background: #f97316;
+      color: white;
+      border: none;
+      padding: 9px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-login-submit:hover { background: #ea580c; }
+    .login-error-msg {
+      font-size: 11px;
+      color: #ef4444;
+      margin: 0;
+      display: none;
+    }
+
+    /* Unlocked Table Container */
+    .table-card {
+      display: none; /* Initially Hidden */
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      margin-top: 10px;
+    }
+    .table-top-meta {
+      padding: 8px 14px;
+      background: #111827;
+      border-bottom: 1px solid #334155;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+    .btn-lock-again {
+      background: #334155;
+      color: #f87171;
+      border: 1px solid #ef4444;
+      padding: 4px 10px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-lock-again:hover { background: #ef4444; color: white; }
+
+    .table-scroll-wrap { overflow-x: auto; max-height: 540px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      white-space: nowrap;
+      text-align: center;
+    }
+    th {
+      background: #0284c7;
+      color: #ffffff;
+      padding: 7px 8px;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      border-right: 1px solid #0369a1;
+      border-bottom: 1px solid #0369a1;
+      z-index: 10;
+      vertical-align: middle;
+    }
+    .th-sub-box {
+      display: block;
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 3px;
+      padding: 1px 3px;
+      margin-top: 2px;
+      font-size: 8.5px;
+      color: #e0f2fe;
+      font-weight: 400;
+      text-transform: uppercase;
+    }
+    td {
+      padding: 6px 8px;
+      border-bottom: 1px solid #334155;
+      border-right: 1px solid #334155;
+      color: #cbd5e1;
+    }
+    tr:nth-child(even) td { background: #1e293b; }
+    tr:nth-child(odd) td { background: #0f172a; }
+    tr:hover td { background: rgba(249, 115, 22, 0.12); color: #ffffff; }
+
+    .badge-fc {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .no-data { padding: 30px; color: #94a3b8; font-size: 13px; text-align: center; }
+
+    /* Modal for SIP */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: #1e293b;
+      border: 1px solid #f97316;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 800px;
+      color: white;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    }
+    .modal-header {
+      padding: 10px 16px;
+      background: #0f172a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+    }
+    .modal-body { padding: 16px; font-size: 12px; }
+  </style>
 </head>
 <body>
 
-<div class="phone-frame">
-    <!-- HEADER -->
-    <div class="top-header">
-        <div class="header-logo">MGL</div>
-        <div class="header-text">
-            <div class="main-title">MILESTONE GEAR LIMITED</div>
-            <div class="sub-title">Heat Treatment Unit 7</div>
-            <div class="real-time" id="clockDisplay">--:--:--</div>
+  <header class="top-bar">
+    <div class="nav-left">
+      <a href="index.html" class="back-btn">⬅ Home</a>
+      <h1>📊 Process & Metallurgical Master Dashboard</h1>
+    </div>
+  </header>
+
+  <div class="dashboard-container">
+    
+    <!-- 1. Search and Filters -->
+    <div class="filter-panel">
+      <div class="search-row">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input 
+            type="text" 
+            id="searchBox" 
+            placeholder="Search by MS Number, Batch No, Part No, Heat Code, Customer..." 
+            oninput="applyAllFilters()"
+          >
         </div>
+        <button class="btn-reset" onclick="resetAllFilters()">🔄 Reset Filters</button>
+      </div>
+
+      <div class="filters-grid">
+        <div class="furnace-group">
+          <span class="furnace-label">F/C No:</span>
+          <label class="furnace-chip"><input type="checkbox" class="fc-filter" value="1" onchange="applyAllFilters()"> F/C 1</label>
+          <label class="furnace-chip"><input type="checkbox" class="fc-filter" value="2" onchange="applyAllFilters()"> F/C 2</label>
+          <label class="furnace-chip"><input type="checkbox" class="fc-filter" value="3" onchange="applyAllFilters()"> F/C 3</label>
+          <label class="furnace-chip"><input type="checkbox" class="fc-filter" value="4" onchange="applyAllFilters()"> F/C 4</label>
+        </div>
+
+        <div class="filter-item">
+          <label>Specific Date</label>
+          <input type="date" id="dateFilter" onchange="applyAllFilters()">
+        </div>
+
+        <div class="filter-item">
+          <label>Month Wise Tab</label>
+          <select id="monthFilter" onchange="applyAllFilters()">
+            <option value="">All Months</option>
+            <option value="01">January</option>
+            <option value="02">February</option>
+            <option value="03">March</option>
+            <option value="04">April</option>
+            <option value="05">May</option>
+            <option value="06">June</option>
+            <option value="07">July</option>
+            <option value="08">August</option>
+            <option value="09">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label>Year</label>
+          <select id="yearFilter" onchange="applyAllFilters()">
+            <option value="">All Years</option>
+            <option value="2026">2026</option>
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+          </select>
+        </div>
+      </div>
     </div>
 
-    <div class="app-body">
-        <!-- SEARCH -->
-        <div class="search-container">
-            <input type="text" id="searchInput" class="search-box" placeholder="Search Part No, Batch or Heat Code..." oninput="filterData()">
-            <button class="btn-search" onclick="filterData()">Search</button>
+    <!-- 2. KPI Summary Ribbon (Exact Sequence) -->
+    <div class="summary-ribbon">
+      <div class="ribbon-item">
+        <div class="ribbon-icon">📦</div>
+        <div class="ribbon-meta">
+          <h5>Total Proceed Piece</h5>
+          <p id="kpiTotalQty">0 Pcs</p>
         </div>
+      </div>
 
-        <!-- FILTERS -->
-        <div class="filters-grid">
-            <div class="fc-row">
-                <button class="fc-btn active" data-fc="ALL" onclick="setFC(this, 'ALL')">ALL F/C</button>
-                <button class="fc-btn" data-fc="1.0" onclick="setFC(this, '1.0')">F/C 1</button>
-                <button class="fc-btn" data-fc="2.0" onclick="setFC(this, '2.0')">F/C 2</button>
-                <button class="fc-btn" data-fc="3.0" onclick="setFC(this, '3.0')">F/C 3</button>
-                <button class="fc-btn" data-fc="4.0" onclick="setFC(this, '4.0')">F/C 4</button>
-            </div>
-            <select class="filter-select" id="monthFilter" onchange="filterData()">
-                <option value="">Month: All</option>
-                <option value="Jan">Jan</option><option value="Feb">Feb</option><option value="Mar">Mar</option>
-                <option value="Apr">Apr</option><option value="May">May</option><option value="Jun">Jun</option>
-                <option value="Jul">Jul</option><option value="Aug">Aug</option><option value="Sep">Sep</option>
-                <option value="Oct">Oct</option><option value="Nov">Nov</option><option value="Dec">Dec</option>
-            </select>
-            <select class="filter-select" id="custFilter" onchange="filterData()">
-                <option value="">Customer: All</option>
-            </select>
+      <div class="ribbon-item">
+        <div class="ribbon-icon">📑</div>
+        <div class="ribbon-meta">
+          <h5>Total Proceed Lot</h5>
+          <p id="kpiTotalLots">0 Lots</p>
         </div>
+      </div>
 
-        <!-- SUMMARY STATS -->
-        <div class="green-ribbon">
-            <div>
-                <div class="ribbon-title" id="ribbonTitle">Live Process Dashboard</div>
-                <div class="ribbon-sub" id="ribbonSub">Total Process Qty: 0 pcs</div>
-            </div>
-            <div class="ribbon-stat">
-                <div class="weight-val" id="totalBatches">0</div>
-                <div class="weight-label">Batches</div>
-            </div>
+      <div class="ribbon-item">
+        <div class="ribbon-icon">🏗️</div>
+        <div class="ribbon-meta">
+          <h5>Estimated Weight</h5>
+          <p id="kpiTotalWeight">0.00 Kg</p>
         </div>
+      </div>
 
-        <div class="summary-grid">
-            <div class="summary-box"><div class="summary-val" id="sumRecords">0</div><div class="summary-label">Total Rows</div></div>
-            <div class="summary-box"><div class="summary-val" id="sumMonths">0</div><div class="summary-label">Months</div></div>
-            <div class="summary-box"><div class="summary-val" id="sumCust">0</div><div class="summary-label">Customers</div></div>
-            <div class="summary-box"><div class="summary-val" id="sumParts">0</div><div class="summary-label">Part Nos</div></div>
+      <div class="ribbon-item">
+        <div class="ribbon-icon">⚖️</div>
+        <div class="ribbon-meta">
+          <h5>Weight Per Piece</h5>
+          <p id="kpiWeightPerPiece">0.00 Kg</p>
         </div>
+      </div>
 
-        <!-- DYNAMIC MONTH SECTIONS GO HERE -->
-        <div id="monthSectionsContainer"></div>
+      <div class="ribbon-item">
+        <div class="ribbon-icon">🔢</div>
+        <div class="ribbon-meta">
+          <h5>Lot Quantity</h5>
+          <p id="kpiLotQuantity">0 Nos</p>
+        </div>
+      </div>
     </div>
 
-    <!-- FOOTER -->
-    <div class="app-footer">
-        MGL Unit 7 &bull; <span>Process Data Engine</span> &bull; 2026
+    <!-- 3. Compact SIP Specs Ribbon -->
+    <div class="sip-card">
+      <div class="sip-grid">
+        <div class="sip-param-box" style="border-color: #38bdf8;">
+          <span>Component Name</span>
+          <strong id="sipCompName" style="color: #38bdf8;">BULL GEAR</strong>
+        </div>
+
+        <div class="sip-param-box" style="border-color: #f97316;">
+          <span>Material Grade</span>
+          <strong id="sipMatGrade" style="color: #f97316;">20MnCr5</strong>
+        </div>
+
+        <div class="sip-param-box">
+          <span>Surface Hardness</span>
+          <strong id="sipSH">60 HRC</strong>
+        </div>
+
+        <div class="sip-param-box">
+          <span>Core Hardness</span>
+          <strong id="sipCore">30-40 HRC</strong>
+        </div>
+
+        <div class="sip-param-box">
+          <span>ECD (Effective)</span>
+          <strong id="sipECD">0.80-1.20 mm</strong>
+        </div>
+
+        <div class="sip-param-box">
+          <span>ECD (Before Grind)</span>
+          <strong id="sipECDBefore">0.90-1.35 mm</strong>
+        </div>
+      </div>
+
+      <button class="btn-full-sip" onclick="openFullSIPModal()">📑 View Full SIP</button>
     </div>
-</div>
 
-<script>
-    // ⏰ Live Clock
-    function updateClock() {
-        const now = new Date();
-        document.getElementById('clockDisplay').innerText = now.toLocaleString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    <!-- 4. Hidden / Locked Section for Process Matrix -->
+    <div class="locked-section-box" id="lockedSection">
+      <div class="locked-icon">🔒</div>
+      <h3 class="locked-title">Restricted Access: Treatment & Metallurgy Process Matrix</h3>
+      <p class="locked-desc">Heat treatment cycle recipes and metallurgical parameters require employee authentication.</p>
+      
+      <form class="login-form-wrap" onsubmit="handleEmployeeLogin(event)">
+        <input type="text" id="loginEmpId" placeholder="Employee ID / Username" required autocomplete="off">
+        <input type="password" id="loginPassword" placeholder="Password" required>
+        <button type="submit" class="btn-login-submit">🔐 Verify & Reveal Process Cycles</button>
+        <p class="login-error-msg" id="loginError">❌ Invalid Employee ID or Password. Try again.</p>
+      </form>
+    </div>
+
+    <!-- 5. Main 21-Column Data Table (Revealed after Login) -->
+    <div class="table-card" id="unlockedTableSection">
+      <div class="table-top-meta">
+        <span style="color:#34d399; font-weight: 600;">🔓 Heat Treatment Cycle Matrix (Unlocked for: <span id="activeUserBadge">Authorized User</span>)</span>
+        <div style="display:flex; align-items:center; gap: 12px;">
+          <span id="recordStatus" style="color: #38bdf8; font-weight: 600;">Showing: 0 records</span>
+          <button class="btn-lock-again" onclick="handleLockout()">🔒 Lock Section</button>
+        </div>
+      </div>
+      <div class="table-scroll-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>DATE</th>
+              <th>CUSTOMER NAME</th>
+              <th>PART NO</th>
+              <th>BATCH NO</th>
+              <th>HEAT CODE</th>
+              <th>F/C NO</th>
+              <th>QTY</th>
+              <th>S.H</th>
+              <th>PCD</th>
+              <th>RCD</th>
+              <th>CORE</th>
+              <th>ECD</th>
+              <th>REMARK / RETEMPERING</th>
+              <th>AFTER GRINDING</th>
+              <th>EQUALISE<span class="th-sub-box">Time * CP</span></th>
+              <th>CARBURISING<span class="th-sub-box">Temp * Time * CP</span></th>
+              <th>DIFFUSION<span class="th-sub-box">Temp * Time * CP</span></th>
+              <th>HARDENING<span class="th-sub-box">Temp * Time * CP</span></th>
+              <th>QUENCHING<span class="th-sub-box">RPM * Oil Temp</span></th>
+              <th>TEMPERING<span class="th-sub-box">Temp * Time</span></th>
+              <th>REMARKS / LOADING / PASTING</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr>
+              <td colspan="21" class="no-data">Loading process master logs...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Full SIP Spec & Drive Viewer Modal -->
+  <div class="modal-overlay" id="sipModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="margin: 0; color: #f97316; font-size: 14px;">📑 Standard Inspection Plan (SIP) Specifications</h3>
+        <span style="font-size: 20px; cursor: pointer; color: #94a3b8;" onclick="closeFullSIPModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <table style="width: 100%; font-size: 11.5px; border-collapse: collapse; text-align: left; margin-bottom: 14px;">
+          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Active Component:</td><td id="modalComp" style="padding: 6px; font-weight: bold; color: #38bdf8;">BULL GEAR (Part: 2105)</td></tr>
+          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Material Grade:</td><td id="modalGrade" style="padding: 6px; font-weight: bold; color: #fde047;">20MnCr5 / Case Hardening Steel</td></tr>
+          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Surface Hardness (S.H):</td><td style="padding: 6px; font-weight: bold; color: #38bdf8;">58 - 62 HRC (Cut-off @ 50 HRC)</td></tr>
+          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Core Hardness:</td><td style="padding: 6px; font-weight: bold; color: #38bdf8;">30 - 40 HRC</td></tr>
+          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Effective Case Depth (ECD):</td><td style="padding: 6px; font-weight: bold; color: #38bdf8;">0.80 - 1.20 mm</td></tr>
+          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">ECD Before Gear Grinding:</td><td style="padding: 6px; font-weight: bold; color: #38bdf8;">0.90 - 1.35 mm (Grind Allowance: 0.15mm)</td></tr>
+        </table>
+        
+        <div style="background: #0f172a; border: 1px solid #334155; padding: 12px; border-radius: 6px; text-align: center;">
+          <p style="margin: 0 0 8px 0; font-size: 11.5px; color: #cbd5e1;">Google Drive PDF Viewer (Direct Access):</p>
+          <a href="https://drive.google.com/drive/folders/1rWWfcpXPSKSUpXToDCvKPPjSPQMPj6CR?usp=drive_link" target="_blank" style="display: inline-block; background: #f97316; color: white; text-decoration: none; padding: 7px 16px; border-radius: 5px; font-weight: 600; font-size: 12px;">🔗 Open SIP Folder in Google Drive ↗</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+
+  <script>
+    let masterLogs = [];
+    let isSectionUnlocked = false;
+
+    // Authorized User List (Add more as needed)
+    const AUTHORIZED_USERS = {
+      "ADMIN": "admin@123",
+      "EMP101": "1234",
+      "MET01": "cqi9",
+      "SUPERVISOR": "ht2026"
+    };
+
+    function parseCustomDate(dateStr) {
+      if (!dateStr) return new Date(0);
+      let str = String(dateStr).trim().split('T')[0];
+      let parts = str.split(/[-/]/);
+      if (parts.length === 3) {
+        if (parts[0].length === 4) return new Date(parts[0], parts[1] - 1, parts[2]);
+        return new Date(parts[2], parts[1] - 1, parts[0]);
+      }
+      let fallback = new Date(str);
+      return isNaN(fallback.getTime()) ? new Date(0) : fallback;
     }
-    setInterval(updateClock, 1000);
-    updateClock();
 
-    // 🗄️ Embedded Dataset (Your Master Data Array Goes Here)
-    const masterData = []; // Paste your full dataset or let it load from your source
-
-    let selectedFC = "ALL";
-
-    function setFC(btn, fc) {
-        document.querySelectorAll('.fc-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        selectedFC = fc;
-        filterData();
+    function initDashboard() {
+      if (typeof plantMasterData !== 'undefined' && plantMasterData.processData) {
+        masterLogs = [...plantMasterData.processData];
+      }
+      masterLogs.sort((a, b) => parseCustomDate(b[0]) - parseCustomDate(a[0]));
+      applyAllFilters();
     }
 
-    function initCustomerFilter() {
-        const custs = new Set();
-        masterData.forEach(d => {
-            const c = d["CUSTOMER  NAME"] || d["CUSTOMER NAME"];
-            if (c && c !== "-" && c !== "NAN") custs.add(c.trim());
-        });
-        const custDropdown = document.getElementById('custFilter');
-        custs.forEach(c => {
-            const opt = document.createElement('option');
-            opt.value = c;
-            opt.innerText = c;
-            custDropdown.appendChild(opt);
-        });
-    }
+    function applyAllFilters() {
+      const searchVal = document.getElementById('searchBox').value.trim().toLowerCase();
+      const selectedFC = Array.from(document.querySelectorAll('.fc-filter:checked')).map(cb => cb.value.trim());
+      const selectedDate = document.getElementById('dateFilter').value;
+      const selectedMonth = document.getElementById('monthFilter').value;
+      const selectedYear = document.getElementById('yearFilter').value;
 
-    function filterData() {
-        const search = document.getElementById('searchInput').value.toLowerCase();
-        const month = document.getElementById('monthFilter').value;
-        const cust = document.getElementById('custFilter').value;
+      const filtered = masterLogs.filter(row => {
+        const rowDateObj = parseCustomDate(row[0]);
+        const rowCust = String(row[1] || '').toLowerCase();
+        const rowPart = String(row[2] || '').toLowerCase();
+        const rowBatch = String(row[3] || '').toLowerCase();
+        const rowHeat = String(row[4] || '').toLowerCase();
+        const rowFC = String(row[5] || '').trim();
+        const rowRemarks = String(row[20] || '').toLowerCase();
 
-        // Sorting recent data on top (Descending by Date)
-        const filtered = masterData.filter(row => {
-            const rowCust = (row["CUSTOMER  NAME"] || row["CUSTOMER NAME"] || "").toLowerCase();
-            const rowPart = (row["PART NO"] || "").toLowerCase();
-            const rowBatch = (row["BATCH NO"] || "").toLowerCase();
-            const rowHeat = (row["HEAT CODE"] || "").toLowerCase();
-            const rowFC = (row["F/C NO"] || "").toString();
-            const rowMonth = row["MONTH_NAME"] || "";
-
-            const matchSearch = !search || rowPart.includes(search) || rowBatch.includes(search) || rowHeat.includes(search);
-            const matchFC = (selectedFC === "ALL") || (rowFC.startsWith(selectedFC.replace('.0', '')));
-            const matchMonth = !month || rowMonth === month;
-            const matchCust = !cust || (rowCust === cust.toLowerCase());
-
-            return matchSearch && matchFC && matchMonth && matchCust;
-        }).sort((a, b) => new Date(b.DATE) - new Date(a.DATE));
-
-        renderDashboard(filtered);
-    }
-
-    function renderDashboard(data) {
-        let totalQty = 0;
-        const uniqueParts = new Set();
-        const uniqueCust = new Set();
-        const groupedByMonth = {};
-
-        data.forEach(row => {
-            const qty = parseInt(row["QTY."]) || 0;
-            totalQty += qty;
-            if (row["PART NO"]) uniqueParts.add(row["PART NO"]);
-            const c = row["CUSTOMER  NAME"] || row["CUSTOMER NAME"];
-            if (c) uniqueCust.add(c);
-
-            const mKey = row["MONTH_YEAR"] || (row["MONTH_NAME"] ? row["MONTH_NAME"] + " 2024" : "Other");
-            if (!groupedByMonth[mKey]) groupedByMonth[mKey] = [];
-            groupedByMonth[mKey].push(row);
-        });
-
-        document.getElementById('ribbonSub').innerText = `Total Process Qty: ${totalQty.toLocaleString()} pcs`;
-        document.getElementById('totalBatches').innerText = data.length;
-        document.getElementById('sumRecords').innerText = data.length;
-        document.getElementById('sumMonths').innerText = Object.keys(groupedByMonth).length;
-        document.getElementById('sumCust').innerText = uniqueCust.size;
-        document.getElementById('sumParts').innerText = uniqueParts.size;
-
-        const container = document.getElementById('monthSectionsContainer');
-        container.innerHTML = "";
-
-        if (data.length === 0) {
-            container.innerHTML = `<div style="text-align:center; padding: 20px; color:#64748b; font-size:12px;">No matching records found.</div>`;
-            return;
+        if (searchVal) {
+          const match = rowCust.includes(searchVal) ||
+                        rowPart.includes(searchVal) ||
+                        rowBatch.includes(searchVal) ||
+                        rowHeat.includes(searchVal) ||
+                        rowRemarks.includes(searchVal);
+          if (!match) return false;
         }
 
-        // Render Month-wise Sections
-        Object.keys(groupedByMonth).forEach(mKey => {
-            const rows = groupedByMonth[mKey];
-            const section = document.createElement('div');
-            section.className = 'month-section';
+        if (selectedFC.length > 0 && !selectedFC.includes(rowFC)) return false;
+        if (selectedDate && rowDateObj.toDateString() !== new Date(selectedDate).toDateString()) return false;
+        if (selectedMonth && String(rowDateObj.getMonth() + 1).padStart(2, '0') !== selectedMonth) return false;
+        if (selectedYear && String(rowDateObj.getFullYear()) !== selectedYear) return false;
 
-            let tableRows = rows.map(r => `
-                <tr>
-                    <td>${r["DATE"] || "-"}</td>
-                    <td>${r["CUSTOMER  NAME"] || r["CUSTOMER NAME"] || "-"}</td>
-                    <td><strong>${r["PART NO"] || "-"}</strong></td>
-                    <td>${r["BATCH NO"] || "-"}</td>
-                    <td>${r["HEAT CODE"] || "-"}</td>
-                    <td>${r["F/C NO"] || "-"}</td>
-                    <td><strong>${r["QTY."] || "-"}</strong></td>
-                    <td>${r["S.H"] || "-"}</td>
-                    <td>${r["PCD"] || "-"}</td>
-                    <td>${r["RCD"] || "-"}</td>
-                    <td>${r["CORE"] || "-"}</td>
-                    <td>${r["ECD"] || "-"}</td>
-                    <td>${r["REMARK/RETEMPERING"] || "-"}</td>
-                    <td>${r["AFTER GRINDING"] || "-"}</td>
-                    <td>${r["EQULISE (TIME*CP)"] || "-"}</td>
-                    <td>${r["CARBURISING (TEMP*TIME*CP)"] || "-"}</td>
-                    <td>${r["DIFFUSION (TEMP*TIME*CP)"] || "-"}</td>
-                    <td>${r["HARDENING (TEMP*TIME*CP)"] || "-"}</td>
-                    <td>${r["QUENCHING (RPM*OIL TEMP)"] || "-"}</td>
-                    <td>${r["TEMPERING (TEMP*TIME)"] || "-"}</td>
-                    <td>${r["REMARKS/LOADING/PASTING"] || "-"}</td>
-                </tr>
-            `).join('');
+        return true;
+      });
 
-            section.innerHTML = `
-                <div class="month-header">
-                    <span>📅 ${mKey}</span>
-                    <span>${rows.length} Entries</span>
-                </div>
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th class="th-cyan">DATE</th>
-                                <th class="th-cyan">CUSTOMER</th>
-                                <th class="th-cyan">PART NO</th>
-                                <th class="th-cyan">BATCH NO</th>
-                                <th class="th-cyan">HEAT CODE</th>
-                                <th class="th-cyan">F/C NO</th>
-                                <th class="th-cyan">QTY</th>
-                                <th class="th-cyan">S.H</th>
-                                <th class="th-cyan">PCD</th>
-                                <th class="th-cyan">RCD</th>
-                                <th class="th-cyan">CORE</th>
-                                <th class="th-cyan">ECD</th>
-                                <th class="th-cyan">RETEMPERING</th>
-                                <th class="th-cyan">GRINDING</th>
-                                <th class="th-yellow">EQUALISE</th>
-                                <th class="th-yellow">CARBURISING</th>
-                                <th class="th-yellow">DIFFUSION</th>
-                                <th class="th-yellow">HARDENING</th>
-                                <th class="th-yellow">QUENCHING</th>
-                                <th class="th-yellow">TEMPERING</th>
-                                <th class="th-yellow">REMARKS</th>
-                            </tr>
-                        </thead>
-                        <tbody>${tableRows}</tbody>
-                    </table>
-                </div>
-            `;
-            container.appendChild(section);
-        });
+      filtered.sort((a, b) => parseCustomDate(b[0]) - parseCustomDate(a[0]));
+
+      // 1. Always update KPIs and SIP Ribbon
+      updateKPIsAndSIP(filtered);
+
+      // 2. Render table if unlocked
+      if (isSectionUnlocked) {
+        renderTable(filtered);
+      }
     }
 
-    // Initialize
-    initCustomerFilter();
-    filterData();
-</script>
+    function renderTable(rows) {
+      const tbody = document.getElementById('tableBody');
+      document.getElementById('recordStatus').innerText = `Showing: ${rows.length} records`;
+
+      if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="21" class="no-data">🔍 No matching process records found.</td></tr>`;
+        return;
+      }
+
+      let html = "";
+      rows.forEach(r => {
+        html += `<tr>
+          <td style="font-weight:600; color:#38bdf8;">${r[0] || '-'}</td>
+          <td>${r[1] || '-'}</td>
+          <td style="font-weight:600; color:#f8fafc;">${r[2] || '-'}</td>
+          <td>${r[3] || '-'}</td>
+          <td>${r[4] || '-'}</td>
+          <td><span class="badge-fc">F/C ${r[5] || '-'}</span></td>
+          <td style="font-weight:700; color:#fde047;">${r[6] || '-'}</td>
+          <td>${r[7] || '-'}</td>
+          <td>${r[8] || '-'}</td>
+          <td>${r[9] || '-'}</td>
+          <td>${r[10] || '-'}</td>
+          <td>${r[11] || '-'}</td>
+          <td>${r[12] || '-'}</td>
+          <td>${r[13] || '-'}</td>
+          <td>${r[14] || '-'}</td>
+          <td>${r[15] || '-'}</td>
+          <td>${r[16] || '-'}</td>
+          <td>${r[17] || '-'}</td>
+          <td>${r[18] || '-'}</td>
+          <td>${r[19] || '-'}</td>
+          <td>${r[20] || '-'}</td>
+        </tr>`;
+      });
+      tbody.innerHTML = html;
+    }
+
+    function updateKPIsAndSIP(rows) {
+      let totalProceedPiece = 0;
+      let totalWeight = 0;
+      const totalProceedLot = rows.length;
+      let weightMap = (typeof plantMasterData !== 'undefined' && plantMasterData.weightListMap) ? plantMasterData.weightListMap : {};
+
+      rows.forEach(r => {
+        const qtyNum = parseFloat(r[6]) || 0;
+        const part = String(r[2] || '').trim();
+        const weightEntry = weightMap[part];
+        const unitWt = weightEntry ? weightEntry.weight : 2.50;
+
+        totalProceedPiece += qtyNum;
+        totalWeight += (qtyNum * unitWt);
+      });
+
+      const avgWeightPerPiece = totalProceedPiece > 0 ? (totalWeight / totalProceedPiece) : 0;
+
+      // 1. Total Proceed Piece
+      document.getElementById('kpiTotalQty').innerText = `${totalProceedPiece.toLocaleString('en-IN')} Pcs`;
+
+      // 2. Total Proceed Lot
+      document.getElementById('kpiTotalLots').innerText = `${totalProceedLot} Lots`;
+
+      // 3. Estimated Weight
+      document.getElementById('kpiTotalWeight').innerText = `${totalWeight.toLocaleString('en-IN', {maximumFractionDigits: 1})} Kg`;
+
+      // 4. Weight Per Piece
+      document.getElementById('kpiWeightPerPiece').innerText = `${avgWeightPerPiece.toFixed(2)} Kg`;
+
+      // 5. Lot Quantity (Master Weightlist Batch Qty)
+      if (rows.length > 0) {
+        const first = rows[0];
+        const part = String(first[2] || '').trim();
+        const mapEntry = weightMap[part];
+        const masterBatchQty = mapEntry && mapEntry.batchQty ? mapEntry.batchQty : (first[6] || '0');
+
+        document.getElementById('kpiLotQuantity').innerText = `${masterBatchQty} Nos`;
+
+        // SIP Ribbon
+        document.getElementById('sipCompName').innerText = mapEntry ? mapEntry.desc : (part || 'BULL GEAR');
+        document.getElementById('sipMatGrade').innerText = mapEntry ? (mapEntry.grade || '20MnCr5') : '20MnCr5';
+        document.getElementById('sipSH').innerText = mapEntry ? mapEntry.sh : (first[7] ? `${first[7]} HRC` : '60 HRC');
+        document.getElementById('sipCore').innerText = mapEntry ? mapEntry.core : (first[10] ? `${first[10]} HRC` : '30-40 HRC');
+        document.getElementById('sipECD').innerText = mapEntry ? mapEntry.ecd : (first[11] ? `${first[11]} mm` : '0.80-1.20 mm');
+        document.getElementById('sipECDBefore').innerText = mapEntry ? mapEntry.ecdBg : (first[13] ? `${first[13]}` : '0.90-1.35 mm');
+
+        document.getElementById('modalComp').innerText = `${mapEntry ? mapEntry.desc : 'Component'} (Part No: ${part})`;
+        document.getElementById('modalGrade').innerText = mapEntry ? (mapEntry.grade || '20MnCr5 / Case Hardening Steel') : '20MnCr5';
+      } else {
+        document.getElementById('kpiLotQuantity').innerText = `0 Nos`;
+      }
+    }
+
+    /* Authentication & Lock Handlers */
+    function handleEmployeeLogin(e) {
+      e.preventDefault();
+      const empId = document.getElementById('loginEmpId').value.trim().toUpperCase();
+      const pass = document.getElementById('loginPassword').value.trim();
+      const errorMsg = document.getElementById('loginError');
+
+      if (AUTHORIZED_USERS[empId] && AUTHORIZED_USERS[empId] === pass) {
+        isSectionUnlocked = true;
+        errorMsg.style.display = 'none';
+        document.getElementById('lockedSection').style.display = 'none';
+        document.getElementById('unlockedTableSection').style.display = 'block';
+        document.getElementById('activeUserBadge').innerText = empId;
+        applyAllFilters();
+      } else {
+        errorMsg.style.display = 'block';
+      }
+    }
+
+    function handleLockout() {
+      isSectionUnlocked = false;
+      document.getElementById('loginPassword').value = '';
+      document.getElementById('lockedSection').style.display = 'block';
+      document.getElementById('unlockedTableSection').style.display = 'none';
+    }
+
+    function resetAllFilters() {
+      document.getElementById('searchBox').value = "";
+      document.getElementById('dateFilter').value = "";
+      document.getElementById('monthFilter').value = "";
+      document.getElementById('yearFilter').value = "";
+      document.querySelectorAll('.fc-filter').forEach(cb => cb.checked = false);
+      applyAllFilters();
+    }
+
+    function openFullSIPModal() { document.getElementById('sipModal').style.display = 'flex'; }
+    function closeFullSIPModal() { document.getElementById('sipModal').style.display = 'none'; }
+
+    window.addEventListener('DOMContentLoaded', initDashboard);
+  </script>
 </body>
 </html>
