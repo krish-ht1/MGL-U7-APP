@@ -543,7 +543,7 @@
           <input 
             type="text" 
             id="searchBox" 
-            placeholder="Search Part (e.g. 33003), Batch, Heat Code, Customer..." 
+            placeholder="Search Part (e.g. 33003, 3001), Batch, Heat Code, Customer..." 
             oninput="applyAllFilters()"
           >
         </div>
@@ -672,7 +672,7 @@
         </div>
       </div>
 
-      <button id="viewSipBtn" class="view-sip-btn" onclick="openSipPdf()" data-url="https://drive.google.com/file/d/1CNZujlalyUkB0gv96UgYbHXKkDfErmdD/view?usp=drivesdk">📑 View Full SIP (PDF)</button>
+      <button id="viewSipBtn" class="view-sip-btn" onclick="openSipPdf()">📑 View Full SIP (PDF)</button>
     </div>
 
     <!-- 4. Hidden / Locked Section for Process Matrix -->
@@ -760,11 +760,13 @@
     const PROCESS_LOG_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=529980778&single=true&output=csv";
     const WEIGHT_LIST_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=373153751&single=true&output=csv";
 
-    // Dynamic Live Master Store (Populated ONLY by Live Google Sheet)
+    // Dynamic Live Store (Populated ONLY by Live Google Sheets)
     let liveWeightMaster = {};
     let masterLogs = [];
+    let logColMap = {}; // Dynamic Column index map
     let isSectionUnlocked = false;
-    let currentActivePart = "33003";
+    let currentActivePart = "";
+    let currentActivePdfLink = "";
 
     const AUTHORIZED_USERS = {
       "ADMIN": "admin@123",
@@ -806,58 +808,64 @@
       return r.map(cols => cols.map(col => (col || '').trim()));
     }
 
+    // High-Speed Direct Fetch with Zero-Delay Proxies
     async function fetchCSVWithProxy(rawUrl) {
       if (!rawUrl) return null;
-      const urlsToTry = [
-        "https://api.allorigins.win/raw?url=" + encodeURIComponent(rawUrl),
-        "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(rawUrl),
+
+      // 1. Direct fetch with cache buster
+      try {
+        const directUrl = rawUrl + (rawUrl.includes('?') ? '&' : '?') + '_t=' + Date.now();
+        const resp = await fetch(directUrl, { cache: 'no-store' });
+        if (resp.ok) {
+          const txt = await resp.text();
+          if (txt && txt.length > 30 && !txt.includes("<!DOCTYPE html>")) return txt;
+        }
+      } catch (e) {}
+
+      // 2. High availability proxies
+      const proxies = [
         "https://corsproxy.io/?" + encodeURIComponent(rawUrl),
-        rawUrl
+        "https://api.allorigins.win/raw?url=" + encodeURIComponent(rawUrl),
+        "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(rawUrl)
       ];
 
-      for (const u of urlsToTry) {
+      for (const p of proxies) {
         try {
           const controller = new AbortController();
-          const timer = setTimeout(() => controller.abort(), 7000);
-          const resp = await fetch(u, { signal: controller.signal, cache: 'no-store' });
+          const timer = setTimeout(() => controller.abort(), 6000);
+          const resp = await fetch(p, { signal: controller.signal, cache: 'no-store' });
           clearTimeout(timer);
           if (resp.ok) {
             const txt = await resp.text();
-            if (txt && txt.length > 50 && !txt.includes("<!DOCTYPE html>")) return txt;
+            if (txt && txt.length > 30 && !txt.includes("<!DOCTYPE html>")) return txt;
           }
         } catch (e) {}
       }
       return null;
     }
 
-    // Dynamic Header Detector & Weight Sheet Importer
+    // Dynamic Header Detection for Weight List Sheet
     function processWeightListSheet(parsedRows) {
       if (!parsedRows || parsedRows.length < 2) return;
 
       let headerIdx = 0;
-      let partCol = -1, weightCol = -1, batchCol = -1, descCol = -1, pdfCol = -1;
+      let partCol = 0, weightCol = 1, batchCol = 2, descCol = -1, pdfCol = -1;
 
-      // Scan rows to find header row
       for (let i = 0; i < Math.min(parsedRows.length, 6); i++) {
         const rowStr = parsedRows[i].join(' ').toLowerCase();
-        if (rowStr.includes('part') || rowStr.includes('weight') || rowStr.includes('wt') || rowStr.includes('item') || rowStr.includes('component')) {
+        if (rowStr.includes('part') || rowStr.includes('weight') || rowStr.includes('wt') || rowStr.includes('item')) {
           headerIdx = i;
           parsedRows[i].forEach((h, colIdx) => {
             const cleanH = h.toLowerCase().trim();
-            if (cleanH.includes('part') || cleanH.includes('item') || cleanH.includes('code') || cleanH.includes('drawing')) partCol = colIdx;
-            if (cleanH.includes('wt') || cleanH.includes('weight') || cleanH.includes('unit wt')) weightCol = colIdx;
-            if (cleanH.includes('batch') || cleanH.includes('lot') || cleanH.includes('qty') || cleanH.includes('std')) batchCol = colIdx;
+            if (cleanH.includes('part') || cleanH.includes('item') || cleanH.includes('code') || cleanH.includes('pnr')) partCol = colIdx;
+            if (cleanH.includes('wt') || cleanH.includes('weight') || cleanH.includes('unit')) weightCol = colIdx;
+            if (cleanH.includes('batch') || cleanH.includes('lot') || cleanH.includes('qty')) batchCol = colIdx;
             if (cleanH.includes('desc') || cleanH.includes('name') || cleanH.includes('component')) descCol = colIdx;
-            if (cleanH.includes('pdf') || cleanH.includes('sip') || cleanH.includes('link') || cleanH.includes('drive')) pdfCol = colIdx;
+            if (cleanH.includes('pdf') || cleanH.includes('sip') || cleanH.includes('link') || cleanH.includes('drive') || cleanH.includes('url')) pdfCol = colIdx;
           });
           break;
         }
       }
-
-      // Default position mappings if header keywords not found
-      if (partCol === -1) partCol = 0;
-      if (weightCol === -1) weightCol = 1;
-      if (batchCol === -1) batchCol = 2;
 
       for (let i = headerIdx + 1; i < parsedRows.length; i++) {
         const r = parsedRows[i];
@@ -879,7 +887,7 @@
         }
 
         const pDesc = (descCol !== -1 && r[descCol]) ? r[descCol] : `PART ${pNo}`;
-        const pPdf = (pdfCol !== -1 && r[pdfCol]) ? r[pdfCol] : '';
+        const pPdf = (pdfCol !== -1 && r[pdfCol]) ? String(r[pdfCol]).trim() : '';
 
         liveWeightMaster[pNo] = {
           desc: pDesc,
@@ -890,18 +898,52 @@
       }
     }
 
-    // Pure Live Fetch Engine
+    // Dynamic Header Detection for Process Log Sheet
+    function processLogHeaders(headerRow) {
+      logColMap = {
+        date: 0, cust: 1, part: 2, batch: 3, heat: 4, fc: 5, qty: 6,
+        sh: 7, pcd: 8, rcd: 9, core: 10, ecd: 11, remark: 12, grind: 13,
+        equal: 14, carb: 15, diff: 16, hard: 17, quench: 18, temper: 19, loading: 20
+      };
+
+      headerRow.forEach((h, idx) => {
+        const clean = String(h || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (clean.includes('date')) logColMap.date = idx;
+        else if (clean.includes('cust')) logColMap.cust = idx;
+        else if (clean.includes('part') || clean.includes('item') || clean.includes('pnr')) logColMap.part = idx;
+        else if (clean.includes('batch')) logColMap.batch = idx;
+        else if (clean.includes('heat')) logColMap.heat = idx;
+        else if (clean.includes('fc') || clean.includes('furnace')) logColMap.fc = idx;
+        else if (clean.includes('qty') || clean.includes('quantity')) logColMap.qty = idx;
+        else if (clean.includes('sh') || clean.includes('surface')) logColMap.sh = idx;
+        else if (clean.includes('pcd')) logColMap.pcd = idx;
+        else if (clean.includes('rcd')) logColMap.rcd = idx;
+        else if (clean.includes('core')) logColMap.core = idx;
+        else if (clean.includes('ecd') && !clean.includes('grind')) logColMap.ecd = idx;
+        else if (clean.includes('grind') || clean.includes('bg') || clean.includes('before')) logColMap.grind = idx;
+        else if (clean.includes('retemper') || clean.includes('remark')) logColMap.remark = idx;
+        else if (clean.includes('equal')) logColMap.equal = idx;
+        else if (clean.includes('carb')) logColMap.carb = idx;
+        else if (clean.includes('diff')) logColMap.diff = idx;
+        else if (clean.includes('hard') && !clean.includes('surface') && !clean.includes('core')) logColMap.hard = idx;
+        else if (clean.includes('quench')) logColMap.quench = idx;
+        else if (clean.includes('temper') && !clean.includes('retemper')) logColMap.temper = idx;
+        else if (clean.includes('load') || clean.includes('past')) logColMap.loading = idx;
+      });
+    }
+
+    // Pure Live Master Loader
     async function loadAllLiveSheets(forceSync = false) {
       const badge = document.getElementById('dataSourceBadge');
       if (badge) {
-        badge.innerHTML = "⏳ Syncing Google Sheets...";
+        badge.innerHTML = "⏳ Syncing Sheets...";
         badge.style.color = "#fde047";
       }
 
       let logSuccess = false;
       let wtSuccess = false;
 
-      // 1. Fetch Live Weight List Sheet
+      // 1. Fetch Weight List Sheet
       try {
         const wtCSV = await fetchCSVWithProxy(WEIGHT_LIST_CSV_URL);
         if (wtCSV) {
@@ -909,25 +951,28 @@
           processWeightListSheet(parsedWt);
           wtSuccess = true;
         }
-      } catch(e) {
-        console.error("Weight list load error:", e);
+      } catch (e) {
+        console.warn("Weight List fetch warning:", e);
       }
 
-      // 2. Fetch Live Process Log Sheet
+      // 2. Fetch Process Log Sheet
       try {
         const logCSV = await fetchCSVWithProxy(PROCESS_LOG_CSV_URL);
         if (logCSV) {
           const parsedLogs = parseCSVData(logCSV);
-          if (parsedLogs.length > 0 && (parsedLogs[0][0].toLowerCase().includes("date") || (parsedLogs[0][1] && parsedLogs[0][1].toLowerCase().includes("customer")))) {
-            parsedLogs.shift();
-          }
           if (parsedLogs.length > 0) {
+            // Check if first row is header
+            const firstRowStr = parsedLogs[0].join(' ').toLowerCase();
+            if (firstRowStr.includes('date') || firstRowStr.includes('customer') || firstRowStr.includes('part')) {
+              processLogHeaders(parsedLogs[0]);
+              parsedLogs.shift();
+            }
             masterLogs = parsedLogs;
             logSuccess = true;
           }
         }
-      } catch(e) {
-        console.error("Process log load error:", e);
+      } catch (e) {
+        console.warn("Process log fetch warning:", e);
       }
 
       if (logSuccess && wtSuccess) {
@@ -935,7 +980,7 @@
           badge.innerHTML = "🟢 Live (Sheets Connected)";
           badge.style.color = "#34d399";
         }
-        if (forceSync) alert("✅ Live Sheets & Weight Master successfully updated!");
+        if (forceSync) alert("✅ All Live Sheets successfully synced!");
       } else if (logSuccess) {
         if (badge) {
           badge.innerHTML = "🟢 Live (Process Sheet OK)";
@@ -948,11 +993,11 @@
         }
       }
 
-      masterLogs.sort((a, b) => parseCustomDate(b[0]) - parseCustomDate(a[0]));
+      masterLogs.sort((a, b) => parseCustomDate(a[logColMap.date || 0]) - parseCustomDate(b[logColMap.date || 0]));
+      masterLogs.reverse();
       applyAllFilters();
     }
 
-    // Lookup weight strictly from the live weight list
     function getComponentWeight(partNo) {
       if (!partNo) return 0;
       const clean = String(partNo).trim().toUpperCase();
@@ -961,13 +1006,12 @@
         return liveWeightMaster[clean].weight;
       }
       
-      // Fuzzy lookup
       for (const k in liveWeightMaster) {
         if (clean.includes(k) || k.includes(clean)) {
           if (liveWeightMaster[k].weight > 0) return liveWeightMaster[k].weight;
         }
       }
-      return 0; // Return 0 if not defined in weight sheet
+      return 0;
     }
 
     function getComponentBatchQty(partNo, fallbackQty) {
@@ -979,6 +1023,20 @@
       return fallbackQty;
     }
 
+    function getComponentPdfLink(partNo) {
+      if (!partNo) return "";
+      const clean = String(partNo).trim().toUpperCase();
+      if (liveWeightMaster[clean] && liveWeightMaster[clean].pdfLink) {
+        return liveWeightMaster[clean].pdfLink;
+      }
+      for (const k in liveWeightMaster) {
+        if ((clean.includes(k) || k.includes(clean)) && liveWeightMaster[k].pdfLink) {
+          return liveWeightMaster[k].pdfLink;
+        }
+      }
+      return "";
+    }
+
     function applyAllFilters() {
       const searchVal = document.getElementById('searchBox').value.trim().toLowerCase();
       const selectedFC = Array.from(document.querySelectorAll('.fc-filter:checked')).map(cb => cb.value.trim());
@@ -986,14 +1044,16 @@
       const selectedMonth = document.getElementById('monthFilter').value;
       const selectedYear = document.getElementById('yearFilter').value;
 
+      const m = logColMap;
+
       const filtered = masterLogs.filter(row => {
-        const rowDateObj = parseCustomDate(row[0]);
-        const rowCust = String(row[1] || '').toLowerCase();
-        const rowPart = String(row[2] || '').toLowerCase();
-        const rowBatch = String(row[3] || '').toLowerCase();
-        const rowHeat = String(row[4] || '').toLowerCase();
-        const rowFC = String(row[5] || '').trim();
-        const rowRemarks = String(row[20] || '').toLowerCase();
+        const rowDateObj = parseCustomDate(row[m.date !== undefined ? m.date : 0]);
+        const rowCust = String(row[m.cust !== undefined ? m.cust : 1] || '').toLowerCase();
+        const rowPart = String(row[m.part !== undefined ? m.part : 2] || '').toLowerCase();
+        const rowBatch = String(row[m.batch !== undefined ? m.batch : 3] || '').toLowerCase();
+        const rowHeat = String(row[m.heat !== undefined ? m.heat : 4] || '').toLowerCase();
+        const rowFC = String(row[m.fc !== undefined ? m.fc : 5] || '').trim();
+        const rowRemarks = String(row[m.loading !== undefined ? m.loading : 20] || '').toLowerCase();
 
         if (searchVal) {
           const match = rowCust.includes(searchVal) ||
@@ -1012,7 +1072,7 @@
         return true;
       });
 
-      filtered.sort((a, b) => parseCustomDate(b[0]) - parseCustomDate(a[0]));
+      filtered.sort((a, b) => parseCustomDate(b[m.date || 0]) - parseCustomDate(a[m.date || 0]));
       updateKPIsAndSIP(filtered);
 
       if (isSectionUnlocked) {
@@ -1030,9 +1090,10 @@
         return;
       }
 
+      const m = logColMap;
       const monthGroups = {};
       rows.forEach(r => {
-        const d = parseCustomDate(r[0]);
+        const d = parseCustomDate(r[m.date || 0]);
         const mKey = d.getTime() === 0 ? "UNKNOWN PERIOD" : d.toLocaleString('en-IN', { month: 'long', year: 'numeric' }).toUpperCase();
         if (!monthGroups[mKey]) monthGroups[mKey] = [];
         monthGroups[mKey].push(r);
@@ -1046,8 +1107,8 @@
         let mWt = 0;
 
         mRows.forEach(r => {
-          const qty = parseFloat(r[6]) || 0;
-          const wt = getComponentWeight(r[2]);
+          const qty = parseFloat(r[m.qty || 6]) || 0;
+          const wt = getComponentWeight(r[m.part || 2]);
           mPcs += qty;
           mWt += (qty * wt);
         });
@@ -1067,27 +1128,27 @@
 
         mRows.forEach(r => {
           html += `<tr>
-            <td style="font-weight:600; color:#38bdf8;">${r[0] || '-'}</td>
-            <td>${r[1] || '-'}</td>
-            <td style="font-weight:700; color:#f8fafc;">${r[2] || '-'}</td>
-            <td>${r[3] || '-'}</td>
-            <td>${r[4] || '-'}</td>
-            <td><span class="badge-fc">F/C ${r[5] || '-'}</span></td>
-            <td style="font-weight:700; color:#fde047;">${r[6] || '-'}</td>
-            <td>${r[7] || '-'}</td>
-            <td>${r[8] || '-'}</td>
-            <td>${r[9] || '-'}</td>
-            <td>${r[10] || '-'}</td>
-            <td>${r[11] || '-'}</td>
-            <td>${r[12] || '-'}</td>
-            <td>${r[13] || '-'}</td>
-            <td>${r[14] || '-'}</td>
-            <td>${r[15] || '-'}</td>
-            <td>${r[16] || '-'}</td>
-            <td>${r[17] || '-'}</td>
-            <td>${r[18] || '-'}</td>
-            <td>${r[19] || '-'}</td>
-            <td>${r[20] || '-'}</td>
+            <td style="font-weight:600; color:#38bdf8;">${r[m.date] || '-'}</td>
+            <td>${r[m.cust] || '-'}</td>
+            <td style="font-weight:700; color:#f8fafc;">${r[m.part] || '-'}</td>
+            <td>${r[m.batch] || '-'}</td>
+            <td>${r[m.heat] || '-'}</td>
+            <td><span class="badge-fc">F/C ${r[m.fc] || '-'}</span></td>
+            <td style="font-weight:700; color:#fde047;">${r[m.qty] || '-'}</td>
+            <td>${r[m.sh] || '-'}</td>
+            <td>${r[m.pcd] || '-'}</td>
+            <td>${r[m.rcd] || '-'}</td>
+            <td>${r[m.core] || '-'}</td>
+            <td>${r[m.ecd] || '-'}</td>
+            <td>${r[m.remark] || '-'}</td>
+            <td>${r[m.grind] || '-'}</td>
+            <td>${r[m.equal] || '-'}</td>
+            <td>${r[m.carb] || '-'}</td>
+            <td>${r[m.diff] || '-'}</td>
+            <td>${r[m.hard] || '-'}</td>
+            <td>${r[m.quench] || '-'}</td>
+            <td>${r[m.temper] || '-'}</td>
+            <td>${r[m.loading] || '-'}</td>
           </tr>`;
         });
       }
@@ -1095,15 +1156,16 @@
       tbody.innerHTML = html;
     }
 
-    // Dynamic Live SIP & KPI Calculation
+    // Dynamic Live SIP & KPI Calculation from Real Rows
     function updateKPIsAndSIP(rows) {
       let totalProceedPiece = 0;
       let totalWeight = 0;
       const totalProceedLot = rows.length;
+      const m = logColMap;
 
       rows.forEach(r => {
-        const qtyNum = parseFloat(r[6]) || 0;
-        const part = String(r[2] || '').trim();
+        const qtyNum = parseFloat(r[m.qty || 6]) || 0;
+        const part = String(r[m.part || 2] || '').trim();
         const unitWt = getComponentWeight(part);
 
         totalProceedPiece += qtyNum;
@@ -1119,27 +1181,29 @@
 
       if (rows.length > 0) {
         const activeRow = rows[0];
-        const custName = activeRow[1] || 'CUSTOMER';
-        const partName = activeRow[2] || '33003';
-        const rawLotQty = activeRow[6] || '0';
+        const custName = activeRow[m.cust || 1] || 'CUSTOMER';
+        const partName = activeRow[m.part || 2] || '-';
+        const rawLotQty = activeRow[m.qty || 6] || '0';
 
         currentActivePart = partName;
+        currentActivePdfLink = getComponentPdfLink(partName);
+
         const mappedBatchQty = getComponentBatchQty(partName, rawLotQty);
 
-        let liveSH = activeRow[7] ? String(activeRow[7]).trim() : '-';
+        let liveSH = activeRow[m.sh !== undefined ? m.sh : 7] ? String(activeRow[m.sh || 7]).trim() : '-';
         if (liveSH !== '-' && !liveSH.toUpperCase().includes('HRC') && !liveSH.toUpperCase().includes('HV')) {
           liveSH += ' HRC';
         }
 
-        let liveCore = activeRow[10] ? String(activeRow[10]).trim() : '-';
+        let liveCore = activeRow[m.core !== undefined ? m.core : 10] ? String(activeRow[m.core || 10]).trim() : '-';
         if (liveCore !== '-' && !liveCore.toUpperCase().includes('HRC') && !liveCore.toUpperCase().includes('HV')) {
           liveCore += ' HRC';
         }
 
-        let liveECD = activeRow[11] ? String(activeRow[11]).trim() : '-';
+        let liveECD = activeRow[m.ecd !== undefined ? m.ecd : 11] ? String(activeRow[m.ecd || 11]).trim() : '-';
         if (liveECD !== '-' && !liveECD.includes('mm')) liveECD += ' mm';
 
-        let liveBeforeGrind = activeRow[13] ? String(activeRow[13]).trim() : (activeRow[8] ? String(activeRow[8]).trim() : '-');
+        let liveBeforeGrind = activeRow[m.grind !== undefined ? m.grind : 13] ? String(activeRow[m.grind || 13]).trim() : (activeRow[m.pcd || 8] ? String(activeRow[m.pcd || 8]).trim() : '-');
         if (liveBeforeGrind !== '-' && !liveBeforeGrind.includes('mm')) liveBeforeGrind += ' mm';
 
         document.getElementById('kpiLotQuantity').innerText = `${mappedBatchQty} Nos`;
@@ -1194,20 +1258,20 @@
       applyAllFilters();
     }
 
-    // Direct In-App Google Drive PDF Preview
+    // Dynamic In-App PDF Preview per Active Part
     function openSipPdf() {
-      const btn = document.getElementById('viewSipBtn');
-      const cleanKey = String(currentActivePart).trim().toUpperCase();
-
-      let targetUrl = "https://drive.google.com/file/d/1CNZujlalyUkB0gv96UgYbHXKkDfErmdD/view?usp=drivesdk";
-      
-      if (liveWeightMaster[cleanKey] && liveWeightMaster[cleanKey].pdfLink) {
-        targetUrl = liveWeightMaster[cleanKey].pdfLink;
-      } else if (btn && btn.getAttribute('data-url')) {
-        targetUrl = btn.getAttribute('data-url');
+      if (!currentActivePart) {
+        alert("Please select or search a component first.");
+        return;
       }
 
-      // Convert Google Drive view URL to direct embed preview
+      let targetUrl = currentActivePdfLink;
+      
+      // Fallback: Check local sip/ folder or search drive
+      if (!targetUrl) {
+        targetUrl = `sip/${encodeURIComponent(currentActivePart)}.pdf`;
+      }
+
       let embedPreviewUrl = targetUrl;
       const match = targetUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
       if (match && match[1]) {
