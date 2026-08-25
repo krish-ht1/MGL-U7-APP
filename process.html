@@ -880,12 +880,24 @@
 
       for (let i = 0; i < Math.min(parsedRows.length, 6); i++) {
         const rowStr = parsedRows[i].join(' ').toLowerCase();
-        if (rowStr.includes('part') || rowStr.includes('weight') || rowStr.includes('wt') || rowStr.includes('item')) {
+        if (rowStr.includes('part') || rowStr.includes('weight') || rowStr.includes('wt') || rowStr.includes('item') || rowStr.includes('ms no')) {
           headerIdx = i;
+          let bestPartScore = -1;
           parsedRows[i].forEach((h, colIdx) => {
-            const cleanH = h.toLowerCase().trim();
-            if (cleanH.includes('part') || cleanH.includes('item') || cleanH.includes('code') || cleanH.includes('pnr')) partCol = colIdx;
-            if (cleanH.includes('wt') || cleanH.includes('weight') || cleanH.includes('unit')) weightCol = colIdx;
+            const cleanH = h.toLowerCase().replace(/\s+/g, ' ').trim();
+
+            // Part/MS-number key column: "MS NO" must always win over a
+            // "PART DESCRIPTION" text column, even though both contain "part".
+            let partScore = -1;
+            if (/\bms\.?\s*no\.?\b/.test(cleanH)) partScore = 100;
+            else if (cleanH.includes('part no') || cleanH.includes('partno') || cleanH.includes('pnr')) partScore = 90;
+            else if ((cleanH.includes('part') || cleanH.includes('item') || cleanH.includes('code')) && !cleanH.includes('desc') && !cleanH.includes('name')) partScore = 50;
+            if (partScore > bestPartScore) { bestPartScore = partScore; partCol = colIdx; }
+
+            // Per-piece weight column: must NOT be a "TOTAL WT" column, or the
+            // KPI ribbon ends up multiplying qty by an already-multiplied total.
+            if ((cleanH.includes('wt') || cleanH.includes('weight')) && !cleanH.includes('total')) weightCol = colIdx;
+
             if (cleanH.includes('batch') || cleanH.includes('lot') || cleanH.includes('qty')) batchCol = colIdx;
             if (cleanH.includes('desc') || cleanH.includes('name') || cleanH.includes('component')) descCol = colIdx;
             if (cleanH.includes('pdf') || cleanH.includes('sip') || cleanH.includes('link') || cleanH.includes('drive') || cleanH.includes('url')) pdfCol = colIdx;
