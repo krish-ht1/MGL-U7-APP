@@ -750,24 +750,18 @@
         </div>
         
         <!-- Interactive PDF Embed -->
-        <iframe id="sipPdfFrame" class="pdf-viewer-frame" src=""></iframe>
+        <iframe id="sipPdfFrame" class="pdf-viewer-frame" src="about:blank"></iframe>
       </div>
     </div>
   </div>
 
   <script>
-    // 1. Live Google Sheet Published CSV URLs
+    // Live Google Sheet CSV URLs
     const PROCESS_LOG_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=529980778&single=true&output=csv";
     const WEIGHT_LIST_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=373153751&single=true&output=csv";
 
-    // Default In-Memory Master Store
-    let liveWeightMaster = {
-      "33003": { desc: "COMPONENT 33003", weight: 1.20, batchQty: 500, pdfLink: "https://drive.google.com/file/d/1CNZujlalyUkB0gv96UgYbHXKkDfErmdD/view?usp=drivesdk" },
-      "2105": { desc: "BULL GEAR", weight: 3.20, batchQty: 480, pdfLink: "" },
-      "2106": { desc: "PINION SHAFT", weight: 2.10, batchQty: 350, pdfLink: "" },
-      "2107": { desc: "INPUT GEAR", weight: 1.85, batchQty: 600, pdfLink: "" }
-    };
-
+    // Dynamic Live Master Store (Populated ONLY by Live Google Sheet)
+    let liveWeightMaster = {};
     let masterLogs = [];
     let isSectionUnlocked = false;
     let currentActivePart = "33003";
@@ -824,7 +818,7 @@
       for (const u of urlsToTry) {
         try {
           const controller = new AbortController();
-          const timer = setTimeout(() => controller.abort(), 6000);
+          const timer = setTimeout(() => controller.abort(), 7000);
           const resp = await fetch(u, { signal: controller.signal, cache: 'no-store' });
           clearTimeout(timer);
           if (resp.ok) {
@@ -836,30 +830,31 @@
       return null;
     }
 
-    // Smart Column Header Detector for Weight List CSV
+    // Dynamic Header Detector & Weight Sheet Importer
     function processWeightListSheet(parsedRows) {
       if (!parsedRows || parsedRows.length < 2) return;
 
       let headerIdx = 0;
       let partCol = -1, weightCol = -1, batchCol = -1, descCol = -1, pdfCol = -1;
 
-      for (let i = 0; i < Math.min(parsedRows.length, 5); i++) {
+      // Scan rows to find header row
+      for (let i = 0; i < Math.min(parsedRows.length, 6); i++) {
         const rowStr = parsedRows[i].join(' ').toLowerCase();
-        if (rowStr.includes('part') || rowStr.includes('weight') || rowStr.includes('wt') || rowStr.includes('item')) {
+        if (rowStr.includes('part') || rowStr.includes('weight') || rowStr.includes('wt') || rowStr.includes('item') || rowStr.includes('component')) {
           headerIdx = i;
           parsedRows[i].forEach((h, colIdx) => {
             const cleanH = h.toLowerCase().trim();
-            if (cleanH.includes('part') || cleanH.includes('item') || cleanH.includes('component')) partCol = colIdx;
-            if (cleanH.includes('wt') || cleanH.includes('weight')) weightCol = colIdx;
-            if (cleanH.includes('batch') || cleanH.includes('lot') || cleanH.includes('qty')) batchCol = colIdx;
-            if (cleanH.includes('desc') || cleanH.includes('name')) descCol = colIdx;
+            if (cleanH.includes('part') || cleanH.includes('item') || cleanH.includes('code') || cleanH.includes('drawing')) partCol = colIdx;
+            if (cleanH.includes('wt') || cleanH.includes('weight') || cleanH.includes('unit wt')) weightCol = colIdx;
+            if (cleanH.includes('batch') || cleanH.includes('lot') || cleanH.includes('qty') || cleanH.includes('std')) batchCol = colIdx;
+            if (cleanH.includes('desc') || cleanH.includes('name') || cleanH.includes('component')) descCol = colIdx;
             if (cleanH.includes('pdf') || cleanH.includes('sip') || cleanH.includes('link') || cleanH.includes('drive')) pdfCol = colIdx;
           });
           break;
         }
       }
 
-      // Default fallback column positions if headers weren't named
+      // Default position mappings if header keywords not found
       if (partCol === -1) partCol = 0;
       if (weightCol === -1) weightCol = 1;
       if (batchCol === -1) batchCol = 2;
@@ -871,7 +866,7 @@
         const pNo = String(r[partCol] || '').trim().toUpperCase();
         if (!pNo) continue;
 
-        let pWt = 1.20;
+        let pWt = 0;
         if (weightCol !== -1 && r[weightCol]) {
           const parsedNum = parseFloat(String(r[weightCol]).replace(/[^0-9.]/g, ''));
           if (!isNaN(parsedNum) && parsedNum > 0) pWt = parsedNum;
@@ -895,40 +890,61 @@
       }
     }
 
-    // Dual Loader: Process Log + Weight List
+    // Pure Live Fetch Engine
     async function loadAllLiveSheets(forceSync = false) {
       const badge = document.getElementById('dataSourceBadge');
       if (badge) {
-        badge.innerHTML = "⏳ Syncing Sheets...";
+        badge.innerHTML = "⏳ Syncing Google Sheets...";
         badge.style.color = "#fde047";
       }
 
-      // 1. Fetch Weight List Sheet
-      const wtCSV = await fetchCSVWithProxy(WEIGHT_LIST_CSV_URL);
-      if (wtCSV) {
-        const parsedWt = parseCSVData(wtCSV);
-        processWeightListSheet(parsedWt);
+      let logSuccess = false;
+      let wtSuccess = false;
+
+      // 1. Fetch Live Weight List Sheet
+      try {
+        const wtCSV = await fetchCSVWithProxy(WEIGHT_LIST_CSV_URL);
+        if (wtCSV) {
+          const parsedWt = parseCSVData(wtCSV);
+          processWeightListSheet(parsedWt);
+          wtSuccess = true;
+        }
+      } catch(e) {
+        console.error("Weight list load error:", e);
       }
 
-      // 2. Fetch Process Log Sheet
-      const logCSV = await fetchCSVWithProxy(PROCESS_LOG_CSV_URL);
-      if (logCSV) {
-        const parsedLogs = parseCSVData(logCSV);
-        if (parsedLogs.length > 0 && (parsedLogs[0][0].toLowerCase().includes("date") || (parsedLogs[0][1] && parsedLogs[0][1].toLowerCase().includes("customer")))) {
-          parsedLogs.shift();
-        }
-        if (parsedLogs.length > 0) {
-          masterLogs = parsedLogs;
-          if (badge) {
-            badge.innerHTML = "🟢 Live (Sheets Connected)";
-            badge.style.color = "#34d399";
+      // 2. Fetch Live Process Log Sheet
+      try {
+        const logCSV = await fetchCSVWithProxy(PROCESS_LOG_CSV_URL);
+        if (logCSV) {
+          const parsedLogs = parseCSVData(logCSV);
+          if (parsedLogs.length > 0 && (parsedLogs[0][0].toLowerCase().includes("date") || (parsedLogs[0][1] && parsedLogs[0][1].toLowerCase().includes("customer")))) {
+            parsedLogs.shift();
           }
-          if (forceSync) alert("✅ Live Sheets & Weight Master synced!");
+          if (parsedLogs.length > 0) {
+            masterLogs = parsedLogs;
+            logSuccess = true;
+          }
+        }
+      } catch(e) {
+        console.error("Process log load error:", e);
+      }
+
+      if (logSuccess && wtSuccess) {
+        if (badge) {
+          badge.innerHTML = "🟢 Live (Sheets Connected)";
+          badge.style.color = "#34d399";
+        }
+        if (forceSync) alert("✅ Live Sheets & Weight Master successfully updated!");
+      } else if (logSuccess) {
+        if (badge) {
+          badge.innerHTML = "🟢 Live (Process Sheet OK)";
+          badge.style.color = "#38bdf8";
         }
       } else {
         if (badge) {
-          badge.innerHTML = "🟠 Local Cache";
-          badge.style.color = "#f97316";
+          badge.innerHTML = "🔴 Connection Failed (Check Network)";
+          badge.style.color = "#ef4444";
         }
       }
 
@@ -936,18 +952,22 @@
       applyAllFilters();
     }
 
+    // Lookup weight strictly from the live weight list
     function getComponentWeight(partNo) {
-      if (!partNo) return 1.20;
+      if (!partNo) return 0;
       const clean = String(partNo).trim().toUpperCase();
+
       if (liveWeightMaster[clean] && liveWeightMaster[clean].weight > 0) {
         return liveWeightMaster[clean].weight;
       }
+      
+      // Fuzzy lookup
       for (const k in liveWeightMaster) {
         if (clean.includes(k) || k.includes(clean)) {
-          return liveWeightMaster[k].weight;
+          if (liveWeightMaster[k].weight > 0) return liveWeightMaster[k].weight;
         }
       }
-      return 1.20; // Exact fallback
+      return 0; // Return 0 if not defined in weight sheet
     }
 
     function getComponentBatchQty(partNo, fallbackQty) {
@@ -1099,7 +1119,7 @@
 
       if (rows.length > 0) {
         const activeRow = rows[0];
-        const custName = activeRow[1] || 'MILESTONE CUSTOMER';
+        const custName = activeRow[1] || 'CUSTOMER';
         const partName = activeRow[2] || '33003';
         const rawLotQty = activeRow[6] || '0';
 
@@ -1174,27 +1194,26 @@
       applyAllFilters();
     }
 
-    // Direct In-App Google Drive PDF Viewer
+    // Direct In-App Google Drive PDF Preview
     function openSipPdf() {
       const btn = document.getElementById('viewSipBtn');
       const cleanKey = String(currentActivePart).trim().toUpperCase();
 
-      // Priority: 1. Button data-url, 2. Live weight master link, 3. Default Drive PDF
-      let directUrl = btn ? btn.getAttribute('data-url') : "";
+      let targetUrl = "https://drive.google.com/file/d/1CNZujlalyUkB0gv96UgYbHXKkDfErmdD/view?usp=drivesdk";
+      
       if (liveWeightMaster[cleanKey] && liveWeightMaster[cleanKey].pdfLink) {
-        directUrl = liveWeightMaster[cleanKey].pdfLink;
-      }
-      if (!directUrl) {
-        directUrl = "https://drive.google.com/file/d/1CNZujlalyUkB0gv96UgYbHXKkDfErmdD/view?usp=drivesdk";
+        targetUrl = liveWeightMaster[cleanKey].pdfLink;
+      } else if (btn && btn.getAttribute('data-url')) {
+        targetUrl = btn.getAttribute('data-url');
       }
 
-      // Convert Drive view link to direct embed preview
-      let embedPreviewUrl = directUrl;
-      const match = directUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      // Convert Google Drive view URL to direct embed preview
+      let embedPreviewUrl = targetUrl;
+      const match = targetUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
       if (match && match[1]) {
         embedPreviewUrl = `https://drive.google.com/file/d/${match[1]}/preview`;
-      } else if (directUrl.includes('/view')) {
-        embedPreviewUrl = directUrl.replace('/view', '/preview');
+      } else if (targetUrl.includes('/view')) {
+        embedPreviewUrl = targetUrl.replace('/view', '/preview');
       }
 
       document.getElementById('modalPartName').innerText = `Part No: ${currentActivePart}`;
@@ -1204,17 +1223,13 @@
       frame.src = embedPreviewUrl;
 
       const fullTabLink = document.getElementById('modalOpenExternal');
-      fullTabLink.href = directUrl;
+      fullTabLink.href = targetUrl;
 
       document.getElementById('sipModal').style.display = 'flex';
     }
 
-    function openFullSIPModal() {
-      openSipPdf();
-    }
-
     function closeFullSIPModal() {
-      document.getElementById('sipPdfFrame').src = "";
+      document.getElementById('sipPdfFrame').src = "about:blank";
       document.getElementById('sipModal').style.display = 'none';
     }
 
