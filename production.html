@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Production DWM Dashboard</title>
+  <title>Production Daily DWM Dashboard</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
@@ -29,7 +29,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 20px;
+      padding: 14px 24px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.8);
       z-index: 1000;
     }
@@ -38,128 +38,211 @@
       background: #0f172a;
       border: 1px solid #334155;
       color: #f97316;
-      padding: 6px 12px;
+      padding: 6px 14px;
       border-radius: 6px;
       font-weight: 600;
       text-decoration: none;
-      font-size: 12px;
+      font-size: 13px;
       transition: 0.2s;
     }
     .back-btn:hover { background: #f97316; color: white; }
-    .nav-left h1 { font-size: 15px; margin: 0; color: #f8fafc; font-weight: 600; }
+    .nav-left h1 { font-size: 17px; margin: 0; color: #f8fafc; font-weight: 600; }
 
     .add-btn {
       background: #f97316;
       color: white;
       border: none;
-      padding: 7px 14px;
+      padding: 8px 16px;
       border-radius: 6px;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
       transition: 0.2s;
-      box-shadow: 0 4px 10px rgba(249, 115, 22, 0.3);
     }
     .add-btn:hover { background: #ea580c; }
 
     .dashboard-container {
-      max-width: 1400px;
+      max-width: 1450px;
       width: 100%;
       margin: 0 auto;
-      padding: 16px;
+      padding: 20px;
       flex: 1;
     }
 
-    /* KPI Ribbon */
-    .summary-ribbon {
-      background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%);
-      border: 1px solid #334155;
-      border-left: 4px solid #34d399;
-      border-radius: 8px;
-      padding: 12px 16px;
+    /* 1. Top Modules Grid (Clean & Big) */
+    .top-modules-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
     }
-    .ribbon-item { display: flex; align-items: center; gap: 10px; }
-    .ribbon-icon {
-      font-size: 18px;
-      background: rgba(52, 211, 153, 0.1);
-      width: 36px;
-      height: 36px;
+    .prod-module-card {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 1px solid #334155;
+      border-top: 4px solid #38bdf8;
+      border-radius: 12px;
+      padding: 22px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
       display: flex;
       align-items: center;
-      justify-content: center;
-      border-radius: 8px;
-      color: #34d399;
-      flex-shrink: 0;
+      justify-content: space-between;
+      transition: transform 0.2s;
     }
-    .ribbon-meta h5 { margin: 0; font-size: 10.5px; color: #94a3b8; text-transform: uppercase; }
-    .ribbon-meta p { margin: 2px 0 0 0; font-size: 15px; font-weight: 700; color: #f8fafc; }
+    .prod-module-card:hover { transform: translateY(-3px); }
+    .prod-module-card:nth-child(1) { border-top-color: #38bdf8; cursor: pointer; } 
+    .prod-module-card:nth-child(2) { border-top-color: #f97316; } 
+    .prod-module-card:nth-child(3) { border-top-color: #ef4444; } 
 
-    /* Table Container */
-    .table-card {
+    .module-info h4 { margin: 0; font-size: 13px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+    .module-info h2 { margin: 8px 0 4px 0; font-size: 28px; color: #f8fafc; font-weight: 700; }
+    .module-info span { font-size: 12px; color: #cbd5e1; font-weight: 500; background: rgba(255,255,255,0.06); padding: 3px 8px; border-radius: 4px; }
+    .module-icon { font-size: 40px; opacity: 0.9; }
+
+    /* 2. DWM Matrix Table */
+    .dwm-section {
       background: #1e293b;
       border: 1px solid #334155;
-      border-radius: 10px;
-      overflow: hidden;
+      border-radius: 12px;
+      padding: 20px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      margin-bottom: 24px;
     }
-    .table-top-meta {
-      padding: 10px 14px;
-      background: #111827;
-      border-bottom: 1px solid #334155;
+    .dwm-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 12px;
-      color: #38bdf8;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #334155;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .dwm-header h3 { margin: 0; font-size: 16px; color: #38bdf8; font-weight: 700; text-transform: uppercase; }
+    
+    .target-info-text {
+      font-size: 12.5px;
+      color: #94a3b8;
+      background: rgba(15, 23, 42, 0.7);
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: 1px dashed #475569;
+    }
+    .target-info-text span { color: #34d399; font-weight: 700; }
+
+    .month-filter {
+      background: #0f172a;
+      border: 1px solid #f97316;
+      color: #fde047;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 14px;
       font-weight: 600;
+      outline: none;
+      cursor: pointer;
     }
-    .table-scroll-wrap {
+
+    .table-responsive {
       overflow-x: auto;
-      max-height: 600px;
-    }
-    table {
       width: 100%;
+      -webkit-overflow-scrolling: touch;
+      border: 1px solid #475569;
+      border-radius: 6px;
+    }
+
+    table {
       border-collapse: collapse;
       font-size: 11.5px;
       white-space: nowrap;
       text-align: center;
+      width: max-content;
     }
-    th {
-      background: #0f172a;
-      color: #94a3b8;
-      padding: 10px;
-      font-weight: 600;
+    
+    th:first-child, td:first-child {
       position: sticky;
-      top: 0;
-      border-bottom: 1px solid #334155;
-      text-transform: uppercase;
+      left: 0;
+      background: #0f172a;
+      z-index: 2;
+      border-right: 2px solid #38bdf8;
+      font-weight: 700;
     }
-    td {
-      padding: 8px 10px;
-      border-bottom: 1px solid #334155;
+    th:first-child { z-index: 3; }
+
+    th, td { border: 1px solid #475569; padding: 6px 8px; }
+    th { background: #0f172a; color: #e2e8f0; font-weight: 600; }
+
+    .vertical-text {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      white-space: nowrap;
+      height: 90px;
+      text-align: center;
+      display: inline-block;
+      font-size: 10.5px;
       color: #cbd5e1;
     }
-    tr:nth-child(even) td { background: #1e293b; }
-    tr:nth-child(odd) td { background: #0f172a; }
-    tr:hover td { background: rgba(56, 189, 248, 0.1); color: #ffffff; }
 
-    .sqf-badge {
-      background: rgba(249, 115, 22, 0.15);
-      color: #f97316;
-      border: 1px solid rgba(249, 115, 22, 0.3);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-weight: 600;
+    .day-col { min-width: 28px; font-weight: 700; background: #1e293b; padding: 4px 2px; }
+
+    .cell-green { background: rgba(34, 197, 94, 0.15) !important; color: #4ade80 !important; font-weight: 700; }
+    .cell-red { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; font-weight: 700; }
+    .cell-highlight { background: rgba(255, 255, 255, 0.04); font-weight: 600; }
+    
+    .total-row td { background: #0f172a !important; font-weight: 700; color: #f8fafc; border-top: 2px solid #94a3b8; }
+    .cumulative-row td { background: #1e293b !important; font-weight: 700; color: #f8fafc;}
+
+    /* 3. Bottom Clean Layout */
+    .kpi-wrapper {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 1024px) {
+      .kpi-wrapper { grid-template-columns: 1fr; }
     }
 
-    /* Modal (DWM Entry Form) */
+    .bottom-kpi-section {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .bottom-kpi-section h3 { margin: 0 0 16px 0; color: #fde047; font-size: 15px; border-bottom: 1px solid #334155; padding-bottom: 10px; text-transform: uppercase; }
+    
+    .kpi-till-date-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+    }
+    .kpi-sqf-box {
+      background: #0f172a;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+    }
+    .kpi-sqf-box span { display: block; font-size: 11.5px; color: #94a3b8; font-weight: 600; text-transform: uppercase; margin-bottom: 4px; }
+    .kpi-sqf-box strong { display: block; font-size: 20px; color: #f8fafc; font-weight: 700; }
+    .kpi-sqf-box small { color: #cbd5e1; font-size: 11px; }
+
+    .dwm-analytics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .analytics-card {
+      background: #0f172a;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+    .analytics-card span { display: block; font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
+    .analytics-card strong { display: block; font-size: 15px; color: #38bdf8; font-weight: 700; margin-top: 4px; }
+
+    /* Modal Styling */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -174,7 +257,7 @@
     .modal-content {
       background: #1e293b;
       border: 1px solid #38bdf8;
-      border-radius: 10px;
+      border-radius: 12px;
       width: 100%;
       max-width: 450px;
       box-shadow: 0 20px 50px rgba(0,0,0,0.8);
@@ -182,285 +265,531 @@
       flex-direction: column;
     }
     .modal-header {
-      padding: 12px 16px;
+      padding: 14px 18px;
       background: #0f172a;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid #334155;
-      border-radius: 10px 10px 0 0;
+      border-radius: 12px 12px 0 0;
     }
-    .modal-header h3 { margin: 0; color: #38bdf8; font-size: 14px; }
-    .close-btn { font-size: 22px; cursor: pointer; color: #94a3b8; line-height: 1; }
+    .modal-header h3 { margin: 0; color: #38bdf8; font-size: 15px; }
+    .close-btn { font-size: 24px; cursor: pointer; color: #94a3b8; line-height: 1; }
     
     .modal-body {
-      padding: 16px;
+      padding: 18px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
+      max-height: 80vh;
+      overflow-y: auto;
     }
-    .form-group { display: flex; flex-direction: column; gap: 4px; }
-    .form-group label { font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
-    .form-group input, .form-group select, .form-group textarea {
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group label { font-size: 11.5px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
+    .form-group input {
       background: #0f172a;
       border: 1px solid #475569;
-      color: #f8fafc;
-      padding: 8px 10px;
+      color: #fde047;
+      padding: 10px 12px;
       border-radius: 6px;
-      font-size: 12px;
+      font-size: 13.5px;
       outline: none;
       font-family: inherit;
-    }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-      border-color: #38bdf8;
+      font-weight: 600;
     }
     .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
+    .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
     .submit-btn {
-      background: #34d399;
-      color: #022c22;
-      border: none;
-      padding: 10px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 8px;
-      transition: 0.2s;
+      background: #34d399; color: #022c22; border: none; padding: 11px;
+      border-radius: 6px; font-size: 13.5px; font-weight: 700; cursor: pointer; transition: 0.2s;
     }
     .submit-btn:hover { background: #10b981; }
+    .clear-btn {
+      background: #ef4444; color: white; border: none; padding: 11px;
+      border-radius: 6px; font-size: 13.5px; font-weight: 700; cursor: pointer; transition: 0.2s;
+    }
+    .clear-btn:hover { background: #dc2626; }
 
     @media (max-width: 768px) {
-      .top-bar { padding: 8px 12px; }
-      .nav-left h1 { font-size: 13px; }
-      .summary-ribbon { grid-template-columns: 1fr 1fr; }
+      .top-bar { padding: 10px 16px; }
+      .dashboard-container { padding: 12px; }
+      .top-modules-grid { grid-template-columns: 1fr; }
+      .dwm-header { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
 <body>
 
+  <!-- Top Navigation -->
   <header class="top-bar">
     <div class="nav-left">
       <a href="index.html" class="back-btn">⬅ Home</a>
-      <h1>🏭 Production DWM Dashboard</h1>
+      <h1>🏭 Production Tracker</h1>
     </div>
-    <button class="add-btn" onclick="openDwmModal()">➕ Add Entry</button>
+    <button class="add-btn" onclick="openEntryModal()">➕ Add / Edit Data</button>
   </header>
 
   <div class="dashboard-container">
     
-    <!-- KPI Ribbon -->
-    <div class="summary-ribbon">
-      <div class="ribbon-item">
-        <div class="ribbon-icon" style="color: #38bdf8; background: rgba(56, 189, 248, 0.1);">🎯</div>
-        <div class="ribbon-meta">
-          <h5>Total Target</h5>
-          <p id="kpiTarget">0 Pcs</p>
+    <!-- 1. Top Modules -->
+    <div class="top-modules-grid">
+      <div class="prod-module-card" onclick="window.location.href='monthly.html'" title="View Monthly Trends">
+        <div class="module-info">
+          <h4>Monthly Production</h4>
+          <h2 id="cardMonthlyVal">0.00 <small style="font-size: 14px; color: #94a3b8;">Tons</small></h2>
+          <span id="cardMonthlyTgt">Target: 260.00 Tons</span>
         </div>
+        <div class="module-icon">📆</div>
       </div>
-      <div class="ribbon-item">
-        <div class="ribbon-icon">✅</div>
-        <div class="ribbon-meta">
-          <h5>Total Produced</h5>
-          <p id="kpiProduced">0 Pcs</p>
+      
+      <div class="prod-module-card">
+        <div class="module-info">
+          <h4>Yearly Production</h4>
+          <h2>3,450.50 <small style="font-size: 14px; color: #94a3b8;">Tons</small></h2>
+          <span>Target: 4,000.00 Tons</span>
         </div>
+        <div class="module-icon">📅</div>
       </div>
-      <div class="ribbon-item">
-        <div class="ribbon-icon" style="color: #ef4444; background: rgba(239, 68, 68, 0.1);">❌</div>
-        <div class="ribbon-meta">
-          <h5>Total Rejection</h5>
-          <p id="kpiRejection">0 Pcs</p>
+
+      <div class="prod-module-card">
+        <div class="module-info">
+          <h4>Total Breakdown</h4>
+          <h2>45 <small style="font-size: 14px; color: #94a3b8;">Hrs</small></h2>
+          <span>MTD Maintenance</span>
         </div>
-      </div>
-      <div class="ribbon-item">
-        <div class="ribbon-icon" style="color: #fde047; background: rgba(253, 224, 71, 0.1);">⏱️</div>
-        <div class="ribbon-meta">
-          <h5>Downtime</h5>
-          <p id="kpiDowntime">0 Mins</p>
-        </div>
+        <div class="module-icon">🔧</div>
       </div>
     </div>
 
-    <!-- Data Table -->
-    <div class="table-card">
-      <div class="table-top-meta">
-        <span>📋 Recent Production Logs (Dummy Data)</span>
+    <!-- 2. Daily DWM Matrix -->
+    <div class="dwm-section">
+      <div class="dwm-header">
+        <h3>📊 Daily DWM</h3>
+        <!-- Target text in between free space -->
+        <div class="target-info-text">
+          Per day production target is <span>2.25 ton/furnace</span>. Instead of <span>2.1 ton/furnace</span> for FY:2026-2027
+        </div>
+        <!-- Month Dropdown up to December -->
+        <select id="monthSelector" class="month-filter" onchange="renderDWMTable()">
+          <option value="2026-12">December 2026</option>
+          <option value="2026-11">November 2026</option>
+          <option value="2026-10">October 2026</option>
+          <option value="2026-09">September 2026</option>
+          <option value="2026-08" selected>August 2026</option>
+          <option value="2026-07">July 2026</option>
+          <option value="2026-06">June 2026</option>
+          <option value="2026-05">May 2026</option>
+          <option value="2026-04">April 2026</option>
+        </select>
       </div>
-      <div class="table-scroll-wrap">
+
+      <div class="table-responsive">
         <table>
           <thead>
-            <tr>
-              <th>Date</th>
-              <th>Furnace</th>
-              <th>Part No</th>
-              <th>Target</th>
-              <th>Produced</th>
-              <th>Rejection</th>
-              <th>Downtime (Min)</th>
-              <th>Remarks</th>
+            <tr id="tableHeaderRow">
+              <th>FURNACE</th>
+              <th><span class="vertical-text">Capacity</span></th>
+              <th><span class="vertical-text">Month Target</span></th>
+              <th><span class="vertical-text">Target MTD</span></th>
+              <th><span class="vertical-text">Actual MTD</span></th>
+              <th><span class="vertical-text">Cap. Utilized</span></th>
             </tr>
           </thead>
-          <tbody id="tableBody">
-            <!-- Data populated by JS -->
-          </tbody>
+          <tbody id="dwmTableBody"></tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- 3. Bottom Live Auto-Calculated KPIs & Analytics -->
+    <div class="kpi-wrapper">
+      <div class="bottom-kpi-section">
+        <h3>🏆 TILL DATE PRODUCTION (APRIL TO TILL DATE - TD)</h3>
+        <div class="kpi-till-date-grid">
+          <div class="kpi-sqf-box"><span>SQF-1</span><strong id="kpi-sqf1">0.00</strong><small>Tons</small></div>
+          <div class="kpi-sqf-box"><span>SQF-2</span><strong id="kpi-sqf2">0.00</strong><small>Tons</small></div>
+          <div class="kpi-sqf-box"><span>SQF-3</span><strong id="kpi-sqf3">0.00</strong><small>Tons</small></div>
+          <div class="kpi-sqf-box"><span>SQF-4</span><strong id="kpi-sqf4">0.00</strong><small>Tons</small></div>
+          <div class="kpi-sqf-box" style="border-color: #fde047;">
+            <span style="color: #fde047;">TOTAL</span>
+            <strong id="kpi-total">0.00</strong><small>Tons</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-kpi-section">
+        <h3>📈 DWM Performance Analytics</h3>
+        <div class="dwm-analytics-grid">
+          <div class="analytics-card">
+            <span>Target Variance</span>
+            <strong id="kpiGap" style="color:#fde047;">0.00 Tons</strong>
+          </div>
+          <div class="analytics-card">
+            <span>Current Daily Average</span>
+            <strong id="kpiAvg">0.00 Tons/day</strong>
+          </div>
+          <div class="analytics-card">
+            <span>Required Daily Run-Rate</span>
+            <strong id="kpiReq" style="color:#34d399;">0.00 Tons/day</strong>
+          </div>
+          <div class="analytics-card">
+            <span>Performance Status</span>
+            <strong id="kpiStatus">On Track</strong>
+          </div>
+        </div>
       </div>
     </div>
 
   </div>
 
-  <!-- Entry Form Modal -->
-  <div class="modal-overlay" id="dwmModal">
+  <!-- Secure Form Modal -->
+  <div class="modal-overlay" id="entryModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>📝 Add DWM Production Entry</h3>
-        <span class="close-btn" onclick="closeDwmModal()">&times;</span>
+        <h3>➕ Add / Edit Month Settings & Daily Data</h3>
+        <span class="close-btn" onclick="closeEntryModal()">&times;</span>
       </div>
       <div class="modal-body">
-        <div class="row-2">
-          <div class="form-group">
-            <label>Date</label>
-            <input type="date" id="entryDate" required>
-          </div>
-          <div class="form-group">
-            <label>Furnace No</label>
-            <select id="entryFurnace">
-              <option value="SQF-1">SQF-1</option>
-              <option value="SQF-2">SQF-2</option>
-              <option value="SQF-3">SQF-3</option>
-              <option value="SQF-4">SQF-4</option>
-            </select>
-          </div>
-        </div>
-
         <div class="form-group">
-          <label>Part Number / Name</label>
-          <input type="text" id="entryPart" placeholder="e.g. 33003" required>
+          <label>Select Date (For Daily Production)</label>
+          <input type="date" id="entryDate" required>
         </div>
 
         <div class="row-2">
           <div class="form-group">
-            <label>Target Qty</label>
-            <input type="number" id="entryTarget" placeholder="0" required>
+            <label>SQF-1 (Tons)</label>
+            <input type="number" id="sqf1Qty" placeholder="0.00" step="0.01">
           </div>
           <div class="form-group">
-            <label>Produced Qty</label>
-            <input type="number" id="entryProduced" placeholder="0" required>
+            <label>SQF-2 (Tons)</label>
+            <input type="number" id="sqf2Qty" placeholder="0.00" step="0.01">
           </div>
         </div>
 
         <div class="row-2">
           <div class="form-group">
-            <label>Rejection Qty</label>
-            <input type="number" id="entryReject" placeholder="0">
+            <label>SQF-3 (Tons)</label>
+            <input type="number" id="sqf3Qty" placeholder="0.00" step="0.01">
           </div>
           <div class="form-group">
-            <label>Downtime (Mins)</label>
-            <input type="number" id="entryDown" placeholder="0">
+            <label>SQF-4 (Tons)</label>
+            <input type="number" id="sqf4Qty" placeholder="0.00" step="0.01">
           </div>
         </div>
 
-        <div class="form-group">
-          <label>Remarks / Reason</label>
-          <textarea id="entryRemarks" rows="2" placeholder="Reason for rejection or downtime..."></textarea>
+        <hr style="border-color: #334155; margin: 5px 0;">
+
+        <div class="row-2">
+          <div class="form-group">
+            <label style="color:#38bdf8;">Target MTD (Month Total)</label>
+            <input type="number" id="formTargetMtd" placeholder="e.g. 216" step="0.1">
+          </div>
+          <div class="form-group">
+            <label style="color:#38bdf8;">Number of Lot MTD</label>
+            <input type="number" id="formLotMtd" placeholder="e.g. 236">
+          </div>
         </div>
 
-        <button class="submit-btn" onclick="submitDwmData()">💾 Submit to Sheet</button>
+        <div class="form-group" style="margin-top: 5px;">
+          <label style="color:#ef4444;">Authorization PIN</label>
+          <input type="password" id="authPin" placeholder="Enter PIN (1234)..." style="border-color:#ef4444;">
+        </div>
+
+        <div class="btn-group">
+          <button class="clear-btn" onclick="clearProductionData()">🗑️ Clear Day</button>
+          <button class="submit-btn" onclick="saveProduction()">💾 Save Changes</button>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    // Dummy Data to show layout (Later this will come from Google Sheets)
-    let prodLogs = [
-      { date: "2026-08-25", furnace: "SQF-1", part: "33003", target: 500, produced: 490, reject: 5, down: 0, remarks: "Normal Run" },
-      { date: "2026-08-25", furnace: "SQF-2", part: "2105", target: 400, produced: 350, reject: 10, down: 45, remarks: "Oil Temp High" },
-      { date: "2026-08-24", furnace: "SQF-3", part: "3001", target: 600, produced: 600, reject: 0, down: 0, remarks: "OK" }
-    ];
+    function getDaysInMonth(year, month) {
+      return new Date(year, month, 0).getDate();
+    }
 
-    function renderTable() {
-      const tbody = document.getElementById('tableBody');
-      let html = "";
+    const monthDataStore = {
+      "2026-04": { targetMtd: 270.0, lotMtd: 275, furnaces: [
+        { name: "SQF-1", cap: 67.5, tgt: 67.5, days: [1.66, 1.58, 3.16, 2.53, 2.37, 3.16, 2.37, 2.53, 3.18, 2.02, 2.53, 2.53, 2.37, 0.79, 3.47, 2.53, 2.53, 2.53, 2.53, 1.67, 2.53, 2.15, 2.02, 2.97, 2.14, 1.74, 2.53, 1.74, 1.46, 2.37] },
+        { name: "SQF-2", cap: 67.5, tgt: 67.5, days: [2.18, 2.74, 1.95, 1.81, 2.24, 2.89, 1.87, 1.00, 2.02, 0.72, 2.83, 1.67, 2.00, 1.74, 1.51, 0.88, 2.66, 1.67, 1.00, 2.38, 1.82, 2.53, 1.77, 0.60, 2.06, 1.74, 3.32, 1.84, 2.29, 2.02] },
+        { name: "SQF-3", cap: 67.5, tgt: 67.5, days: [2.17, 3.30, 2.13, 1.44, 3.28, 1.59, 3.00, 1.74, 2.01, 2.17, 3.18, 1.58, 1.90, 1.85, 2.12, 3.07, 1.85, 1.93, 2.01, 2.53, 1.85, 1.04, 1.78, 0,0,0,0,0,0,0] },
+        { name: "SQF-4", cap: 67.5, tgt: 67.5, days: [2.07, 2.93, 1.64, 2.55, 2.21, 2.55, 2.05, 3.26, 2.10, 2.34, 2.88, 1.72, 2.66, 2.19, 2.35, 2.09, 1.61, 1.96, 1.61, 2.65, 2.88, 1.51, 2.22, 1.92, 2.85, 1.91, 1.98, 2.30, 2.17, 1.08] }
+      ]},
+      "2026-05": { targetMtd: 279.0, lotMtd: 262, furnaces: [
+        { name: "SQF-1", cap: 69.75, tgt: 69.75, days: [2.02, 2.49, 0.95, 2.37, 2.52, 3.47, 2.81, 1.89, 2.53, 2.68, 2.37, 2.37, 2.50, 0,0,0,0,0, 2.68, 2.04, 2.53, 2.62, 2.04, 2.83, 1.74, 2.68, 2.64, 1.87, 3.02, 1.92, 2.01] },
+        { name: "SQF-2", cap: 69.75, tgt: 69.75, days: [2.53, 2.94, 1.74, 1.69, 1.03, 2.63, 1.79, 2.58, 1.74, 2.37, 0.95, 1.94, 1.99, 1.58, 2.68, 2.68, 2.54, 2.55, 2.68, 2.79, 1.03, 1.82, 2.37, 2.37, 1.82, 1.74, 2.00, 2.73, 1.91, 1.86, 2.53] },
+        { name: "SQF-3", cap: 69.75, tgt: 69.75, days: [1.51, 3.14, 2.24, 1.99, 2.14, 2.01, 2.24, 1.91, 2.14, 1.98, 2.71, 1.74, 2.15, 2.17, 1.99, 2.13, 2.06, 2.13, 2.05, 2.46, 1.93, 2.61, 2.09, 2.73, 0,0,0,0,0,0,0] },
+        { name: "SQF-4", cap: 69.75, tgt: 69.75, days: [2.10, 2.80, 2.48, 1.51, 2.18, 1.67, 2.67, 2.12, 1.85, 3.09, 2.45, 1.42, 1.98, 1.45, 2.70, 2.99, 2.02, 2.12, 2.74, 1.13, 0,0,0,0,0, 2.70, 1.95, 2.12, 2.08, 1.66, 1.96] }
+      ]},
+      "2026-06": { targetMtd: 270.0, lotMtd: 285, furnaces: [
+        { name: "SQF-1", cap: 67.5, tgt: 67.5, days: [2.01, 2.53, 2.78, 1.79, 1.67, 2.53, 2.37, 2.68, 2.74, 1.74, 2.74, 2.37, 0,0,0,0,0, 1.79, 2.01, 1.83, 2.08, 1.95, 2.53, 2.97, 1.83, 2.37, 1.85, 1.95, 2.68, 2.53] },
+        { name: "SQF-2", cap: 67.5, tgt: 67.5, days: [1.79, 2.58, 1.37, 1.04, 2.82, 1.67, 2.02, 1.51, 2.09, 2.16, 2.06, 1.95, 2.68, 1.79, 2.68, 2.78, 2.78, 2.68, 2.53, 2.00, 1.94, 2.66, 1.85, 1.95, 1.58, 2.81, 1.95, 2.62, 1.49, 2.37] },
+        { name: "SQF-3", cap: 67.5, tgt: 67.5, days: [1.10, 3.05, 1.96, 2.09, 2.13, 2.04, 2.16, 1.99, 2.07, 1.67, 1.05, 3.20, 2.08, 2.13, 2.62, 1.44, 2.04, 2.22, 3.33, 2.23, 2.17, 2.14, 3.11, 1.60, 2.22, 2.73, 2.04, 2.12, 2.01, 3.19] },
+        { name: "SQF-4", cap: 67.5, tgt: 67.5, days: [2.41, 1.81, 2.48, 1.97, 2.84, 1.93, 2.85, 2.54, 1.98, 2.15, 2.86, 1.73, 2.79, 2.97, 1.62, 3.04, 2.13, 2.07, 3.04, 1.88, 2.49, 2.41, 2.51, 2.54, 2.61, 1.83, 1.83, 2.62, 1.45, 1.60] }
+      ]},
+      "2026-07": { targetMtd: 279.0, lotMtd: 297, furnaces: [
+        { name: "SQF-1", cap: 69.75, tgt: 69.75, days: [3.32, 2.53, 2.77, 1.58, 0.79, 2.61, 2.06, 1.83, 1.74, 2.93, 2.78, 1.83, 2.44, 1.53, 1.83, 2.37, 2.65, 1.28, 0.95, 2.53, 2.60, 2.23, 2.62, 1.89, 2.10, 2.68, 2.44, 2.61, 2.53, 2.68, 1.83] },
+        { name: "SQF-2", cap: 69.75, tgt: 69.75, days: [2.37, 2.00, 2.58, 1.79, 1.00, 2.58, 2.53, 2.74, 1.79, 2.26, 2.00, 2.68, 1.47, 2.68, 2.78, 2.88, 1.79, 1.74, 2.73, 1.00, 1.79, 2.04, 1.91, 2.58, 2.37, 2.10, 2.68, 2.53, 2.08, 2.68, 2.53] },
+        { name: "SQF-3", cap: 69.75, tgt: 69.75, days: [2.15, 3.01, 1.97, 2.38, 1.94, 1.92, 1.94, 2.80, 2.20, 2.10, 2.10, 2.96, 2.00, 3.20, 1.57, 1.96, 2.02, 2.13, 2.15, 2.17, 2.12, 2.18, 1.98, 2.57, 2.10, 2.20, 2.05, 3.00, 2.09, 2.10, 2.22] },
+        { name: "SQF-4", cap: 69.75, tgt: 69.75, days: [1.76, 2.14, 2.15, 2.64, 1.59, 2.17, 2.06, 1.71, 2.05, 3.25, 2.02, 2.89, 1.79, 1.67, 2.02, 3.12, 1.91, 2.83, 1.79, 2.05, 2.10, 1.69, 2.84, 2.04, 2.88, 2.12, 2.06, 2.71, 1.58, 3.17, 1.93] }
+      ]},
+      "2026-08": { targetMtd: 216.0, lotMtd: 236, furnaces: [
+        { name: "SQF-1", cap: 69.75, tgt: 69.75, days: [1.74, 3.06, 2.23, 2.23, 1.97, 2.53, 2.53, 2.79, 2.53, 1.87, 1.87, 2.53, 2.87, 1.87, 1.99, 0.79, 2.62, 2.53, 2.87, 1.75, 2.53, 1.84, 2.35, 2.38, 0,0,0,0,0,0,0] },
+        { name: "SQF-2", cap: 69.75, tgt: 69.75, days: [2.89, 2.03, 2.53, 1.69, 1.75, 2.97, 1.89, 2.09, 1.74, 1.85, 2.68, 2.64, 1.74, 2.68, 1.87, 1.98, 2.84, 1.66, 2.68, 2.60, 0.87, 2.68, 2.53, 2.45, 0,0,0,0,0,0,0] },
+        { name: "SQF-3", cap: 69.75, tgt: 69.75, days: [2.20, 2.05, 3.25, 2.05, 2.20, 2.20, 2.09, 2.12, 2.13, 2.21, 2.13, 3.14, 2.04, 2.20, 2.04, 2.06, 2.09, 2.04, 2.80, 1.97, 2.07, 2.16, 2.06, 1.96, 0,0,0,0,0,0,0] },
+        { name: "SQF-4", cap: 69.75, tgt: 69.75, days: [3.17, 1.93, 2.09, 2.50, 2.11, 2.30, 1.98, 2.89, 2.07, 3.07, 2.25, 2.50, 2.60, 2.00, 3.19, 1.55, 2.35, 1.13, 2.45, 1.52, 3.00, 1.99, 2.65, 2.43, 0,0,0,0,0,0,0] }
+      ]},
+      "2026-09": { targetMtd: 270.0, lotMtd: 0, furnaces: generateEmptyFurnaces(30) },
+      "2026-10": { targetMtd: 279.0, lotMtd: 0, furnaces: generateEmptyFurnaces(31) },
+      "2026-11": { targetMtd: 270.0, lotMtd: 0, furnaces: generateEmptyFurnaces(30) },
+      "2026-12": { targetMtd: 279.0, lotMtd: 0, furnaces: generateEmptyFurnaces(31) }
+    };
+
+    function generateEmptyFurnaces(days) {
+      return [
+        { name: "SQF-1", cap: 69.75, tgt: 69.75, days: new Array(days).fill(0) },
+        { name: "SQF-2", cap: 69.75, tgt: 69.75, days: new Array(days).fill(0) },
+        { name: "SQF-3", cap: 69.75, tgt: 69.75, days: new Array(days).fill(0) },
+        { name: "SQF-4", cap: 69.75, tgt: 69.75, days: new Array(days).fill(0) }
+      ];
+    }
+
+    function updateTillDateKPI() {
+      let totals = [0, 0, 0, 0];
+      let grandTotal = 0;
       
-      let tTarget = 0, tProduced = 0, tReject = 0, tDown = 0;
+      for(let monthKey in monthDataStore) {
+        monthDataStore[monthKey].furnaces.forEach((f, idx) => {
+          let monthSum = f.days.reduce((acc, val) => acc + (val || 0), 0);
+          totals[idx] += monthSum;
+          grandTotal += monthSum;
+        });
+      }
 
-      prodLogs.forEach(row => {
-        tTarget += Number(row.target);
-        tProduced += Number(row.produced);
-        tReject += Number(row.reject);
-        tDown += Number(row.down);
+      document.getElementById('kpi-sqf1').innerHTML = `${totals[0].toFixed(2)} <small>Tons</small>`;
+      document.getElementById('kpi-sqf2').innerHTML = `${totals[1].toFixed(2)} <small>Tons</small>`;
+      document.getElementById('kpi-sqf3').innerHTML = `${totals[2].toFixed(2)} <small>Tons</small>`;
+      document.getElementById('kpi-sqf4').innerHTML = `${totals[3].toFixed(2)} <small>Tons</small>`;
+      document.getElementById('kpi-total').innerHTML = `${grandTotal.toFixed(2)} <small>Tons</small>`;
+    }
+
+    function renderDWMTable() {
+      updateTillDateKPI();
+
+      const selectedMonth = document.getElementById("monthSelector").value;
+      const [yr, mo] = selectedMonth.split('-').map(Number);
+      const totalDays = getDaysInMonth(yr, mo);
+
+      const headerRow = document.getElementById("tableHeaderRow");
+      const tbody = document.getElementById("dwmTableBody");
+      
+      let headerHTML = `
+        <th>FURNACE</th>
+        <th><span class="vertical-text">Capacity</span></th>
+        <th><span class="vertical-text">Month Target</span></th>
+        <th><span class="vertical-text">Target MTD</span></th>
+        <th><span class="vertical-text">Actual MTD</span></th>
+        <th><span class="vertical-text">Cap. Utilized</span></th>
+      `;
+      for(let d=1; d<=totalDays; d++) {
+        headerHTML += `<th class="day-col">${d}</th>`;
+      }
+      headerRow.innerHTML = headerHTML;
+
+      const data = monthDataStore[selectedMonth] || { furnaces: generateEmptyFurnaces(totalDays), targetMtd: 0, lotMtd: 0 };
+      
+      let html = "";
+      let dailyTotals = new Array(totalDays).fill(0);
+      let runningSum = 0;
+      let grandCap = 0, grandMonthTgt = 0, grandActualMtd = 0;
+
+      data.furnaces.forEach(f => {
+        let actualMtd = f.days.slice(0, totalDays).reduce((acc, val) => acc + (val || 0), 0);
+        grandCap += f.cap; 
+        grandMonthTgt += f.tgt; 
+        grandActualMtd += actualMtd;
+
+        let daysHtml = "";
+        for(let idx=0; idx<totalDays; idx++) {
+          let val = f.days[idx] !== undefined ? f.days[idx] : 0;
+          dailyTotals[idx] += val;
+          let colorClass = val >= 2.0 ? "cell-green" : "cell-red";
+          if (val === 0) colorClass = "cell-red"; 
+          daysHtml += `<td class="${colorClass}">${val.toFixed(2)}</td>`;
+        }
+
+        let capUtil = (actualMtd / f.cap) * 100;
 
         html += `
           <tr>
-            <td style="color: #38bdf8; font-weight: 600;">${row.date}</td>
-            <td><span class="sqf-badge">${row.furnace}</span></td>
-            <td style="color: #f8fafc; font-weight: 600;">${row.part}</td>
-            <td>${row.target}</td>
-            <td style="color: #34d399; font-weight: 600;">${row.produced}</td>
-            <td style="color: ${row.reject > 0 ? '#ef4444' : '#94a3b8'};">${row.reject}</td>
-            <td style="color: ${row.down > 0 ? '#fde047' : '#94a3b8'};">${row.down}</td>
-            <td style="font-size: 10.5px;">${row.remarks || '-'}</td>
+            <td>${f.name}</td>
+            <td class="cell-highlight">${f.cap.toFixed(1)}</td>
+            <td class="cell-highlight">${f.tgt.toFixed(1)}</td>
+            <td class="cell-highlight" style="color:#38bdf8;">${(data.targetMtd / 4).toFixed(1)}</td>
+            <td class="cell-highlight" style="font-weight:700; color:#fde047;">${actualMtd.toFixed(2)}</td>
+            <td class="cell-highlight">${capUtil.toFixed(1)}</td>
+            ${daysHtml}
           </tr>
         `;
       });
 
-      tbody.innerHTML = html;
+      let totalRowHtml = "";
+      let cumulativeRowHtml = "";
 
-      // Update KPIs
-      document.getElementById('kpiTarget').innerText = `${tTarget} Pcs`;
-      document.getElementById('kpiProduced').innerText = `${tProduced} Pcs`;
-      document.getElementById('kpiRejection').innerText = `${tReject} Pcs`;
-      document.getElementById('kpiDowntime').innerText = `${tDown} Mins`;
-    }
-
-    // Modal Controls
-    function openDwmModal() {
-      document.getElementById('entryDate').valueAsDate = new Date();
-      document.getElementById('dwmModal').style.display = 'flex';
-    }
-    function closeDwmModal() {
-      document.getElementById('dwmModal').style.display = 'none';
-    }
-
-    // Dummy Submit Function
-    function submitDwmData() {
-      const date = document.getElementById('entryDate').value;
-      const furnace = document.getElementById('entryFurnace').value;
-      const part = document.getElementById('entryPart').value;
-      const target = document.getElementById('entryTarget').value || 0;
-      const produced = document.getElementById('entryProduced').value || 0;
-      const reject = document.getElementById('entryReject').value || 0;
-      const down = document.getElementById('entryDown').value || 0;
-      const remarks = document.getElementById('entryRemarks').value;
-
-      if(!part || !target || !produced) {
-        alert("Please fill Part No, Target, and Produced Qty!");
-        return;
+      for (let i = 0; i < totalDays; i++) {
+        let dt = dailyTotals[i];
+        runningSum += dt;
+        totalRowHtml += `<td>${dt.toFixed(2)}</td>`;
+        cumulativeRowHtml += `<td style="color: ${runningSum > 0 ? '#f8fafc' : '#475569'};">${runningSum.toFixed(2)}</td>`;
       }
 
-      // Add to UI Dummy Array
-      prodLogs.unshift({
-        date: date, furnace: furnace, part: part, 
-        target: target, produced: produced, reject: reject, 
-        down: down, remarks: remarks
+      let totalCapUtil = (grandActualMtd / grandCap * 100).toFixed(1);
+
+      html += `
+        <tr class="total-row">
+          <td style="color: white;">TOTAL IN TON</td>
+          <td>${grandCap.toFixed(1)}</td>
+          <td>${grandMonthTgt.toFixed(1)}</td>
+          <td style="color: #38bdf8;">${(data.targetMtd || 0).toFixed(1)}</td>
+          <td style="color: #f8fafc;">${grandActualMtd.toFixed(2)}</td>
+          <td>${totalCapUtil}</td>
+          ${totalRowHtml}
+        </tr>
+      `;
+
+      html += `
+        <tr class="cumulative-row">
+          <td style="color: #94a3b8; font-size: 10px;">Total No. Of<br>Lot MTD</td>
+          <td style="color: #f8fafc; font-size: 14px;">${data.lotMtd || ''}</td>
+          <td colspan="1"></td>
+          <td colspan="2" style="text-align: right; padding-right: 15px; color: #38bdf8;">CUMULATIVE<br>TOTAL</td>
+          ${cumulativeRowHtml}
+        </tr>
+      `;
+
+      tbody.innerHTML = html;
+
+      // Update Top Monthly Card
+      document.getElementById('cardMonthlyVal').innerHTML = `${grandActualMtd.toFixed(2)} <small style="font-size: 14px; color: #94a3b8;">Tons</small>`;
+      document.getElementById('cardMonthlyTgt').innerText = `Target: 260.00 Tons`;
+
+      // Live Calculation of Live Monthly Average (Total Prod till date / 5 months)
+      let activeMonthsCount = 5; 
+      let totalProdTillDate = 0;
+      let monthsWithData = ["2026-04", "2026-05", "2026-06", "2026-07", "2026-08"];
+      
+      monthsWithData.forEach(m => {
+        if(monthDataStore[m]) {
+          monthDataStore[m].furnaces.forEach(f => {
+            totalProdTillDate += f.days.reduce((a, b) => a + (b || 0), 0);
+          });
+        }
       });
 
-      renderTable();
-      closeDwmModal();
-      
-      // Clear inputs
-      document.getElementById('entryPart').value = '';
-      document.getElementById('entryTarget').value = '';
-      document.getElementById('entryProduced').value = '';
-      document.getElementById('entryReject').value = '';
-      document.getElementById('entryDown').value = '';
-      document.getElementById('entryRemarks').value = '';
+      let monthlyAverage = totalProdTillDate / activeMonthsCount;
 
-      alert("Data Saved Locally! (Linking to Google Sheet next...)");
+      let today = new Date();
+      let activeDaysCount = totalDays;
+      if(selectedMonth === "2026-08") {
+        activeDaysCount = Math.min(today.getDate(), totalDays);
+      }
+
+      let gap = grandActualMtd - (data.targetMtd || 0);
+      let currentAvg = activeDaysCount > 0 ? (grandActualMtd / activeDaysCount) : 0;
+      let remainingTarget = 260.00 - grandActualMtd; 
+      let remainingDays = totalDays - activeDaysCount;
+      let requiredRate = remainingDays > 0 ? (remainingTarget / remainingDays) : 0;
+
+      document.getElementById('kpiGap').innerText = `${gap >= 0 ? '+' : ''}${gap.toFixed(2)} Tons`;
+      document.getElementById('kpiGap').style.color = gap >= 0 ? '#34d399' : '#f87171';
+      document.getElementById('kpiAvg').innerText = `${currentAvg.toFixed(2)} Tons/day`;
+      document.getElementById('kpiReq').innerText = `${requiredRate > 0 ? requiredRate.toFixed(2) : '0.00'} Tons/day`;
+      document.getElementById('kpiStatus').innerText = gap >= 0 ? 'Optimal & On Track' : 'Requires Acceleration';
+      document.getElementById('kpiStatus').style.color = gap >= 0 ? '#34d399' : '#f87171';
     }
 
-    // Load initial data
-    window.onload = renderTable;
+    // Modal & Secure Form Controls
+    const VALID_PIN = "1234";
+
+    function openEntryModal() {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      document.getElementById('entryDate').value = `${yyyy}-${mm}-${dd}`;
+      
+      const currentMonthKey = document.getElementById("monthSelector").value;
+      if(monthDataStore[currentMonthKey]) {
+        document.getElementById('formTargetMtd').value = monthDataStore[currentMonthKey].targetMtd || "";
+        document.getElementById('formLotMtd').value = monthDataStore[currentMonthKey].lotMtd || "";
+      }
+
+      document.getElementById('entryModal').style.display = 'flex';
+    }
+
+    function closeEntryModal() {
+      document.getElementById('entryModal').style.display = 'none';
+      document.getElementById('authPin').value = ''; 
+    }
+
+    function saveProduction() { processEntry(false); }
+    function clearProductionData() { processEntry(true); }
+
+    function processEntry(isClear) {
+      const dateStr = document.getElementById('entryDate').value;
+      const pin = document.getElementById('authPin').value;
+
+      if(!dateStr) { alert("Please select a date!"); return; }
+      if(pin !== VALID_PIN) { alert("❌ Unauthorized Access: Invalid PIN."); return; }
+
+      const parts = dateStr.split('-');
+      const monthKey = `${parts[0]}-${parts[1]}`; 
+      const dayIndex = parseInt(parts[2], 10) - 1; 
+
+      if(!monthDataStore[monthKey]) {
+        const [yr, mo] = monthKey.split('-').map(Number);
+        monthDataStore[monthKey] = { targetMtd: 260.0, lotMtd: 0, furnaces: generateEmptyFurnaces(getDaysInMonth(yr, mo)) };
+      }
+
+      const newTgtMtd = document.getElementById('formTargetMtd').value;
+      const newLotMtd = document.getElementById('formLotMtd').value;
+      if(newTgtMtd !== "") monthDataStore[monthKey].targetMtd = parseFloat(newTgtMtd);
+      if(newLotMtd !== "") monthDataStore[monthKey].lotMtd = parseInt(newLotMtd, 10);
+
+      const totalDaysInThisMonth = monthDataStore[monthKey].furnaces[0].days.length;
+      if(dayIndex >= totalDaysInThisMonth) { alert("Selected date exceeds month boundary."); return; }
+
+      if (isClear) {
+        monthDataStore[monthKey].furnaces.forEach(f => f.days[dayIndex] = 0.00);
+        alert("🗑️ Daily record cleared successfully.");
+      } else {
+        const q1 = document.getElementById('sqf1Qty').value;
+        const q2 = document.getElementById('sqf2Qty').value;
+        const q3 = document.getElementById('sqf3Qty').value;
+        const q4 = document.getElementById('sqf4Qty').value;
+
+        if(q1 !== "") monthDataStore[monthKey].furnaces[0].days[dayIndex] = parseFloat(q1);
+        if(q2 !== "") monthDataStore[monthKey].furnaces[1].days[dayIndex] = parseFloat(q2);
+        if(q3 !== "") monthDataStore[monthKey].furnaces[2].days[dayIndex] = parseFloat(q3);
+        if(q4 !== "") monthDataStore[monthKey].furnaces[3].days[dayIndex] = parseFloat(q4);
+        
+        alert("✅ Production data & month settings updated successfully.");
+      }
+
+      document.getElementById("monthSelector").value = monthKey;
+      renderDWMTable();
+      closeEntryModal();
+      
+      document.getElementById('sqf1Qty').value = "";
+      document.getElementById('sqf2Qty').value = "";
+      document.getElementById('sqf3Qty').value = "";
+      document.getElementById('sqf4Qty').value = "";
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById("monthSelector").value = "2026-08";
+      renderDWMTable();
+    });
   </script>
 </body>
 </html>
