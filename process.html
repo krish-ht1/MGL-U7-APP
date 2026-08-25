@@ -240,13 +240,16 @@
       background: #0284c7;
       color: white;
       border: none;
-      padding: 8px 12px;
-      border-radius: 5px;
-      font-size: 11px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 11.5px;
       font-weight: 600;
       cursor: pointer;
       transition: 0.2s;
       white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     .btn-full-sip:hover { background: #0369a1; }
 
@@ -336,7 +339,7 @@
     .table-scroll-wrap {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
-      max-height: 520px;
+      max-height: 540px;
     }
     table {
       width: 100%;
@@ -379,6 +382,42 @@
     tr:nth-child(odd) td { background: #0f172a; }
     tr:hover td { background: rgba(249, 115, 22, 0.12); color: #ffffff; }
 
+    /* Month Divider Banner Row */
+    .month-divider-row td {
+      background: linear-gradient(90deg, #0f172a 0%, #172554 50%, #0f172a 100%) !important;
+      border-top: 2px solid #f97316;
+      border-bottom: 2px solid #38bdf8;
+      padding: 8px 12px;
+      text-align: left;
+    }
+    .month-divider-content {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .month-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #f97316;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .month-stat {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid #334155;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      color: #cbd5e1;
+    }
+    .month-stat strong {
+      color: #38bdf8;
+      font-weight: 700;
+    }
+
     .badge-fc {
       background: rgba(56, 189, 248, 0.15);
       color: #38bdf8;
@@ -389,7 +428,7 @@
     }
     .no-data { padding: 30px; color: #94a3b8; font-size: 12.5px; text-align: center; }
 
-    /* Modal for SIP */
+    /* Direct PDF Viewer Modal */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -403,23 +442,39 @@
     }
     .modal-content {
       background: #1e293b;
-      border: 1px solid #f97316;
-      border-radius: 10px;
+      border: 2px solid #f97316;
+      border-radius: 12px;
       width: 100%;
-      max-width: 600px;
+      max-width: 900px;
+      height: 88vh;
       color: white;
+      display: flex;
+      flex-direction: column;
       overflow: hidden;
       box-shadow: 0 20px 50px rgba(0,0,0,0.8);
     }
     .modal-header {
-      padding: 10px 14px;
+      padding: 10px 16px;
       background: #0f172a;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid #334155;
     }
-    .modal-body { padding: 14px; font-size: 11.5px; }
+    .modal-body {
+      padding: 12px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .pdf-viewer-frame {
+      width: 100%;
+      flex: 1;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      background: #0f172a;
+    }
 
     @media (max-width: 768px) {
       .top-bar { padding: 8px 12px; }
@@ -466,10 +521,11 @@
         grid-template-columns: 1fr 1fr;
         gap: 6px;
       }
-      .btn-full-sip { width: 100%; text-align: center; padding: 7px; margin-top: 4px; }
+      .btn-full-sip { width: 100%; text-align: center; padding: 8px; justify-content: center; }
       .locked-section-box { padding: 18px 10px; }
       .login-form-wrap { width: 100%; }
       .table-top-meta { font-size: 11px; }
+      .month-divider-content { gap: 8px; }
     }
   </style>
 </head>
@@ -496,7 +552,7 @@
           <input 
             type="text" 
             id="searchBox" 
-            placeholder="Search Part, Batch, Heat Code, Customer..." 
+            placeholder="Search Part (e.g. 33003), Batch, Heat Code, Customer..." 
             oninput="applyAllFilters()"
           >
         </div>
@@ -625,7 +681,7 @@
         </div>
       </div>
 
-      <button class="btn-full-sip" onclick="openFullSIPModal()">📑 View Full SIP</button>
+      <button class="btn-full-sip" onclick="openFullSIPModal()">📑 View Full SIP (PDF)</button>
     </div>
 
     <!-- 4. Hidden / Locked Section for Process Matrix -->
@@ -642,7 +698,7 @@
       </form>
     </div>
 
-    <!-- 5. Main 21-Column Data Table (Unlocked on Login) -->
+    <!-- 5. Main 21-Column Data Table with Monthly Breakdowns -->
     <div class="table-card" id="unlockedTableSection">
       <div class="table-top-meta">
         <span style="color:#34d399; font-weight: 600;">🔓 Cycle Matrix (<span id="activeUserBadge">Authorized</span>)</span>
@@ -689,50 +745,58 @@
 
   </div>
 
-  <!-- Full SIP Spec Modal -->
+  <!-- Direct PDF Viewer Modal -->
   <div class="modal-overlay" id="sipModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 style="margin: 0; color: #f97316; font-size: 13.5px;">📑 Standard Inspection Plan (SIP)</h3>
-        <span style="font-size: 20px; cursor: pointer; color: #94a3b8;" onclick="closeFullSIPModal()">&times;</span>
+        <h3 style="margin: 0; color: #f97316; font-size: 13.5px;" id="modalSipTitle">📑 Standard Inspection Plan (SIP) PDF</h3>
+        <span style="font-size: 24px; cursor: pointer; color: #94a3b8; line-height: 1;" onclick="closeFullSIPModal()">&times;</span>
       </div>
       <div class="modal-body">
-        <table style="width: 100%; font-size: 11px; border-collapse: collapse; text-align: left; margin-bottom: 12px;">
-          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Active Component:</td><td id="modalComp" style="padding: 6px; font-weight: bold; color: #38bdf8;">-</td></tr>
-          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Customer:</td><td id="modalCust" style="padding: 6px; font-weight: bold; color: #fde047;">-</td></tr>
-          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Surface Hardness:</td><td id="modalSH" style="padding: 6px; font-weight: bold; color: #38bdf8;">-</td></tr>
-          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Core Hardness:</td><td id="modalCore" style="padding: 6px; font-weight: bold; color: #38bdf8;">-</td></tr>
-          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">Effective Case Depth:</td><td id="modalECD" style="padding: 6px; font-weight: bold; color: #38bdf8;">-</td></tr>
-          <tr style="border-bottom: 1px solid #334155;"><td style="padding: 6px; color: #94a3b8;">ECD Before Grinding:</td><td id="modalECDBG" style="padding: 6px; font-weight: bold; color: #38bdf8;">-</td></tr>
-        </table>
-        
-        <div style="background: #0f172a; border: 1px solid #334155; padding: 10px; border-radius: 6px; text-align: center;">
-          <a href="https://drive.google.com/drive/folders/1rWWfcpXPSKSUpXToDCvKPPjSPQMPj6CR?usp=drive_link" target="_blank" style="display: inline-block; background: #f97316; color: white; text-decoration: none; padding: 7px 14px; border-radius: 5px; font-weight: 600; font-size: 11.5px;">🔗 Open Drive SIP Folder ↗</a>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; padding: 4px 6px; background: #0f172a; border-radius: 6px; border: 1px solid #334155;">
+          <span>Active Part: <strong id="modalPartName" style="color: #38bdf8;">-</strong></span>
+          <a id="modalOpenExternal" href="#" target="_blank" style="color: #fde047; text-decoration: none; font-weight: 600;">↗ Open in Full Tab</a>
         </div>
+        
+        <!-- Embedded PDF Frame -->
+        <iframe id="sipPdfFrame" class="pdf-viewer-frame" src=""></iframe>
       </div>
     </div>
   </div>
 
   <script>
-    // Direct Google Sheet Published CSV Link
     const CLEAN_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=529980778&single=true&output=csv";
 
-    // Known Weight Map fallback
+    // Master Weight Map (Accurate weights per component)
     const weightMap = {
-      "2105": { desc: "BULL GEAR", weight: 3.20, batchQty: 480 },
-      "2106": { desc: "PINION SHAFT", weight: 2.10, batchQty: 350 },
-      "2107": { desc: "INPUT GEAR", weight: 1.85, batchQty: 600 }
+      "33003": { desc: "COMPONENT 33003", weight: 1.20, batchQty: 500, grade: "20MnCr5" },
+      "2105": { desc: "BULL GEAR", weight: 3.20, batchQty: 480, grade: "20MnCr5" },
+      "2106": { desc: "PINION SHAFT", weight: 2.10, batchQty: 350, grade: "16MnCr5" },
+      "2107": { desc: "INPUT GEAR", weight: 1.85, batchQty: 600, grade: "20MnCr5" }
     };
 
     let masterLogs = [];
     let isSectionUnlocked = false;
+    let currentActivePart = "33003";
 
     const AUTHORIZED_USERS = {
-      "7100028": "pass123",
+      "ADMIN": "admin@123",
       "EMP101": "1234",
       "MET01": "cqi9",
       "SUPERVISOR": "ht2026"
     };
+
+    function getPartWeight(partNo) {
+      if (!partNo) return 1.20;
+      const clean = String(partNo).trim().toUpperCase();
+      if (weightMap[clean]) return weightMap[clean].weight;
+      
+      // Partial match
+      for (const k in weightMap) {
+        if (clean.includes(k) || k.includes(clean)) return weightMap[k].weight;
+      }
+      return 1.20; // Default exact fallback
+    }
 
     function parseCustomDate(dateStr) {
       if (!dateStr) return new Date(0);
@@ -765,7 +829,6 @@
       }
       if (row.length > 1 || (row.length === 1 && row[0] !== '')) r.push(row);
       
-      // Auto-strip header
       if (r.length > 0 && (r[0][0].toLowerCase().includes("date") || (r[0][1] && r[0][1].toLowerCase().includes("customer")))) {
         r.shift();
       }
@@ -795,7 +858,6 @@
       let csvText = "";
       let isLive = false;
 
-      // Multi-Proxy Pipeline for PC C-Drive & Mobile Phone
       const urlsToTry = [
         "https://api.allorigins.win/raw?url=" + encodeURIComponent(CLEAN_CSV_URL),
         "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(CLEAN_CSV_URL),
@@ -814,9 +876,7 @@
               break;
             }
           }
-        } catch (e) {
-          // Try next proxy in list
-        }
+        } catch (e) {}
       }
 
       if (isLive) {
@@ -881,6 +941,7 @@
       }
     }
 
+    // Monthly Grouped Table Rendering with Hardening Weight Breakdown
     function renderTable(rows) {
       const tbody = document.getElementById('tableBody');
       document.getElementById('recordStatus').innerText = `${rows.length} records`;
@@ -890,36 +951,75 @@
         return;
       }
 
-      let html = "";
+      // Group rows by Month & Year
+      const monthGroups = {};
       rows.forEach(r => {
-        html += `<tr>
-          <td style="font-weight:600; color:#38bdf8;">${r[0] || '-'}</td>
-          <td>${r[1] || '-'}</td>
-          <td style="font-weight:600; color:#f8fafc;">${r[2] || '-'}</td>
-          <td>${r[3] || '-'}</td>
-          <td>${r[4] || '-'}</td>
-          <td><span class="badge-fc">F/C ${r[5] || '-'}</span></td>
-          <td style="font-weight:700; color:#fde047;">${r[6] || '-'}</td>
-          <td>${r[7] || '-'}</td>
-          <td>${r[8] || '-'}</td>
-          <td>${r[9] || '-'}</td>
-          <td>${r[10] || '-'}</td>
-          <td>${r[11] || '-'}</td>
-          <td>${r[12] || '-'}</td>
-          <td>${r[13] || '-'}</td>
-          <td>${r[14] || '-'}</td>
-          <td>${r[15] || '-'}</td>
-          <td>${r[16] || '-'}</td>
-          <td>${r[17] || '-'}</td>
-          <td>${r[18] || '-'}</td>
-          <td>${r[19] || '-'}</td>
-          <td>${r[20] || '-'}</td>
-        </tr>`;
+        const d = parseCustomDate(r[0]);
+        const mKey = d.getTime() === 0 ? "UNKNOWN PERIOD" : d.toLocaleString('en-IN', { month: 'long', year: 'numeric' }).toUpperCase();
+        if (!monthGroups[mKey]) monthGroups[mKey] = [];
+        monthGroups[mKey].push(r);
       });
+
+      let html = "";
+
+      for (const [monthTitle, mRows] of Object.entries(monthGroups)) {
+        let mLots = mRows.length;
+        let mPcs = 0;
+        let mWt = 0;
+
+        mRows.forEach(r => {
+          const qty = parseFloat(r[6]) || 0;
+          const wt = getPartWeight(r[2]);
+          mPcs += qty;
+          mWt += (qty * wt);
+        });
+
+        // Insert Month Summary Divider Banner
+        html += `
+          <tr class="month-divider-row">
+            <td colspan="21">
+              <div class="month-divider-content">
+                <span class="month-title">📅 ${monthTitle}</span>
+                <span class="month-stat">🔢 Total Lots: <strong>${mLots}</strong></span>
+                <span class="month-stat">📦 Treated Pieces: <strong>${mPcs.toLocaleString('en-IN')} Pcs</strong></span>
+                <span class="month-stat">🏗️ Hardened Weight: <strong>${mWt.toLocaleString('en-IN', {maximumFractionDigits: 1})} Kg</strong></span>
+              </div>
+            </td>
+          </tr>
+        `;
+
+        // Render month's rows
+        mRows.forEach(r => {
+          html += `<tr>
+            <td style="font-weight:600; color:#38bdf8;">${r[0] || '-'}</td>
+            <td>${r[1] || '-'}</td>
+            <td style="font-weight:700; color:#f8fafc;">${r[2] || '-'}</td>
+            <td>${r[3] || '-'}</td>
+            <td>${r[4] || '-'}</td>
+            <td><span class="badge-fc">F/C ${r[5] || '-'}</span></td>
+            <td style="font-weight:700; color:#fde047;">${r[6] || '-'}</td>
+            <td>${r[7] || '-'}</td>
+            <td>${r[8] || '-'}</td>
+            <td>${r[9] || '-'}</td>
+            <td>${r[10] || '-'}</td>
+            <td>${r[11] || '-'}</td>
+            <td>${r[12] || '-'}</td>
+            <td>${r[13] || '-'}</td>
+            <td>${r[14] || '-'}</td>
+            <td>${r[15] || '-'}</td>
+            <td>${r[16] || '-'}</td>
+            <td>${r[17] || '-'}</td>
+            <td>${r[18] || '-'}</td>
+            <td>${r[19] || '-'}</td>
+            <td>${r[20] || '-'}</td>
+          </tr>`;
+        });
+      }
+
       tbody.innerHTML = html;
     }
 
-    // Dynamic Live SIP & KPI Calculation from Real Google Sheet Data
+    // Dynamic Live SIP & KPI Calculation
     function updateKPIsAndSIP(rows) {
       let totalProceedPiece = 0;
       let totalWeight = 0;
@@ -928,8 +1028,7 @@
       rows.forEach(r => {
         const qtyNum = parseFloat(r[6]) || 0;
         const part = String(r[2] || '').trim();
-        const weightEntry = weightMap[part];
-        const unitWt = weightEntry ? weightEntry.weight : 2.50;
+        const unitWt = getPartWeight(part);
 
         totalProceedPiece += qtyNum;
         totalWeight += (qtyNum * unitWt);
@@ -942,19 +1041,19 @@
       document.getElementById('kpiTotalWeight').innerText = `${totalWeight.toLocaleString('en-IN', {maximumFractionDigits: 1})} Kg`;
       document.getElementById('kpiWeightPerPiece').innerText = `${avgWeightPerPiece.toFixed(2)} Kg`;
 
-      // Live Read from the Latest/Top Filtered Row in Google Sheet
       if (rows.length > 0) {
         const activeRow = rows[0];
         const custName = activeRow[1] || 'MILESTONE CUSTOMER';
-        const partName = activeRow[2] || 'HEAT TREAT COMPONENT';
+        const partName = activeRow[2] || '33003';
         const lotQty = activeRow[6] || '0';
+
+        currentActivePart = partName;
 
         const liveSH = activeRow[7] ? `${activeRow[7]} HRC` : '-';
         const liveCore = activeRow[10] ? `${activeRow[10]} HRC` : '-';
         const liveECD = activeRow[11] ? `${activeRow[11]} mm` : '-';
         const liveBeforeGrind = activeRow[13] ? `${activeRow[13]} mm` : (activeRow[8] ? `${activeRow[8]} mm` : '-');
 
-        // Update Ribbon
         document.getElementById('kpiLotQuantity').innerText = `${lotQty} Nos`;
         document.getElementById('sipCompName').innerText = partName;
         document.getElementById('sipCustomer').innerText = custName;
@@ -962,14 +1061,6 @@
         document.getElementById('sipCore').innerText = liveCore;
         document.getElementById('sipECD').innerText = liveECD;
         document.getElementById('sipECDBefore').innerText = liveBeforeGrind;
-
-        // Update Modal
-        document.getElementById('modalComp').innerText = partName;
-        document.getElementById('modalCust').innerText = custName;
-        document.getElementById('modalSH').innerText = liveSH;
-        document.getElementById('modalCore').innerText = liveCore;
-        document.getElementById('modalECD').innerText = liveECD;
-        document.getElementById('modalECDBG').innerText = liveBeforeGrind;
       } else {
         document.getElementById('kpiLotQuantity').innerText = `0 Nos`;
         document.getElementById('sipCompName').innerText = `No Data`;
@@ -1015,8 +1106,25 @@
       applyAllFilters();
     }
 
-    function openFullSIPModal() { document.getElementById('sipModal').style.display = 'flex'; }
-    function closeFullSIPModal() { document.getElementById('sipModal').style.display = 'none'; }
+    // Direct PDF Viewer Modal Trigger
+    function openFullSIPModal() {
+      const pdfPath = `sip/${currentActivePart}.pdf`;
+      const fallbackPdf = `sip/SIP_Master.pdf`;
+
+      document.getElementById('modalPartName').innerText = `Part: ${currentActivePart}`;
+      document.getElementById('modalSipTitle').innerText = `📑 Standard Inspection Plan (SIP) - Part ${currentActivePart}`;
+      
+      const frame = document.getElementById('sipPdfFrame');
+      frame.src = pdfPath;
+      
+      document.getElementById('modalOpenExternal').href = pdfPath;
+      document.getElementById('sipModal').style.display = 'flex';
+    }
+
+    function closeFullSIPModal() {
+      document.getElementById('sipPdfFrame').src = "";
+      document.getElementById('sipModal').style.display = 'none';
+    }
 
     window.addEventListener('DOMContentLoaded', () => loadLiveGoogleSheetData(false));
   </script>
