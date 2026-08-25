@@ -20,7 +20,7 @@
       flex-direction: column;
     }
 
-    /* Top Bar */
+    /* Top Navigation */
     .top-bar {
       position: sticky;
       top: 0;
@@ -47,7 +47,7 @@
       transition: 0.2s;
     }
     .back-btn:hover { background: #f97316; color: white; }
-    .nav-left h1 { font-size: 15px; margin: 0; color: #f8fafc; font-weight: 600; line-height: 1.3; }
+    .nav-left h1 { font-size: 15px; margin: 0; color: #f8fafc; font-weight: 600; }
 
     .sync-badge-group { display: flex; align-items: center; gap: 8px; }
     .live-sync-btn {
@@ -712,7 +712,7 @@
     const PROCESS_LOG_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=529980778&single=true&output=csv";
     const WEIGHT_LIST_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=373153751&single=true&output=csv";
 
-    // 100% Pure Live Objects
+    // Dynamic Live Store
     let liveWeightMaster = {};
     let masterLogs = [];
     let logColMap = {};
@@ -760,7 +760,7 @@
       return r.map(cols => cols.map(col => (col || '').trim()));
     }
 
-    // Direct / Proxy Multi-Pipeline Engine
+    // Direct & Multi-Proxy Fetch Engine
     async function fetchCSVData(url) {
       const endpoints = [
         url + (url.includes('?') ? '&' : '?') + '_ts=' + Date.now(),
@@ -1020,7 +1020,7 @@
       });
 
       filtered.sort((a, b) => parseCustomDate(b[m.date || 0]) - parseCustomDate(a[m.date || 0]));
-      updateKPIsAndSIP(filtered, searchVal);
+      updateKPIsAndSIP(filtered);
 
       if (isSectionUnlocked) {
         renderTable(filtered);
@@ -1104,7 +1104,7 @@
     }
 
     // Dynamic Live SIP & KPI Calculation from Real Rows
-    function updateKPIsAndSIP(rows, searchVal) {
+    function updateKPIsAndSIP(rows) {
       let totalProceedPiece = 0;
       let totalWeight = 0;
       const totalProceedLot = rows.length;
@@ -1128,9 +1128,9 @@
 
       if (rows.length > 0) {
         const activeRow = rows[0];
-        const custName = activeRow[m.cust !== undefined ? m.cust : 1] || 'CUSTOMER';
-        const partName = activeRow[m.part !== undefined ? m.part : 2] || (searchVal ? searchVal.toUpperCase() : '-');
-        const rawLotQty = activeRow[m.qty !== undefined ? m.qty : 6] || '0';
+        const custName = activeRow[m.cust || 1] || 'CUSTOMER';
+        const partName = activeRow[m.part || 2] || '-';
+        const rawLotQty = activeRow[m.qty || 6] || '0';
 
         currentActivePart = partName;
         currentActivePdfLink = getComponentPdfLink(partName);
@@ -1151,7 +1151,7 @@
         let liveECD = activeRow[m.ecd !== undefined ? m.ecd : 11] ? String(activeRow[m.ecd || 11]).trim() : '-';
         if (liveECD !== '-' && !liveECD.includes('mm')) liveECD += ' mm';
 
-        let liveBeforeGrind = activeRow[m.grind !== undefined ? m.grind : 13] ? String(activeRow[m.grind || 13]).trim() : (activeRow[m.pcd !== undefined ? m.pcd : 8] ? String(activeRow[m.pcd || 8]).trim() : '-');
+        let liveBeforeGrind = activeRow[m.grind !== undefined ? m.grind : 13] ? String(activeRow[m.grind || 13]).trim() : (activeRow[m.pcd || 8] ? String(activeRow[m.pcd || 8]).trim() : '-');
         if (liveBeforeGrind !== '-' && !liveBeforeGrind.includes('mm')) liveBeforeGrind += ' mm';
 
         document.getElementById('kpiLotQuantity').innerText = `${mappedBatchQty} Nos`;
@@ -1164,8 +1164,8 @@
         document.getElementById('sipECDBefore').innerText = liveBeforeGrind;
       } else {
         document.getElementById('kpiLotQuantity').innerText = `0 Nos`;
-        document.getElementById('sipCompName').innerText = searchVal ? searchVal.toUpperCase() : `No Data`;
-        document.getElementById('sipPartNo').innerText = searchVal ? searchVal.toUpperCase() : `-`;
+        document.getElementById('sipCompName').innerText = `No Data`;
+        document.getElementById('sipPartNo').innerText = `-`;
         document.getElementById('sipCustomer').innerText = `-`;
         document.getElementById('sipSH').innerText = `-`;
         document.getElementById('sipCore').innerText = `-`;
