@@ -51,6 +51,22 @@
     .back-btn:hover { background: #f97316; color: white; }
     .nav-left h1 { font-size: 15px; margin: 0; color: #f8fafc; font-weight: 600; line-height: 1.3; }
 
+    .live-sync-btn {
+      background: #0f172a;
+      border: 1px solid #34d399;
+      color: #34d399;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: 0.2s;
+    }
+    .live-sync-btn:hover { background: #34d399; color: #0f172a; }
+
     .dashboard-container {
       max-width: 1600px;
       width: 100%;
@@ -407,20 +423,14 @@
     }
     .modal-body { padding: 14px; font-size: 11.5px; }
 
-    /* =========================================================
-       📱 MOBILE SPECIFIC RESPONSIVE CSS (Max Width: 768px)
-       ========================================================= */
     @media (max-width: 768px) {
       .top-bar { padding: 8px 12px; }
       .nav-left h1 { font-size: 13.5px; }
       .dashboard-container { padding: 8px 10px; }
-      
-      /* Search & Reset on Mobile */
       .search-row { flex-direction: row; }
       .search-input-wrap input { padding: 8px 10px 8px 32px; font-size: 12px; }
       .btn-reset { padding: 8px 10px; font-size: 11px; }
 
-      /* Filters: Clean 2-Column Grid on Mobile */
       .filters-grid {
         grid-template-columns: 1fr 1fr;
         gap: 8px;
@@ -434,7 +444,6 @@
       }
       .filter-item select, .filter-item input { padding: 6px; font-size: 11px; }
 
-      /* KPI Ribbon: Neat 2-Column Balanced Grid */
       .summary-ribbon {
         grid-template-columns: 1fr 1fr;
         gap: 8px;
@@ -450,7 +459,6 @@
       .ribbon-meta h5 { font-size: 9px; }
       .ribbon-meta p { font-size: 12.5px; }
 
-      /* SIP Ribbon: Clean Grid Layout */
       .sip-card {
         flex-direction: column;
         align-items: stretch;
@@ -461,12 +469,8 @@
         gap: 6px;
       }
       .btn-full-sip { width: 100%; text-align: center; padding: 7px; margin-top: 4px; }
-
-      /* Locked Box on Mobile */
       .locked-section-box { padding: 18px 10px; }
       .login-form-wrap { width: 100%; }
-
-      /* Table Header Sticky on Mobile */
       .table-top-meta { font-size: 11px; }
     }
   </style>
@@ -477,6 +481,10 @@
     <div class="nav-left">
       <a href="index.html" class="back-btn">⬅ Home</a>
       <h1>📊 Process & Metallurgical Master Dashboard</h1>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span id="dataSourceBadge" style="font-size: 11px; font-weight: 600; color: #38bdf8;">⏳ Connecting...</span>
+      <button class="live-sync-btn" onclick="loadLiveGoogleSheetData(true)" title="Force sync latest Google Sheet entries">⚡ Sync Sheet</button>
     </div>
   </header>
 
@@ -674,7 +682,7 @@
           </thead>
           <tbody id="tableBody">
             <tr>
-              <td colspan="21" class="no-data">Loading process logs...</td>
+              <td colspan="21" class="no-data">Loading process logs from Google Sheets...</td>
             </tr>
           </tbody>
         </table>
@@ -710,12 +718,15 @@
   <script src="data.js"></script>
 
   <script>
+    // Clean Direct Google Sheet Published CSV Link
+    const CLEAN_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=529980778&single=true&output=csv";
+
     let masterLogs = [];
     let isSectionUnlocked = false;
 
-    // Authorized User List
+    // Authorized User Access List
     const AUTHORIZED_USERS = {
-      "7100028": "pass123",
+      "ADMIN": "admin@123",
       "EMP101": "1234",
       "MET01": "cqi9",
       "SUPERVISOR": "ht2026"
@@ -733,12 +744,127 @@
       return isNaN(fallback.getTime()) ? new Date(0) : fallback;
     }
 
-    function initDashboard() {
+    // Advanced CSV Parser for accurate column mapping
+    function parseCSVData(text) {
+      let p = '', c = '', r = [];
+      let q = false;
+      let row = [''];
+      for (let i = 0; i < text.length; i++) {
+        c = text[i];
+        let next = text[i + 1];
+        if (c === '"') {
+          if (q && next === '"') { row[row.length - 1] += '"'; i++; }
+          else { q = !q; }
+        } else if (c === ',' && !q) {
+          row.push('');
+        } else if ((c === '\r' || c === '\n') && !q) {
+          if (c === '\r' && next === '\n') { i++; }
+          if (row.length > 1 || (row.length === 1 && row[0] !== '')) {
+            r.push(row);
+          }
+          row = [''];
+        } else {
+          row[row.length - 1] += c;
+        }
+      }
+      if (row.length > 1 || (row.length === 1 && row[0] !== '')) {
+        r.push(row);
+      }
+      
+      // Auto-strip header
+      if (r.length > 0 && (r[0][0].toLowerCase().includes("date") || (r[0][1] && r[0][1].toLowerCase().includes("customer")))) {
+        r.shift();
+      }
+      return r.map(cols => cols.map(col => (col || '').trim()));
+    }
+
+    async function loadLiveGoogleSheetData(forceSync = false) {
+      const badge = document.getElementById('dataSourceBadge');
+      if (badge) {
+        badge.innerHTML = "⏳ Fetching Sheet...";
+        badge.style.color = "#fde047";
+      }
+
+      let csvText = "";
+      let isLive = false;
+
+      // 1. Direct Fetch Attempt (Works online / hosted)
+      try {
+        const resp = await fetch(CLEAN_CSV_URL, { cache: "no-store" });
+        if (resp.ok) {
+          const txt = await resp.text();
+          if (txt && txt.length > 100 && !txt.includes("<!DOCTYPE html>")) {
+            csvText = txt;
+            isLive = true;
+          }
+        }
+      } catch (e) {
+        console.warn("Direct fetch unavailable. Connecting via secure CORS proxy...");
+      }
+
+      // 2. High-speed Proxy Attempt (For local file:/// or restricted browser)
+      if (!isLive) {
+        try {
+          const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(CLEAN_CSV_URL);
+          const resp = await fetch(proxyUrl, { cache: "no-store" });
+          if (resp.ok) {
+            const txt = await resp.text();
+            if (txt && txt.length > 100 && !txt.includes("<!DOCTYPE html>")) {
+              csvText = txt;
+              isLive = true;
+            }
+          }
+        } catch (e) {
+          console.warn("Proxy 1 failed, trying fallback proxy...");
+        }
+      }
+
+      // 3. Secondary Proxy Attempt
+      if (!isLive) {
+        try {
+          const proxyUrl2 = "https://api.allorigins.win/raw?url=" + encodeURIComponent(CLEAN_CSV_URL);
+          const resp = await fetch(proxyUrl2, { cache: "no-store" });
+          if (resp.ok) {
+            const txt = await resp.text();
+            if (txt && txt.length > 100 && !txt.includes("<!DOCTYPE html>")) {
+              csvText = txt;
+              isLive = true;
+            }
+          }
+        } catch (e) {
+          console.warn("All proxy channels unavailable.");
+        }
+      }
+
+      // Parse and Apply
+      if (isLive) {
+        const parsed = parseCSVData(csvText);
+        if (parsed.length > 0) {
+          masterLogs = parsed;
+          if (badge) {
+            badge.innerHTML = "🟢 Live (Google Sheet Connected)";
+            badge.style.color = "#34d399";
+          }
+          if (forceSync) alert("✅ Live Google Sheet data synced successfully!");
+        } else {
+          fallbackToLocalData();
+        }
+      } else {
+        fallbackToLocalData();
+        if (badge) {
+          badge.innerHTML = "🟠 Offline Mode (data.js)";
+          badge.style.color = "#f97316";
+        }
+      }
+
+      masterLogs.sort((a, b) => parseCustomDate(b[0]) - parseCustomDate(a[0]));
+      applyAllFilters();
+    }
+
+    function fallbackToLocalData() {
       if (typeof plantMasterData !== 'undefined' && plantMasterData.processData) {
         masterLogs = [...plantMasterData.processData];
       }
-      masterLogs.sort((a, b) => parseCustomDate(b[0]) - parseCustomDate(a[0]));
-      applyAllFilters();
     }
 
     function applyAllFilters() {
@@ -903,7 +1029,7 @@
     function openFullSIPModal() { document.getElementById('sipModal').style.display = 'flex'; }
     function closeFullSIPModal() { document.getElementById('sipModal').style.display = 'none'; }
 
-    window.addEventListener('DOMContentLoaded', initDashboard);
+    window.addEventListener('DOMContentLoaded', () => loadLiveGoogleSheetData(false));
   </script>
 </body>
 </html>
