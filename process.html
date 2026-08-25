@@ -49,6 +49,7 @@
     .back-btn:hover { background: #f97316; color: white; }
     .nav-left h1 { font-size: 15px; margin: 0; color: #f8fafc; font-weight: 600; line-height: 1.3; }
 
+    .sync-badge-group { display: flex; align-items: center; gap: 8px; }
     .live-sync-btn {
       background: #0f172a;
       border: 1px solid #34d399;
@@ -208,7 +209,7 @@
     }
     .sip-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
       gap: 8px;
       flex: 1;
     }
@@ -382,7 +383,7 @@
     tr:nth-child(odd) td { background: #0f172a; }
     tr:hover td { background: rgba(249, 115, 22, 0.12); color: #ffffff; }
 
-    /* Month Divider Banner Row */
+    /* Monthly Divider Banner */
     .month-divider-row td {
       background: linear-gradient(90deg, #0f172a 0%, #172554 50%, #0f172a 100%) !important;
       border-top: 2px solid #f97316;
@@ -413,10 +414,7 @@
       font-size: 11px;
       color: #cbd5e1;
     }
-    .month-stat strong {
-      color: #38bdf8;
-      font-weight: 700;
-    }
+    .month-stat strong { color: #38bdf8; font-weight: 700; }
 
     .badge-fc {
       background: rgba(56, 189, 248, 0.15);
@@ -428,13 +426,13 @@
     }
     .no-data { padding: 30px; color: #94a3b8; font-size: 12.5px; text-align: center; }
 
-    /* Direct PDF Viewer Modal */
+    /* In-App PDF Modal */
     .modal-overlay {
       display: none;
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(4px);
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(6px);
       z-index: 2000;
       justify-content: center;
       align-items: center;
@@ -445,13 +443,13 @@
       border: 2px solid #f97316;
       border-radius: 12px;
       width: 100%;
-      max-width: 900px;
+      max-width: 950px;
       height: 88vh;
       color: white;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.9);
     }
     .modal-header {
       padding: 10px 16px;
@@ -462,7 +460,7 @@
       border-bottom: 1px solid #334155;
     }
     .modal-body {
-      padding: 12px;
+      padding: 10px;
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -512,15 +510,8 @@
       .ribbon-meta h5 { font-size: 9px; }
       .ribbon-meta p { font-size: 12.5px; }
 
-      .sip-card {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 8px;
-      }
-      .sip-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 6px;
-      }
+      .sip-card { flex-direction: column; align-items: stretch; padding: 8px; }
+      .sip-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
       .btn-full-sip { width: 100%; text-align: center; padding: 8px; justify-content: center; }
       .locked-section-box { padding: 18px 10px; }
       .login-form-wrap { width: 100%; }
@@ -536,9 +527,9 @@
       <a href="index.html" class="back-btn">⬅ Home</a>
       <h1>📊 Process & Metallurgical Master Dashboard</h1>
     </div>
-    <div style="display: flex; align-items: center; gap: 8px;">
+    <div class="sync-badge-group">
       <span id="dataSourceBadge" style="font-size: 11px; font-weight: 600; color: #38bdf8;">⏳ Connecting...</span>
-      <button class="live-sync-btn" onclick="loadLiveGoogleSheetData(true)" title="Force sync latest Google Sheet entries">⚡ Sync Sheet</button>
+      <button class="live-sync-btn" onclick="loadAllLiveSheets(true)" title="Force sync latest entries">⚡ Sync All</button>
     </div>
   </header>
 
@@ -641,7 +632,7 @@
       <div class="ribbon-item">
         <div class="ribbon-icon">🔢</div>
         <div class="ribbon-meta">
-          <h5>Lot Quantity</h5>
+          <h5>Lot Quantity (Batch)</h5>
           <p id="kpiLotQuantity">0 Nos</p>
         </div>
       </div>
@@ -651,7 +642,7 @@
     <div class="sip-card">
       <div class="sip-grid">
         <div class="sip-param-box" style="border-color: #38bdf8;">
-          <span>Active Component / Part</span>
+          <span>Component / Part</span>
           <strong id="sipCompName" style="color: #38bdf8;">-</strong>
         </div>
 
@@ -671,12 +662,12 @@
         </div>
 
         <div class="sip-param-box">
-          <span>ECD (Effective)</span>
+          <span>ECD (Final / After)</span>
           <strong id="sipECD">-</strong>
         </div>
 
         <div class="sip-param-box">
-          <span>Before Grind (ECD/PCD)</span>
+          <span>ECD (Before Grind)</span>
           <strong id="sipECDBefore">-</strong>
         </div>
       </div>
@@ -745,34 +736,36 @@
 
   </div>
 
-  <!-- Direct PDF Viewer Modal -->
+  <!-- Direct Embedded PDF Viewer Modal -->
   <div class="modal-overlay" id="sipModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 style="margin: 0; color: #f97316; font-size: 13.5px;" id="modalSipTitle">📑 Standard Inspection Plan (SIP) PDF</h3>
+        <h3 style="margin: 0; color: #f97316; font-size: 13.5px;" id="modalSipTitle">📑 Standard Inspection Plan (SIP)</h3>
         <span style="font-size: 24px; cursor: pointer; color: #94a3b8; line-height: 1;" onclick="closeFullSIPModal()">&times;</span>
       </div>
       <div class="modal-body">
-        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; padding: 4px 6px; background: #0f172a; border-radius: 6px; border: 1px solid #334155;">
-          <span>Active Part: <strong id="modalPartName" style="color: #38bdf8;">-</strong></span>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; padding: 6px 10px; background: #0f172a; border-radius: 6px; border: 1px solid #334155;">
+          <span>Active Component: <strong id="modalPartName" style="color: #38bdf8;">-</strong></span>
           <a id="modalOpenExternal" href="#" target="_blank" style="color: #fde047; text-decoration: none; font-weight: 600;">↗ Open in Full Tab</a>
         </div>
         
-        <!-- Embedded PDF Frame -->
+        <!-- Embedded PDF Viewer -->
         <iframe id="sipPdfFrame" class="pdf-viewer-frame" src=""></iframe>
       </div>
     </div>
   </div>
 
   <script>
-    const CLEAN_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=529980778&single=true&output=csv";
+    // 1. Live Google Sheet Published CSV URLs
+    const PROCESS_LOG_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=529980778&single=true&output=csv";
+    const WEIGHT_LIST_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=373153751&single=true&output=csv";
 
-    // Master Weight Map (Accurate weights per component)
-    const weightMap = {
-      "33003": { desc: "COMPONENT 33003", weight: 1.20, batchQty: 500, grade: "20MnCr5" },
-      "2105": { desc: "BULL GEAR", weight: 3.20, batchQty: 480, grade: "20MnCr5" },
-      "2106": { desc: "PINION SHAFT", weight: 2.10, batchQty: 350, grade: "16MnCr5" },
-      "2107": { desc: "INPUT GEAR", weight: 1.85, batchQty: 600, grade: "20MnCr5" }
+    // Live Master Store
+    let liveWeightMaster = {
+      "33003": { desc: "COMPONENT 33003", weight: 1.20, batchQty: 500, pdfLink: "" },
+      "2105": { desc: "BULL GEAR", weight: 3.20, batchQty: 480, pdfLink: "" },
+      "2106": { desc: "PINION SHAFT", weight: 2.10, batchQty: 350, pdfLink: "" },
+      "2107": { desc: "INPUT GEAR", weight: 1.85, batchQty: 600, pdfLink: "" }
     };
 
     let masterLogs = [];
@@ -785,18 +778,6 @@
       "MET01": "cqi9",
       "SUPERVISOR": "ht2026"
     };
-
-    function getPartWeight(partNo) {
-      if (!partNo) return 1.20;
-      const clean = String(partNo).trim().toUpperCase();
-      if (weightMap[clean]) return weightMap[clean].weight;
-      
-      // Partial match
-      for (const k in weightMap) {
-        if (clean.includes(k) || k.includes(clean)) return weightMap[k].weight;
-      }
-      return 1.20; // Default exact fallback
-    }
 
     function parseCustomDate(dateStr) {
       if (!dateStr) return new Date(0);
@@ -828,66 +809,80 @@
         }
       }
       if (row.length > 1 || (row.length === 1 && row[0] !== '')) r.push(row);
-      
-      if (r.length > 0 && (r[0][0].toLowerCase().includes("date") || (r[0][1] && r[0][1].toLowerCase().includes("customer")))) {
-        r.shift();
-      }
       return r.map(cols => cols.map(col => (col || '').trim()));
     }
 
-    async function fetchWithTimeout(url, timeout = 5000) {
-      const controller = new AbortController();
-      const id = setTimeout(() => controller.abort(), timeout);
-      try {
-        const response = await fetch(url, { signal: controller.signal, cache: 'no-store' });
-        clearTimeout(id);
-        return response;
-      } catch (err) {
-        clearTimeout(id);
-        throw err;
-      }
-    }
-
-    async function loadLiveGoogleSheetData(forceSync = false) {
-      const badge = document.getElementById('dataSourceBadge');
-      if (badge) {
-        badge.innerHTML = "⏳ Syncing...";
-        badge.style.color = "#fde047";
-      }
-
-      let csvText = "";
-      let isLive = false;
-
+    async function fetchCSVWithProxy(rawUrl) {
+      if (!rawUrl) return null;
       const urlsToTry = [
-        "https://api.allorigins.win/raw?url=" + encodeURIComponent(CLEAN_CSV_URL),
-        "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(CLEAN_CSV_URL),
-        "https://corsproxy.io/?" + encodeURIComponent(CLEAN_CSV_URL),
-        CLEAN_CSV_URL
+        "https://api.allorigins.win/raw?url=" + encodeURIComponent(rawUrl),
+        "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(rawUrl),
+        "https://corsproxy.io/?" + encodeURIComponent(rawUrl),
+        rawUrl
       ];
 
-      for (const targetUrl of urlsToTry) {
+      for (const u of urlsToTry) {
         try {
-          const resp = await fetchWithTimeout(targetUrl, 6000);
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 6000);
+          const resp = await fetch(u, { signal: controller.signal, cache: 'no-store' });
+          clearTimeout(timer);
           if (resp.ok) {
             const txt = await resp.text();
-            if (txt && txt.length > 80 && !txt.includes("<!DOCTYPE html>")) {
-              csvText = txt;
-              isLive = true;
-              break;
-            }
+            if (txt && txt.length > 50 && !txt.includes("<!DOCTYPE html>")) return txt;
           }
         } catch (e) {}
       }
+      return null;
+    }
 
-      if (isLive) {
-        const parsed = parseCSVData(csvText);
-        if (parsed.length > 0) {
-          masterLogs = parsed;
+    // Dual Loader: Process Log + Weight List
+    async function loadAllLiveSheets(forceSync = false) {
+      const badge = document.getElementById('dataSourceBadge');
+      if (badge) {
+        badge.innerHTML = "⏳ Syncing Sheets...";
+        badge.style.color = "#fde047";
+      }
+
+      // 1. Fetch Weight List Sheet
+      const wtCSV = await fetchCSVWithProxy(WEIGHT_LIST_CSV_URL);
+      if (wtCSV) {
+        const parsedWt = parseCSVData(wtCSV);
+        if (parsedWt.length > 1) {
+          parsedWt.shift(); // Remove header
+          parsedWt.forEach(row => {
+            const pNo = String(row[0] || '').trim().toUpperCase();
+            const pDesc = row[1] || `PART ${pNo}`;
+            const pWt = parseFloat(row[2]) || 1.20;
+            const pBatch = parseFloat(row[3]) || 0;
+            const pPdf = row[4] || '';
+
+            if (pNo) {
+              liveWeightMaster[pNo] = {
+                desc: pDesc,
+                weight: pWt,
+                batchQty: pBatch,
+                pdfLink: pPdf
+              };
+            }
+          });
+        }
+      }
+
+      // 2. Fetch Process Log Sheet
+      const logCSV = await fetchCSVWithProxy(PROCESS_LOG_CSV_URL);
+      if (logCSV) {
+        const parsedLogs = parseCSVData(logCSV);
+        if (parsedLogs.length > 0 && (parsedLogs[0][0].toLowerCase().includes("date") || (parsedLogs[0][1] && parsedLogs[0][1].toLowerCase().includes("customer")))) {
+          parsedLogs.shift();
+        }
+        if (parsedLogs.length > 0) {
+          masterLogs = parsedLogs;
           if (badge) {
-            badge.innerHTML = "🟢 Live (Connected)";
+            badge.innerHTML = "🟢 Live (Sheets Connected)";
             badge.style.color = "#34d399";
           }
-          if (forceSync) alert("✅ Live Google Sheet data synced successfully!");
+          if (forceSync) alert("✅ Live Sheets & Weight Master synced!");
         }
       } else {
         if (badge) {
@@ -898,6 +893,26 @@
 
       masterLogs.sort((a, b) => parseCustomDate(b[0]) - parseCustomDate(a[0]));
       applyAllFilters();
+    }
+
+    function getComponentWeight(partNo) {
+      if (!partNo) return 1.20;
+      const clean = String(partNo).trim().toUpperCase();
+      if (liveWeightMaster[clean]) return liveWeightMaster[clean].weight;
+
+      for (const k in liveWeightMaster) {
+        if (clean.includes(k) || k.includes(clean)) return liveWeightMaster[k].weight;
+      }
+      return 1.20; // Default exact fallback for 33003
+    }
+
+    function getComponentBatchQty(partNo, fallbackQty) {
+      if (!partNo) return fallbackQty;
+      const clean = String(partNo).trim().toUpperCase();
+      if (liveWeightMaster[clean] && liveWeightMaster[clean].batchQty > 0) {
+        return liveWeightMaster[clean].batchQty;
+      }
+      return fallbackQty;
     }
 
     function applyAllFilters() {
@@ -941,7 +956,7 @@
       }
     }
 
-    // Monthly Grouped Table Rendering with Hardening Weight Breakdown
+    // Monthly Grouped Table Rendering
     function renderTable(rows) {
       const tbody = document.getElementById('tableBody');
       document.getElementById('recordStatus').innerText = `${rows.length} records`;
@@ -951,7 +966,6 @@
         return;
       }
 
-      // Group rows by Month & Year
       const monthGroups = {};
       rows.forEach(r => {
         const d = parseCustomDate(r[0]);
@@ -969,12 +983,11 @@
 
         mRows.forEach(r => {
           const qty = parseFloat(r[6]) || 0;
-          const wt = getPartWeight(r[2]);
+          const wt = getComponentWeight(r[2]);
           mPcs += qty;
           mWt += (qty * wt);
         });
 
-        // Insert Month Summary Divider Banner
         html += `
           <tr class="month-divider-row">
             <td colspan="21">
@@ -988,7 +1001,6 @@
           </tr>
         `;
 
-        // Render month's rows
         mRows.forEach(r => {
           html += `<tr>
             <td style="font-weight:600; color:#38bdf8;">${r[0] || '-'}</td>
@@ -1028,7 +1040,7 @@
       rows.forEach(r => {
         const qtyNum = parseFloat(r[6]) || 0;
         const part = String(r[2] || '').trim();
-        const unitWt = getPartWeight(part);
+        const unitWt = getComponentWeight(part);
 
         totalProceedPiece += qtyNum;
         totalWeight += (qtyNum * unitWt);
@@ -1045,16 +1057,28 @@
         const activeRow = rows[0];
         const custName = activeRow[1] || 'MILESTONE CUSTOMER';
         const partName = activeRow[2] || '33003';
-        const lotQty = activeRow[6] || '0';
+        const rawLotQty = activeRow[6] || '0';
 
         currentActivePart = partName;
+        const mappedBatchQty = getComponentBatchQty(partName, rawLotQty);
 
-        const liveSH = activeRow[7] ? `${activeRow[7]} HRC` : '-';
-        const liveCore = activeRow[10] ? `${activeRow[10]} HRC` : '-';
-        const liveECD = activeRow[11] ? `${activeRow[11]} mm` : '-';
-        const liveBeforeGrind = activeRow[13] ? `${activeRow[13]} mm` : (activeRow[8] ? `${activeRow[8]} mm` : '-');
+        let liveSH = activeRow[7] ? String(activeRow[7]).trim() : '-';
+        if (liveSH !== '-' && !liveSH.toUpperCase().includes('HRC') && !liveSH.toUpperCase().includes('HV')) {
+          liveSH += ' HRC';
+        }
 
-        document.getElementById('kpiLotQuantity').innerText = `${lotQty} Nos`;
+        let liveCore = activeRow[10] ? String(activeRow[10]).trim() : '-';
+        if (liveCore !== '-' && !liveCore.toUpperCase().includes('HRC') && !liveCore.toUpperCase().includes('HV')) {
+          liveCore += ' HRC';
+        }
+
+        let liveECD = activeRow[11] ? String(activeRow[11]).trim() : '-';
+        if (liveECD !== '-' && !liveECD.includes('mm')) liveECD += ' mm';
+
+        let liveBeforeGrind = activeRow[13] ? String(activeRow[13]).trim() : (activeRow[8] ? String(activeRow[8]).trim() : '-');
+        if (liveBeforeGrind !== '-' && !liveBeforeGrind.includes('mm')) liveBeforeGrind += ' mm';
+
+        document.getElementById('kpiLotQuantity').innerText = `${mappedBatchQty} Nos`;
         document.getElementById('sipCompName').innerText = partName;
         document.getElementById('sipCustomer').innerText = custName;
         document.getElementById('sipSH').innerText = liveSH;
@@ -1106,18 +1130,25 @@
       applyAllFilters();
     }
 
-    // Direct PDF Viewer Modal Trigger
+    // Direct Embedded In-App PDF Modal
     function openFullSIPModal() {
-      const pdfPath = `sip/${currentActivePart}.pdf`;
-      const fallbackPdf = `sip/SIP_Master.pdf`;
-
-      document.getElementById('modalPartName').innerText = `Part: ${currentActivePart}`;
+      document.getElementById('modalPartName').innerText = `Part No: ${currentActivePart}`;
       document.getElementById('modalSipTitle').innerText = `📑 Standard Inspection Plan (SIP) - Part ${currentActivePart}`;
       
       const frame = document.getElementById('sipPdfFrame');
-      frame.src = pdfPath;
-      
-      document.getElementById('modalOpenExternal').href = pdfPath;
+      const cleanKey = String(currentActivePart).trim().toUpperCase();
+
+      let targetPdfUrl = `sip/${currentActivePart}.pdf`;
+      if (liveWeightMaster[cleanKey] && liveWeightMaster[cleanKey].pdfLink) {
+        let driveLink = liveWeightMaster[cleanKey].pdfLink;
+        if (driveLink.includes('/view')) {
+          driveLink = driveLink.replace('/view', '/preview');
+        }
+        targetPdfUrl = driveLink;
+      }
+
+      frame.src = targetPdfUrl;
+      document.getElementById('modalOpenExternal').href = targetPdfUrl;
       document.getElementById('sipModal').style.display = 'flex';
     }
 
@@ -1126,7 +1157,7 @@
       document.getElementById('sipModal').style.display = 'none';
     }
 
-    window.addEventListener('DOMContentLoaded', () => loadLiveGoogleSheetData(false));
+    window.addEventListener('DOMContentLoaded', () => loadAllLiveSheets(false));
   </script>
 </body>
 </html>
