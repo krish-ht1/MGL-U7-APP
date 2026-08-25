@@ -103,15 +103,14 @@
       border-color: #f97316;
       box-shadow: 0 10px 24px rgba(249, 115, 22, 0.35);
     }
-    /* Child elements don't block click */
     .emp-card * {
       pointer-events: none;
     }
 
-    /* Circular Photo Frame */
+    /* Ultra-Clear HD Photo Slot */
     .photo-slot {
-      width: 76px;
-      height: 76px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       border: 2px solid #38bdf8;
       background: #0f172a;
@@ -123,6 +122,8 @@
       flex-shrink: 0;
       box-shadow: 0 4px 12px rgba(0,0,0,0.5);
       position: relative;
+      transform: translateZ(0);
+      -webkit-mask-image: -webkit-radial-gradient(white, black);
     }
     .photo-slot img {
       width: 100%;
@@ -132,6 +133,10 @@
       display: block;
       font-size: 0;
       color: transparent;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: high-quality;
+      backface-visibility: hidden;
+      transform: translateZ(0);
     }
     .photo-slot .avatar-fallback {
       font-size: 15px;
@@ -174,8 +179,8 @@
       padding: 16px;
     }
     .hod-card .photo-slot {
-      width: 88px;
-      height: 88px;
+      width: 90px;
+      height: 90px;
       border-color: #f97316;
     }
     .hod-card .emp-name { font-size: 16px; color: #f8fafc; }
@@ -297,8 +302,8 @@
     }
 
     .modal-photo-wrap {
-      width: 130px;
-      height: 130px;
+      width: 140px;
+      height: 140px;
       border-radius: 50%;
       border: 3px solid #f97316;
       padding: 3px;
@@ -309,6 +314,8 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      transform: translateZ(0);
+      -webkit-mask-image: -webkit-radial-gradient(white, black);
     }
     .modal-photo-wrap img {
       width: 100%;
@@ -319,6 +326,9 @@
       display: block;
       font-size: 0;
       color: transparent;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: high-quality;
+      backface-visibility: hidden;
     }
 
     .modal-meta { text-align: center; width: 100%; }
@@ -364,324 +374,9 @@
       .modal-content { max-width: 95%; }
     }
   </style>
-</head>
-<body>
 
-  <header class="top-bar">
-    <div class="nav-left">
-      <a href="index.html" class="back-btn">⬅ Home</a>
-      <h1>👥 Plant Organization & Technical Team</h1>
-    </div>
-  </header>
-
-  <div class="main-wrapper">
-    
-    <!-- Tab Controls -->
-    <div class="tab-bar">
-      <button class="tab-btn active" onclick="switchOrgView('ALL', this)">🏢 Full Plant View</button>
-      <button class="tab-btn" onclick="switchOrgView('OPERATION', this)">⚙️ HT Production (Operation)</button>
-      <button class="tab-btn" onclick="switchOrgView('LAB', this)">🔬 Metallurgical Lab</button>
-      <button class="tab-btn" onclick="switchOrgView('MAINTENANCE', this)">🔧 Plant Maintenance</button>
-    </div>
-
-    <!-- 1. H.O.D (Top Level) -->
-    <div class="hod-container" id="hodSection">
-      <div class="emp-card hod-card" onclick="showProfile('anand')">
-        <div class="photo-slot">
-          <img src="image/anand.jpg" onerror="autoLoadImage(this, 'anand', 'AB')">
-          <span class="avatar-fallback">AB</span>
-        </div>
-        <h3 class="emp-name">Mr ANAND BHATT</h3>
-        <p class="emp-role">Head of Department (H.O.D)</p>
-        <span class="emp-badge">Diploma HT & Metallurgy + B.Sc + MBA Opr Mgt.</span>
-        <span class="emp-exp">⭐ 18 Year Experience</span>
-      </div>
-    </div>
-
-    <!-- 2. Main Department Divisions -->
-    <div class="org-main-grid" id="mainTreeGrid">
-      
-      <!-- ================= LEFT PILLAR: OPERATION ================= -->
-      <div class="section-box" id="secOperation">
-        <div class="section-title op-header">⚙️ OPERATION (HEAT TREATMENT)</div>
-
-        <!-- Operation Lead -->
-        <div style="max-width: 280px; margin: 0 auto 14px auto;">
-          <div class="emp-card" onclick="showProfile('kapil')">
-            <div class="photo-slot">
-              <img src="image/kapil.jpg" onerror="autoLoadImage(this, 'kapil', 'KR')">
-              <span class="avatar-fallback">KR</span>
-            </div>
-            <h4 class="emp-name">Mr. Kapil Raj</h4>
-            <p class="emp-role">Sr. Engineer H.T Production</p>
-            <span class="emp-badge">🎓 B.Tech</span>
-            <span class="emp-exp">5 Year Exp.</span>
-          </div>
-        </div>
-
-        <!-- 4 Sub-divisions -->
-        <div class="sub-columns-grid">
-          
-          <!-- Shift A -->
-          <div class="sub-col">
-            <div class="sub-col-header">SHIFT - A</div>
-            <div class="emp-card" onclick="showProfile('sujeet')">
-              <div class="photo-slot"><img src="image/sujeet.jpg" onerror="autoLoadImage(this, 'sujeet', 'SK')"><span class="avatar-fallback">SK</span></div>
-              <h5 class="emp-name">Sujeet Kumar</h5>
-              <p class="emp-role">Shift Engineer</p>
-              <span class="emp-badge">B.Tech</span>
-              <span class="emp-exp">4 Year Exp.</span>
-            </div>
-            <div class="emp-card" onclick="showProfile('yaman')">
-              <div class="photo-slot"><img src="image/yaman.jpg" onerror="autoLoadImage(this, 'yaman', 'YT')"><span class="avatar-fallback">YT</span></div>
-              <h5 class="emp-name">Yaman Tyagi</h5>
-              <p class="emp-role">Sr. Operator</p>
-              <span class="emp-badge">ITI</span>
-              <span class="emp-exp">5 Year Exp.</span>
-            </div>
-            <div class="emp-card" onclick="showProfile('vishal')">
-              <div class="photo-slot"><img src="image/vishal.jpg" onerror="autoLoadImage(this, 'vishal', 'VK')"><span class="avatar-fallback">VK</span></div>
-              <h5 class="emp-name">Vishal Kumar</h5>
-              <p class="emp-role">Operator</p>
-              <span class="emp-badge">ITI</span>
-              <span class="emp-exp">2 Year Exp.</span>
-            </div>
-          </div>
-
-          <!-- Shift B -->
-          <div class="sub-col">
-            <div class="sub-col-header">SHIFT - B</div>
-            <div class="emp-card" onclick="showProfile('amrinder')">
-              <div class="photo-slot"><img src="image/amrinder.jpg" onerror="autoLoadImage(this, 'amrinder', 'AY')"><span class="avatar-fallback">AY</span></div>
-              <h5 class="emp-name">Amrinder Yadav</h5>
-              <p class="emp-role">Shift Engineer</p>
-              <span class="emp-badge">B.Tech</span>
-              <span class="emp-exp">3 Year Exp.</span>
-            </div>
-            <div class="emp-card" onclick="showProfile('vivek')">
-              <div class="photo-slot"><img src="image/vivek.jpg" onerror="autoLoadImage(this, 'vivek', 'VS')"><span class="avatar-fallback">VS</span></div>
-              <h5 class="emp-name">Vivek Siyal</h5>
-              <p class="emp-role">Sr. Operator</p>
-              <span class="emp-badge">ITI</span>
-              <span class="emp-exp">5 Year Exp.</span>
-            </div>
-            <div class="emp-card" onclick="showProfile('ajay')">
-              <div class="photo-slot"><img src="image/ajay.jpg" onerror="autoLoadImage(this, 'ajay', 'AS')"><span class="avatar-fallback">AS</span></div>
-              <h5 class="emp-name">Ajay Saini</h5>
-              <p class="emp-role">Operator</p>
-              <span class="emp-badge">ITI</span>
-              <span class="emp-exp">2 Year Exp.</span>
-            </div>
-          </div>
-
-          <!-- Backup Man Power (Murari) -->
-          <div class="sub-col">
-            <div class="sub-col-header">BACKUP MAN POWER</div>
-            <div class="emp-card" onclick="showProfile('murari')">
-              <div class="photo-slot">
-                <img src="image/murari.jpg" onerror="autoLoadImage(this, 'murari', 'MS')">
-                <span class="avatar-fallback">MS</span>
-              </div>
-              <h5 class="emp-name">Murari Singh</h5>
-              <p class="emp-role">Engineer</p>
-              <span class="emp-badge">DME</span>
-              <span class="emp-exp">3 Year Exp.</span>
-            </div>
-            <div class="emp-card" onclick="showProfile('surinder')">
-              <div class="photo-slot"><img src="image/surinder.jpg" onerror="autoLoadImage(this, 'surinder', 'SR')"><span class="avatar-fallback">SR</span></div>
-              <h5 class="emp-name">Surinder</h5>
-              <p class="emp-role">Operator</p>
-              <span class="emp-badge">ITI</span>
-              <span class="emp-exp">4 Year Exp.</span>
-            </div>
-          </div>
-
-          <!-- HT PPC / SAP -->
-          <div class="sub-col">
-            <div class="sub-col-header">HT PPC / SAP</div>
-            <div class="emp-card" onclick="showProfile('aadarsh')">
-              <div class="photo-slot"><img src="image/aadarsh.jpg" onerror="autoLoadImage(this, 'aadarsh', 'AS')"><span class="avatar-fallback">AS</span></div>
-              <h5 class="emp-name">Aadarsh Sharma</h5>
-              <p class="emp-role">PPC / SAP</p>
-              <span class="emp-badge">Diploma IT</span>
-              <span class="emp-exp">2 Year Exp.</span>
-            </div>
-            <div class="emp-card" onclick="showProfile('tarun')">
-              <div class="photo-slot"><img src="image/tarun.jpg" onerror="autoLoadImage(this, 'tarun', 'TS')"><span class="avatar-fallback">TS</span></div>
-              <h5 class="emp-name">Tarun Sharma</h5>
-              <p class="emp-role">PPC / SAP</p>
-              <span class="emp-badge">Diploma IT</span>
-              <span class="emp-exp">1 Year Exp.</span>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Quality Inspector Section (Rakesh & Ravindra) -->
-        <div class="horizontal-band">
-          <div class="band-title">HT Quality Inspector (VISUAL AHT/ BHT)</div>
-          <div class="band-grid">
-            <div class="emp-card" onclick="showProfile('rakesh')">
-              <div class="photo-slot">
-                <img src="image/rakesh.jpg" onerror="autoLoadImage(this, 'rakesh', 'RG')">
-                <span class="avatar-fallback">RG</span>
-              </div>
-              <h5 class="emp-name">Rakesh Giri</h5>
-              <p class="emp-role">HT Quality Inspector</p>
-              <span class="emp-badge">B.Tech</span>
-              <span class="emp-exp">2 Year Exp.</span>
-            </div>
-            <div class="emp-card" onclick="showProfile('ravindra')">
-              <div class="photo-slot">
-                <img src="image/ravindra.jpg" onerror="autoLoadImage(this, 'ravindra', 'RV')">
-                <span class="avatar-fallback">RV</span>
-              </div>
-              <h5 class="emp-name">Ravinder</h5>
-              <p class="emp-role">HT Quality Inspector</p>
-              <span class="emp-badge">ITI</span>
-              <span class="emp-exp">2 Year Exp.</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- ================= RIGHT PILLAR: METALLURGICAL LAB ================= -->
-      <div class="section-box" id="secLab">
-        <div class="section-title lab-header">🔬 METALLURGICAL LAB</div>
-
-        <!-- Lab Lead (Rahul Rai) -->
-        <div style="max-width: 280px; margin: 0 auto 10px auto;">
-          <div class="emp-card" onclick="showProfile('rahul')">
-            <div class="photo-slot">
-              <img src="image/rahul.jpg" onerror="autoLoadImage(this, 'rahul', 'RR')">
-              <span class="avatar-fallback">RR</span>
-            </div>
-            <h4 class="emp-name">Mr. Rahul Rai</h4>
-            <p class="emp-role">Sr. Engineer LAB</p>
-            <span class="emp-badge">🎓 B.Tech</span>
-            <span class="emp-exp">4 Year Exp.</span>
-          </div>
-        </div>
-
-        <!-- Engineer LAB (Pankaj) -->
-        <div style="max-width: 280px; margin: 0 auto 12px auto;">
-          <div class="emp-card" onclick="showProfile('pankaj')">
-            <div class="photo-slot">
-              <img src="image/pankaj.jpg" onerror="autoLoadImage(this, 'pankaj', 'PK')">
-              <span class="avatar-fallback">PK</span>
-            </div>
-            <h4 class="emp-name">Mr. Pankaj</h4>
-            <p class="emp-role">Engineer LAB</p>
-            <span class="emp-badge">🎓 B.Tech</span>
-            <span class="emp-exp">4 Year Exp.</span>
-          </div>
-        </div>
-
-        <!-- 3 Lab Team Members (Chetan, Ankit, Ajeet) -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px;">
-          <div class="emp-card" onclick="showProfile('chetan')">
-            <div class="photo-slot"><img src="image/chetan.jpg" onerror="autoLoadImage(this, 'chetan', 'CH')"><span class="avatar-fallback">CH</span></div>
-            <h5 class="emp-name">Mr. Chetan</h5>
-            <p class="emp-role">Jr. Engineer</p>
-            <span class="emp-badge">DME</span>
-            <span class="emp-exp">3 Year Exp.</span>
-          </div>
-          <div class="emp-card" onclick="showProfile('ankit')">
-            <div class="photo-slot"><img src="image/ankit.jpg" onerror="autoLoadImage(this, 'ankit', 'AK')"><span class="avatar-fallback">AK</span></div>
-            <h5 class="emp-name">Mr. Ankit</h5>
-            <p class="emp-role">Jr. Engineer</p>
-            <span class="emp-badge">DME</span>
-            <span class="emp-exp">3 Year Exp.</span>
-          </div>
-          <div class="emp-card" onclick="showProfile('ajeet')">
-            <div class="photo-slot"><img src="image/ajeet.jpg" onerror="autoLoadImage(this, 'ajeet', 'AJ')"><span class="avatar-fallback">AJ</span></div>
-            <h5 class="emp-name">Mr. Ajeet</h5>
-            <p class="emp-role">Lab- Inspector</p>
-            <span class="emp-badge">B.Sc</span>
-            <span class="emp-exp">2 Year Exp.</span>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- 3. Plant Maintenance Section -->
-    <div class="section-box" id="secMaintenance" style="margin-top: 20px; display: none;">
-      <div class="section-title maint-header">🔧 PLANT MAINTENANCE & UTILITIES</div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; max-width: 900px; margin: 0 auto;">
-        
-        <div class="emp-card" onclick="showProfile('maint_head')">
-          <div class="photo-slot"><img src="image/maint_head.jpg" onerror="autoLoadImage(this, 'maint_head', 'MH')"><span class="avatar-fallback">MH</span></div>
-          <h4 class="emp-name">Maintenance Lead</h4>
-          <p class="emp-role">Sr. Engineer Maintenance</p>
-          <span class="emp-badge">B.Tech (Electrical)</span>
-          <span class="emp-exp">8+ Yrs Exp.</span>
-        </div>
-
-        <div class="emp-card" onclick="showProfile('maint_tech')">
-          <div class="photo-slot"><img src="image/maint_tech.jpg" onerror="autoLoadImage(this, 'maint_tech', 'ST')"><span class="avatar-fallback">ST</span></div>
-          <h4 class="emp-name">Shift Technician</h4>
-          <p class="emp-role">Electrical & Instruments</p>
-          <span class="emp-badge">ITI (Electrician)</span>
-          <span class="emp-exp">5+ Yrs Exp.</span>
-        </div>
-
-        <div class="emp-card" onclick="showProfile('maint_fitter')">
-          <div class="photo-slot"><img src="image/maint_fitter.jpg" onerror="autoLoadImage(this, 'maint_fitter', 'MF')"><span class="avatar-fallback">MF</span></div>
-          <h4 class="emp-name">Mechanical Fitter</h4>
-          <p class="emp-role">Furnace Utility & Mechanical</p>
-          <span class="emp-badge">ITI (Fitter)</span>
-          <span class="emp-exp">6+ Yrs Exp.</span>
-        </div>
-
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Big Detailed Profile Modal -->
-  <div class="modal-overlay" id="profileModal" onclick="closeProfile(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-      <div class="modal-header">
-        <h4 style="margin: 0; color: #f97316; font-size: 13.5px;">👤 Employee Profile Card</h4>
-        <span class="modal-close-icon" onclick="closeProfile()">&times;</span>
-      </div>
-      
-      <div class="modal-body">
-        <div class="modal-photo-wrap">
-          <img id="mPhoto" src="" onerror="autoLoadImage(this, currentProfileKey, 'MG')">
-        </div>
-
-        <div class="modal-meta">
-          <h3 class="modal-emp-name" id="mName">Employee Name</h3>
-          <p class="modal-emp-role" id="mRole">Designation</p>
-          <span class="modal-dept-chip" id="mDept">DEPARTMENT</span>
-        </div>
-
-        <div class="modal-detail-table">
-          <div class="detail-row">
-            <span class="detail-label">🎓 Qualification:</span>
-            <span class="detail-val" id="mQual" style="color: #fde047;">-</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">⭐ Total Experience:</span>
-            <span class="detail-val" id="mExp" style="color: #34d399;">-</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">🎯 Key Scope:</span>
-            <span class="detail-val" id="mFocus" style="color: #cbd5e1;">-</span>
-          </div>
-        </div>
-
-        <button onclick="closeProfile()" style="width: 100%; background: #f97316; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s;">Done / Close</button>
-      </div>
-    </div>
-  </div>
-
+  <!-- Early Execution Script to Prevent ReferenceError -->
   <script>
-    // Master Team Dataset (Safe against syntax bugs)
     const teamData = {
       anand: {
         name: "Mr ANAND BHATT",
@@ -863,26 +558,31 @@
 
     let currentProfileKey = "anand";
 
-    // Auto Image Loader (.jpg, .jpeg, .png)
     function autoLoadImage(img, baseName, initials) {
-      const exts = ['.jpeg', '.jpg', '.png', '.JPEG', '.JPG', '.PNG'];
-      let attempt = parseInt(img.dataset.attempt || '0', 10);
+      const candidates = [
+        `image/${baseName}.jpeg`,
+        `image/${baseName}.jpg`,
+        `image/${baseName}.png`,
+        `image/${baseName}.JPEG`,
+        `image/${baseName}.JPG`,
+        `${baseName}.jpeg`,
+        `${baseName}.jpg`,
+        `${baseName}.png`
+      ];
 
-      if (attempt < exts.length) {
-        img.dataset.attempt = attempt + 1;
-        img.src = `image/${baseName}${exts[attempt]}`;
-      } else if (attempt < exts.length * 2) {
-        let rootAttempt = attempt - exts.length;
-        img.dataset.attempt = attempt + 1;
-        img.src = `${baseName}${exts[rootAttempt]}`;
+      let attempt = parseInt(img.getAttribute('data-attempt') || '0', 10);
+
+      if (attempt < candidates.length) {
+        img.setAttribute('data-attempt', attempt + 1);
+        img.src = candidates[attempt];
       } else {
+        img.onerror = null;
         img.style.display = 'none';
         const fallback = img.parentElement.querySelector('.avatar-fallback');
         if (fallback) fallback.style.display = 'block';
       }
     }
 
-    // Direct Profile Open Trigger
     function showProfile(key) {
       const member = teamData[key];
       if (!member) return;
@@ -897,8 +597,12 @@
       document.getElementById('mDept').innerText = member.dept;
 
       const mPhoto = document.getElementById('mPhoto');
+      mPhoto.onerror = null;
       mPhoto.style.display = 'block';
-      mPhoto.dataset.attempt = '0';
+      mPhoto.setAttribute('data-attempt', '0');
+      mPhoto.onerror = function() {
+        autoLoadImage(mPhoto, key, 'MG');
+      };
       mPhoto.src = `image/${key}.jpeg`;
 
       document.getElementById('profileModal').style.display = 'flex';
@@ -908,7 +612,6 @@
       document.getElementById('profileModal').style.display = 'none';
     }
 
-    // Tab Navigation
     function switchOrgView(view, btn) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
@@ -944,5 +647,321 @@
       }
     }
   </script>
+</head>
+<body>
+
+  <header class="top-bar">
+    <div class="nav-left">
+      <a href="index.html" class="back-btn">⬅ Home</a>
+      <h1>👥 Plant Organization & Technical Team</h1>
+    </div>
+  </header>
+
+  <div class="main-wrapper">
+    
+    <!-- Tab Controls -->
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchOrgView('ALL', this)">🏢 Full Plant View</button>
+      <button class="tab-btn" onclick="switchOrgView('OPERATION', this)">⚙️ HT Production (Operation)</button>
+      <button class="tab-btn" onclick="switchOrgView('LAB', this)">🔬 Metallurgical Lab</button>
+      <button class="tab-btn" onclick="switchOrgView('MAINTENANCE', this)">🔧 Plant Maintenance</button>
+    </div>
+
+    <!-- 1. H.O.D (Top Level) -->
+    <div class="hod-container" id="hodSection">
+      <div class="emp-card hod-card" onclick="showProfile('anand')">
+        <div class="photo-slot">
+          <img src="image/anand.jpeg" onerror="autoLoadImage(this, 'anand', 'AB')">
+          <span class="avatar-fallback">AB</span>
+        </div>
+        <h3 class="emp-name">Mr ANAND BHATT</h3>
+        <p class="emp-role">Head of Department (H.O.D)</p>
+        <span class="emp-badge">Diploma HT & Metallurgy + B.Sc + MBA Opr Mgt.</span>
+        <span class="emp-exp">⭐ 18 Year Experience</span>
+      </div>
+    </div>
+
+    <!-- 2. Main Department Divisions -->
+    <div class="org-main-grid" id="mainTreeGrid">
+      
+      <!-- ================= LEFT PILLAR: OPERATION ================= -->
+      <div class="section-box" id="secOperation">
+        <div class="section-title op-header">⚙️ OPERATION (HEAT TREATMENT)</div>
+
+        <!-- Operation Lead -->
+        <div style="max-width: 280px; margin: 0 auto 14px auto;">
+          <div class="emp-card" onclick="showProfile('kapil')">
+            <div class="photo-slot">
+              <img src="image/kapil.jpeg" onerror="autoLoadImage(this, 'kapil', 'KR')">
+              <span class="avatar-fallback">KR</span>
+            </div>
+            <h4 class="emp-name">Mr. Kapil Raj</h4>
+            <p class="emp-role">Sr. Engineer H.T Production</p>
+            <span class="emp-badge">🎓 B.Tech</span>
+            <span class="emp-exp">5 Year Exp.</span>
+          </div>
+        </div>
+
+        <!-- 4 Sub-divisions -->
+        <div class="sub-columns-grid">
+          
+          <!-- Shift A -->
+          <div class="sub-col">
+            <div class="sub-col-header">SHIFT - A</div>
+            <div class="emp-card" onclick="showProfile('sujeet')">
+              <div class="photo-slot"><img src="image/sujeet.jpeg" onerror="autoLoadImage(this, 'sujeet', 'SK')"><span class="avatar-fallback">SK</span></div>
+              <h5 class="emp-name">Sujeet Kumar</h5>
+              <p class="emp-role">Shift Engineer</p>
+              <span class="emp-badge">B.Tech</span>
+              <span class="emp-exp">4 Year Exp.</span>
+            </div>
+            <div class="emp-card" onclick="showProfile('yaman')">
+              <div class="photo-slot"><img src="image/yaman.jpeg" onerror="autoLoadImage(this, 'yaman', 'YT')"><span class="avatar-fallback">YT</span></div>
+              <h5 class="emp-name">Yaman Tyagi</h5>
+              <p class="emp-role">Sr. Operator</p>
+              <span class="emp-badge">ITI</span>
+              <span class="emp-exp">5 Year Exp.</span>
+            </div>
+            <div class="emp-card" onclick="showProfile('vishal')">
+              <div class="photo-slot"><img src="image/vishal.jpeg" onerror="autoLoadImage(this, 'vishal', 'VK')"><span class="avatar-fallback">VK</span></div>
+              <h5 class="emp-name">Vishal Kumar</h5>
+              <p class="emp-role">Operator</p>
+              <span class="emp-badge">ITI</span>
+              <span class="emp-exp">2 Year Exp.</span>
+            </div>
+          </div>
+
+          <!-- Shift B -->
+          <div class="sub-col">
+            <div class="sub-col-header">SHIFT - B</div>
+            <div class="emp-card" onclick="showProfile('amrinder')">
+              <div class="photo-slot"><img src="image/amrinder.jpeg" onerror="autoLoadImage(this, 'amrinder', 'AY')"><span class="avatar-fallback">AY</span></div>
+              <h5 class="emp-name">Amrinder Yadav</h5>
+              <p class="emp-role">Shift Engineer</p>
+              <span class="emp-badge">B.Tech</span>
+              <span class="emp-exp">3 Year Exp.</span>
+            </div>
+            <div class="emp-card" onclick="showProfile('vivek')">
+              <div class="photo-slot"><img src="image/vivek.jpeg" onerror="autoLoadImage(this, 'vivek', 'VS')"><span class="avatar-fallback">VS</span></div>
+              <h5 class="emp-name">Vivek Siyal</h5>
+              <p class="emp-role">Sr. Operator</p>
+              <span class="emp-badge">ITI</span>
+              <span class="emp-exp">5 Year Exp.</span>
+            </div>
+            <div class="emp-card" onclick="showProfile('ajay')">
+              <div class="photo-slot"><img src="image/ajay.jpeg" onerror="autoLoadImage(this, 'ajay', 'AS')"><span class="avatar-fallback">AS</span></div>
+              <h5 class="emp-name">Ajay Saini</h5>
+              <p class="emp-role">Operator</p>
+              <span class="emp-badge">ITI</span>
+              <span class="emp-exp">2 Year Exp.</span>
+            </div>
+          </div>
+
+          <!-- Backup Man Power (Murari) -->
+          <div class="sub-col">
+            <div class="sub-col-header">BACKUP MAN POWER</div>
+            <div class="emp-card" onclick="showProfile('murari')">
+              <div class="photo-slot">
+                <img src="image/murari.jpeg" onerror="autoLoadImage(this, 'murari', 'MS')">
+                <span class="avatar-fallback">MS</span>
+              </div>
+              <h5 class="emp-name">Murari Singh</h5>
+              <p class="emp-role">Engineer</p>
+              <span class="emp-badge">DME</span>
+              <span class="emp-exp">3 Year Exp.</span>
+            </div>
+            <div class="emp-card" onclick="showProfile('surinder')">
+              <div class="photo-slot"><img src="image/surinder.jpeg" onerror="autoLoadImage(this, 'surinder', 'SR')"><span class="avatar-fallback">SR</span></div>
+              <h5 class="emp-name">Surinder</h5>
+              <p class="emp-role">Operator</p>
+              <span class="emp-badge">ITI</span>
+              <span class="emp-exp">4 Year Exp.</span>
+            </div>
+          </div>
+
+          <!-- HT PPC / SAP -->
+          <div class="sub-col">
+            <div class="sub-col-header">HT PPC / SAP</div>
+            <div class="emp-card" onclick="showProfile('aadarsh')">
+              <div class="photo-slot"><img src="image/aadarsh.jpeg" onerror="autoLoadImage(this, 'aadarsh', 'AS')"><span class="avatar-fallback">AS</span></div>
+              <h5 class="emp-name">Aadarsh Sharma</h5>
+              <p class="emp-role">PPC / SAP</p>
+              <span class="emp-badge">Diploma IT</span>
+              <span class="emp-exp">2 Year Exp.</span>
+            </div>
+            <div class="emp-card" onclick="showProfile('tarun')">
+              <div class="photo-slot"><img src="image/tarun.jpeg" onerror="autoLoadImage(this, 'tarun', 'TS')"><span class="avatar-fallback">TS</span></div>
+              <h5 class="emp-name">Tarun Sharma</h5>
+              <p class="emp-role">PPC / SAP</p>
+              <span class="emp-badge">Diploma IT</span>
+              <span class="emp-exp">1 Year Exp.</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Quality Inspector Section (Rakesh & Ravindra) -->
+        <div class="horizontal-band">
+          <div class="band-title">HT Quality Inspector (VISUAL AHT/ BHT)</div>
+          <div class="band-grid">
+            <div class="emp-card" onclick="showProfile('rakesh')">
+              <div class="photo-slot">
+                <img src="image/rakesh.jpeg" onerror="autoLoadImage(this, 'rakesh', 'RG')">
+                <span class="avatar-fallback">RG</span>
+              </div>
+              <h5 class="emp-name">Rakesh Giri</h5>
+              <p class="emp-role">HT Quality Inspector</p>
+              <span class="emp-badge">B.Tech</span>
+              <span class="emp-exp">2 Year Exp.</span>
+            </div>
+            <div class="emp-card" onclick="showProfile('ravindra')">
+              <div class="photo-slot">
+                <img src="image/ravindra.jpeg" onerror="autoLoadImage(this, 'ravindra', 'RV')">
+                <span class="avatar-fallback">RV</span>
+              </div>
+              <h5 class="emp-name">Ravinder</h5>
+              <p class="emp-role">HT Quality Inspector</p>
+              <span class="emp-badge">ITI</span>
+              <span class="emp-exp">2 Year Exp.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================= RIGHT PILLAR: METALLURGICAL LAB ================= -->
+      <div class="section-box" id="secLab">
+        <div class="section-title lab-header">🔬 METALLURGICAL LAB</div>
+
+        <!-- Lab Lead (Rahul Rai) -->
+        <div style="max-width: 280px; margin: 0 auto 10px auto;">
+          <div class="emp-card" onclick="showProfile('rahul')">
+            <div class="photo-slot">
+              <img src="image/rahul.jpeg" onerror="autoLoadImage(this, 'rahul', 'RR')">
+              <span class="avatar-fallback">RR</span>
+            </div>
+            <h4 class="emp-name">Mr. Rahul Rai</h4>
+            <p class="emp-role">Sr. Engineer LAB</p>
+            <span class="emp-badge">🎓 B.Tech</span>
+            <span class="emp-exp">4 Year Exp.</span>
+          </div>
+        </div>
+
+        <!-- Engineer LAB (Pankaj) -->
+        <div style="max-width: 280px; margin: 0 auto 12px auto;">
+          <div class="emp-card" onclick="showProfile('pankaj')">
+            <div class="photo-slot">
+              <img src="image/pankaj.jpeg" onerror="autoLoadImage(this, 'pankaj', 'PK')">
+              <span class="avatar-fallback">PK</span>
+            </div>
+            <h4 class="emp-name">Mr. Pankaj</h4>
+            <p class="emp-role">Engineer LAB</p>
+            <span class="emp-badge">🎓 B.Tech</span>
+            <span class="emp-exp">4 Year Exp.</span>
+          </div>
+        </div>
+
+        <!-- 3 Lab Team Members (Chetan, Ankit, Ajeet) -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px;">
+          <div class="emp-card" onclick="showProfile('chetan')">
+            <div class="photo-slot"><img src="image/chetan.jpeg" onerror="autoLoadImage(this, 'chetan', 'CH')"><span class="avatar-fallback">CH</span></div>
+            <h5 class="emp-name">Mr. Chetan</h5>
+            <p class="emp-role">Jr. Engineer</p>
+            <span class="emp-badge">DME</span>
+            <span class="emp-exp">3 Year Exp.</span>
+          </div>
+          <div class="emp-card" onclick="showProfile('ankit')">
+            <div class="photo-slot"><img src="image/ankit.jpeg" onerror="autoLoadImage(this, 'ankit', 'AK')"><span class="avatar-fallback">AK</span></div>
+            <h5 class="emp-name">Mr. Ankit</h5>
+            <p class="emp-role">Jr. Engineer</p>
+            <span class="emp-badge">DME</span>
+            <span class="emp-exp">3 Year Exp.</span>
+          </div>
+          <div class="emp-card" onclick="showProfile('ajeet')">
+            <div class="photo-slot"><img src="image/ajeet.jpeg" onerror="autoLoadImage(this, 'ajeet', 'AJ')"><span class="avatar-fallback">AJ</span></div>
+            <h5 class="emp-name">Mr. Ajeet</h5>
+            <p class="emp-role">Lab- Inspector</p>
+            <span class="emp-badge">B.Sc</span>
+            <span class="emp-exp">2 Year Exp.</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- 3. Plant Maintenance Section -->
+    <div class="section-box" id="secMaintenance" style="margin-top: 20px; display: none;">
+      <div class="section-title maint-header">🔧 PLANT MAINTENANCE & UTILITIES</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; max-width: 900px; margin: 0 auto;">
+        
+        <div class="emp-card" onclick="showProfile('maint_head')">
+          <div class="photo-slot"><img src="image/maint_head.jpeg" onerror="autoLoadImage(this, 'maint_head', 'MH')"><span class="avatar-fallback">MH</span></div>
+          <h4 class="emp-name">Maintenance Lead</h4>
+          <p class="emp-role">Sr. Engineer Maintenance</p>
+          <span class="emp-badge">B.Tech (Electrical)</span>
+          <span class="emp-exp">8+ Yrs Exp.</span>
+        </div>
+
+        <div class="emp-card" onclick="showProfile('maint_tech')">
+          <div class="photo-slot"><img src="image/maint_tech.jpeg" onerror="autoLoadImage(this, 'maint_tech', 'ST')"><span class="avatar-fallback">ST</span></div>
+          <h4 class="emp-name">Shift Technician</h4>
+          <p class="emp-role">Electrical & Instruments</p>
+          <span class="emp-badge">ITI (Electrician)</span>
+          <span class="emp-exp">5+ Yrs Exp.</span>
+        </div>
+
+        <div class="emp-card" onclick="showProfile('maint_fitter')">
+          <div class="photo-slot"><img src="image/maint_fitter.jpeg" onerror="autoLoadImage(this, 'maint_fitter', 'MF')"><span class="avatar-fallback">MF</span></div>
+          <h4 class="emp-name">Mechanical Fitter</h4>
+          <p class="emp-role">Furnace Utility & Mechanical</p>
+          <span class="emp-badge">ITI (Fitter)</span>
+          <span class="emp-exp">6+ Yrs Exp.</span>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Big Detailed Profile Modal -->
+  <div class="modal-overlay" id="profileModal" onclick="closeProfile(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h4 style="margin: 0; color: #f97316; font-size: 13.5px;">👤 Employee Profile Card</h4>
+        <span class="modal-close-icon" onclick="closeProfile()">&times;</span>
+      </div>
+      
+      <div class="modal-body">
+        <div class="modal-photo-wrap">
+          <img id="mPhoto" src="" onerror="autoLoadImage(this, currentProfileKey, 'MG')">
+        </div>
+
+        <div class="modal-meta">
+          <h3 class="modal-emp-name" id="mName">Employee Name</h3>
+          <p class="modal-emp-role" id="mRole">Designation</p>
+          <span class="modal-dept-chip" id="mDept">DEPARTMENT</span>
+        </div>
+
+        <div class="modal-detail-table">
+          <div class="detail-row">
+            <span class="detail-label">🎓 Qualification:</span>
+            <span class="detail-val" id="mQual" style="color: #fde047;">-</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">⭐ Total Experience:</span>
+            <span class="detail-val" id="mExp" style="color: #34d399;">-</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">🎯 Key Scope:</span>
+            <span class="detail-val" id="mFocus" style="color: #cbd5e1;">-</span>
+          </div>
+        </div>
+
+        <button onclick="closeProfile()" style="width: 100%; background: #f97316; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s;">Done / Close</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
