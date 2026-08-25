@@ -237,7 +237,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .btn-full-sip {
+    .view-sip-btn {
       background: #0284c7;
       color: white;
       border: none;
@@ -252,7 +252,7 @@
       align-items: center;
       gap: 6px;
     }
-    .btn-full-sip:hover { background: #0369a1; }
+    .view-sip-btn:hover { background: #0369a1; }
 
     /* Locked State Screen */
     .locked-section-box {
@@ -512,7 +512,7 @@
 
       .sip-card { flex-direction: column; align-items: stretch; padding: 8px; }
       .sip-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
-      .btn-full-sip { width: 100%; text-align: center; padding: 8px; justify-content: center; }
+      .view-sip-btn { width: 100%; text-align: center; padding: 8px; justify-content: center; }
       .locked-section-box { padding: 18px 10px; }
       .login-form-wrap { width: 100%; }
       .table-top-meta { font-size: 11px; }
@@ -638,7 +638,7 @@
       </div>
     </div>
 
-    <!-- 3. Dynamic Live SIP Specs Ribbon -->
+    <!-- 3. Dynamic Live SIP Specs Ribbon with Direct PDF Button -->
     <div class="sip-card">
       <div class="sip-grid">
         <div class="sip-param-box" style="border-color: #38bdf8;">
@@ -672,7 +672,7 @@
         </div>
       </div>
 
-      <button class="btn-full-sip" onclick="openFullSIPModal()">📑 View Full SIP (PDF)</button>
+      <button id="viewSipBtn" class="view-sip-btn" onclick="openSipPdf()" data-url="https://drive.google.com/file/d/1CNZujlalyUkB0gv96UgYbHXKkDfErmdD/view?usp=drivesdk">📑 View Full SIP (PDF)</button>
     </div>
 
     <!-- 4. Hidden / Locked Section for Process Matrix -->
@@ -749,7 +749,7 @@
           <a id="modalOpenExternal" href="#" target="_blank" style="color: #fde047; text-decoration: none; font-weight: 600;">↗ Open in Full Tab</a>
         </div>
         
-        <!-- Embedded PDF Viewer -->
+        <!-- Interactive PDF Embed -->
         <iframe id="sipPdfFrame" class="pdf-viewer-frame" src=""></iframe>
       </div>
     </div>
@@ -760,8 +760,9 @@
     const PROCESS_LOG_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=529980778&single=true&output=csv";
     const WEIGHT_LIST_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=373153751&single=true&output=csv";
 
-    // Live Master Store
+    // Default In-Memory Master Store
     let liveWeightMaster = {
+      "33003": { desc: "COMPONENT 33003", weight: 1.20, batchQty: 500, pdfLink: "https://drive.google.com/file/d/1CNZujlalyUkB0gv96UgYbHXKkDfErmdD/view?usp=drivesdk" },
       "2105": { desc: "BULL GEAR", weight: 3.20, batchQty: 480, pdfLink: "" },
       "2106": { desc: "PINION SHAFT", weight: 2.10, batchQty: 350, pdfLink: "" },
       "2107": { desc: "INPUT GEAR", weight: 1.85, batchQty: 600, pdfLink: "" }
@@ -835,6 +836,65 @@
       return null;
     }
 
+    // Smart Column Header Detector for Weight List CSV
+    function processWeightListSheet(parsedRows) {
+      if (!parsedRows || parsedRows.length < 2) return;
+
+      let headerIdx = 0;
+      let partCol = -1, weightCol = -1, batchCol = -1, descCol = -1, pdfCol = -1;
+
+      for (let i = 0; i < Math.min(parsedRows.length, 5); i++) {
+        const rowStr = parsedRows[i].join(' ').toLowerCase();
+        if (rowStr.includes('part') || rowStr.includes('weight') || rowStr.includes('wt') || rowStr.includes('item')) {
+          headerIdx = i;
+          parsedRows[i].forEach((h, colIdx) => {
+            const cleanH = h.toLowerCase().trim();
+            if (cleanH.includes('part') || cleanH.includes('item') || cleanH.includes('component')) partCol = colIdx;
+            if (cleanH.includes('wt') || cleanH.includes('weight')) weightCol = colIdx;
+            if (cleanH.includes('batch') || cleanH.includes('lot') || cleanH.includes('qty')) batchCol = colIdx;
+            if (cleanH.includes('desc') || cleanH.includes('name')) descCol = colIdx;
+            if (cleanH.includes('pdf') || cleanH.includes('sip') || cleanH.includes('link') || cleanH.includes('drive')) pdfCol = colIdx;
+          });
+          break;
+        }
+      }
+
+      // Default fallback column positions if headers weren't named
+      if (partCol === -1) partCol = 0;
+      if (weightCol === -1) weightCol = 1;
+      if (batchCol === -1) batchCol = 2;
+
+      for (let i = headerIdx + 1; i < parsedRows.length; i++) {
+        const r = parsedRows[i];
+        if (!r || r.length <= partCol) continue;
+
+        const pNo = String(r[partCol] || '').trim().toUpperCase();
+        if (!pNo) continue;
+
+        let pWt = 1.20;
+        if (weightCol !== -1 && r[weightCol]) {
+          const parsedNum = parseFloat(String(r[weightCol]).replace(/[^0-9.]/g, ''));
+          if (!isNaN(parsedNum) && parsedNum > 0) pWt = parsedNum;
+        }
+
+        let pBatch = 0;
+        if (batchCol !== -1 && r[batchCol]) {
+          const parsedB = parseFloat(String(r[batchCol]).replace(/[^0-9.]/g, ''));
+          if (!isNaN(parsedB) && parsedB > 0) pBatch = parsedB;
+        }
+
+        const pDesc = (descCol !== -1 && r[descCol]) ? r[descCol] : `PART ${pNo}`;
+        const pPdf = (pdfCol !== -1 && r[pdfCol]) ? r[pdfCol] : '';
+
+        liveWeightMaster[pNo] = {
+          desc: pDesc,
+          weight: pWt,
+          batchQty: pBatch,
+          pdfLink: pPdf
+        };
+      }
+    }
+
     // Dual Loader: Process Log + Weight List
     async function loadAllLiveSheets(forceSync = false) {
       const badge = document.getElementById('dataSourceBadge');
@@ -844,28 +904,10 @@
       }
 
       // 1. Fetch Weight List Sheet
-      const wtCSV = await fetchCSVWithProxy("https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=373153751&single=true&output=csv");
+      const wtCSV = await fetchCSVWithProxy(WEIGHT_LIST_CSV_URL);
       if (wtCSV) {
         const parsedWt = parseCSVData(wtCSV);
-        if (parsedWt.length > 1) {
-          parsedWt.shift(); // Remove header
-          parsedWt.forEach(row => {
-            const pNo = String(row[0] || '').trim().toUpperCase();
-            const pDesc = row[1] || `PART ${pNo}`;
-            const pWt = parseFloat(row[2]) || 1.20;
-            const pBatch = parseFloat(row[3]) || 0;
-            const pPdf = row[4] || '';
-
-            if (pNo) {
-              liveWeightMaster[pNo] = {
-                desc: pDesc,
-                weight: pWt,
-                batchQty: pBatch,
-                pdfLink: pPdf
-              };
-            }
-          });
-        }
+        processWeightListSheet(parsedWt);
       }
 
       // 2. Fetch Process Log Sheet
@@ -897,12 +939,15 @@
     function getComponentWeight(partNo) {
       if (!partNo) return 1.20;
       const clean = String(partNo).trim().toUpperCase();
-      if (liveWeightMaster[clean]) return liveWeightMaster[clean].weight;
-
-      for (const k in liveWeightMaster) {
-        if (clean.includes(k) || k.includes(clean)) return liveWeightMaster[k].weight;
+      if (liveWeightMaster[clean] && liveWeightMaster[clean].weight > 0) {
+        return liveWeightMaster[clean].weight;
       }
-      return ; // Default exact fallback for 3003
+      for (const k in liveWeightMaster) {
+        if (clean.includes(k) || k.includes(clean)) {
+          return liveWeightMaster[k].weight;
+        }
+      }
+      return 1.20; // Exact fallback
     }
 
     function getComponentBatchQty(partNo, fallbackQty) {
@@ -1129,26 +1174,43 @@
       applyAllFilters();
     }
 
-    // Direct Embedded In-App PDF Modal
-    function openFullSIPModal() {
-      document.getElementById('modalPartName').innerText = `Part No: ${currentActivePart}`;
-      document.getElementById('modalSipTitle').innerText = `📑 Standard Inspection Plan (SIP) - Part ${currentActivePart}`;
-      
-      const frame = document.getElementById('sipPdfFrame');
+    // Direct In-App Google Drive PDF Viewer
+    function openSipPdf() {
+      const btn = document.getElementById('viewSipBtn');
       const cleanKey = String(currentActivePart).trim().toUpperCase();
 
-      let targetPdfUrl = `sip/${currentActivePart}.pdf`;
+      // Priority: 1. Button data-url, 2. Live weight master link, 3. Default Drive PDF
+      let directUrl = btn ? btn.getAttribute('data-url') : "";
       if (liveWeightMaster[cleanKey] && liveWeightMaster[cleanKey].pdfLink) {
-        let driveLink = liveWeightMaster[cleanKey].pdfLink;
-        if (driveLink.includes('/view')) {
-          driveLink = driveLink.replace('/view', '/preview');
-        }
-        targetPdfUrl = driveLink;
+        directUrl = liveWeightMaster[cleanKey].pdfLink;
+      }
+      if (!directUrl) {
+        directUrl = "https://drive.google.com/file/d/1CNZujlalyUkB0gv96UgYbHXKkDfErmdD/view?usp=drivesdk";
       }
 
-      frame.src = targetPdfUrl;
-      document.getElementById('modalOpenExternal').href = targetPdfUrl;
+      // Convert Drive view link to direct embed preview
+      let embedPreviewUrl = directUrl;
+      const match = directUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (match && match[1]) {
+        embedPreviewUrl = `https://drive.google.com/file/d/${match[1]}/preview`;
+      } else if (directUrl.includes('/view')) {
+        embedPreviewUrl = directUrl.replace('/view', '/preview');
+      }
+
+      document.getElementById('modalPartName').innerText = `Part No: ${currentActivePart}`;
+      document.getElementById('modalSipTitle').innerText = `📑 SIP Document - Part ${currentActivePart}`;
+      
+      const frame = document.getElementById('sipPdfFrame');
+      frame.src = embedPreviewUrl;
+
+      const fullTabLink = document.getElementById('modalOpenExternal');
+      fullTabLink.href = directUrl;
+
       document.getElementById('sipModal').style.display = 'flex';
+    }
+
+    function openFullSIPModal() {
+      openSipPdf();
     }
 
     function closeFullSIPModal() {
