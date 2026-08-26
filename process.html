@@ -208,7 +208,7 @@
     .ribbon-meta h5 { margin: 0; font-size: 9px; color: #94a3b8; text-transform: uppercase; font-weight: 600; letter-spacing: 0.2px; }
     .ribbon-meta p { margin: 2px 0 0 0; font-size: 12.5px; font-weight: 700; color: #38bdf8; }
 
-    /* Compact SIP Specs Ribbon (Updated with Material Grade) */
+    /* Compact SIP Specs Ribbon */
     .sip-card {
       background: #172033;
       border: 1px solid #0284c7;
@@ -223,7 +223,7 @@
     }
     .sip-grid {
       display: grid;
-      grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr 1fr 1fr;
+      grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr 1fr;
       gap: 8px;
       flex: 1;
     }
@@ -503,7 +503,7 @@
     </div>
     <div class="sync-badge-group">
       <div class="sync-badge-row">
-        <!-- Clean Status: Only LIVE symbol as requested -->
+        <!-- Clean Status: Only LIVE symbol -->
         <span id="dataSourceBadge" style="font-size: 11px; font-weight: 600; color: #34d399;">🟢 LIVE</span>
         <button class="live-sync-btn" onclick="loadAllLiveSheets(true)" title="Force sync latest entries">⚡ Sync</button>
       </div>
@@ -622,7 +622,7 @@
       </div>
     </div>
 
-    <!-- 3. Dynamic Live SIP Specs Ribbon (Updated with Material Grade, Part Name, S.H, ECD, Core as per SIP P0003) -->
+    <!-- 3. Dynamic Live SIP Specs Ribbon -->
     <div class="sip-card">
       <div class="sip-grid">
         <div class="sip-param-box comp-box">
@@ -833,7 +833,6 @@
       return null;
     }
 
-    // Weight List Processor supporting MS No, Material Grade, Specs, and PDF Links from Sheet
     function processWeightListSheet(parsedRows) {
       if (!parsedRows || parsedRows.length < 2) return;
 
@@ -896,10 +895,10 @@
         }
 
         const pDesc = (descCol !== -1 && r[descCol]) ? r[descCol] : 'Main Shaft';
-        const pGrade = (gradeCol !== -1 && r[gradeCol]) ? r[gradeCol] : '20MnCr5';
-        const pSH = (shCol !== -1 && r[shCol]) ? r[shCol] : '59-63 HRC';
-        const pCore = (coreCol !== -1 && r[coreCol]) ? r[coreCol] : 'LCTM + Bainitic';
-        const pECD = (ecdCol !== -1 && r[ecdCol]) ? r[ecdCol] : '0.75-1.0 mm';
+        const pGrade = (gradeCol !== -1 && r[gradeCol]) ? r[gradeCol] : '-';
+        const pSH = (shCol !== -1 && r[shCol]) ? r[shCol] : '-';
+        const pCore = (coreCol !== -1 && r[coreCol]) ? r[coreCol] : '-';
+        const pECD = (ecdCol !== -1 && r[ecdCol]) ? r[ecdCol] : '-';
         const pPdf = (pdfCol !== -1 && r[pdfCol]) ? String(r[pdfCol]).trim() : '';
 
         liveWeightMaster[pNo] = {
@@ -952,8 +951,6 @@
     function updateLastSyncText(ok) {
       const el = document.getElementById('lastSyncText');
       if (!el) return;
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       el.innerText = ok ? 'Live' : 'Syncing...';
     }
 
@@ -1044,7 +1041,7 @@
           return liveWeightMaster[k];
         }
       }
-      return { desc: 'Main Shaft', grade: '20MnCr5', sh: '59-63 HRC', core: 'LCTM + Bainitic', ecd: '0.75-1.0 mm', pdfLink: '' };
+      return { desc: `MS PART ${partNo}`, grade: '-', sh: '-', core: '-', ecd: '-', pdfLink: '' };
     }
 
     function applyAllFilters() {
