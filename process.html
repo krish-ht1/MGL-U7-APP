@@ -503,7 +503,6 @@
     </div>
     <div class="sync-badge-group">
       <div class="sync-badge-row">
-        <!-- Clean Status: Only LIVE symbol -->
         <span id="dataSourceBadge" style="font-size: 11px; font-weight: 600; color: #34d399;">🟢 LIVE</span>
         <button class="live-sync-btn" onclick="loadAllLiveSheets(true)" title="Force sync latest entries">⚡ Sync</button>
       </div>
@@ -514,7 +513,7 @@
   <div class="dashboard-container">
 
     <div class="file-warning-banner" id="fileModeWarning">
-      ⚠️ <b>Ye file abhi seedhe C: drive se (file://) khul rahi hai.</b> Local server se open karo (e.g. <code>python -m http.server 8000</code>).
+      ⚠️ <b>Ye file abhi seedhe C: drive से (file://) खुल रही है।</b> Local server से open करें (e.g. <code>python -m http.server 8000</code>).
     </div>
 
     <!-- 1. Search and Filters -->
@@ -647,7 +646,7 @@
         </div>
 
         <div class="sip-param-box">
-          <span>Core Structure</span>
+          <span>Core Hardness</span>
           <strong id="sipCore">-</strong>
         </div>
 
@@ -674,7 +673,7 @@
       </form>
     </div>
 
-    <!-- 5. Main 21-Column Data Table with Monthly Breakdowns -->
+    <!-- 5. Main Data Table with Monthly Breakdowns -->
     <div class="table-card" id="unlockedTableSection">
       <div class="table-top-meta">
         <span style="color:#34d399; font-weight: 600;">🔓 Cycle Matrix (<span id="activeUserBadge">Authorized</span>)</span>
@@ -722,12 +721,15 @@
   </div>
 
   <script>
+    // Separate Independent Google Sheet URLs (No Data Mixing)
     const PROCESS_LOG_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=529980778&single=true&output=csv";
     const WEIGHT_LIST_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=373153751&single=true&output=csv";
+    const MASTER_SIP_CSV_URL  = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR2XoCQTy6ylgyNHQHqSy8pO4KU7GvDhh1sINw_FMzDQ1Ryl3oqc6cXl8sx--wxF211TQI6OinrkXNA/pub?gid=1496498963&single=true&output=csv";
 
     const AUTO_REFRESH_MS = 3 * 60 * 1000;
 
     let liveWeightMaster = {};
+    let masterSIPMap = {};
     let masterLogs = [];
     let logColMap = {};
     let isSectionUnlocked = false;
@@ -833,11 +835,12 @@
       return null;
     }
 
+    // 1. Process Weight List Sheet
     function processWeightListSheet(parsedRows) {
       if (!parsedRows || parsedRows.length < 2) return;
 
       let headerIdx = 0;
-      let partCol = 0, weightPerPieceCol = -1, batchQtyCol = -1, totalWtCol = -1, descCol = -1, gradeCol = -1, shCol = -1, coreCol = -1, ecdCol = -1, pdfCol = -1;
+      let partCol = 0, weightPerPieceCol = -1, batchQtyCol = -1, totalWtCol = -1;
 
       for (let i = 0; i < Math.min(parsedRows.length, 6); i++) {
         const rowStr = parsedRows[i].join(' ').toLowerCase();
@@ -849,12 +852,6 @@
             if (cleanH.includes('weight per piece') || cleanH.includes('wt/pc') || (cleanH.includes('weight') && !cleanH.includes('total') && !cleanH.includes('batch'))) weightPerPieceCol = colIdx;
             if (cleanH.includes('batch') || cleanH.includes('lot') || cleanH.includes('qty') || cleanH.includes('nos')) batchQtyCol = colIdx;
             if (cleanH.includes('total wt') || cleanH.includes('total weight') || cleanH.includes('batch wt')) totalWtCol = colIdx;
-            if (cleanH.includes('desc') || cleanH.includes('name') || cleanH.includes('component')) descCol = colIdx;
-            if (cleanH.includes('grade') || cleanH.includes('material')) gradeCol = colIdx;
-            if (cleanH.includes('surface') || cleanH.includes('s.h') || cleanH.includes('hardness')) shCol = colIdx;
-            if (cleanH.includes('core')) coreCol = colIdx;
-            if (cleanH.includes('ecd') || cleanH.includes('depth')) ecdCol = colIdx;
-            if (cleanH.includes('pdf') || cleanH.includes('sip') || cleanH.includes('link') || cleanH.includes('drive')) pdfCol = colIdx;
           });
           break;
         }
@@ -894,22 +891,61 @@
           totalBatchWt = unitWt * pBatch;
         }
 
-        const pDesc = (descCol !== -1 && r[descCol]) ? r[descCol] : 'Main Shaft';
-        const pGrade = (gradeCol !== -1 && r[gradeCol]) ? r[gradeCol] : '-';
-        const pSH = (shCol !== -1 && r[shCol]) ? r[shCol] : '-';
-        const pCore = (coreCol !== -1 && r[coreCol]) ? r[coreCol] : '-';
-        const pECD = (ecdCol !== -1 && r[ecdCol]) ? r[ecdCol] : '-';
-        const pPdf = (pdfCol !== -1 && r[pdfCol]) ? String(r[pdfCol]).trim() : '';
-
         liveWeightMaster[pNo] = {
-          desc: pDesc,
-          grade: pGrade,
-          sh: pSH,
-          core: pCore,
-          ecd: pECD,
           weight: unitWt,
           totalBatchWeight: totalBatchWt,
-          batchQty: pBatch,
+          batchQty: pBatch
+        };
+      }
+    }
+
+    // 2. Process Master SIP Sheet (User's New Google Sheet)
+    function processMasterSIPSheet(parsedRows) {
+      if (!parsedRows || parsedRows.length < 2) return;
+
+      let headerIdx = 0;
+      let partCol = 0, nameCol = -1, gradeCol = -1, shCol = -1, ecdCol = -1, coreCol = -1, pdfCol = -1;
+
+      for (let i = 0; i < Math.min(parsedRows.length, 6); i++) {
+        const rowStr = parsedRows[i].join(' ').toLowerCase();
+        if (rowStr.includes('ms') || rowStr.includes('part') || rowStr.includes('sip') || rowStr.includes('grade')) {
+          headerIdx = i;
+          parsedRows[i].forEach((h, colIdx) => {
+            const cleanH = h.toLowerCase().trim();
+            if (cleanH.includes('ms') || cleanH.includes('sip no') || cleanH.includes('part no') || cleanH.includes('code')) partCol = colIdx;
+            else if (cleanH.includes('name') || cleanH.includes('desc')) nameCol = colIdx;
+            else if (cleanH.includes('grade') || cleanH.includes('material')) gradeCol = colIdx;
+            else if (cleanH.includes('surface') || cleanH.includes('s.h') || cleanH.includes('hardness')) shCol = colIdx;
+            else if (cleanH.includes('ecd') || cleanH.includes('depth')) ecdCol = colIdx;
+            else if (cleanH.includes('core')) coreCol = colIdx;
+            else if (cleanH.includes('pdf') || cleanH.includes('link') || cleanH.includes('drive')) pdfCol = colIdx;
+          });
+          break;
+        }
+      }
+
+      masterSIPMap = {};
+
+      for (let i = headerIdx + 1; i < parsedRows.length; i++) {
+        const r = parsedRows[i];
+        if (!r || r.length <= partCol) continue;
+
+        const pNo = String(r[partCol] || '').trim().toUpperCase();
+        if (!pNo) continue;
+
+        const pName = (nameCol !== -1 && r[nameCol]) ? r[nameCol] : '-';
+        const pGrade = (gradeCol !== -1 && r[gradeCol]) ? r[gradeCol] : '-';
+        const pSH = (shCol !== -1 && r[shCol]) ? r[shCol] : '-';
+        const pECD = (ecdCol !== -1 && r[ecdCol]) ? r[ecdCol] : '-';
+        const pCore = (coreCol !== -1 && r[coreCol]) ? r[coreCol] : '-';
+        const pPdf = (pdfCol !== -1 && r[pdfCol]) ? String(r[pdfCol]).trim() : '';
+
+        masterSIPMap[pNo] = {
+          desc: pName,
+          grade: pGrade,
+          sh: pSH,
+          ecd: pECD,
+          core: pCore,
           pdfLink: pPdf
         };
       }
@@ -957,7 +993,19 @@
     async function loadAllLiveSheets(forceSync = false) {
       let logSuccess = false;
       let wtSuccess = false;
+      let sipSuccess = false;
 
+      // 1. Fetch Master SIP Sheet
+      try {
+        const sipCSV = await fetchCSVData(MASTER_SIP_CSV_URL);
+        if (sipCSV) {
+          const parsedSIP = parseCSVData(sipCSV);
+          processMasterSIPSheet(parsedSIP);
+          sipSuccess = true;
+        }
+      } catch (e) {}
+
+      // 2. Fetch Weight List Sheet
       try {
         const wtCSV = await fetchCSVData(WEIGHT_LIST_CSV_URL);
         if (wtCSV) {
@@ -967,6 +1015,7 @@
         }
       } catch (e) {}
 
+      // 3. Fetch Process Log Sheet
       try {
         const logCSV = await fetchCSVData(PROCESS_LOG_CSV_URL);
         if (logCSV) {
@@ -983,7 +1032,7 @@
         }
       } catch (e) {}
 
-      updateLastSyncText(logSuccess || wtSuccess);
+      updateLastSyncText(logSuccess || wtSuccess || sipSuccess);
       masterLogs.sort((a, b) => parseCustomDate(b[logColMap.date || 0]) - parseCustomDate(a[logColMap.date || 0]));
       applyAllFilters();
     }
@@ -1030,18 +1079,38 @@
       return null;
     }
 
+    // Strict Fallback: Shows '-' if data is missing, no junk values
     function getComponentDetails(partNo) {
       if (!partNo) return { desc: '-', grade: '-', sh: '-', core: '-', ecd: '-', pdfLink: '' };
       const clean = String(partNo).trim().toUpperCase();
-      if (liveWeightMaster[clean]) {
-        return liveWeightMaster[clean];
+      
+      if (masterSIPMap[clean]) {
+        const item = masterSIPMap[clean];
+        return {
+          desc: item.desc && item.desc !== "" ? item.desc : `-`,
+          grade: item.grade && item.grade !== "" ? item.grade : `-`,
+          sh: item.sh && item.sh !== "" ? item.sh : `-`,
+          core: item.core && item.core !== "" ? item.core : `-`,
+          ecd: item.ecd && item.ecd !== "" ? item.ecd : `-`,
+          pdfLink: item.pdfLink || ''
+        };
       }
-      for (const k in liveWeightMaster) {
+
+      for (const k in masterSIPMap) {
         if (clean.includes(k) || k.includes(clean)) {
-          return liveWeightMaster[k];
+          const item = masterSIPMap[k];
+          return {
+            desc: item.desc && item.desc !== "" ? item.desc : `-`,
+            grade: item.grade && item.grade !== "" ? item.grade : `-`,
+            sh: item.sh && item.sh !== "" ? item.sh : `-`,
+            core: item.core && item.core !== "" ? item.core : `-`,
+            ecd: item.ecd && item.ecd !== "" ? item.ecd : `-`,
+            pdfLink: item.pdfLink || ''
+          };
         }
       }
-      return { desc: `MS PART ${partNo}`, grade: '-', sh: '-', core: '-', ecd: '-', pdfLink: '' };
+
+      return { desc: `-`, grade: `-`, sh: `-`, core: `-`, ecd: `-`, pdfLink: '' };
     }
 
     function applyAllFilters() {
@@ -1265,13 +1334,13 @@
       }
 
       if (!currentActivePdfLink) {
-        // Direct popup search on Google Drive for this specific MS Number matching SIP standards
         const searchFallbackUrl = `https://drive.google.com/drive/search?q=${encodeURIComponent(currentActivePart)}`;
         window.open(searchFallbackUrl, '_blank', 'width=1000,height=700');
         return;
       }
 
-      window.open(bustCache(currentActivePdfLink), '_blank', 'width=1000,height=700');
+      const finalPdfUrl = normalizeDriveLink(currentActivePdfLink);
+      window.open(bustCache(finalPdfUrl), '_blank', 'width=1000,height=700');
     }
 
     window.addEventListener('DOMContentLoaded', () => {
