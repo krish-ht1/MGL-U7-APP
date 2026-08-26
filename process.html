@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <!-- Prevent the BROWSER itself from caching this HTML file -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -545,7 +544,7 @@
           <input 
             type="text" 
             id="searchBox" 
-            placeholder="Search Part (e.g. 33003, 3001), Batch, Heat Code, Customer..." 
+            placeholder="Search Part / MS No (e.g. 33003, 3001), Batch, Heat Code, Customer..." 
             oninput="applyAllFilters()"
           >
         </div>
@@ -646,7 +645,7 @@
         <div class="sip-param-box comp-box">
           <span>Component Name</span>
           <strong id="sipCompName">-</strong>
-          <span class="part-sub-badge">Part No: <b id="sipPartNo" style="color: #fde047;">-</b></span>
+          <span class="part-sub-badge">MS No: <b id="sipPartNo" style="color: #fde047;">-</b></span>
         </div>
 
         <div class="sip-param-box" style="border-color: #f97316;">
@@ -708,7 +707,7 @@
             <tr>
               <th>DATE</th>
               <th>CUSTOMER NAME</th>
-              <th>PART NO</th>
+              <th>MS NO / PART NO</th>
               <th>BATCH NO</th>
               <th>HEAT CODE</th>
               <th>F/C NO</th>
@@ -857,6 +856,7 @@
       return null;
     }
 
+    // Weight List Sheet Processor (Pulls Unit Weight, Batch Qty, Description & Drive PDF Link directly from sheet)
     function processWeightListSheet(parsedRows) {
       if (!parsedRows || parsedRows.length < 2) return;
 
@@ -865,11 +865,11 @@
 
       for (let i = 0; i < Math.min(parsedRows.length, 6); i++) {
         const rowStr = parsedRows[i].join(' ').toLowerCase();
-        if (rowStr.includes('part') || rowStr.includes('weight') || rowStr.includes('wt') || rowStr.includes('item')) {
+        if (rowStr.includes('part') || rowStr.includes('ms') || rowStr.includes('weight') || rowStr.includes('wt') || rowStr.includes('item')) {
           headerIdx = i;
           parsedRows[i].forEach((h, colIdx) => {
             const cleanH = h.toLowerCase().trim();
-            if (cleanH.includes('part') || cleanH.includes('item') || cleanH.includes('code') || cleanH.includes('pnr')) partCol = colIdx;
+            if (cleanH.includes('part') || cleanH.includes('item') || cleanH.includes('code') || cleanH.includes('pnr') || cleanH.includes('ms')) partCol = colIdx;
             if (cleanH.includes('wt') || cleanH.includes('weight') || cleanH.includes('unit')) weightCol = colIdx;
             if (cleanH.includes('batch') || cleanH.includes('lot') || cleanH.includes('qty')) batchCol = colIdx;
             if (cleanH.includes('desc') || cleanH.includes('name') || cleanH.includes('component')) descCol = colIdx;
@@ -900,7 +900,7 @@
           if (!isNaN(parsedB) && parsedB > 0) pBatch = parsedB;
         }
 
-        const pDesc = (descCol !== -1 && r[descCol]) ? r[descCol] : `PART ${pNo}`;
+        const pDesc = (descCol !== -1 && r[descCol]) ? r[descCol] : `MS PART ${pNo}`;
         const pPdf = (pdfCol !== -1 && r[pdfCol]) ? String(r[pdfCol]).trim() : '';
 
         liveWeightMaster[pNo] = {
@@ -923,7 +923,7 @@
         const clean = String(h || '').toLowerCase().replace(/[^a-z0-9]/g, '');
         if (clean.includes('date')) logColMap.date = idx;
         else if (clean.includes('cust')) logColMap.cust = idx;
-        else if (clean.includes('part') || clean.includes('item') || clean.includes('pnr')) logColMap.part = idx;
+        else if (clean.includes('part') || clean.includes('item') || clean.includes('pnr') || clean.includes('ms')) logColMap.part = idx;
         else if (clean.includes('batch')) logColMap.batch = idx;
         else if (clean.includes('heat')) logColMap.heat = idx;
         else if (clean.includes('fc') || clean.includes('furnace')) logColMap.fc = idx;
@@ -978,7 +978,7 @@
           const parsedLogs = parseCSVData(logCSV);
           if (parsedLogs.length > 0) {
             const firstRowStr = parsedLogs[0].join(' ').toLowerCase();
-            if (firstRowStr.includes('date') || firstRowStr.includes('customer') || firstRowStr.includes('part')) {
+            if (firstRowStr.includes('date') || firstRowStr.includes('customer') || firstRowStr.includes('part') || firstRowStr.includes('ms')) {
               processLogHeaders(parsedLogs[0]);
               parsedLogs.shift();
             }
@@ -990,23 +990,23 @@
 
       if (logSuccess && wtSuccess) {
         if (badge) {
-          badge.innerHTML = "🟢 Live — Process + Weight/PDF List Merged";
+          badge.innerHTML = "🟢 Live — Process + Weight List Merged";
           badge.style.color = "#34d399";
         }
-        if (forceSync) alert("✅ Both sheets synced & merged.");
+        if (forceSync) alert("✅ Both Google Sheets successfully synced & merged.");
       } else if (logSuccess) {
         if (badge) {
-          badge.innerHTML = "🟡 Live — Process OK, Weight/PDF List NOT loaded";
+          badge.innerHTML = "🟡 Live — Process OK, Weight List NOT loaded";
           badge.style.color = "#fbbf24";
         }
       } else if (wtSuccess) {
         if (badge) {
-          badge.innerHTML = "🟡 Live — Weight/PDF List OK, Process log NOT loaded";
+          badge.innerHTML = "🟡 Live — Weight List OK, Process log NOT loaded";
           badge.style.color = "#fbbf24";
         }
       } else {
         if (badge) {
-          badge.innerHTML = "🔴 Connection Issue / Link Required";
+          badge.innerHTML = "🔴 Connection Issue";
           badge.style.color = "#ef4444";
         }
       }
@@ -1019,7 +1019,6 @@
     function getComponentWeight(partNo) {
       if (!partNo) return 0;
       const clean = String(partNo).trim().toUpperCase();
-
       if (liveWeightMaster[clean] && liveWeightMaster[clean].weight > 0) {
         return liveWeightMaster[clean].weight;
       }
@@ -1051,7 +1050,7 @@
           return liveWeightMaster[k].desc;
         }
       }
-      return `COMPONENT ${partNo}`;
+      return `MS PART ${partNo}`;
     }
 
     function getComponentPdfLink(partNo) {
@@ -1252,7 +1251,7 @@
 
         const pdfStatusEl = document.getElementById('pdfLinkStatus');
         if (pdfStatusEl) {
-          pdfStatusEl.innerText = currentActivePdfLink ? '📄 PDF linked (Drive)' : '⚠️ No PDF link for this part';
+          pdfStatusEl.innerText = currentActivePdfLink ? '📄 PDF linked (Drive)' : '⚠️ No PDF link in Weight List';
           pdfStatusEl.style.color = currentActivePdfLink ? '#34d399' : '#f87171';
         }
       } else {
@@ -1311,6 +1310,7 @@
 
       let targetUrl = currentActivePdfLink;
       if (!targetUrl) {
+        // Fallback pattern if no link provided in sheet
         targetUrl = `sip/${encodeURIComponent(currentActivePart)}.pdf`;
       }
       window.open(bustCache(targetUrl), '_blank');
