@@ -10,7 +10,7 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     body {
-      background: #090d16;
+      background: #070d1b;
       color: #e2e8f0;
       font-family: 'Inter', sans-serif;
       margin: 0;
@@ -24,7 +24,7 @@
     .ewm-header {
       background: #0f172a;
       border-bottom: 1px solid #1e293b;
-      padding: 14px 20px;
+      padding: 12px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -33,107 +33,105 @@
       z-index: 1000;
     }
     .ewm-brand { display: flex; align-items: center; gap: 10px; }
-    .ewm-brand h1 { font-size: 15px; font-weight: 700; margin: 0; color: #f8fafc; letter-spacing: 0.4px; }
-    .ewm-badge { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+    .ewm-brand h1 { font-size: 14.5px; font-weight: 700; margin: 0; color: #f8fafc; }
+    .ewm-badge { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-size: 10.5px; font-weight: 600; }
 
-    .ewm-container { max-width: 1500px; width: 100%; margin: 0 auto; padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 16px; }
+    .ewm-container { max-width: 1600px; width: 100%; margin: 0 auto; padding: 14px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
 
-    /* Timeframe Selector Tabs */
-    .timeframe-bar {
+    /* Top Control Bar with Month Dropdown */
+    .control-bar {
       background: #0f172a;
       border: 1px solid #1e293b;
       border-radius: 10px;
-      padding: 8px;
+      padding: 10px 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 10px;
     }
-    .tf-tabs { display: flex; gap: 6px; }
-    .tf-btn {
+    .month-select-wrap { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: #94a3b8; }
+    .month-select-wrap select {
       background: #1e293b;
       border: 1px solid #334155;
-      color: #94a3b8;
-      padding: 7px 16px;
+      color: #f8fafc;
+      padding: 6px 12px;
       border-radius: 6px;
-      font-size: 11.5px;
+      font-size: 12px;
+      outline: none;
       font-weight: 600;
       cursor: pointer;
-      transition: 0.2s;
     }
-    .tf-btn.active, .tf-btn:hover { background: #3b82f6; border-color: #3b82f6; color: #fff; }
-    .tf-date-info { font-size: 11px; color: #94a3b8; font-weight: 500; }
 
-    /* DWM Shift & Furnace Quick View Dock */
-    .dwm-shift-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-    .shift-box {
+    /* KPI Cards Grid (Month Target, Target MTD, Actual MTD, Avg Prod, Variance) */
+    .kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+    .kpi-card {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-card::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: #3b82f6; }
+    .kpi-card.green::after { background: #34d399; }
+    .kpi-card.orange::after { background: #f59e0b; }
+    .kpi-card.red::after { background: #ef4444; }
+
+    .kpi-card span { font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
+    .kpi-card h3 { margin: 2px 0 0 0; font-size: 17px; font-weight: 700; color: #f8fafc; }
+    .kpi-card p { margin: 0; font-size: 9px; color: #64748b; }
+
+    /* DWM Matrix Section */
+    .dwm-section {
       background: #0f172a;
       border: 1px solid #1e293b;
       border-radius: 10px;
       padding: 14px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      border-left: 4px solid #3b82f6;
+      gap: 10px;
     }
-    .shift-box.shift-b { border-left-color: #f59e0b; }
-    .shift-box.shift-c { border-left-color: #8b5cf6; }
-    .shift-title { font-size: 12px; font-weight: 700; color: #f8fafc; display: flex; justify-content: space-between; }
-    .shift-val { font-size: 16px; font-weight: 700; color: #38bdf8; margin: 0; }
-    .shift-sub { font-size: 10px; color: #64748b; }
+    .dwm-title-row { display: flex; justify-content: space-between; align-items: center; }
+    .dwm-title-row h3 { font-size: 12.5px; font-weight: 700; color: #f8fafc; margin: 0; }
+    .note-text { font-size: 10px; color: #fbbf24; background: rgba(251, 191, 36, 0.1); padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(251, 191, 36, 0.2); }
 
-    /* Analytics Metric Cards */
-    .ewm-metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-    .metric-card {
-      background: #0f172a;
-      border: 1px solid #1e293b;
-      border-radius: 10px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      position: relative;
-      overflow: hidden;
+    /* Matrix Table Layout */
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table.dwm-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10.5px;
+      text-align: center;
+      white-space: nowrap;
     }
-    .metric-card::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: #3b82f6; }
-    .metric-card.success::after { background: #34d399; }
-    .metric-card.warning::after { background: #f59e0b; }
-    .metric-card.accent::after { background: #f97316; }
-
-    .metric-top { display: flex; justify-content: space-between; align-items: center; }
-    .metric-top span { font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
-    .metric-icon { font-size: 14px; }
-    .metric-value { font-size: 22px; font-weight: 700; color: #f8fafc; margin: 0; }
-    .metric-sub { font-size: 10px; color: #64748b; }
-
-    /* Section Box */
-    .ewm-section-box {
-      background: #0f172a;
-      border: 1px solid #1e293b;
-      border-radius: 10px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+    table.dwm-table th, table.dwm-table td {
+      border: 1px solid #334155;
+      padding: 6px 4px;
     }
-    .section-title { font-size: 13px; font-weight: 700; color: #f8fafc; margin: 0; display: flex; align-items: center; gap: 8px; }
-
-    /* Table Styling */
-    .ewm-table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 11.5px; text-align: left; }
-    th { background: #1e293b; color: #94a3b8; padding: 10px 12px; font-weight: 600; border-bottom: 1px solid #334155; }
-    td { padding: 10px 12px; border-bottom: 1px solid #1e293b; color: #cbd5e1; }
-    tr:hover td { background: rgba(59, 130, 246, 0.05); color: #fff; }
-
-    @media (max-width: 1024px) {
-      .dwm-shift-grid { grid-template-columns: 1fr; }
-      .ewm-metrics-grid { grid-template-columns: repeat(2, 1fr); }
+    table.dwm-table th {
+      background: #1e293b;
+      color: #94a3b8;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 5;
     }
-    @media (max-width: 600px) {
-      .ewm-metrics-grid { grid-template-columns: 1fr; }
-      .timeframe-bar { flex-direction: column; align-items: stretch; }
-      .tf-tabs { justify-content: center; }
+    table.dwm-table td { background: #0f172a; color: #f1f5f9; }
+    
+    /* Green and Red cell color coding like original DWM sheet */
+    .cell-green { background: rgba(52, 211, 153, 0.2) !important; color: #34d399 !important; font-weight: 600; }
+    .cell-red { background: rgba(239, 68, 68, 0.2) !important; color: #f87171 !important; font-weight: 600; }
+    .total-row td { background: #172033 !important; font-weight: 700; color: #38bdf8 !important; }
+
+    @media (max-width: 1200px) {
+      .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
@@ -141,101 +139,84 @@
 
   <header class="ewm-header">
     <div class="ewm-brand">
-      <span style="font-size: 18px;">💻</span>
+      <span style="font-size: 16px;">📊</span>
       <h1>My Laptop Gear Unit 7 Production Review Dashboard</h1>
     </div>
-    <div class="ewm-badge">DWM Live Mode</div>
+    <div class="ewm-badge">DWM Matrix View</div>
   </header>
 
   <div class="ewm-container">
 
-    <!-- Timeframe Selector Tabs -->
-    <div class="timeframe-bar">
-      <div class="tf-tabs">
-        <button class="tf-btn active" onclick="switchTimeframe('daily')">📅 Daily (DWM View)</button>
-        <button class="tf-btn" onclick="switchTimeframe('monthly')">📊 Monthly Report</button>
-        <button class="tf-btn" onclick="switchTimeframe('yearly')">📈 Yearly Analytics</button>
+    <!-- Control Bar with Month Dropdown -->
+    <div class="control-bar">
+      <div class="month-select-wrap">
+        <span>Select Month:</span>
+        <select id="monthDropdown" onchange="updateDWMData()">
+          <option value="MARCH-2026" selected>March - 2026</option>
+          <option value="FEBRUARY-2026">February - 2026</option>
+          <option value="JANUARY-2026">January - 2026</option>
+          <option value="DECEMBER-2025">December - 2025</option>
+        </select>
       </div>
-      <div class="tf-date-info" id="tfInfoText">Active View: DWM Daily Production Review & Shifts</div>
+      <div class="note-text">⚡ Target: 2.1 ton/furnace (FY:2025-2026)</div>
     </div>
 
-    <!-- DWM Shift Breakdown Cards (Only visible on Daily View) -->
-    <div class="dwm-shift-grid" id="dwmShiftSection">
-      <div class="shift-box">
-        <div class="shift-title"><span>Shift A (Morning)</span> <span style="color:#34d399;">🟢 Active</span></div>
-        <h3 class="shift-value" id="shiftAVal">0 Pcs</h3>
-        <span class="shift-sub">Furnace F/C 1 & 2 Output</span>
+    <!-- KPI Summary Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <span>Month Target</span>
+        <h3 id="kpiMonthTarget">270.0 Ton</h3>
+        <p>Full month goal</p>
       </div>
-      <div class="shift-box shift-b">
-        <div class="shift-title"><span>Shift B (Evening)</span> <span style="color:#f59e0b;">⏳ Scheduled</span></div>
-        <h3 class="shift-value" id="shiftBVal">0 Pcs</h3>
-        <span class="shift-sub">Furnace F/C 3 & 4 Output</span>
+      <div class="kpi-card green">
+        <span>Target MTD</span>
+        <h3 id="kpiTargetMTD">270.0 Ton</h3>
+        <p>Month to date goal</p>
       </div>
-      <div class="shift-box shift-c">
-        <div class="shift-title"><span>Shift C (Night)</span> <span style="color:#8b5cf6;">💤 Pending</span></div>
-        <h3 class="shift-value" id="shiftCVal">0 Pcs</h3>
-        <span class="shift-sub">Continuous Heat Treatment</span>
+      <div class="kpi-card orange">
+        <span>Actual MTD</span>
+        <h3 id="kpiActualMTD">243.14 Ton</h3>
+        <p>Achieved production</p>
       </div>
-    </div>
-
-    <!-- Analytics Metric Cards -->
-    <div class="ewm-metrics-grid">
-      <div class="metric-card success">
-        <div class="metric-top">
-          <span id="metricTitle1">Daily Output Qty</span>
-          <span class="metric-icon">📦</span>
-        </div>
-        <h2 class="metric-value" id="valTotalQty">0 Pcs</h2>
-        <span class="metric-sub" id="subText1">DWM Live Track</span>
+      <div class="kpi-card">
+        <span>Average Production</span>
+        <h3 id="kpiAvgProd">8.1 Ton/Day</h3>
+        <p>Daily run-rate</p>
       </div>
-
-      <div class="metric-card accent">
-        <div class="metric-top">
-          <span>Active Batches / Lots</span>
-          <span class="metric-icon">🔢</span>
-        </div>
-        <h2 class="metric-value" id="valTotalLots">0 Lots</h2>
-        <span class="metric-sub">Unit 7 Shopfloor</span>
-      </div>
-
-      <div class="metric-card">
-        <div class="metric-top">
-          <span>Total Weight</span>
-          <span class="metric-icon">⚖️</span>
-        </div>
-        <h2 class="metric-value" id="valTotalWeight">0 Kg</h2>
-        <span class="metric-sub">Batch Weight Summary</span>
-      </div>
-
-      <div class="metric-card warning">
-        <div class="metric-top">
-          <span>Target Adherence</span>
-          <span class="metric-icon">⚡</span>
-        </div>
-        <h2 class="metric-value">95.2%</h2>
-        <span class="metric-sub">DWM Performance</span>
+      <div class="kpi-card red">
+        <span>Variance / Gap</span>
+        <h3 id="kpiVariance" style="color:#ef4444;">-26.86 Ton</h3>
+        <p>Deficit against target</p>
       </div>
     </div>
 
-    <!-- Production Breakdown Table -->
-    <div class="ewm-section-box">
-      <h3 class="section-title" id="tableSectionTitle">📋 DWM Daily Production Review Log</h3>
-      <div class="ewm-table-wrap">
-        <table>
+    <!-- DWM Matrix Table View -->
+    <div class="dwm-section">
+      <div class="dwm-title-row">
+        <h3 id="dwmTableTitle">📋 Daily Work Management (DWM) - MARCH-2026</h3>
+        <span style="font-size: 10.5px; color:#34d399;">🟢 Target Met | 🔴 Below Target</span>
+      </div>
+
+      <div class="table-scroll">
+        <table class="dwm-table">
           <thead>
-            <tr id="tableHeaders">
-              <th>DATE</th>
-              <th>PART / MODEL</th>
-              <th>BATCH NO</th>
-              <th>F/C NO</th>
-              <th>PRODUCED QTY</th>
-              <th>STATUS</th>
+            <tr>
+              <th style="min-width: 90px;">FURNACE</th>
+              <th>Capacity</th>
+              <th>Month Target</th>
+              <th>Target MTD</th>
+              <th>Actual MTD</th>
+              <th>Cap. Utilized</th>
+              <!-- Days 1 to 30 -->
+              <script>
+                for(let d=1; d<=30; d++) {
+                  document.write(`<th>${d}</th>`);
+                }
+              </script>
             </tr>
           </thead>
-          <tbody id="ewmTableBody">
-            <tr>
-              <td colspan="6" style="text-align: center; padding: 20px; color: #64748b;">Loading DWM review data...</td>
-            </tr>
+          <tbody id="dwmTableBody">
+            <!-- Dynamically populated rows for SQF-1 to SQF-4 -->
           </tbody>
         </table>
       </div>
@@ -244,240 +225,94 @@
   </div>
 
   <script>
-    const PROCESS_LOG_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=529980778&single=true&output=csv";
-    const WEIGHT_LIST_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=373153751&single=true&output=csv";
-
-    let liveWeightMaster = {};
-    let masterLogs = [];
-    let logColMap = {};
-    let currentTimeframe = 'daily';
-
-    function parseCustomDate(dateStr) {
-      if (!dateStr) return new Date(0);
-      let str = String(dateStr).trim().split('T')[0];
-      let parts = str.split(/[-/]/);
-      if (parts.length === 3) {
-        if (parts[0].length === 4) return new Date(parts[0], parts[1] - 1, parts[2]);
-        return new Date(parts[2], parts[1] - 1, parts[0]);
+    // Sample simulation data matching your DWM sheet structure
+    const dwmDatabase = {
+      "MARCH-2026": {
+        monthTarget: 270.0,
+        targetMTD: 270.0,
+        actualMTD: 243.14,
+        avgProd: "8.1 Ton",
+        variance: "-26.86 Ton",
+        furnaces: [
+          { name: "SQF-1", cap: 67.5, mTarget: 67.5, tMTD: 67.5, aMTD: 69.65, util: "103.18%", days: [1.66, 1.58, 3.16, 2.53, 2.37, 3.16, 2.37, 2.53, 3.18, 2.02, 2.53, 2.53, 2.37, 0.79, 3.47, 2.53, 2.53, 2.53, 2.53, 1.67, 2.53, 2.15, 2.02, 2.97, 2.14, 1.74, 2.53, 1.74, 1.46, 2.37] },
+          { name: "SQF-2", cap: 67.5, mTarget: 67.5, tMTD: 67.5, aMTD: 57.72, util: "85.51%", days: [2.18, 2.74, 1.95, 1.81, 2.24, 2.89, 1.87, 1.00, 2.02, 0.72, 2.83, 1.67, 2.00, 1.74, 1.51, 0.88, 2.66, 1.67, 1.00, 2.38, 1.82, 2.53, 1.77, 0.60, 2.06, 1.74, 3.32, 1.84, 2.29, 2.02] },
+          { name: "SQF-3", cap: 67.5, mTarget: 67.5, tMTD: 67.5, aMTD: 49.56, util: "73.42%", days: [2.17, 3.30, 2.13, 1.44, 3.28, 1.59, 3.00, 1.74, 2.01, 2.17, 3.18, 1.58, 1.90, 1.85, 2.12, 3.07, 1.85, 1.93, 2.01, 2.53, 1.85, 1.04, 1.78, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00] },
+          { name: "SQF-4", cap: 67.5, mTarget: 67.5, tMTD: 67.5, aMTD: 66.21, util: "98.09%", days: [2.07, 2.93, 1.64, 2.55, 2.21, 2.55, 2.05, 3.26, 2.10, 2.34, 2.88, 1.72, 2.66, 2.19, 2.35, 2.09, 1.61, 1.96, 1.61, 2.65, 2.88, 1.51, 2.22, 1.92, 2.85, 1.91, 1.98, 2.30, 2.17, 1.08] }
+        ],
+        totals: [8.08, 10.55, 8.88, 8.33, 10.10, 10.20, 9.30, 8.53, 9.32, 7.25, 11.42, 7.49, 8.92, 6.56, 9.45, 8.57, 8.65, 8.08, 7.15, 9.23, 9.07, 7.23, 7.79, 5.49, 7.05, 5.39, 7.82, 5.87, 5.92, 5.47],
+        cumu: [8.08, 18.63, 27.51, 35.85, 45.95, 56.14, 65.44, 73.97, 83.29, 90.54, 101.95, 109.45, 118.37, 124.94, 134.38, 142.95, 151.60, 159.7, 166.82, 176.05, 185.12, 192.35, 200.14, 205.63, 212.67, 218.06, 225.88, 231.75, 237.68, 243.14]
+      },
+      "FEBRUARY-2026": {
+        monthTarget: 252.0, targetMTD: 252.0, actualMTD: 238.50, avgProd: "8.5 Ton", variance: "-13.50 Ton",
+        furnaces: [
+          { name: "SQF-1", cap: 63.0, mTarget: 63.0, tMTD: 63.0, aMTD: 65.20, util: "103.4%", days: Array(28).fill(2.33) },
+          { name: "SQF-2", cap: 63.0, mTarget: 63.0, tMTD: 63.0, aMTD: 58.10, util: "92.2%", days: Array(28).fill(2.07) },
+          { name: "SQF-3", cap: 63.0, mTarget: 63.0, tMTD: 63.0, aMTD: 55.40, util: "87.9%", days: Array(28).fill(1.97) },
+          { name: "SQF-4", cap: 63.0, mTarget: 63.0, tMTD: 63.0, aMTD: 59.80, util: "94.9%", days: Array(28).fill(2.13) }
+        ],
+        totals: Array(28).fill(8.5), cumu: Array(28).fill(0).map((_, i) => (i+1)*8.5)
       }
-      let fallback = new Date(str);
-      return isNaN(fallback.getTime()) ? new Date(0) : fallback;
-    }
+    };
 
-    function parseCSVData(text) {
-      let r = [], row = [''], q = false;
-      for (let i = 0; i < text.length; i++) {
-        let c = text[i], next = text[i + 1];
-        if (c === '"') {
-          if (q && next === '"') { row[row.length - 1] += '"'; i++; }
-          else { q = !q; }
-        } else if (c === ',' && !q) {
-          row.push('');
-        } else if ((c === '\r' || c === '\n') && !q) {
-          if (c === '\r' && next === '\n') { i++; }
-          if (row.length > 1 || (row.length === 1 && row[0] !== '')) r.push(row);
-          row = [''];
-        } else {
-          row[row.length - 1] += c;
-        }
-      }
-      if (row.length > 1 || (row.length === 1 && row[0] !== '')) r.push(row);
-      return r.map(cols => cols.map(col => (col || '').trim()));
-    }
+    function updateDWMData() {
+      const selectedMonth = document.getElementById('monthDropdown').value;
+      const data = dwmDatabase[selectedMonth] || dwmDatabase["MARCH-2026"];
 
-    async function fetchCSVData(url) {
-      const endpoints = [
-        url,
-        "https://api.allorigins.win/raw?url=" + encodeURIComponent(url),
-        "https://corsproxy.io/?" + encodeURIComponent(url)
-      ];
-      for (const ep of endpoints) {
-        try {
-          const resp = await fetch(ep, { cache: 'no-store' });
-          if (resp.ok) {
-            const txt = await resp.text();
-            if (txt && txt.length > 30) return txt;
-          }
-        } catch (e) {}
-      }
-      return null;
-    }
+      // Update KPIs
+      document.getElementById('kpiMonthTarget').innerText = `${data.monthTarget} Ton`;
+      document.getElementById('kpiTargetMTD').innerText = `${data.targetMTD} Ton`;
+      document.getElementById('kpiActualMTD').innerText = `${data.actualMTD} Ton`;
+      document.getElementById('kpiAvgProd').innerText = data.avgProd;
+      document.getElementById('kpiVariance').innerText = data.variance;
+      document.getElementById('dwmTitleTitle').innerText = `📋 Daily Work Management (DWM) - ${selectedMonth}`;
 
-    function processWeightListSheet(parsedRows) {
-      if (!parsedRows || parsedRows.length < 2) return;
-      let partCol = 0, weightCol = -1;
-      parsedRows[0].forEach((h, idx) => {
-        const clean = h.toLowerCase();
-        if (clean.includes('ms') || clean.includes('part')) partCol = idx;
-        if (clean.includes('weight') || clean.includes('wt')) weightCol = idx;
-      });
-      liveWeightMaster = {};
-      for (let i = 1; i < parsedRows.length; i++) {
-        const r = parsedRows[i];
-        if (!r || r.length <= partCol) continue;
-        const p = String(r[partCol] || '').trim().toUpperCase();
-        const w = weightCol !== -1 ? parseFloat(String(r[weightCol]).replace(/[^0-9.]/g, '')) : 0;
-        if (p) liveWeightMaster[p] = isNaN(w) ? 0 : w;
-      }
-    }
+      // Build Table Body
+      let tbodyHtml = "";
 
-    function getComponentWeight(partNo) {
-      if (!partNo) return 0;
-      const clean = String(partNo).trim().toUpperCase();
-      return liveWeightMaster[clean] || 0;
-    }
+      data.furnaces.forEach(f => {
+        tbodyHtml += `<tr>
+          <td style="font-weight:700; color:#38bdf8;">${f.name}</td>
+          <td>${f.cap}</td>
+          <td>${f.mTarget}</td>
+          <td>${f.tMTD}</td>
+          <td style="font-weight:700;">${f.aMTD}</td>
+          <td>${f.util}</td>`;
 
-    async function initDashboard() {
-      try {
-        const wtCSV = await fetchCSVData(WEIGHT_LIST_CSV_URL);
-        if (wtCSV) processWeightListSheet(parseCSVData(wtCSV));
-
-        const logCSV = await fetchCSVData(PROCESS_LOG_CSV_URL);
-        if (logCSV) {
-          const parsed = parseCSVData(logCSV);
-          if (parsed.length > 0) {
-            logColMap = { date: 0, part: 2, batch: 3, fc: 5, qty: 6 };
-            parsed[0].forEach((h, idx) => {
-              const c = h.toLowerCase();
-              if (c.includes('date')) logColMap.date = idx;
-              else if (c.includes('part') || c.includes('ms')) logColMap.part = idx;
-              else if (c.includes('batch')) logColMap.batch = idx;
-              else if (c.includes('fc')) logColMap.fc = idx;
-              else if (c.includes('qty')) logColMap.qty = idx;
-            });
-            parsed.shift();
-            masterLogs = parsed;
-          }
-        }
-      } catch (e) {}
-      renderDashboardData();
-    }
-
-    function switchTimeframe(tf) {
-      currentTimeframe = tf;
-      document.querySelectorAll('.tf-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-      
-      const infoText = document.getElementById('tfInfoText');
-      const shiftSection = document.getElementById('dwmShiftSection');
-
-      if (tf === 'daily') {
-        infoText.innerText = "Active View: DWM Daily Production Review & Shifts";
-        shiftSection.style.display = 'grid';
-      } else {
-        shiftSection.style.display = 'none';
-        if (tf === 'monthly') infoText.innerText = "Active View: Monthly Production Report";
-        if (tf === 'yearly') infoText.innerText = "Active View: Yearly Analytics Overview";
-      }
-
-      renderDashboardData();
-    }
-
-    function renderDashboardData() {
-      const today = new Date();
-      let filtered = [...masterLogs];
-
-      if (currentTimeframe === 'daily') {
-        filtered = masterLogs.filter(r => {
-          const d = parseCustomDate(r[logColMap.date || 0]);
-          return d.toDateString() === today.toDateString();
+        f.days.forEach(val => {
+          let cssClass = val >= 2.1 ? "cell-green" : "cell-red";
+          if (val === 0) cssClass = "";
+          tbodyHtml += `<td class="${cssClass}">${val > 0 ? val.toFixed(2) : '-'}</td>`;
         });
-        if (filtered.length === 0) filtered = masterLogs.slice(0, 15);
-      } else if (currentTimeframe === 'monthly') {
-        filtered = masterLogs.filter(r => {
-          const d = parseCustomDate(r[logColMap.date || 0]);
-          return d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
-        });
-      }
 
-      let totalQty = 0, totalWeight = 0;
-      let shiftAQty = 0, shiftBQty = 0, shiftCQty = 0;
-      const totalLots = filtered.length;
-
-      filtered.forEach((r, idx) => {
-        const qty = parseFloat(r[logColMap.qty || 6]) || 0;
-        const wt = getComponentWeight(r[logColMap.part || 2]);
-        totalQty += qty;
-        totalWeight += (qty * wt);
-
-        // Simulated distribution for DWM Shifts A, B, C for visual realism
-        if (idx % 3 === 0) shiftAQty += qty;
-        else if (idx % 3 === 1) shiftBQty += qty;
-        else shiftCQty += qty;
+        tbodyHtml += `</tr>`;
       });
 
-      document.getElementById('valTotalQty').innerText = `${totalQty.toLocaleString('en-IN')} Pcs`;
-      document.getElementById('valTotalLots').innerText = `${totalLots} Lots`;
-      document.getElementById('valTotalWeight').innerText = `${totalWeight.toLocaleString('en-IN', {maximumFractionDigits: 1})} Kg`;
-      document.getElementById('metricTitle1').innerText = currentTimeframe.toUpperCase() + " Output Qty";
+      // Total in Ton Row
+      tbodyHtml += `<tr class="total-row">
+        <td>TOTAL IN TON</td>
+        <td>270.0</td>
+        <td>270.0</td>
+        <td>270.0</td>
+        <td>${data.actualMTD}</td>
+        <td>90.1%</td>`;
+      data.totals.forEach(t => {
+        tbodyHtml += `<td>${t.toFixed(2)}</td>`;
+      });
+      tbodyHtml += `</tr>`;
 
-      document.getElementById('shiftAVal').innerText = `${shiftAQty.toLocaleString('en-IN')} Pcs`;
-      document.getElementById('shiftBVal').innerText = `${shiftBQty.toLocaleString('en-IN')} Pcs`;
-      document.getElementById('shiftCVal').innerText = `${shiftCQty.toLocaleString('en-IN')} Pcs`;
+      // Cumulative Total Row
+      tbodyHtml += `<tr class="total-row" style="background:#111827 !important;">
+        <td>CUMULATIVE TOTAL</td>
+        <td colspan="5">LOT MTD</td>`;
+      data.cumu.forEach(c => {
+        tbodyHtml += `<td>${c.toFixed(2)}</td>`;
+      });
+      tbodyHtml += `</tr>`;
 
-      let html = "";
-      if (currentTimeframe === 'daily') {
-        document.getElementById('tableSectionTitle').innerText = "📋 DWM Daily Production Review Log & Shifts";
-        document.getElementById('tableHeaders').innerHTML = `
-          <th>DATE</th>
-          <th>PART / MODEL</th>
-          <th>BATCH NO</th>
-          <th>F/C NO</th>
-          <th>PRODUCED QTY</th>
-          <th>STATUS</th>
-        `;
-
-        filtered.forEach(r => {
-          html += `
-            <tr>
-              <td><b>${r[logColMap.date || 0] || '-'}</b></td>
-              <td style="color:#38bdf8; font-weight:600;">${r[logColMap.part || 2] || '-'}</td>
-              <td>${r[logColMap.batch || 3] || '-'}</td>
-              <td>F/C ${r[logColMap.fc || 5] || '-'}</td>
-              <td style="font-weight:700; color:#fde047;">${r[logColMap.qty || 6] || '-'} Pcs</td>
-              <td><span style="color:#34d399; background:rgba(52,211,153,0.1); padding:2px 8px; border-radius:4px; font-size:10px;">Verified</span></td>
-            </tr>
-          `;
-        });
-      } else {
-        document.getElementById('tableSectionTitle').innerText = "📋 Periodic Summary Breakdown";
-        document.getElementById('tableHeaders').innerHTML = `
-          <th>PERIOD / DATE</th>
-          <th>TOTAL LOTS</th>
-          <th>PRODUCED PIECES</th>
-          <th>TOTAL WEIGHT (KG)</th>
-          <th>STATUS</th>
-        `;
-
-        const groups = {};
-        filtered.forEach(r => {
-          const d = parseCustomDate(r[logColMap.date || 0]);
-          const key = d.getTime() === 0 ? "GENERAL" : d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-          if (!groups[key]) groups[key] = { lots: 0, pcs: 0, wt: 0 };
-          groups[key].lots++;
-          const q = parseFloat(r[logColMap.qty || 6]) || 0;
-          groups[key].pcs += q;
-          groups[key].wt += (q * getComponentWeight(r[logColMap.part || 2]));
-        });
-
-        for (const [k, v] of Object.entries(groups)) {
-          html += `
-            <tr>
-              <td><b>${k}</b></td>
-              <td>${v.lots} Lots</td>
-              <td style="color:#38bdf8; font-weight:600;">${v.pcs.toLocaleString('en-IN')} Pcs</td>
-              <td>${v.wt.toLocaleString('en-IN', {maximumFractionDigits: 1})} Kg</td>
-              <td><span style="color:#34d399; background:rgba(52,211,153,0.1); padding:2px 8px; border-radius:4px; font-size:10px;">Completed</span></td>
-            </tr>
-          `;
-        }
-      }
-
-      if (html === "") html = `<tr><td colspan="6" style="text-align:center; padding:20px; color:#64748b;">No records found.</td></tr>`;
-      document.getElementById('ewmTableBody').innerHTML = html;
+      document.getElementById('dwmTableBody').innerHTML = tbodyHtml;
     }
 
-    window.addEventListener('DOMContentLoaded', initDashboard);
+    window.addEventListener('DOMContentLoaded', updateDWMData);
   </script>
 </body>
 </html>
