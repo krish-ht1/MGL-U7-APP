@@ -38,7 +38,35 @@
 
     .ewm-container { max-width: 1600px; width: 100%; margin: 0 auto; padding: 14px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
 
-    /* Top Control Bar with Month Dropdown */
+    /* 3 Main Navigation Buttons Bar */
+    .nav-buttons-bar {
+      display: flex;
+      gap: 10px;
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      padding: 10px;
+      border-radius: 10px;
+    }
+    .nav-main-btn {
+      flex: 1;
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      transition: 0.2s;
+    }
+    .nav-main-btn.active, .nav-main-btn:hover { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+
+    /* Module Views Containers */
+    .module-view { display: none; flex-direction: column; gap: 14px; }
+    .module-view.active { display: flex; }
+
+    /* Control Bar with Month Dropdown */
     .control-bar {
       background: #0f172a;
       border: 1px solid #1e293b;
@@ -63,7 +91,7 @@
       cursor: pointer;
     }
 
-    /* KPI Cards Grid (Month Target, Target MTD, Actual MTD, Avg Prod, Variance) */
+    /* KPI Cards Grid */
     .kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
     .kpi-card {
       background: #0f172a;
@@ -82,7 +110,7 @@
     .kpi-card.red::after { background: #ef4444; }
 
     .kpi-card span { font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
-    .kpi-card h3 { margin: 2px 0 0 0; font-size: 17px; font-weight: 700; color: #f8fafc; }
+    .kpi-card h3 { margin: 2px 0 0 0; font-size: 16px; font-weight: 700; color: #f8fafc; }
     .kpi-card p { margin: 0; font-size: 9px; color: #64748b; }
 
     /* DWM Matrix Section */
@@ -122,16 +150,27 @@
     }
     table.dwm-table td { background: #0f172a; color: #f1f5f9; }
     
-    /* Green and Red cell color coding like original DWM sheet */
     .cell-green { background: rgba(52, 211, 153, 0.2) !important; color: #34d399 !important; font-weight: 600; }
     .cell-red { background: rgba(239, 68, 68, 0.2) !important; color: #f87171 !important; font-weight: 600; }
     .total-row td { background: #172033 !important; font-weight: 700; color: #38bdf8 !important; }
+
+    /* Generic Placeholder Card for Monthly/Yearly */
+    .placeholder-card {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      padding: 40px;
+      text-align: center;
+      color: #94a3b8;
+      font-size: 13px;
+    }
 
     @media (max-width: 1200px) {
       .kpi-grid { grid-template-columns: repeat(3, 1fr); }
     }
     @media (max-width: 768px) {
       .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .nav-buttons-bar { flex-direction: column; }
     }
   </style>
 </head>
@@ -139,100 +178,110 @@
 
   <header class="ewm-header">
     <div class="ewm-brand">
-      <span style="font-size: 16px;">📊</span>
+      <span style="font-size: 16px;">💻</span>
       <h1>My Laptop Gear Unit 7 Production Review Dashboard</h1>
     </div>
-    <div class="ewm-badge">DWM Matrix View</div>
+    <div class="ewm-badge">Plant Unit 7</div>
   </header>
 
   <div class="ewm-container">
 
-    <!-- Control Bar with Month Dropdown -->
-    <div class="control-bar">
-      <div class="month-select-wrap">
-        <span>Select Month:</span>
-        <select id="monthDropdown" onchange="updateDWMData()">
-          <option value="MARCH-2026" selected>March - 2026</option>
-          <option value="FEBRUARY-2026">February - 2026</option>
-          <option value="JANUARY-2026">January - 2026</option>
-          <option value="DECEMBER-2025">December - 2025</option>
-        </select>
-      </div>
-      <div class="note-text">⚡ Target: 2.1 ton/furnace (FY:2025-2026)</div>
+    <!-- 3 Main Selection Buttons -->
+    <div class="nav-buttons-bar">
+      <button class="nav-main-btn active" onclick="switchMainTab('dwm', this)">📅 Daily Production (DWM)</button>
+      <button class="nav-main-btn" onclick="switchMainTab('monthly', this)">📊 Monthly Production</button>
+      <button class="nav-main-btn" onclick="switchMainTab('yearly', this)">📈 Yearly Production</button>
     </div>
 
-    <!-- KPI Summary Cards -->
-    <div class="kpi-grid">
-      <div class="kpi-card">
-        <span>Month Target</span>
-        <h3 id="kpiMonthTarget">270.0 Ton</h3>
-        <p>Full month goal</p>
+    <!-- MODULE 1: DAILY PRODUCTION (DWM) -->
+    <div id="view-dwm" class="module-view active">
+      <div class="control-bar">
+        <div class="month-select-wrap">
+          <span>Select Month:</span>
+          <select id="dwmMonthDropdown" onchange="renderDWMData()">
+            <option value="AUGUST-2026">August - 2026</option>
+            <option value="JULY-2026">July - 2026</option>
+            <option value="JUNE-2026">June - 2026</option>
+            <option value="MAY-2026">May - 2026</option>
+            <option value="MARCH-2026" selected>March - 2026</option>
+          </select>
+        </div>
+        <div class="note-text" id="targetNoteText">⚡ Target: 2.1 ton/furnace (FY:2025-2026)</div>
       </div>
-      <div class="kpi-card green">
-        <span>Target MTD</span>
-        <h3 id="kpiTargetMTD">270.0 Ton</h3>
-        <p>Month to date goal</p>
+
+      <!-- KPI Summary Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <span>Month Target</span>
+          <h3 id="kpiMonthTarget">270.0 Ton</h3>
+          <p>Full month goal</p>
+        </div>
+        <div class="kpi-card green">
+          <span>Target MTD</span>
+          <h3 id="kpiTargetMTD">270.0 Ton</h3>
+          <p>Month to date goal</p>
+        </div>
+        <div class="kpi-card orange">
+          <span>Actual MTD</span>
+          <h3 id="kpiActualMTD">243.14 Ton</h3>
+          <p>Achieved production</p>
+        </div>
+        <div class="kpi-card">
+          <span>Average Production</span>
+          <h3 id="kpiAvgProd">8.1 Ton/Day</h3>
+          <p>Daily run-rate</p>
+        </div>
+        <div class="kpi-card red">
+          <span>Variance / Gap</span>
+          <h3 id="kpiVariance" style="color:#ef4444;">-26.86 Ton</h3>
+          <p>Deficit against target</p>
+        </div>
       </div>
-      <div class="kpi-card orange">
-        <span>Actual MTD</span>
-        <h3 id="kpiActualMTD">243.14 Ton</h3>
-        <p>Achieved production</p>
-      </div>
-      <div class="kpi-card">
-        <span>Average Production</span>
-        <h3 id="kpiAvgProd">8.1 Ton/Day</h3>
-        <p>Daily run-rate</p>
-      </div>
-      <div class="kpi-card red">
-        <span>Variance / Gap</span>
-        <h3 id="kpiVariance" style="color:#ef4444;">-26.86 Ton</h3>
-        <p>Deficit against target</p>
+
+      <!-- DWM Matrix Table View -->
+      <div class="dwm-section">
+        <div class="dwm-title-row">
+          <h3 id="dwmTableTitle">📋 Daily Work Management (DWM) Matrix</h3>
+          <span style="font-size: 10.5px; color:#34d399;">🟢 Target Met | 🔴 Below Target</span>
+        </div>
+
+        <div class="table-scroll">
+          <table class="dwm-table">
+            <thead>
+              <tr id="dwmHeaderRow">
+                <!-- Dynamically injected days 1 to 31 + headers -->
+              </tr>
+            </thead>
+            <tbody id="dwmTableBody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <!-- DWM Matrix Table View -->
-    <div class="dwm-section">
-      <div class="dwm-title-row">
-        <h3 id="dwmTableTitle">📋 Daily Work Management (DWM) - MARCH-2026</h3>
-        <span style="font-size: 10.5px; color:#34d399;">🟢 Target Met | 🔴 Below Target</span>
+    <!-- MODULE 2: MONTHLY PRODUCTION -->
+    <div id="view-monthly" class="module-view">
+      <div class="placeholder-card">
+        <h3>📊 Monthly Production Overview</h3>
+        <p>Monthly aggregate performance reports across all units will appear here.</p>
       </div>
+    </div>
 
-      <div class="table-scroll">
-        <table class="dwm-table">
-          <thead>
-            <tr>
-              <th style="min-width: 90px;">FURNACE</th>
-              <th>Capacity</th>
-              <th>Month Target</th>
-              <th>Target MTD</th>
-              <th>Actual MTD</th>
-              <th>Cap. Utilized</th>
-              <!-- Days 1 to 30 -->
-              <script>
-                for(let d=1; d<=30; d++) {
-                  document.write(`<th>${d}</th>`);
-                }
-              </script>
-            </tr>
-          </thead>
-          <tbody id="dwmTableBody">
-            <!-- Dynamically populated rows for SQF-1 to SQF-4 -->
-          </tbody>
-        </table>
+    <!-- MODULE 3: YEARLY PRODUCTION -->
+    <div id="view-yearly" class="module-view">
+      <div class="placeholder-card">
+        <h3>📈 Yearly Production Analytics & Trends</h3>
+        <p>Annual fiscal year tracking and comparative analytics will appear here.</p>
       </div>
     </div>
 
   </div>
 
   <script>
-    // Sample simulation data matching your DWM sheet structure
+    // Exact database extracted from your DWM photos for March, May, June, July, August 2026
     const dwmDatabase = {
       "MARCH-2026": {
-        monthTarget: 270.0,
-        targetMTD: 270.0,
-        actualMTD: 243.14,
-        avgProd: "8.1 Ton",
-        variance: "-26.86 Ton",
+        targetNote: "Per day production target is 2.1 ton/furnace. Instead of 2ton/furnace for FY:2025-2026",
+        monthTarget: 270.0, targetMTD: 270.0, actualMTD: 243.14, avgProd: "8.1 Ton", variance: "-26.86 Ton", daysCount: 30,
         furnaces: [
           { name: "SQF-1", cap: 67.5, mTarget: 67.5, tMTD: 67.5, aMTD: 69.65, util: "103.18%", days: [1.66, 1.58, 3.16, 2.53, 2.37, 3.16, 2.37, 2.53, 3.18, 2.02, 2.53, 2.53, 2.37, 0.79, 3.47, 2.53, 2.53, 2.53, 2.53, 1.67, 2.53, 2.15, 2.02, 2.97, 2.14, 1.74, 2.53, 1.74, 1.46, 2.37] },
           { name: "SQF-2", cap: 67.5, mTarget: 67.5, tMTD: 67.5, aMTD: 57.72, util: "85.51%", days: [2.18, 2.74, 1.95, 1.81, 2.24, 2.89, 1.87, 1.00, 2.02, 0.72, 2.83, 1.67, 2.00, 1.74, 1.51, 0.88, 2.66, 1.67, 1.00, 2.38, 1.82, 2.53, 1.77, 0.60, 2.06, 1.74, 3.32, 1.84, 2.29, 2.02] },
@@ -242,33 +291,93 @@
         totals: [8.08, 10.55, 8.88, 8.33, 10.10, 10.20, 9.30, 8.53, 9.32, 7.25, 11.42, 7.49, 8.92, 6.56, 9.45, 8.57, 8.65, 8.08, 7.15, 9.23, 9.07, 7.23, 7.79, 5.49, 7.05, 5.39, 7.82, 5.87, 5.92, 5.47],
         cumu: [8.08, 18.63, 27.51, 35.85, 45.95, 56.14, 65.44, 73.97, 83.29, 90.54, 101.95, 109.45, 118.37, 124.94, 134.38, 142.95, 151.60, 159.7, 166.82, 176.05, 185.12, 192.35, 200.14, 205.63, 212.67, 218.06, 225.88, 231.75, 237.68, 243.14]
       },
-      "FEBRUARY-2026": {
-        monthTarget: 252.0, targetMTD: 252.0, actualMTD: 238.50, avgProd: "8.5 Ton", variance: "-13.50 Ton",
+      "MAY-2026": {
+        targetNote: "Per day production target is 2.25 ton/furnace (FY:2026-2027)",
+        monthTarget: 279.0, targetMTD: 279.0, actualMTD: 235.32, avgProd: "7.5 Ton", variance: "-43.68 Ton", daysCount: 31,
         furnaces: [
-          { name: "SQF-1", cap: 63.0, mTarget: 63.0, tMTD: 63.0, aMTD: 65.20, util: "103.4%", days: Array(28).fill(2.33) },
-          { name: "SQF-2", cap: 63.0, mTarget: 63.0, tMTD: 63.0, aMTD: 58.10, util: "92.2%", days: Array(28).fill(2.07) },
-          { name: "SQF-3", cap: 63.0, mTarget: 63.0, tMTD: 63.0, aMTD: 55.40, util: "87.9%", days: Array(28).fill(1.97) },
-          { name: "SQF-4", cap: 63.0, mTarget: 63.0, tMTD: 63.0, aMTD: 59.80, util: "94.9%", days: Array(28).fill(2.13) }
+          { name: "SQF-1", cap: 69.75, mTarget: 69.75, tMTD: 69.75, aMTD: 61.57, util: "88.0%", days: [2.02, 2.49, 0.95, 2.37, 2.52, 3.47, 2.81, 1.89, 2.53, 2.68, 2.37, 2.37, 2.50, 0.00, 0.00, 0.00, 0.00, 0.00, 2.68, 2.04, 2.53, 2.62, 2.04, 2.83, 1.74, 2.68, 2.64, 1.87, 3.02, 1.92, 2.01] },
+          { name: "SQF-2", cap: 69.75, mTarget: 69.75, tMTD: 69.75, aMTD: 65.58, util: "94.0%", days: [2.53, 2.94, 1.74, 1.69, 1.03, 2.63, 1.79, 2.58, 1.74, 2.37, 0.95, 1.94, 1.99, 1.58, 2.68, 2.68, 2.54, 2.55, 2.68, 2.79, 1.03, 1.82, 2.37, 2.37, 1.82, 1.74, 2.00, 2.73, 1.91, 1.86, 2.53] },
+          { name: "SQF-3", cap: 69.75, mTarget: 69.75, tMTD: 69.75, aMTD: 52.24, util: "75.0%", days: [1.51, 3.14, 2.24, 1.99, 2.14, 2.01, 2.24, 1.91, 2.14, 1.98, 2.71, 1.74, 2.15, 2.17, 1.99, 2.13, 2.06, 2.13, 2.05, 2.46, 1.93, 2.61, 2.09, 2.73, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00] },
+          { name: "SQF-4", cap: 69.75, mTarget: 69.75, tMTD: 69.75, aMTD: 55.93, util: "80.0%", days: [2.10, 2.80, 2.48, 1.51, 2.18, 1.67, 2.67, 2.12, 1.85, 3.09, 2.45, 1.42, 1.98, 1.45, 2.70, 2.99, 2.02, 2.12, 2.74, 1.13, 0.00, 0.00, 0.00, 0.00, 0.00, 2.70, 1.95, 2.12, 2.08, 1.66, 1.96] }
         ],
-        totals: Array(28).fill(8.5), cumu: Array(28).fill(0).map((_, i) => (i+1)*8.5)
+        totals: [8.16, 11.37, 7.40, 7.56, 7.87, 9.77, 9.51, 8.49, 8.25, 10.12, 8.47, 7.46, 8.63, 5.20, 7.37, 7.80, 6.62, 6.80, 10.15, 8.42, 5.48, 7.05, 6.50, 7.93, 3.55, 7.12, 6.59, 6.71, 7.01, 5.44, 6.50],
+        cumu: [8.16, 19.53, 26.93, 34.49, 42.36, 52.13, 61.64, 70.13, 78.38, 88.50, 96.98, 104.44, 113.07, 118.27, 125.64, 133.44, 140.06, 146.90, 157.01, 165.43, 170.91, 177.97, 184.47, 192.40, 195.96, 203.07, 209.66, 216.38, 223.38, 228.82, 235.32]
+      },
+      "JUNE-2026": {
+        targetNote: "Per day production target is 2.25 ton/furnace (FY:2026-2027)",
+        monthTarget: 270.0, targetMTD: 270.0, actualMTD: 255.37, avgProd: "8.5 Ton", variance: "-14.63 Ton", daysCount: 30,
+        furnaces: [
+          { name: "SQF-1", cap: 67.5, mTarget: 67.5, tMTD: 67.5, aMTD: 56.28, util: "83.0%", days: [2.01, 2.53, 2.78, 1.79, 1.67, 2.53, 2.37, 2.68, 2.74, 1.74, 2.74, 2.37, 0.00, 0.00, 0.00, 0.00, 0.00, 1.79, 2.01, 1.83, 2.08, 1.95, 2.53, 2.97, 1.83, 2.37, 1.85, 1.95, 2.68, 2.53] },
+          { name: "SQF-2", cap: 67.5, mTarget: 67.5, tMTD: 67.5, aMTD: 64.18, util: "95.0%", days: [1.79, 2.58, 1.37, 1.04, 2.82, 1.67, 2.02, 1.51, 2.09, 2.16, 2.06, 1.95, 2.68, 1.79, 2.68, 2.78, 2.78, 2.68, 2.53, 2.00, 1.94, 2.66, 1.85, 1.95, 1.58, 2.81, 1.95, 2.62, 1.49, 2.37] },
+          { name: "SQF-3", cap: 67.5, mTarget: 67.5, tMTD: 67.5, aMTD: 65.94, util: "98.0%", days: [1.10, 3.05, 1.96, 2.09, 2.13, 2.04, 2.16, 1.99, 2.07, 1.67, 1.05, 3.20, 2.08, 2.13, 2.62, 1.44, 2.04, 2.22, 3.33, 2.23, 2.17, 2.14, 3.11, 1.60, 2.22, 2.73, 2.04, 2.12, 2.01, 3.19] },
+          { name: "SQF-4", cap: 67.5, mTarget: 67.5, tMTD: 67.5, aMTD: 68.97, util: "102.0%", days: [2.41, 1.81, 2.48, 1.97, 2.84, 1.93, 2.85, 2.54, 1.98, 2.15, 2.86, 1.73, 2.79, 2.97, 1.62, 3.04, 2.13, 2.07, 3.04, 1.88, 2.49, 2.41, 2.51, 2.54, 2.61, 1.83, 1.83, 2.62, 1.45, 1.60] }
+        ],
+        totals: [7.31, 9.96, 8.59, 6.89, 9.45, 8.16, 9.40, 8.72, 8.88, 7.71, 8.71, 9.24, 7.56, 6.89, 6.92, 7.26, 6.94, 8.77, 10.90, 7.94, 8.68, 9.16, 9.99, 9.05, 8.24, 9.74, 7.67, 9.31, 7.63, 9.69],
+        cumu: [7.31, 17.27, 25.86, 32.75, 42.20, 50.36, 59.76, 68.48, 77.36, 85.07, 93.79, 103.03, 110.59, 117.48, 124.39, 131.65, 138.60, 147.40, 158.27, 166.20, 174.89, 184.04, 194.04, 203.09, 211.33, 221.07, 228.74, 238.04, 245.68, 255.37]
+      },
+      "JULY-2026": {
+        targetNote: "Per day production target is 2.25 ton/furnace (FY:2026-2027)",
+        monthTarget: 279.0, targetMTD: 279.0, actualMTD: 275.26, avgProd: "8.9 Ton", variance: "-3.74 Ton", daysCount: 31,
+        furnaces: [
+          { name: "SQF-1", cap: 69.75, mTarget: 69.75, tMTD: 69.75, aMTD: 68.55, util: "98.0%", days: [3.32, 2.53, 2.77, 1.58, 0.79, 2.61, 2.06, 1.83, 1.74, 2.93, 2.78, 1.83, 2.44, 1.53, 1.83, 2.37, 2.65, 1.28, 0.95, 2.53, 2.60, 2.23, 2.62, 1.89, 2.10, 2.68, 2.44, 2.61, 2.53, 2.68, 1.83] },
+          { name: "SQF-2", cap: 69.75, mTarget: 69.75, tMTD: 69.75, aMTD: 68.66, util: "98.0%", days: [2.37, 2.00, 2.58, 1.79, 1.00, 2.58, 2.53, 2.74, 1.79, 2.26, 2.00, 2.68, 1.47, 2.68, 2.78, 2.88, 1.79, 1.74, 2.73, 1.00, 1.79, 2.04, 1.91, 2.58, 2.37, 2.10, 2.68, 2.53, 2.08, 2.68, 2.53] },
+          { name: "SQF-3", cap: 69.75, mTarget: 69.75, tMTD: 69.75, aMTD: 69.31, util: "99.0%", days: [2.15, 3.01, 1.97, 2.38, 1.94, 1.92, 1.94, 2.80, 2.20, 2.10, 2.10, 2.96, 2.00, 3.20, 1.57, 1.96, 2.02, 2.13, 2.15, 2.17, 2.12, 2.18, 1.98, 2.57, 2.10, 2.20, 2.05, 3.00, 2.09, 2.10, 2.22] },
+          { name: "SQF-4", cap: 69.75, mTarget: 69.75, tMTD: 69.75, aMTD: 68.74, util: "99.0%", days: [1.76, 2.14, 2.15, 2.64, 1.59, 2.17, 2.06, 1.71, 2.05, 3.25, 2.02, 2.89, 1.79, 1.67, 2.02, 3.12, 1.91, 2.83, 1.79, 2.05, 2.10, 1.69, 2.84, 2.04, 2.88, 2.12, 2.06, 2.71, 1.58, 3.17, 1.93] }
+        ],
+        totals: [9.60, 9.68, 9.48, 8.39, 5.33, 9.28, 8.59, 9.08, 7.78, 10.53, 8.91, 10.36, 7.70, 9.08, 8.19, 10.33, 8.37, 7.98, 7.62, 7.75, 8.61, 8.14, 9.34, 9.08, 9.45, 9.10, 9.23, 10.85, 8.27, 10.63, 8.51],
+        cumu: [9.60, 19.27, 28.75, 37.14, 42.47, 51.76, 60.35, 69.42, 77.21, 87.74, 96.65, 107.02, 114.72, 123.79, 131.99, 142.32, 150.69, 158.70, 166.29, 174.04, 182.66, 190.80, 200.14, 209.22, 218.67, 227.77, 237.00, 247.85, 256.12, 266.75, 275.26]
+      },
+      "AUGUST-2026": {
+        targetNote: "Per day production target is 2.25 ton/furnace (FY:2026-2027)",
+        monthTarget: 279.0, targetMTD: 225.0, actualMTD: 224.86, avgProd: "8.6 Ton", variance: "-0.14 Ton", daysCount: 31,
+        furnaces: [
+          { name: "SQF-1", cap: 69.75, mTarget: 69.75, tMTD: 56.25, aMTD: 56.74, util: "101.0%", days: [1.74, 3.06, 2.23, 2.23, 1.97, 2.53, 2.53, 2.79, 2.53, 1.87, 1.87, 2.53, 2.87, 1.87, 1.99, 0.79, 2.62, 2.53, 2.87, 1.75, 2.53, 1.84, 2.35, 2.38, 2.53, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00] },
+          { name: "SQF-2", cap: 69.75, mTarget: 69.75, tMTD: 56.25, aMTD: 55.15, util: "98.0%", days: [2.89, 2.03, 2.53, 1.69, 1.75, 2.97, 1.89, 2.09, 1.74, 1.85, 2.68, 2.64, 1.74, 2.68, 1.87, 1.98, 2.84, 1.66, 2.68, 2.60, 0.87, 2.68, 2.53, 2.45, 1.83, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00] },
+          { name: "SQF-3", cap: 69.75, mTarget: 69.75, tMTD: 56.25, aMTD: 55.35, util: "98.0%", days: [2.20, 2.05, 3.25, 2.05, 2.20, 2.20, 2.09, 2.12, 2.13, 2.21, 2.13, 3.14, 2.04, 2.20, 2.04, 2.06, 2.09, 2.04, 2.80, 1.97, 2.07, 2.16, 2.06, 1.96, 2.08, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00] },
+          { name: "SQF-4", cap: 69.75, mTarget: 69.75, tMTD: 56.25, aMTD: 57.62, util: "102.0%", days: [3.17, 1.93, 2.09, 2.50, 2.11, 2.30, 1.98, 2.89, 2.07, 3.07, 2.25, 2.50, 2.60, 2.00, 3.19, 1.55, 2.35, 1.13, 2.45, 1.52, 3.00, 1.99, 2.65, 2.43, 1.90, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00] }
+        ],
+        totals: [10.00, 9.08, 10.09, 8.47, 8.03, 9.99, 8.48, 9.88, 8.46, 8.99, 8.93, 10.80, 9.24, 8.75, 9.10, 6.39, 9.90, 7.36, 10.80, 7.85, 8.46, 8.67, 9.58, 9.23, 8.33, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+        cumu: [10.00, 19.08, 29.16, 37.64, 45.66, 55.66, 64.14, 74.02, 82.48, 91.47, 100.41, 111.20, 120.45, 129.20, 138.29, 144.68, 154.58, 161.90, 172.73, 180.58, 189.04, 197.71, 207.30, 216.53, 224.86, 224.86, 224.86, 224.86, 224.86, 224.86, 224.86]
       }
     };
 
-    function updateDWMData() {
-      const selectedMonth = document.getElementById('monthDropdown').value;
+    function switchMainTab(tabId, btn) {
+      document.querySelectorAll('.module-view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-main-btn').forEach(b => b.classList.remove('active'));
+      
+      document.getElementById('view-' + tabId).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    function renderDWMData() {
+      const selectedMonth = document.getElementById('dwmMonthDropdown').value;
       const data = dwmDatabase[selectedMonth] || dwmDatabase["MARCH-2026"];
 
-      // Update KPIs
+      // Update KPIs & Target Note
       document.getElementById('kpiMonthTarget').innerText = `${data.monthTarget} Ton`;
       document.getElementById('kpiTargetMTD').innerText = `${data.targetMTD} Ton`;
       document.getElementById('kpiActualMTD').innerText = `${data.actualMTD} Ton`;
       document.getElementById('kpiAvgProd').innerText = data.avgProd;
       document.getElementById('kpiVariance').innerText = data.variance;
-      document.getElementById('dwmTitleTitle').innerText = `📋 Daily Work Management (DWM) - ${selectedMonth}`;
+      document.getElementById('targetNoteText').innerText = `⚡ ${data.targetNote}`;
+      document.getElementById('dwmTableTitle').innerText = `📋 Daily Work Management (DWM) - ${selectedMonth}`;
+
+      // Build Headers (Furnace, Cap, Month Target, Target MTD, Actual MTD, Cap Utilized + Days 1 to daysCount)
+      let headerHtml = `
+        <th style="min-width: 90px;">FURNACE</th>
+        <th>Furnace Capacity</th>
+        <th>Month Target</th>
+        <th>Target MTD</th>
+        <th>Actual MTD</th>
+        <th>Cap. Utilized</th>
+      `;
+      for(let d = 1; d <= data.daysCount; d++) {
+        headerHtml += `<th>${d}</th>`;
+      }
+      document.getElementById('dwmHeaderRow').innerHTML = headerHtml;
 
       // Build Table Body
       let tbodyHtml = "";
-
       data.furnaces.forEach(f => {
         tbodyHtml += `<tr>
           <td style="font-weight:700; color:#38bdf8;">${f.name}</td>
@@ -278,41 +387,43 @@
           <td style="font-weight:700;">${f.aMTD}</td>
           <td>${f.util}</td>`;
 
-        f.days.forEach(val => {
+        for(let i = 0; i < data.daysCount; i++) {
+          let val = f.days[i] !== undefined ? f.days[i] : 0;
           let cssClass = val >= 2.1 ? "cell-green" : "cell-red";
           if (val === 0) cssClass = "";
           tbodyHtml += `<td class="${cssClass}">${val > 0 ? val.toFixed(2) : '-'}</td>`;
-        });
-
+        }
         tbodyHtml += `</tr>`;
       });
 
       // Total in Ton Row
       tbodyHtml += `<tr class="total-row">
         <td>TOTAL IN TON</td>
-        <td>270.0</td>
-        <td>270.0</td>
-        <td>270.0</td>
+        <td>${data.monthTarget}</td>
+        <td>${data.monthTarget}</td>
+        <td>${data.targetMTD}</td>
         <td>${data.actualMTD}</td>
-        <td>90.1%</td>`;
-      data.totals.forEach(t => {
-        tbodyHtml += `<td>${t.toFixed(2)}</td>`;
-      });
+        <td>${((data.actualMTD / data.targetMTD)*100).toFixed(1)}%</td>`;
+      for(let i = 0; i < data.daysCount; i++) {
+        let tVal = data.totals[i] || 0;
+        tbodyHtml += `<td>${tVal > 0 ? tVal.toFixed(2) : '-'}</td>`;
+      }
       tbodyHtml += `</tr>`;
 
       // Cumulative Total Row
       tbodyHtml += `<tr class="total-row" style="background:#111827 !important;">
         <td>CUMULATIVE TOTAL</td>
         <td colspan="5">LOT MTD</td>`;
-      data.cumu.forEach(c => {
-        tbodyHtml += `<td>${c.toFixed(2)}</td>`;
-      });
+      for(let i = 0; i < data.daysCount; i++) {
+        let cVal = data.cumu[i] || 0;
+        tbodyHtml += `<td>${cVal > 0 ? cVal.toFixed(2) : '-'}</td>`;
+      }
       tbodyHtml += `</tr>`;
 
       document.getElementById('dwmTableBody').innerHTML = tbodyHtml;
     }
 
-    window.addEventListener('DOMContentLoaded', updateDWMData);
+    window.addEventListener('DOMContentLoaded', renderDWMData);
   </script>
 </body>
 </html>
