@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Production Daily DWM Dashboard</title>
+  <title>Milestone Gear - Live Production Intelligence</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     body {
-      background: #090d16;
-      color: #e2e8f0;
+      background: #070d1b;
+      color: #f1f5f9;
       font-family: 'Inter', sans-serif;
       margin: 0;
       padding: 0;
@@ -21,713 +21,240 @@
     }
 
     /* Top Bar */
-    .top-bar {
+    .top-header {
+      background: #0f172a;
+      border-bottom: 1px solid #1e293b;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       position: sticky;
       top: 0;
-      background: #111827;
-      border-bottom: 1px solid #1f2937;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 18px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
-      z-index: 1000;
+      z-index: 100;
     }
-    .nav-left { display: flex; align-items: center; gap: 12px; }
-    .back-btn {
-      background: #1f2937;
-      border: 1px solid #374151;
-      color: #38bdf8;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-weight: 600;
-      text-decoration: none;
-      font-size: 12px;
-      transition: 0.2s;
-    }
-    .back-btn:hover { background: #38bdf8; color: #090d16; }
-    .nav-left h1 { font-size: 15px; margin: 0; color: #f9fafb; font-weight: 600; letter-spacing: -0.2px; }
+    .brand-title { display: flex; align-items: center; gap: 10px; }
+    .brand-title h1 { font-size: 15px; font-weight: 700; margin: 0; color: #f8fafc; letter-spacing: 0.3px; }
+    .live-indicator { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: #34d399; background: rgba(52,211,153,0.1); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(52,211,153,0.2); }
+    .pulse-dot { width: 7px; height: 7px; background: #34d399; border-radius: 50%; box-shadow: 0 0 8px #34d399; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
-    .add-btn {
-      background: #f97316;
-      color: white;
-      border: none;
-      padding: 7px 14px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      transition: 0.2s;
-    }
-    .add-btn:hover { background: #ea580c; }
+    .main-wrapper { max-width: 1400px; width: 100%; margin: 0 auto; padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 16px; }
 
-    .dashboard-container {
-      max-width: 1400px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 12px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
+    /* 4-Furnace Status Quick Dock */
+    .furnace-dock { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .fc-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px; position: relative; overflow: hidden; }
+    .fc-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: #3b82f6; }
+    .fc-card.active::before { background: #34d399; }
+    .fc-header { display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
+    .fc-status { font-size: 9.5px; padding: 2px 6px; border-radius: 4px; background: rgba(52,211,153,0.15); color: #34d399; }
+    .fc-body h4 { margin: 0; font-size: 13px; color: #f8fafc; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fc-body p { margin: 2px 0 0 0; font-size: 10px; color: #64748b; }
 
-    /* 1. Daily DWM Matrix */
-    .dwm-section {
-      background: #111827;
-      border: 1px solid #1f2937;
-      border-radius: 10px;
-      padding: 14px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-    }
-    .dwm-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid #1f2937;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .dwm-header h3 { margin: 0; font-size: 14px; color: #38bdf8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    /* Control & Search Bar */
+    .control-panel { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 14px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .search-box { flex: 1; min-width: 240px; position: relative; }
+    .search-box input { width: 100%; background: #070d1b; border: 1px solid #334155; color: #fff; padding: 10px 12px 10px 36px; border-radius: 8px; font-size: 12.5px; outline: none; }
+    .search-box input:focus { border-color: #f97316; }
+    .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #94a3b8; }
     
-    .target-info-text {
-      font-size: 11px;
-      color: #9ca3af;
-      background: rgba(17, 24, 39, 0.8);
-      padding: 5px 10px;
-      border-radius: 6px;
-      border: 1px solid #374151;
-    }
-    .target-info-text span { color: #34d399; font-weight: 600; }
+    .filter-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .pill { background: #1e293b; border: 1px solid #334155; color: #cbd5e1; padding: 8px 14px; border-radius: 8px; font-size: 11.5px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .pill.active, .pill:hover { background: #f97316; border-color: #f97316; color: #fff; }
 
-    .month-filter {
-      background: #090d16;
-      border: 1px solid #374151;
-      color: #fde047;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      outline: none;
-      cursor: pointer;
-    }
+    /* Summary KPI Row */
+    .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .kpi-box { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 12px 16px; display: flex; flex-direction: column; justify-content: center; }
+    .kpi-box span { font-size: 10px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
+    .kpi-box h3 { margin: 4px 0 0 0; font-size: 18px; font-weight: 700; color: #38bdf8; }
 
-    .table-responsive {
-      overflow-x: auto;
-      width: 100%;
-      -webkit-overflow-scrolling: touch;
-      border: 1px solid #1f2937;
-      border-radius: 6px;
-    }
-
-    table {
-      border-collapse: collapse;
-      font-size: 11px;
-      white-space: nowrap;
-      text-align: center;
-      width: max-content;
-    }
+    /* Modern Grid Cards Area (Power BI Style Feed) */
+    .feed-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+    .prod-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; transition: 0.2s; position: relative; }
+    .prod-card:hover { border-color: #334155; transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
     
-    th:first-child, td:first-child {
-      position: sticky;
-      left: 0;
-      background: #090d16;
-      z-index: 2;
-      border-right: 2px solid #1f2937;
-      font-weight: 600;
-    }
-    th:first-child { z-index: 3; }
+    .card-header-row { display: flex; justify-content: space-between; align-items: flex-start; }
+    .part-tag { font-size: 14px; font-weight: 700; color: #f8fafc; margin: 0; }
+    .cust-badge { font-size: 10px; font-weight: 600; background: rgba(249,115,22,0.15); color: #f97316; border: 1px solid rgba(249,115,22,0.3); padding: 3px 8px; border-radius: 6px; }
 
-    th, td { border: 1px solid #1f2937; padding: 5px 8px; }
-    th { background: #090d16; color: #9ca3af; font-weight: 600; }
+    .specs-grid-mini { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: #070d1b; padding: 8px; border-radius: 8px; border: 1px solid #1e293b; }
+    .spec-item { display: flex; flex-direction: column; }
+    .spec-item span { font-size: 8.5px; color: #64748b; font-weight: 600; text-transform: uppercase; }
+    .spec-item strong { font-size: 11px; color: #fde047; font-weight: 600; margin-top: 1px; }
 
-    .vertical-text {
-      writing-mode: vertical-rl;
-      transform: rotate(180deg);
-      white-space: nowrap;
-      height: 75px;
-      text-align: center;
-      display: inline-block;
-      font-size: 10px;
-      color: #9ca3af;
-    }
+    .card-footer-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #1e293b; padding-top: 10px; margin-top: 2px; }
+    .batch-info { font-size: 11px; color: #94a3b8; }
+    .batch-info b { color: #38bdf8; }
 
-    .day-col { min-width: 24px; font-weight: 600; background: #111827; padding: 4px 2px; }
+    .action-btn-group { display: flex; gap: 6px; }
+    .btn-action { background: #1e293b; border: 1px solid #334155; color: #e2e8f0; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; text-decoration: none; transition: 0.2s; display: flex; align-items: center; gap: 4px; }
+    .btn-action:hover { background: #3b82f6; border-color: #3b82f6; color: white; }
 
-    .cell-green { background: rgba(34, 197, 94, 0.12) !important; color: #4ade80 !important; font-weight: 600; }
-    .cell-red { background: rgba(239, 68, 68, 0.12) !important; color: #f87171 !important; font-weight: 600; }
-    .cell-highlight { background: rgba(255, 255, 255, 0.02); font-weight: 500; }
-    
-    .total-row td { background: #090d16 !important; font-weight: 700; color: #f9fafb; border-top: 2px solid #374151; }
-    .cumulative-row td { background: #111827 !important; font-weight: 600; color: #f9fafb;}
-
-    /* DWM Analytics Row inside Table (Run-rate removed) */
-    .dwm-analytics-row td {
-      background: #090d16 !important;
-      padding: 10px;
-      border-top: 2px solid #1f2937;
+    @media (max-width: 900px) {
+      .furnace-dock { grid-template-columns: repeat(2, 1fr); }
+      .kpi-row { grid-template-columns: repeat(2, 1fr); }
     }
-    .dwm-analytics-container {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      text-align: center;
+    @media (max-width: 600px) {
+      .furnace-dock { grid-template-columns: 1fr; }
+      .kpi-row { grid-template-columns: 1fr; }
     }
-    .dwm-analytics-item {
-      background: #111827;
-      border: 1px solid #1f2937;
-      padding: 8px 6px;
-      border-radius: 6px;
-    }
-    .dwm-analytics-item span { display: block; font-size: 9.5px; color: #9ca3af; text-transform: uppercase; font-weight: 600; letter-spacing: 0.3px; }
-    .dwm-analytics-item strong { display: block; font-size: 13px; color: #38bdf8; font-weight: 700; margin-top: 3px; }
-
-    /* 2. Till Date Production (Bold, Clean & Attractive without small 'T') */
-    .bottom-kpi-section {
-      background: #111827;
-      border: 1px solid #1f2937;
-      border-radius: 10px;
-      padding: 14px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-    }
-    .bottom-kpi-section h3 { margin: 0 0 10px 0; color: #fde047; font-size: 13px; border-bottom: 1px solid #1f2937; padding-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-    
-    .kpi-till-date-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 8px;
-    }
-    .kpi-sqf-box {
-      background: #090d16;
-      border: 1px solid #1f2937;
-      border-radius: 6px;
-      padding: 10px 6px;
-      text-align: center;
-    }
-    .kpi-sqf-box span { display: block; font-size: 10px; color: #9ca3af; font-weight: 600; text-transform: uppercase; margin-bottom: 3px; }
-    .kpi-sqf-box strong { display: block; font-size: 15px; color: #f9fafb; font-weight: 700; letter-spacing: -0.3px; }
-
-    /* 3. Bottom 3 Navigation Buttons */
-    .bottom-nav-buttons {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 4px;
-    }
-    .nav-card-btn {
-      background: #111827;
-      border: 1px solid #1f2937;
-      border-top: 3px solid #f97316;
-      border-radius: 8px;
-      padding: 12px 6px;
-      text-align: center;
-      color: #f9fafb;
-      font-weight: 600;
-      font-size: 12px;
-      cursor: pointer;
-      text-decoration: none;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      transition: 0.2s;
-    }
-    .nav-card-btn:hover { background: #1f2937; }
-    .nav-card-btn:nth-child(2) { border-top-color: #38bdf8; }
-    .nav-card-btn:nth-child(3) { border-top-color: #ef4444; }
-
-    /* Modal Styling */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8);
-      backdrop-filter: blur(4px);
-      z-index: 2000;
-      justify-content: center;
-      align-items: center;
-      padding: 12px;
-    }
-    .modal-content {
-      background: #111827;
-      border: 1px solid #374151;
-      border-radius: 12px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-      display: flex;
-      flex-direction: column;
-    }
-    .modal-header {
-      padding: 14px 18px;
-      background: #090d16;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #1f2937;
-      border-radius: 12px 12px 0 0;
-    }
-    .modal-header h3 { margin: 0; color: #38bdf8; font-size: 14px; font-weight: 600; }
-    .close-btn { font-size: 22px; cursor: pointer; color: #9ca3af; line-height: 1; }
-    
-    .modal-body {
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-    .form-group { display: flex; flex-direction: column; gap: 5px; }
-    .form-group label { font-size: 11px; color: #9ca3af; font-weight: 600; text-transform: uppercase; }
-    .form-group input {
-      background: #090d16;
-      border: 1px solid #374151;
-      color: #fde047;
-      padding: 9px 12px;
-      border-radius: 6px;
-      font-size: 13px;
-      outline: none;
-      font-family: inherit;
-      font-weight: 600;
-    }
-    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-    .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
-    .submit-btn {
-      background: #10b981; color: #090d16; border: none; padding: 10px;
-      border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.2s;
-    }
-    .submit-btn:hover { background: #059669; }
-    .clear-btn {
-      background: #ef4444; color: white; border: none; padding: 10px;
-      border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.2s;
-    }
-    .clear-btn:hover { background: #dc2626; }
   </style>
 </head>
 <body>
 
-  <!-- Top Navigation -->
-  <header class="top-bar">
-    <div class="nav-left">
-      <a href="index.html" class="back-btn">⬅ Home</a>
-      <h1>🏭 Production Tracker</h1>
+  <header class="top-header">
+    <div class="brand-title">
+      <span style="font-size: 18px;">⚙️</span>
+      <h1>Milestone Gear - Live Plant Control</h1>
     </div>
-    <button class="add-btn" onclick="openEntryModal()">➕ Add Data</button>
+    <div class="live-indicator">
+      <div class="pulse-dot"></div>
+      <span>SYSTEM LIVE</span>
+    </div>
   </header>
 
-  <div class="dashboard-container">
-    
-    <!-- 1. Daily DWM Matrix (DWM on Top) -->
-    <div class="dwm-section">
-      <div class="dwm-header">
-        <h3>📊 Daily DWM (DWM)</h3>
-        <div class="target-info-text">
-          Target: <span>2.25 ton/furnace</span>
+  <div class="main-wrapper">
+
+    <!-- 4 Furnaces Live Status Dock -->
+    <div class="furnace-dock">
+      <div class="fc-card active">
+        <div class="fc-header"><span>Furnace 01</span><span class="fc-status">Running</span></div>
+        <div class="fc-body">
+          <h4>Helical Gear Range B</h4>
+          <p>Batch: B-2026-041 | F/C 1</p>
         </div>
-        <select id="monthSelector" class="month-filter" onchange="renderDWMTable()">
-          <option value="2026-12">December</option>
-          <option value="2026-11">November</option>
-          <option value="2026-10">October</option>
-          <option value="2026-09">September</option>
-          <option value="2026-08" selected>August</option>
-          <option value="2026-07">July</option>
-          <option value="2026-06">June</option>
-          <option value="2026-05">May</option>
-          <option value="2026-04">April</option>
-        </select>
       </div>
-
-      <div class="table-responsive">
-        <table>
-          <thead>
-            <tr id="tableHeaderRow">
-              <th>FURNACE</th>
-              <th><span class="vertical-text">Capacity</span></th>
-              <th><span class="vertical-text">Month Target</span></th>
-              <th><span class="vertical-text">Target MTD</span></th>
-              <th><span class="vertical-text">Actual MTD</span></th>
-              <th><span class="vertical-text">Cap. Utilized</span></th>
-            </tr>
-          </thead>
-          <tbody id="dwmTableBody"></tbody>
-        </table>
+      <div class="fc-card active">
+        <div class="fc-header"><span>Furnace 02</span><span class="fc-status">Running</span></div>
+        <div class="fc-body">
+          <h4>Spur Gear (TRI46803)</h4>
+          <p>Batch: B-2026-042 | F/C 2</p>
+        </div>
       </div>
-    </div>
-
-    <!-- 2. Till Date Production (Bold & Synchronized) -->
-    <div class="bottom-kpi-section">
-      <h3>🏆 Till Date Production (TD)</h3>
-      <div class="kpi-till-date-grid">
-        <div class="kpi-sqf-box"><span>SQF-1</span><strong id="kpi-sqf1">0.00</strong></div>
-        <div class="kpi-sqf-box"><span>SQF-2</span><strong id="kpi-sqf2">0.00</strong></div>
-        <div class="kpi-sqf-box"><span>SQF-3</span><strong id="kpi-sqf3">0.00</strong></div>
-        <div class="kpi-sqf-box"><span>SQF-4</span><strong id="kpi-sqf4">0.00</strong></div>
-        <div class="kpi-sqf-box" style="border-color: #fde047;">
-          <span style="color: #fde047;">TOTAL</span>
-          <strong id="kpi-total">0.00</strong>
+      <div class="fc-card">
+        <div class="fc-header"><span>Furnace 03</span><span class="fc-status" style="background:rgba(239,68,68,0.15); color:#ef4444;">Idle</span></div>
+        <div class="fc-body">
+          <h4>No Active Lot</h4>
+          <p>Ready for Loading</p>
+        </div>
+      </div>
+      <div class="fc-card active">
+        <div class="fc-header"><span>Furnace 04</span><span class="fc-status">Running</span></div>
+        <div class="fc-body">
+          <h4>Bevel Gear (CE36221)</h4>
+          <p>Batch: B-2026-044 | F/C 4</p>
         </div>
       </div>
     </div>
 
-    <!-- 3. Bottom 3 Navigation Buttons -->
-    <div class="bottom-nav-buttons">
-      <a href="under-construction.html?module=daily" class="nav-card-btn">Daily Production</a>
-      <a href="under-construction.html?module=monthly" class="nav-card-btn">Monthly Production</a>
-      <a href="under-construction.html?module=yearly" class="nav-card-btn">Yearly Production</a>
+    <!-- Filter & Control Panel -->
+    <div class="control-panel">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Quick search part name, MS No, batch or customer...">
+      </div>
+      <div class="filter-pills">
+        <div class="pill active">All</div>
+        <div class="pill">F/C 1</div>
+        <div class="pill">F/C 2</div>
+        <div class="pill">F/C 3</div>
+        <div class="pill">F/C 4</div>
+      </div>
+    </div>
+
+    <!-- KPI Summary Row -->
+    <div class="kpi-row">
+      <div class="kpi-box">
+        <span>Today's Total Output</span>
+        <h3>14,850 Pcs</h3>
+      </div>
+      <div class="kpi-box">
+        <span>Active Lots Processed</span>
+        <h3>18 Lots</h3>
+      </div>
+      <div class="kpi-box">
+        <span>Total Hardened Wt</span>
+        <h3>6,420 Kg</h3>
+      </div>
+      <div class="kpi-box">
+        <span>Furnace Utilization</span>
+        <h3>88.5%</h3>
+      </div>
+    </div>
+
+    <!-- Modern Card Feed (Instead of heavy table) -->
+    <div class="feed-container">
+      
+      <!-- Sample Card 1 -->
+      <div class="prod-card">
+        <div class="card-header-row">
+          <div>
+            <p class="part-tag">SU70247</p>
+            <span style="font-size: 11px; color: #94a3b8;">Helical Gear Range B Driven</span>
+          </div>
+          <span class="cust-badge">JOHN DEERE</span>
+        </div>
+
+        <div class="specs-grid-mini">
+          <div class="spec-item">
+            <span>Surf. Hardness</span>
+            <strong>58-64 HRC</strong>
+          </div>
+          <div class="spec-item">
+            <span>Core Hardness</span>
+            <strong>25-45 HRC</strong>
+          </div>
+          <div class="spec-item">
+            <span>E.C.D</span>
+            <strong>0.60-1.0 mm</strong>
+          </div>
+        </div>
+
+        <div class="card-footer-row">
+          <div class="batch-info">Batch: <b>LOT-802</b> | Qty: <b>450 Pcs</b></div>
+          <div class="action-btn-group">
+            <button class="btn-action">📄 SIP PDF</button>
+            <button class="btn-action" style="background:#3b82f6; border-color:#3b82f6;">⚙️ Cycle</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sample Card 2 -->
+      <div class="prod-card">
+        <div class="card-header-row">
+          <div>
+            <p class="part-tag">TRI46803</p>
+            <span style="font-size: 11px; color: #94a3b8;">Spur Gear</span>
+          </div>
+          <span class="cust-badge">JOHN DEERE</span>
+        </div>
+
+        <div class="specs-grid-mini">
+          <div class="spec-item">
+            <span>Surf. Hardness</span>
+            <strong>58-64 HRC</strong>
+          </div>
+          <div class="spec-item">
+            <span>Core Hardness</span>
+            <strong>25-45 HRC</strong>
+          </div>
+          <div class="spec-item">
+            <span>E.C.D</span>
+            <strong>0.95-1.25 mm</strong>
+          </div>
+        </div>
+
+        <div class="card-footer-row">
+          <div class="batch-info">Batch: <b>LOT-803</b> | Qty: <b>320 Pcs</b></div>
+          <div class="action-btn-group">
+            <button class="btn-action">📄 SIP PDF</button>
+            <button class="btn-action" style="background:#3b82f6; border-color:#3b82f6;">⚙️ Cycle</button>
+          </div>
+        </div>
+      </div>
+
     </div>
 
   </div>
 
-  <!-- Secure Form Modal -->
-  <div class="modal-overlay" id="entryModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>➕ Add / Edit Data</h3>
-        <span class="close-btn" onclick="closeEntryModal()">&times;</span>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Select Date</label>
-          <input type="date" id="entryDate" required>
-        </div>
-
-        <div class="row-2">
-          <div class="form-group">
-            <label>SQF-1 (Tons)</label>
-            <input type="number" id="sqf1Qty" placeholder="0.00" step="0.01">
-          </div>
-          <div class="form-group">
-            <label>SQF-2 (Tons)</label>
-            <input type="number" id="sqf2Qty" placeholder="0.00" step="0.01">
-          </div>
-        </div>
-
-        <div class="row-2">
-          <div class="form-group">
-            <label>SQF-3 (Tons)</label>
-            <input type="number" id="sqf3Qty" placeholder="0.00" step="0.01">
-          </div>
-          <div class="form-group">
-            <label>SQF-4 (Tons)</label>
-            <input type="number" id="sqf4Qty" placeholder="0.00" step="0.01">
-          </div>
-        </div>
-
-        <hr style="border-color: #1f2937; margin: 4px 0;">
-
-        <div class="row-2">
-          <div class="form-group">
-            <label style="color:#38bdf8;">Target MTD</label>
-            <input type="number" id="formTargetMtd" placeholder="e.g. 216" step="0.1">
-          </div>
-          <div class="form-group">
-            <label style="color:#38bdf8;">Lot MTD</label>
-            <input type="number" id="formLotMtd" placeholder="e.g. 236">
-          </div>
-        </div>
-
-        <div class="form-group" style="margin-top: 4px;">
-          <label style="color:#ef4444;">Authorization PIN</label>
-          <input type="password" id="authPin" placeholder="PIN (1234)" style="border-color:#ef4444;">
-        </div>
-
-        <div class="btn-group">
-          <button class="clear-btn" onclick="clearProductionData()">🗑️ Clear</button>
-          <button class="submit-btn" onclick="saveProduction()">💾 Save</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    function getDaysInMonth(year, month) {
-      return new Date(year, month, 0).getDate();
-    }
-
-    const monthDataStore = {
-      "2026-04": { targetMtd: 270.0, lotMtd: 275, furnaces: [
-        { name: "SQF-1", cap: 67.5, tgt: 67.5, days: [1.66, 1.58, 3.16, 2.53, 2.37, 3.16, 2.37, 2.53, 3.18, 2.02, 2.53, 2.53, 2.37, 0.79, 3.47, 2.53, 2.53, 2.53, 2.53, 1.67, 2.53, 2.15, 2.02, 2.97, 2.14, 1.74, 2.53, 1.74, 1.46, 2.37] },
-        { name: "SQF-2", cap: 67.5, tgt: 67.5, days: [2.18, 2.74, 1.95, 1.81, 2.24, 2.89, 1.87, 1.00, 2.02, 0.72, 2.83, 1.67, 2.00, 1.74, 1.51, 0.88, 2.66, 1.67, 1.00, 2.38, 1.82, 2.53, 1.77, 0.60, 2.06, 1.74, 3.32, 1.84, 2.29, 2.02] },
-        { name: "SQF-3", cap: 67.5, tgt: 67.5, days: [2.17, 3.30, 2.13, 1.44, 3.28, 1.59, 3.00, 1.74, 2.01, 2.17, 3.18, 1.58, 1.90, 1.85, 2.12, 3.07, 1.85, 1.93, 2.01, 2.53, 1.85, 1.04, 1.78, 0,0,0,0,0,0,0] },
-        { name: "SQF-4", cap: 67.5, tgt: 67.5, days: [2.07, 2.93, 1.64, 2.55, 2.21, 2.55, 2.05, 3.26, 2.10, 2.34, 2.88, 1.72, 2.66, 2.19, 2.35, 2.09, 1.61, 1.96, 1.61, 2.65, 2.88, 1.51, 2.22, 1.92, 2.85, 1.91, 1.98, 2.30, 2.17, 1.08] }
-      ]},
-      "2026-05": { targetMtd: 279.0, lotMtd: 262, furnaces: [
-        { name: "SQF-1", cap: 69.75, tgt: 69.75, days: [2.02, 2.49, 0.95, 2.37, 2.52, 3.47, 2.81, 1.89, 2.53, 2.68, 2.37, 2.37, 2.50, 0,0,0,0,0, 2.68, 2.04, 2.53, 2.62, 2.04, 2.83, 1.74, 2.68, 2.64, 1.87, 3.02, 1.92, 2.01] },
-        { name: "SQF-2", cap: 69.75, tgt: 69.75, days: [2.53, 2.94, 1.74, 1.69, 1.03, 2.63, 1.79, 2.58, 1.74, 2.37, 0.95, 1.94, 1.99, 1.58, 2.68, 2.68, 2.54, 2.55, 2.68, 2.79, 1.03, 1.82, 2.37, 2.37, 1.82, 1.74, 2.00, 2.73, 1.91, 1.86, 2.53] },
-        { name: "SQF-3", cap: 69.75, tgt: 69.75, days: [1.51, 3.14, 2.24, 1.99, 2.14, 2.01, 2.24, 1.91, 2.14, 1.98, 2.71, 1.74, 2.15, 2.17, 1.99, 2.13, 2.06, 2.13, 2.05, 2.46, 1.93, 2.61, 2.09, 2.73, 0,0,0,0,0,0,0] },
-        { name: "SQF-4", cap: 69.75, tgt: 69.75, days: [2.10, 2.80, 2.48, 1.51, 2.18, 1.67, 2.67, 2.12, 1.85, 3.09, 2.45, 1.42, 1.98, 1.45, 2.70, 2.99, 2.02, 2.12, 2.74, 1.13, 0,0,0,0,0, 2.70, 1.95, 2.12, 2.08, 1.66, 1.96] }
-      ]},
-      "2026-06": { targetMtd: 270.0, lotMtd: 285, furnaces: [
-        { name: "SQF-1", cap: 67.5, tgt: 67.5, days: [2.01, 2.53, 2.78, 1.79, 1.67, 2.53, 2.37, 2.68, 2.74, 1.74, 2.74, 2.37, 0,0,0,0,0, 1.79, 2.01, 1.83, 2.08, 1.95, 2.53, 2.97, 1.83, 2.37, 1.85, 1.95, 2.68, 2.53] },
-        { name: "SQF-2", cap: 67.5, tgt: 67.5, days: [1.79, 2.58, 1.37, 1.04, 2.82, 1.67, 2.02, 1.51, 2.09, 2.16, 2.06, 1.95, 2.68, 1.79, 2.68, 2.78, 2.78, 2.68, 2.53, 2.00, 1.94, 2.66, 1.85, 1.95, 1.58, 2.81, 1.95, 2.62, 1.49, 2.37] },
-        { name: "SQF-3", cap: 67.5, tgt: 67.5, days: [1.10, 3.05, 1.96, 2.09, 2.13, 2.04, 2.16, 1.99, 2.07, 1.67, 1.05, 3.20, 2.08, 2.13, 2.62, 1.44, 2.04, 2.22, 3.33, 2.23, 2.17, 2.14, 3.11, 1.60, 2.22, 2.73, 2.04, 2.12, 2.01, 3.19] },
-        { name: "SQF-4", cap: 67.5, tgt: 67.5, days: [2.41, 1.81, 2.48, 1.97, 2.84, 1.93, 2.85, 2.54, 1.98, 2.15, 2.86, 1.73, 2.79, 2.97, 1.62, 3.04, 2.13, 2.07, 3.04, 1.88, 2.49, 2.41, 2.51, 2.54, 2.61, 1.83, 1.83, 2.62, 1.45, 1.60] }
-      ]},
-      "2026-07": { targetMtd: 279.0, lotMtd: 297, furnaces: [
-        { name: "SQF-1", cap: 69.75, tgt: 69.75, days: [3.32, 2.53, 2.77, 1.58, 0.79, 2.61, 2.06, 1.83, 1.74, 2.93, 2.78, 1.83, 2.44, 1.53, 1.83, 2.37, 2.65, 1.28, 0.95, 2.53, 2.60, 2.23, 2.62, 1.89, 2.10, 2.68, 2.44, 2.61, 2.53, 2.68, 1.83] },
-        { name: "SQF-2", cap: 69.75, tgt: 69.75, days: [2.37, 2.00, 2.58, 1.79, 1.00, 2.58, 2.53, 2.74, 1.79, 2.26, 2.00, 2.68, 1.47, 2.68, 2.78, 2.88, 1.79, 1.74, 2.73, 1.00, 1.79, 2.04, 1.91, 2.58, 2.37, 2.10, 2.68, 2.53, 2.08, 2.68, 2.53] },
-        { name: "SQF-3", cap: 69.75, tgt: 69.75, days: [2.15, 3.01, 1.97, 2.38, 1.94, 1.92, 1.94, 2.80, 2.20, 2.10, 2.10, 2.96, 2.00, 3.20, 1.57, 1.96, 2.02, 2.13, 2.15, 2.17, 2.12, 2.18, 1.98, 2.57, 2.10, 2.20, 2.05, 3.00, 2.09, 2.10, 2.22] },
-        { name: "SQF-4", cap: 69.75, tgt: 69.75, days: [1.76, 2.14, 2.15, 2.64, 1.59, 2.17, 2.06, 1.71, 2.05, 3.25, 2.02, 2.89, 1.79, 1.67, 2.02, 3.12, 1.91, 2.83, 1.79, 2.05, 2.10, 1.69, 2.84, 2.04, 2.88, 2.12, 2.06, 2.71, 1.58, 3.17, 1.93] }
-      ]},
-      "2026-08": { targetMtd: 216.0, lotMtd: 236, furnaces: [
-        { name: "SQF-1", cap: 69.75, tgt: 69.75, days: [1.74, 3.06, 2.23, 2.23, 1.97, 2.53, 2.53, 2.79, 2.53, 1.87, 1.87, 2.53, 2.87, 1.87, 1.99, 0.79, 2.62, 2.53, 2.87, 1.75, 2.53, 1.84, 2.35, 2.38, 0,0,0,0,0,0,0] },
-        { name: "SQF-2", cap: 69.75, tgt: 69.75, days: [2.89, 2.03, 2.53, 1.69, 1.75, 2.97, 1.89, 2.09, 1.74, 1.85, 2.68, 2.64, 1.74, 2.68, 1.87, 1.98, 2.84, 1.66, 2.68, 2.60, 0.87, 2.68, 2.53, 2.45, 0,0,0,0,0,0,0] },
-        { name: "SQF-3", cap: 69.75, tgt: 69.75, days: [2.20, 2.05, 3.25, 2.05, 2.20, 2.20, 2.09, 2.12, 2.13, 2.21, 2.13, 3.14, 2.04, 2.20, 2.04, 2.06, 2.09, 2.04, 2.80, 1.97, 2.07, 2.16, 2.06, 1.96, 0,0,0,0,0,0,0] },
-        { name: "SQF-4", cap: 69.75, tgt: 69.75, days: [3.17, 1.93, 2.09, 2.50, 2.11, 2.30, 1.98, 2.89, 2.07, 3.07, 2.25, 2.50, 2.60, 2.00, 3.19, 1.55, 2.35, 1.13, 2.45, 1.52, 3.00, 1.99, 2.65, 2.43, 0,0,0,0,0,0,0] }
-      ]},
-      "2026-09": { targetMtd: 270.0, lotMtd: 0, furnaces: generateEmptyFurnaces(30) },
-      "2026-10": { targetMtd: 279.0, lotMtd: 0, furnaces: generateEmptyFurnaces(31) },
-      "2026-11": { targetMtd: 270.0, lotMtd: 0, furnaces: generateEmptyFurnaces(30) },
-      "2026-12": { targetMtd: 279.0, lotMtd: 0, furnaces: generateEmptyFurnaces(31) }
-    };
-
-    function generateEmptyFurnaces(days) {
-      return [
-        { name: "SQF-1", cap: 69.75, tgt: 69.75, days: new Array(days).fill(0) },
-        { name: "SQF-2", cap: 69.75, tgt: 69.75, days: new Array(days).fill(0) },
-        { name: "SQF-3", cap: 69.75, tgt: 69.75, days: new Array(days).fill(0) },
-        { name: "SQF-4", cap: 69.75, tgt: 69.75, days: new Array(days).fill(0) }
-      ];
-    }
-
-    function updateTillDateKPI() {
-      let totals = [0, 0, 0, 0];
-      let grandTotal = 0;
-      
-      for(let monthKey in monthDataStore) {
-        monthDataStore[monthKey].furnaces.forEach((f, idx) => {
-          let monthSum = f.days.reduce((acc, val) => acc + (val || 0), 0);
-          totals[idx] += monthSum;
-          grandTotal += monthSum;
-        });
-      }
-
-      document.getElementById('kpi-sqf1').innerHTML = `${totals[0].toFixed(2)}`;
-      document.getElementById('kpi-sqf2').innerHTML = `${totals[1].toFixed(2)}`;
-      document.getElementById('kpi-sqf3').innerHTML = `${totals[2].toFixed(2)}`;
-      document.getElementById('kpi-sqf4').innerHTML = `${totals[3].toFixed(2)}`;
-      document.getElementById('kpi-total').innerHTML = `${grandTotal.toFixed(2)}`;
-    }
-
-    function renderDWMTable() {
-      updateTillDateKPI();
-
-      const selectedMonth = document.getElementById("monthSelector").value;
-      const [yr, mo] = selectedMonth.split('-').map(Number);
-      const totalDays = getDaysInMonth(yr, mo);
-
-      const headerRow = document.getElementById("tableHeaderRow");
-      const tbody = document.getElementById("dwmTableBody");
-      
-      let headerHTML = `
-        <th>FURNACE</th>
-        <th><span class="vertical-text">Capacity</span></th>
-        <th><span class="vertical-text">Month Target</span></th>
-        <th><span class="vertical-text">Target MTD</span></th>
-        <th><span class="vertical-text">Actual MTD</span></th>
-        <th><span class="vertical-text">Cap. Utilized</span></th>
-      `;
-      for(let d=1; d<=totalDays; d++) {
-        headerHTML += `<th class="day-col">${d}</th>`;
-      }
-      headerRow.innerHTML = headerHTML;
-
-      const data = monthDataStore[selectedMonth] || { furnaces: generateEmptyFurnaces(totalDays), targetMtd: 0, lotMtd: 0 };
-      
-      let html = "";
-      let dailyTotals = new Array(totalDays).fill(0);
-      let runningSum = 0;
-      let grandCap = 0, grandMonthTgt = 0, grandActualMtd = 0;
-
-      data.furnaces.forEach(f => {
-        let actualMtd = f.days.slice(0, totalDays).reduce((acc, val) => acc + (val || 0), 0);
-        grandCap += f.cap; 
-        grandMonthTgt += f.tgt; 
-        grandActualMtd += actualMtd;
-
-        let daysHtml = "";
-        for(let idx=0; idx<totalDays; idx++) {
-          let val = f.days[idx] !== undefined ? f.days[idx] : 0;
-          dailyTotals[idx] += val;
-          let colorClass = val >= 2.0 ? "cell-green" : "cell-red";
-          if (val === 0) colorClass = "cell-red"; 
-          daysHtml += `<td class="${colorClass}">${val.toFixed(2)}</td>`;
-        }
-
-        let capUtil = (actualMtd / f.cap) * 100;
-
-        html += `
-          <tr>
-            <td>${f.name}</td>
-            <td class="cell-highlight">${f.cap.toFixed(1)}</td>
-            <td class="cell-highlight">${f.tgt.toFixed(1)}</td>
-            <td class="cell-highlight" style="color:#38bdf8;">${(data.targetMtd / 4).toFixed(1)}</td>
-            <td class="cell-highlight" style="font-weight:700; color:#fde047;">${actualMtd.toFixed(2)}</td>
-            <td class="cell-highlight">${capUtil.toFixed(1)}</td>
-            ${daysHtml}
-          </tr>
-        `;
-      });
-
-      let totalRowHtml = "";
-      let cumulativeRowHtml = "";
-
-      for (let i = 0; i < totalDays; i++) {
-        let dt = dailyTotals[i];
-        runningSum += dt;
-        totalRowHtml += `<td>${dt.toFixed(2)}</td>`;
-        cumulativeRowHtml += `<td style="color: ${runningSum > 0 ? '#f9fafb' : '#374151'};">${runningSum.toFixed(2)}</td>`;
-      }
-
-      let totalCapUtil = (grandActualMtd / grandCap * 100).toFixed(1);
-
-      html += `
-        <tr class="total-row">
-          <td style="color: white;">TOTAL IN TON</td>
-          <td>${grandCap.toFixed(1)}</td>
-          <td>${grandMonthTgt.toFixed(1)}</td>
-          <td style="color: #38bdf8;">${(data.targetMtd || 0).toFixed(1)}</td>
-          <td style="color: #f9fafb;">${grandActualMtd.toFixed(2)}</td>
-          <td>${totalCapUtil}</td>
-          ${totalRowHtml}
-        </tr>
-      `;
-
-      html += `
-        <tr class="cumulative-row">
-          <td style="color: #9ca3af; font-size: 10px;">Total No. Of<br>Lot MTD</td>
-          <td style="color: #f9fafb; font-size: 14px;">${data.lotMtd || ''}</td>
-          <td colspan="1"></td>
-          <td colspan="2" style="text-align: right; padding-right: 15px; color: #38bdf8;">CUMULATIVE<br>TOTAL</td>
-          ${cumulativeRowHtml}
-        </tr>
-      `;
-
-      // DWM Analytics Row inside Table (Run-rate removed)
-      let today = new Date();
-      let activeDaysCount = totalDays;
-      if(selectedMonth === "2026-08") {
-        activeDaysCount = Math.min(today.getDate(), totalDays);
-      }
-
-      let gap = grandActualMtd - (data.targetMtd || 0);
-      let currentAvg = activeDaysCount > 0 ? (grandActualMtd / activeDaysCount) : 0;
-      let statusText = gap >= 0 ? 'On Track' : 'Lagging';
-      let statusColor = gap >= 0 ? '#34d399' : '#f87171';
-
-      html += `
-        <tr class="dwm-analytics-row">
-          <td colspan="${6 + totalDays}">
-            <div class="dwm-analytics-container">
-              <div class="dwm-analytics-item">
-                <span>Target Variance</span>
-                <strong style="color: ${statusColor};">${gap >= 0 ? '+' : ''}${gap.toFixed(2)} T</strong>
-              </div>
-              <div class="dwm-analytics-item">
-                <span>Daily Average</span>
-                <strong>${currentAvg.toFixed(2)} T</strong>
-              </div>
-              <div class="dwm-analytics-item">
-                <span>Required Prod.</span>
-                <strong>${(data.targetMtd / totalDays).toFixed(2)} T/d</strong>
-              </div>
-              <div class="dwm-analytics-item">
-                <span>Status</span>
-                <strong style="color: ${statusColor};">${statusText}</strong>
-              </div>
-            </div>
-          </td>
-        </tr>
-      `;
-
-      tbody.innerHTML = html;
-    }
-
-    const VALID_PIN = "2020";
-
-    function openEntryModal() {
-      const today = new Date();
-      const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, '0');
-      const dd = String(today.getDate()).padStart(2, '0');
-      document.getElementById('entryDate').value = `${yyyy}-${mm}-${dd}`;
-      
-      const currentMonthKey = document.getElementById("monthSelector").value;
-      if(monthDataStore[currentMonthKey]) {
-        document.getElementById('formTargetMtd').value = monthDataStore[currentMonthKey].targetMtd || "";
-        document.getElementById('formLotMtd').value = monthDataStore[currentMonthKey].lotMtd || "";
-      }
-
-      document.getElementById('entryModal').style.display = 'flex';
-    }
-
-    function closeEntryModal() {
-      document.getElementById('entryModal').style.display = 'none';
-      document.getElementById('authPin').value = ''; 
-    }
-
-    function saveProduction() { processEntry(false); }
-    function clearProductionData() { processEntry(true); }
-
-    function processEntry(isClear) {
-      const dateStr = document.getElementById('entryDate').value;
-      const pin = document.getElementById('authPin').value;
-
-      if(!dateStr) { alert("Please select a date!"); return; }
-      if(pin !== VALID_PIN) { alert("❌ Unauthorized Access: Invalid PIN."); return; }
-
-      const parts = dateStr.split('-');
-      const monthKey = `${parts[0]}-${parts[1]}`; 
-      const dayIndex = parseInt(parts[2], 10) - 1; 
-
-      if(!monthDataStore[monthKey]) {
-        const [yr, mo] = monthKey.split('-').map(Number);
-        monthDataStore[monthKey] = { targetMtd: 260.0, lotMtd: 0, furnaces: generateEmptyFurnaces(getDaysInMonth(yr, mo)) };
-      }
-
-      const newTgtMtd = document.getElementById('formTargetMtd').value;
-      const newLotMtd = document.getElementById('formLotMtd').value;
-      if(newTgtMtd !== "") monthDataStore[monthKey].targetMtd = parseFloat(newTgtMtd);
-      if(newLotMtd !== "") monthDataStore[monthKey].lotMtd = parseInt(newLotMtd, 10);
-
-      const totalDaysInThisMonth = monthDataStore[monthKey].furnaces[0].days.length;
-      if(dayIndex >= totalDaysInThisMonth) { alert("Selected date exceeds month boundary."); return; }
-
-      if (isClear) {
-        monthDataStore[monthKey].furnaces.forEach(f => f.days[dayIndex] = 0.00);
-        alert("🗑️ Daily record cleared successfully.");
-      } else {
-        const q1 = document.getElementById('sqf1Qty').value;
-        const q2 = document.getElementById('sqf2Qty').value;
-        const q3 = document.getElementById('sqf3Qty').value;
-        const q4 = document.getElementById('sqf4Qty').value;
-
-        if(q1 !== "") monthDataStore[monthKey].furnaces[0].days[dayIndex] = parseFloat(q1);
-        if(q2 !== "") monthDataStore[monthKey].furnaces[1].days[dayIndex] = parseFloat(q2);
-        if(q3 !== "") monthDataStore[monthKey].furnaces[2].days[dayIndex] = parseFloat(q3);
-        if(q4 !== "") monthDataStore[monthKey].furnaces[3].days[dayIndex] = parseFloat(q4);
-        
-        alert("✅ Production data & month settings updated successfully.");
-      }
-
-      document.getElementById("monthSelector").value = monthKey;
-      renderDWMTable();
-      closeEntryModal();
-      
-      document.getElementById('sqf1Qty').value = "";
-      document.getElementById('sqf2Qty').value = "";
-      document.getElementById('sqf3Qty').value = "";
-      document.getElementById('sqf4Qty').value = "";
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      document.getElementById("monthSelector").value = "2026-08";
-      renderDWMTable();
-    });
-  </script>
 </body>
 </html>
