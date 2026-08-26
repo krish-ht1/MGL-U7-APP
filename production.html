@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Milestone Gear - Live Production Intelligence</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -18,6 +21,7 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow-x: hidden;
     }
 
     /* Top Bar */
@@ -30,72 +34,88 @@
       align-items: center;
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 1000;
     }
-    .brand-title { display: flex; align-items: center; gap: 10px; }
-    .brand-title h1 { font-size: 15px; font-weight: 700; margin: 0; color: #f8fafc; letter-spacing: 0.3px; }
+    .brand-title { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .brand-title h1 { font-size: 14px; font-weight: 700; margin: 0; color: #f8fafc; letter-spacing: 0.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    
+    .header-right-group { display: flex; align-items: center; gap: 10px; }
+    .sync-btn {
+      background: #1e293b;
+      border: 1px solid #34d399;
+      color: #34d399;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
     .live-indicator { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: #34d399; background: rgba(52,211,153,0.1); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(52,211,153,0.2); }
     .pulse-dot { width: 7px; height: 7px; background: #34d399; border-radius: 50%; box-shadow: 0 0 8px #34d399; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
-    .main-wrapper { max-width: 1400px; width: 100%; margin: 0 auto; padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 16px; }
+    .main-wrapper { max-width: 1500px; width: 100%; margin: 0 auto; padding: 14px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
 
     /* 4-Furnace Status Quick Dock */
-    .furnace-dock { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-    .fc-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px; position: relative; overflow: hidden; }
+    .furnace-dock { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .fc-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; position: relative; overflow: hidden; }
     .fc-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: #3b82f6; }
     .fc-card.active::before { background: #34d399; }
-    .fc-header { display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
-    .fc-status { font-size: 9.5px; padding: 2px 6px; border-radius: 4px; background: rgba(52,211,153,0.15); color: #34d399; }
-    .fc-body h4 { margin: 0; font-size: 13px; color: #f8fafc; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .fc-body p { margin: 2px 0 0 0; font-size: 10px; color: #64748b; }
+    .fc-header { display: flex; justify-content: space-between; align-items: center; font-size: 10.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
+    .fc-status { font-size: 9px; padding: 1px 5px; border-radius: 4px; background: rgba(52,211,153,0.15); color: #34d399; }
+    .fc-body h4 { margin: 0; font-size: 12px; color: #f8fafc; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fc-body p { margin: 1px 0 0 0; font-size: 9.5px; color: #64748b; }
 
     /* Control & Search Bar */
-    .control-panel { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 14px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-    .search-box { flex: 1; min-width: 240px; position: relative; }
-    .search-box input { width: 100%; background: #070d1b; border: 1px solid #334155; color: #fff; padding: 10px 12px 10px 36px; border-radius: 8px; font-size: 12.5px; outline: none; }
+    .control-panel { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 12px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .search-box { flex: 1; min-width: 220px; position: relative; }
+    .search-box input { width: 100%; background: #070d1b; border: 1px solid #334155; color: #fff; padding: 9px 12px 9px 34px; border-radius: 8px; font-size: 12px; outline: none; }
     .search-box input:focus { border-color: #f97316; }
-    .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #94a3b8; }
+    .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 12px; color: #94a3b8; }
     
-    .filter-pills { display: flex; gap: 6px; flex-wrap: wrap; }
-    .pill { background: #1e293b; border: 1px solid #334155; color: #cbd5e1; padding: 8px 14px; border-radius: 8px; font-size: 11.5px; font-weight: 600; cursor: pointer; transition: 0.2s; }
-    .pill.active, .pill:hover { background: #f97316; border-color: #f97316; color: #fff; }
+    .filter-pills { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
+    .pill { background: #1e293b; border: 1px solid #334155; color: #cbd5e1; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.2s; user-select: none; }
+    .pill input { display: none; }
+    .pill.active { background: #f97316; border-color: #f97316; color: #fff; }
 
     /* Summary KPI Row */
-    .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-    .kpi-box { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 12px 16px; display: flex; flex-direction: column; justify-content: center; }
-    .kpi-box span { font-size: 10px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
-    .kpi-box h3 { margin: 4px 0 0 0; font-size: 18px; font-weight: 700; color: #38bdf8; }
+    .kpi-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+    .kpi-box { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+    .kpi-box span { font-size: 9px; font-weight: 600; color: #94a3b8; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .kpi-box h3 { margin: 3px 0 0 0; font-size: 14px; font-weight: 700; color: #38bdf8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* Modern Grid Cards Area (Power BI Style Feed) */
-    .feed-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
-    .prod-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; transition: 0.2s; position: relative; }
-    .prod-card:hover { border-color: #334155; transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    /* Modern Card Feed (Power BI Style Feed) */
+    .feed-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+    .prod-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 10px; transition: 0.2s; position: relative; }
+    .prod-card:hover { border-color: #334155; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
     
-    .card-header-row { display: flex; justify-content: space-between; align-items: flex-start; }
-    .part-tag { font-size: 14px; font-weight: 700; color: #f8fafc; margin: 0; }
-    .cust-badge { font-size: 10px; font-weight: 600; background: rgba(249,115,22,0.15); color: #f97316; border: 1px solid rgba(249,115,22,0.3); padding: 3px 8px; border-radius: 6px; }
+    .card-header-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .part-tag { font-size: 13.5px; font-weight: 700; color: #f8fafc; margin: 0; word-break: break-word; }
+    .cust-badge { font-size: 9.5px; font-weight: 600; background: rgba(249,115,22,0.15); color: #f97316; border: 1px solid rgba(249,115,22,0.3); padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
 
-    .specs-grid-mini { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: #070d1b; padding: 8px; border-radius: 8px; border: 1px solid #1e293b; }
-    .spec-item { display: flex; flex-direction: column; }
-    .spec-item span { font-size: 8.5px; color: #64748b; font-weight: 600; text-transform: uppercase; }
-    .spec-item strong { font-size: 11px; color: #fde047; font-weight: 600; margin-top: 1px; }
+    .specs-grid-mini { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: #070d1b; padding: 8px; border-radius: 8px; border: 1px solid #1e293b; }
+    .spec-item { display: flex; flex-direction: column; min-width: 0; }
+    .spec-item span { font-size: 8px; color: #64748b; font-weight: 600; text-transform: uppercase; white-space: nowrap; }
+    .spec-item strong { font-size: 10.5px; color: #fde047; font-weight: 600; margin-top: 1px; word-break: break-word; }
 
-    .card-footer-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #1e293b; padding-top: 10px; margin-top: 2px; }
-    .batch-info { font-size: 11px; color: #94a3b8; }
+    .card-footer-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #1e293b; padding-top: 8px; margin-top: 2px; gap: 8px; flex-wrap: wrap; }
+    .batch-info { font-size: 10.5px; color: #94a3b8; }
     .batch-info b { color: #38bdf8; }
 
     .action-btn-group { display: flex; gap: 6px; }
-    .btn-action { background: #1e293b; border: 1px solid #334155; color: #e2e8f0; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; text-decoration: none; transition: 0.2s; display: flex; align-items: center; gap: 4px; }
-    .btn-action:hover { background: #3b82f6; border-color: #3b82f6; color: white; }
+    .btn-action { background: #1e293b; border: 1px solid #334155; color: #e2e8f0; padding: 5px 10px; border-radius: 6px; font-size: 10.5px; font-weight: 600; cursor: pointer; text-decoration: none; transition: 0.2s; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+    .btn-action:hover { background: #0284c7; border-color: #0284c7; color: white; }
 
-    @media (max-width: 900px) {
+    .no-data-card { grid-column: span 10; text-align: center; padding: 40px; color: #64748b; font-size: 12px; background: #0f172a; border-radius: 10px; border: 1px solid #1e293b; }
+
+    @media (max-width: 1024px) {
+      .kpi-row { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 768px) {
       .furnace-dock { grid-template-columns: repeat(2, 1fr); }
       .kpi-row { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 600px) {
-      .furnace-dock { grid-template-columns: 1fr; }
-      .kpi-row { grid-template-columns: 1fr; }
+      .control-panel { flex-direction: column; align-items: stretch; }
+      .filter-pills { justify-content: space-between; }
     }
   </style>
 </head>
@@ -103,12 +123,15 @@
 
   <header class="top-header">
     <div class="brand-title">
-      <span style="font-size: 18px;">⚙️</span>
-      <h1>Milestone Gear - Live Plant Control</h1>
+      <span style="font-size: 16px;">⚙️</span>
+      <h1>Milestone Gear - Plant Intelligence</h1>
     </div>
-    <div class="live-indicator">
-      <div class="pulse-dot"></div>
-      <span>SYSTEM LIVE</span>
+    <div class="header-right-group">
+      <button class="sync-btn" onclick="loadAllLiveSheets()">⚡ Sync</button>
+      <div class="live-indicator">
+        <div class="pulse-dot"></div>
+        <span>LIVE</span>
+      </div>
     </div>
   </header>
 
@@ -117,31 +140,31 @@
     <!-- 4 Furnaces Live Status Dock -->
     <div class="furnace-dock">
       <div class="fc-card active">
-        <div class="fc-header"><span>Furnace 01</span><span class="fc-status">Running</span></div>
+        <div class="fc-header"><span>Furnace 01</span><span class="fc-status">Active</span></div>
         <div class="fc-body">
-          <h4>Helical Gear Range B</h4>
-          <p>Batch: B-2026-041 | F/C 1</p>
+          <h4 id="fc1Part">-</h4>
+          <p id="fc1Batch">F/C 1 Logs</p>
         </div>
       </div>
       <div class="fc-card active">
-        <div class="fc-header"><span>Furnace 02</span><span class="fc-status">Running</span></div>
+        <div class="fc-header"><span>Furnace 02</span><span class="fc-status">Active</span></div>
         <div class="fc-body">
-          <h4>Spur Gear (TRI46803)</h4>
-          <p>Batch: B-2026-042 | F/C 2</p>
-        </div>
-      </div>
-      <div class="fc-card">
-        <div class="fc-header"><span>Furnace 03</span><span class="fc-status" style="background:rgba(239,68,68,0.15); color:#ef4444;">Idle</span></div>
-        <div class="fc-body">
-          <h4>No Active Lot</h4>
-          <p>Ready for Loading</p>
+          <h4 id="fc2Part">-</h4>
+          <p id="fc2Batch">F/C 2 Logs</p>
         </div>
       </div>
       <div class="fc-card active">
-        <div class="fc-header"><span>Furnace 04</span><span class="fc-status">Running</span></div>
+        <div class="fc-header"><span>Furnace 03</span><span class="fc-status">Active</span></div>
         <div class="fc-body">
-          <h4>Bevel Gear (CE36221)</h4>
-          <p>Batch: B-2026-044 | F/C 4</p>
+          <h4 id="fc3Part">-</h4>
+          <p id="fc3Batch">F/C 3 Logs</p>
+        </div>
+      </div>
+      <div class="fc-card active">
+        <div class="fc-header"><span>Furnace 04</span><span class="fc-status">Active</span></div>
+        <div class="fc-body">
+          <h4 id="fc4Part">-</h4>
+          <p id="fc4Batch">F/C 4 Logs</p>
         </div>
       </div>
     </div>
@@ -150,111 +173,444 @@
     <div class="control-panel">
       <div class="search-box">
         <span class="search-icon">🔍</span>
-        <input type="text" placeholder="Quick search part name, MS No, batch or customer...">
+        <input type="text" id="searchBox" placeholder="Search MS No, Part Name, Batch, Heat Code, Customer..." oninput="applyAllFilters()">
       </div>
       <div class="filter-pills">
-        <div class="pill active">All</div>
-        <div class="pill">F/C 1</div>
-        <div class="pill">F/C 2</div>
-        <div class="pill">F/C 3</div>
-        <div class="pill">F/C 4</div>
+        <label class="pill active"><input type="radio" name="fcTab" value="" checked onchange="applyAllFilters()"> All F/C</label>
+        <label class="pill"><input type="radio" name="fcTab" value="1" onchange="applyAllFilters()"> F/C 1</label>
+        <label class="pill"><input type="radio" name="fcTab" value="2" onchange="applyAllFilters()"> F/C 2</label>
+        <label class="pill"><input type="radio" name="fcTab" value="3" onchange="applyAllFilters()"> F/C 3</label>
+        <label class="pill"><input type="radio" name="fcTab" value="4" onchange="applyAllFilters()"> F/C 4</label>
       </div>
     </div>
 
     <!-- KPI Summary Row -->
     <div class="kpi-row">
       <div class="kpi-box">
-        <span>Today's Total Output</span>
-        <h3>14,850 Pcs</h3>
+        <span>Total Pieces</span>
+        <h3 id="kpiTotalQty">0 Pcs</h3>
       </div>
       <div class="kpi-box">
-        <span>Active Lots Processed</span>
-        <h3>18 Lots</h3>
+        <span>Total Lots</span>
+        <h3 id="kpiTotalLots">0 Lots</h3>
       </div>
       <div class="kpi-box">
-        <span>Total Hardened Wt</span>
-        <h3>6,420 Kg</h3>
+        <span>Est. Weight</span>
+        <h3 id="kpiTotalWeight">0 Kg</h3>
       </div>
       <div class="kpi-box">
-        <span>Furnace Utilization</span>
-        <h3>88.5%</h3>
+        <span>Wt / Piece</span>
+        <h3 id="kpiWeightPerPiece">-</h3>
+      </div>
+      <div class="kpi-box">
+        <span>Total Lot Wt</span>
+        <h3 id="kpiTotalBatchWeight">-</h3>
+      </div>
+      <div class="kpi-box">
+        <span>Lot Qty</span>
+        <h3 id="kpiLotQuantity">-</h3>
       </div>
     </div>
 
-    <!-- Modern Card Feed (Instead of heavy table) -->
-    <div class="feed-container">
-      
-      <!-- Sample Card 1 -->
-      <div class="prod-card">
-        <div class="card-header-row">
-          <div>
-            <p class="part-tag">SU70247</p>
-            <span style="font-size: 11px; color: #94a3b8;">Helical Gear Range B Driven</span>
-          </div>
-          <span class="cust-badge">JOHN DEERE</span>
-        </div>
-
-        <div class="specs-grid-mini">
-          <div class="spec-item">
-            <span>Surf. Hardness</span>
-            <strong>58-64 HRC</strong>
-          </div>
-          <div class="spec-item">
-            <span>Core Hardness</span>
-            <strong>25-45 HRC</strong>
-          </div>
-          <div class="spec-item">
-            <span>E.C.D</span>
-            <strong>0.60-1.0 mm</strong>
-          </div>
-        </div>
-
-        <div class="card-footer-row">
-          <div class="batch-info">Batch: <b>LOT-802</b> | Qty: <b>450 Pcs</b></div>
-          <div class="action-btn-group">
-            <button class="btn-action">📄 SIP PDF</button>
-            <button class="btn-action" style="background:#3b82f6; border-color:#3b82f6;">⚙️ Cycle</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Sample Card 2 -->
-      <div class="prod-card">
-        <div class="card-header-row">
-          <div>
-            <p class="part-tag">TRI46803</p>
-            <span style="font-size: 11px; color: #94a3b8;">Spur Gear</span>
-          </div>
-          <span class="cust-badge">JOHN DEERE</span>
-        </div>
-
-        <div class="specs-grid-mini">
-          <div class="spec-item">
-            <span>Surf. Hardness</span>
-            <strong>58-64 HRC</strong>
-          </div>
-          <div class="spec-item">
-            <span>Core Hardness</span>
-            <strong>25-45 HRC</strong>
-          </div>
-          <div class="spec-item">
-            <span>E.C.D</span>
-            <strong>0.95-1.25 mm</strong>
-          </div>
-        </div>
-
-        <div class="card-footer-row">
-          <div class="batch-info">Batch: <b>LOT-803</b> | Qty: <b>320 Pcs</b></div>
-          <div class="action-btn-group">
-            <button class="btn-action">📄 SIP PDF</button>
-            <button class="btn-action" style="background:#3b82f6; border-color:#3b82f6;">⚙️ Cycle</button>
-          </div>
-        </div>
-      </div>
-
+    <!-- Modern Power BI Style Feed Container -->
+    <div class="feed-container" id="feedContainer">
+      <div class="no-data-card">Loading live data from Google Sheets...</div>
     </div>
 
   </div>
 
+  <script>
+    // Separate Independent Google Sheet CSV URLs
+    const PROCESS_LOG_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=529980778&single=true&output=csv";
+    const WEIGHT_LIST_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=373153751&single=true&output=csv";
+    const MASTER_SIP_CSV_URL  = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR2XoCQTy6ylgyNHQHqSy8pO4KU7GvDhh1sINw_FMzDQ1Ryl3oqc6cXl8sx--wxF211TQI6OinrkXNA/pub?gid=1496498963&single=true&output=csv";
+
+    const AUTO_REFRESH_MS = 3 * 60 * 1000;
+
+    let liveWeightMaster = {};
+    let masterSIPMap = {};
+    let masterLogs = [];
+    let logColMap = {};
+
+    function parseCustomDate(dateStr) {
+      if (!dateStr) return new Date(0);
+      let str = String(dateStr).trim().split('T')[0];
+      let parts = str.split(/[-/]/);
+      if (parts.length === 3) {
+        if (parts[0].length === 4) return new Date(parts[0], parts[1] - 1, parts[2]);
+        return new Date(parts[2], parts[1] - 1, parts[0]);
+      }
+      let fallback = new Date(str);
+      return isNaN(fallback.getTime()) ? new Date(0) : fallback;
+    }
+
+    function parseCSVData(text) {
+      let r = [], row = [''], q = false;
+      for (let i = 0; i < text.length; i++) {
+        let c = text[i], next = text[i + 1];
+        if (c === '"') {
+          if (q && next === '"') { row[row.length - 1] += '"'; i++; }
+          else { q = !q; }
+        } else if (c === ',' && !q) {
+          row.push('');
+        } else if ((c === '\r' || c === '\n') && !q) {
+          if (c === '\r' && next === '\n') { i++; }
+          if (row.length > 1 || (row.length === 1 && row[0] !== '')) r.push(row);
+          row = [''];
+        } else {
+          row[row.length - 1] += c;
+        }
+      }
+      if (row.length > 1 || (row.length === 1 && row[0] !== '')) r.push(row);
+      return r.map(cols => cols.map(col => (col || '').trim()));
+    }
+
+    function normalizeDriveLink(raw) {
+      if (!raw) return "";
+      const link = String(raw).trim();
+      if (!link) return "";
+      let fileId = "";
+      let match = link.match(/\/d\/([a-zA-Z0-9_-]{15,})/);
+      if (match) fileId = match[1];
+      if (!fileId) {
+        match = link.match(/[?&]id=([a-zA-Z0-9_-]{15,})/);
+        if (match) fileId = match[1];
+      }
+      if (!fileId && /^[a-zA-Z0-9_-]{20,}$/.test(link)) fileId = link;
+      if (fileId) {
+        return `https://drive.google.com/file/d/${fileId}/preview`;
+      }
+      return link;
+    }
+
+    function bustCache(url) {
+      const buster = 'nocache=' + Date.now() + '_' + Math.random().toString(36).slice(2);
+      return url + (url.includes('?') ? '&' : '?') + buster;
+    }
+
+    async function fetchCSVData(url) {
+      const freshUrl = bustCache(url);
+      const endpoints = [
+        freshUrl,
+        "https://api.allorigins.win/raw?url=" + encodeURIComponent(bustCache(url)),
+        "https://corsproxy.io/?" + encodeURIComponent(bustCache(url)),
+        "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(bustCache(url))
+      ];
+
+      for (const ep of endpoints) {
+        try {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 8000);
+          const resp = await fetch(ep, {
+            signal: controller.signal,
+            cache: 'no-store',
+            headers: { 'Cache-Control': 'no-cache' }
+          });
+          clearTimeout(timer);
+          if (resp.ok) {
+            const txt = await resp.text();
+            if (txt && txt.length > 30 && !txt.includes("<!DOCTYPE html>")) return txt;
+          }
+        } catch (e) {}
+      }
+      return null;
+    }
+
+    function processWeightListSheet(parsedRows) {
+      if (!parsedRows || parsedRows.length < 2) return;
+      let headerIdx = 0, partCol = 0, weightPerPieceCol = -1, batchQtyCol = -1, totalWtCol = -1;
+
+      for (let i = 0; i < Math.min(parsedRows.length, 6); i++) {
+        const rowStr = parsedRows[i].join(' ').toLowerCase();
+        if (rowStr.includes('ms') || rowStr.includes('part') || rowStr.includes('weight') || rowStr.includes('wt')) {
+          headerIdx = i;
+          parsedRows[i].forEach((h, colIdx) => {
+            const cleanH = h.toLowerCase().trim();
+            if (cleanH.includes('ms') || cleanH.includes('part') || cleanH.includes('code')) partCol = colIdx;
+            if (cleanH.includes('weight per piece') || cleanH.includes('wt/pc') || (cleanH.includes('weight') && !cleanH.includes('total'))) weightPerPieceCol = colIdx;
+            if (cleanH.includes('batch') || cleanH.includes('lot') || cleanH.includes('qty')) batchQtyCol = colIdx;
+            if (cleanH.includes('total wt') || cleanH.includes('total weight')) totalWtCol = colIdx;
+          });
+          break;
+        }
+      }
+
+      liveWeightMaster = {};
+      for (let i = headerIdx + 1; i < parsedRows.length; i++) {
+        const r = parsedRows[i];
+        if (!r || r.length <= partCol) continue;
+        const pNo = String(r[partCol] || '').trim().toUpperCase();
+        if (!pNo) continue;
+
+        let unitWt = (weightPerPieceCol !== -1 && r[weightPerPieceCol]) ? parseFloat(String(r[weightPerPieceCol]).replace(/[^0-9.]/g, '')) : null;
+        let pBatch = (batchQtyCol !== -1 && r[batchQtyCol]) ? parseFloat(String(r[batchQtyCol]).replace(/[^0-9.]/g, '')) : null;
+        let totalBatchWt = (totalWtCol !== -1 && r[totalWtCol]) ? parseFloat(String(r[totalWtCol]).replace(/[^0-9.]/g, '')) : null;
+
+        if (unitWt === null && totalBatchWt !== null && pBatch > 0) unitWt = totalBatchWt / pBatch;
+        if (totalBatchWt === null && unitWt !== null && pBatch > 0) totalBatchWt = unitWt * pBatch;
+
+        liveWeightMaster[pNo] = { weight: unitWt, totalBatchWeight: totalBatchWt, batchQty: pBatch };
+      }
+    }
+
+    function processMasterSIPSheet(parsedRows) {
+      if (!parsedRows || parsedRows.length < 2) return;
+      let headerIdx = 0, msNoCol = 0, partNameCol = -1, partNoCol = -1, custCol = -1, matCol = -1, shCol = -1, ecdCol = -1, coreCol = -1, pdfCol = -1;
+
+      for (let i = 0; i < Math.min(parsedRows.length, 6); i++) {
+        const rowStr = parsedRows[i].join(' ').toLowerCase();
+        if (rowStr.includes('ms no') || rowStr.includes('part name') || rowStr.includes('material')) {
+          headerIdx = i;
+          parsedRows[i].forEach((h, colIdx) => {
+            const cleanH = h.toLowerCase().replace(/[^a-z0-9]/g, '');
+            if (cleanH === 'msno' || cleanH === 'ms') msNoCol = colIdx;
+            else if (cleanH.includes('partname')) partNameCol = colIdx;
+            else if (cleanH.includes('partno')) partNoCol = colIdx;
+            else if (cleanH.includes('customer')) custCol = colIdx;
+            else if (cleanH.includes('material')) matCol = colIdx;
+            else if (cleanH.includes('surfacehardness') || cleanH.includes('sh')) shCol = colIdx;
+            else if (cleanH.includes('ecd')) ecdCol = colIdx;
+            else if (cleanH.includes('corehardness') || cleanH.includes('core')) coreCol = colIdx;
+            else if (cleanH.includes('pdf') || cleanH.includes('link') || cleanH.includes('sip')) pdfCol = colIdx;
+          });
+          break;
+        }
+      }
+
+      masterSIPMap = {};
+      for (let i = headerIdx + 1; i < parsedRows.length; i++) {
+        const r = parsedRows[i];
+        if (!r || r.length <= msNoCol) continue;
+        const msNo = String(r[msNoCol] || '').trim().toUpperCase();
+        const partNo = partNoCol !== -1 ? String(r[partNoCol] || '').trim().toUpperCase() : '';
+        if (!msNo && !partNo) continue;
+
+        const entryData = {
+          desc: (partNameCol !== -1 && r[partNameCol]) ? r[partNameCol] : '-',
+          cust: (custCol !== -1 && r[custCol]) ? r[custCol] : '-',
+          grade: (matCol !== -1 && r[matCol]) ? r[matCol] : '-',
+          sh: (shCol !== -1 && r[shCol]) ? r[shCol] : '-',
+          ecd: (ecdCol !== -1 && r[ecdCol]) ? r[ecdCol] : '-',
+          core: (coreCol !== -1 && r[coreCol]) ? r[coreCol] : '-',
+          pdfLink: (pdfCol !== -1 && r[pdfCol]) ? String(r[pdfCol]).trim() : ''
+        };
+
+        if (msNo) masterSIPMap[msNo] = entryData;
+        if (partNo) masterSIPMap[partNo] = entryData;
+      }
+    }
+
+    function processLogHeaders(headerRow) {
+      logColMap = { date: 0, cust: 1, part: 2, batch: 3, heat: 4, fc: 5, qty: 6, sh: 7, core: 10, ecd: 11, loading: 20 };
+      headerRow.forEach((h, idx) => {
+        const clean = String(h || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (clean.includes('date')) logColMap.date = idx;
+        else if (clean.includes('cust')) logColMap.cust = idx;
+        else if (clean.includes('part') || clean.includes('ms')) logColMap.part = idx;
+        else if (clean.includes('batch')) logColMap.batch = idx;
+        else if (clean.includes('heat')) logColMap.heat = idx;
+        else if (clean.includes('fc') || clean.includes('furnace')) logColMap.fc = idx;
+        else if (clean.includes('qty')) logColMap.qty = idx;
+        else if (clean.includes('sh') || clean.includes('surface')) logColMap.sh = idx;
+        else if (clean.includes('core')) logColMap.core = idx;
+        else if (clean.includes('ecd') && !clean.includes('grind')) logColMap.ecd = idx;
+      });
+    }
+
+    async function loadAllLiveSheets() {
+      try {
+        const sipCSV = await fetchCSVData(MASTER_SIP_CSV_URL);
+        if (sipCSV) processMasterSIPSheet(parseCSVData(sipCSV));
+      } catch (e) {}
+
+      try {
+        const wtCSV = await fetchCSVData(WEIGHT_LIST_CSV_URL);
+        if (wtCSV) processWeightListSheet(parseCSVData(wtCSV));
+      } catch (e) {}
+
+      try {
+        const logCSV = await fetchCSVData(PROCESS_LOG_CSV_URL);
+        if (logCSV) {
+          const parsedLogs = parseCSVData(logCSV);
+          if (parsedLogs.length > 0) {
+            processLogHeaders(parsedLogs[0]);
+            parsedLogs.shift();
+            masterLogs = parsedLogs;
+          }
+        }
+      } catch (e) {}
+
+      masterLogs.sort((a, b) => parseCustomDate(b[logColMap.date || 0]) - parseCustomDate(a[logColMap.date || 0]));
+      updateFurnaceDockStatus();
+      applyAllFilters();
+    }
+
+    function getComponentWeight(partNo) {
+      if (!partNo) return 0;
+      const clean = String(partNo).trim().toUpperCase();
+      if (liveWeightMaster[clean] && liveWeightMaster[clean].weight > 0) return liveWeightMaster[clean].weight;
+      for (const k in liveWeightMaster) {
+        if (clean.includes(k) || k.includes(clean)) {
+          if (liveWeightMaster[k].weight > 0) return liveWeightMaster[k].weight;
+        }
+      }
+      return 0;
+    }
+
+    function getComponentDetails(partNo) {
+      if (!partNo) return { desc: '-', cust: '-', grade: '-', sh: '-', core: '-', ecd: '-', pdfLink: '' };
+      const clean = String(partNo).trim().toUpperCase();
+      if (masterSIPMap[clean]) return masterSIPMap[clean];
+      for (const k in masterSIPMap) {
+        if (clean.includes(k) || k.includes(clean)) return masterSIPMap[k];
+      }
+      return { desc: '-', cust: '-', grade: '-', sh: '-', core: '-', ecd: '-', pdfLink: '' };
+    }
+
+    function updateFurnaceDockStatus() {
+      for (let fc = 1; fc <= 4; fc++) {
+        const fcRows = masterLogs.filter(r => String(r[logColMap.fc || 5]).trim() === String(fc));
+        const partEl = document.getElementById(`fc${fc}Part`);
+        const batchEl = document.getElementById(`fc${fc}Batch`);
+        if (fcRows.length > 0) {
+          const latest = fcRows[0];
+          const pNo = latest[logColMap.part || 2] || '-';
+          const details = getComponentDetails(pNo);
+          partEl.innerText = details.desc !== '-' ? details.desc : pNo;
+          batchEl.innerText = `Batch: ${latest[logColMap.batch || 3] || '-'} | Qty: ${latest[logColMap.qty || 6] || '-'}`;
+        } else {
+          partEl.innerText = "Idle";
+          batchEl.innerText = "Ready for Loading";
+        }
+      }
+    }
+
+    function applyAllFilters() {
+      const searchVal = document.getElementById('searchBox').value.trim().toLowerCase();
+      const selectedFC = document.querySelector('input[name="fcTab"]:checked').value;
+      const m = logColMap;
+
+      // Update active pill UI styling
+      document.querySelectorAll('.filter-pills .pill').forEach(pill => {
+        if (pill.querySelector('input').checked) pill.classList.add('active');
+        else pill.classList.remove('active');
+      });
+
+      const filtered = masterLogs.filter(row => {
+        const rowCust = String(row[m.cust || 1] || '').toLowerCase();
+        const rowPart = String(row[m.part || 2] || '').toLowerCase();
+        const rowBatch = String(row[m.batch || 3] || '').toLowerCase();
+        const rowHeat = String(row[m.heat || 4] || '').toLowerCase();
+        const rowFC = String(row[m.fc || 5] || '').trim();
+
+        if (searchVal) {
+          const match = rowCust.includes(searchVal) || rowPart.includes(searchVal) || rowBatch.includes(searchVal) || rowHeat.includes(searchVal);
+          if (!match) return false;
+        }
+
+        if (selectedFC && rowFC !== selectedFC) return false;
+        return true;
+      });
+
+      updateKPIs(filtered);
+      renderCards(filtered);
+    }
+
+    function updateKPIs(rows) {
+      let totalQty = 0, totalWeight = 0;
+      const totalLots = rows.length;
+      const m = logColMap;
+
+      rows.forEach(r => {
+        const qty = parseFloat(r[m.qty || 6]) || 0;
+        const wt = getComponentWeight(r[m.part || 2]);
+        totalQty += qty;
+        totalWeight += (qty * wt);
+      });
+
+      const avgWt = totalQty > 0 ? (totalWeight / totalQty) : 0;
+
+      document.getElementById('kpiTotalQty').innerText = `${totalQty.toLocaleString('en-IN')} Pcs`;
+      document.getElementById('kpiTotalLots').innerText = `${totalLots} Lots`;
+      document.getElementById('kpiTotalWeight').innerText = `${totalWeight.toLocaleString('en-IN', {maximumFractionDigits: 1})} Kg`;
+      document.getElementById('kpiWeightPerPiece').innerText = avgWt > 0 ? `${avgWt.toFixed(2)} Kg` : '-';
+      document.getElementById('kpiTotalBatchWeight').innerText = rows.length > 0 ? `${(getComponentWeight(rows[0][m.part]) * (parseFloat(rows[0][m.qty])||0)).toFixed(1)} Kg` : '-';
+      document.getElementById('kpiLotQuantity').innerText = rows.length > 0 ? `${rows[0][m.qty] || '-'} Pcs` : '-';
+    }
+
+    function renderCards(rows) {
+      const container = document.getElementById('feedContainer');
+      if (rows.length === 0) {
+        container.innerHTML = `<div class="no-data-card">🔍 No matching production records found.</div>`;
+        return;
+      }
+
+      const m = logColMap;
+      let html = "";
+
+      rows.forEach(r => {
+        const partNo = r[m.part || 2] || '-';
+        const details = getComponentDetails(partNo);
+        const cust = details.cust !== '-' ? details.cust : (r[m.cust || 1] || '-');
+        const sh = details.sh !== '-' ? details.sh : (r[m.sh || 7] || '-');
+        const core = details.core !== '-' ? details.core : (r[m.core || 10] || '-');
+        const ecd = details.ecd !== '-' ? details.ecd : (r[m.ecd || 11] || '-');
+        const batch = r[m.batch || 3] || '-';
+        const qty = r[m.qty || 6] || '-';
+        const fc = r[m.fc || 5] || '-';
+
+        html += `
+          <div class="prod-card">
+            <div class="card-header-row">
+              <div>
+                <p class="part-tag">${partNo}</p>
+                <span style="font-size: 11px; color: #94a3b8;">${details.desc}</span>
+              </div>
+              <span class="cust-badge">${cust}</span>
+            </div>
+
+            <div class="specs-grid-mini">
+              <div class="spec-item">
+                <span>Surf. Hardness</span>
+                <strong>${sh}</strong>
+              </div>
+              <div class="spec-item">
+                <span>Core Hardness</span>
+                <strong>${core}</strong>
+              </div>
+              <div class="spec-item">
+                <span>E.C.D</span>
+                <strong>${ecd}</strong>
+              </div>
+            </div>
+
+            <div class="card-footer-row">
+              <div class="batch-info">F/C <b>${fc}</b> | Batch: <b>${batch}</b> | Qty: <b>${qty} Pcs</b></div>
+              <div class="action-btn-group">
+                <button class="btn-action" onclick="openSipPdf('${partNo}', '${details.pdfLink}')">📄 SIP PDF</button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function openSipPdf(partNo, link) {
+      let targetUrl = "";
+      if (link && link.trim() !== "") {
+        targetUrl = normalizeDriveLink(link);
+      } else {
+        targetUrl = `https://drive.google.com/drive/search?q=${encodeURIComponent(partNo.trim())}`;
+      }
+      window.open(bustCache(targetUrl), '_blank', 'width=1000,height=700');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadAllLiveSheets();
+      setInterval(loadAllLiveSheets, AUTO_REFRESH_MS);
+    });
+  </script>
 </body>
 </html>
