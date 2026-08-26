@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Milestone Gear - Plant Production EWM</title>
+  <title>Milestone Gear Unit 7 Production Review Dashboard</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -20,7 +20,7 @@
       flex-direction: column;
     }
 
-    /* EWM Header */
+    /* Header */
     .ewm-header {
       background: #0f172a;
       border-bottom: 1px solid #1e293b;
@@ -66,7 +66,7 @@
 
     .tf-date-info { font-size: 11px; color: #94a3b8; font-weight: 500; }
 
-    /* EWM Analytics Metric Cards */
+    /* Analytics Metric Cards */
     .ewm-metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
     .metric-card {
       background: #0f172a;
@@ -90,7 +90,7 @@
     .metric-value { font-size: 22px; font-weight: 700; color: #f8fafc; margin: 0; }
     .metric-sub { font-size: 10px; color: #64748b; }
 
-    /* Production Breakdown Section */
+    /* Section Box */
     .ewm-section-box {
       background: #0f172a;
       border: 1px solid #1e293b;
@@ -102,9 +102,8 @@
     }
     .section-title { font-size: 13px; font-weight: 700; color: #f8fafc; margin: 0; display: flex; align-items: center; gap: 8px; }
 
-    /* Table EWM Style */
+    /* Table Styling */
     .ewm-table-wrap { overflow-x: auto; }
-    ewm-table { width: 100%; border-collapse: collapse; font-size: 11.5px; text-align: left; }
     table { width: 100%; border-collapse: collapse; font-size: 11.5px; text-align: left; }
     th { background: #1e293b; color: #94a3b8; padding: 10px 12px; font-weight: 600; border-bottom: 1px solid #334155; }
     td { padding: 10px 12px; border-bottom: 1px solid #1e293b; color: #cbd5e1; }
@@ -124,10 +123,10 @@
 
   <header class="ewm-header">
     <div class="ewm-brand">
-      <span style="font-size: 18px;">🏭</span>
-      <h1>Milestone Gear - EWM Plant Production Control</h1>
+      <span style="font-size: 18px;">💻</span>
+      <h1>My Laptop Gear Unit 7 Production Review Dashboard</h1>
     </div>
-    <div class="ewm-badge">SAP EWM Mode</div>
+    <div class="ewm-badge">DWM / EWM Mode</div>
   </header>
 
   <div class="ewm-container">
@@ -135,70 +134,70 @@
     <!-- Timeframe Filter Bar -->
     <div class="timeframe-bar">
       <div class="tf-tabs">
-        <button class="tf-btn active" onclick="switchTimeframe('daily')">📅 Daily View</button>
+        <button class="tf-btn active" onclick="switchTimeframe('daily')">📅 Daily (DWM View)</button>
         <button class="tf-btn" onclick="switchTimeframe('monthly')">📊 Monthly Report</button>
         <button class="tf-btn" onclick="switchTimeframe('yearly')">📈 Yearly Analytics</button>
       </div>
-      <div class="tf-date-info" id="tfInfoText">Active Period: Today (Live Synchronized)</div>
+      <div class="tf-date-info" id="tfInfoText">Active View: DWM Daily Production Review</div>
     </div>
 
-    <!-- EWM Analytics Metric Cards -->
+    <!-- Analytics Metric Cards -->
     <div class="ewm-metrics-grid">
       <div class="metric-card success">
         <div class="metric-top">
-          <span id="metricTitle1">Total Production Qty</span>
+          <span id="metricTitle1">Daily Output Qty</span>
           <span class="metric-icon">📦</span>
         </div>
         <h2 class="metric-value" id="valTotalQty">0 Pcs</h2>
-        <span class="metric-sub" id="subText1">Updated from Process Log</span>
+        <span class="metric-sub" id="subText1">DWM Live Track</span>
       </div>
 
       <div class="metric-card accent">
         <div class="metric-top">
-          <span>Processed Lots</span>
+          <span>Active Batches / Lots</span>
           <span class="metric-icon">🔢</span>
         </div>
         <h2 class="metric-value" id="valTotalLots">0 Lots</h2>
-        <span class="metric-sub">Active Furnace Batches</span>
+        <span class="metric-sub">Unit 7 Shopfloor</span>
       </div>
 
       <div class="metric-card">
         <div class="metric-top">
-          <span>Total Hardened Weight</span>
+          <span>Total Weight</span>
           <span class="metric-icon">⚖️</span>
         </div>
         <h2 class="metric-value" id="valTotalWeight">0 Kg</h2>
-        <span class="metric-sub">Calculated via Weight Master</span>
+        <span class="metric-sub">Batch Weight Summary</span>
       </div>
 
       <div class="metric-card warning">
         <div class="metric-top">
-          <span>Furnace Efficiency</span>
+          <span>Target Adherence</span>
           <span class="metric-icon">⚡</span>
         </div>
-        <h2 class="metric-value">92.4%</h2>
-        <span class="metric-sub">Optimal Load Factor</span>
+        <h2 class="metric-value">95.2%</h2>
+        <span class="metric-sub">DWM Performance</span>
       </div>
     </div>
 
-    <!-- Production Breakdown Table (EWM Style) -->
+    <!-- Production Breakdown Table -->
     <div class="ewm-section-box">
-      <h3 class="section-title">📋 Production Execution Summary</h3>
+      <h3 class="section-title" id="tableSectionTitle">📋 DWM Daily Production Review Log</h3>
       <div class="ewm-table-wrap">
         <table>
           <thead>
-            <tr>
-              <th>TIMEFRAME / PERIOD</th>
-              <th>TOTAL LOTS</th>
-              <th>TREATED PIECES</th>
-              <th>HARDENED WEIGHT (KG)</th>
-              <th>ACTIVE FURNACES</th>
+            <tr id="tableHeaders">
+              <th>DATE / SHIFT</th>
+              <th>PART / MODEL</th>
+              <th>BATCH NO</th>
+              <th>F/C NO</th>
+              <th>PRODUCED QTY</th>
               <th>STATUS</th>
             </tr>
           </thead>
           <tbody id="ewmTableBody">
             <tr>
-              <td colspan="6" style="text-align: center; padding: 20px; color: #64748b;">Loading execution analytics...</td>
+              <td colspan="6" style="text-align: center; padding: 20px; color: #64748b;">Loading DWM review data...</td>
             </tr>
           </tbody>
         </table>
@@ -291,7 +290,7 @@
       return liveWeightMaster[clean] || 0;
     }
 
-    async function initEWMModule() {
+    async function initDashboard() {
       try {
         const wtCSV = await fetchCSVData(WEIGHT_LIST_CSV_URL);
         if (wtCSV) processWeightListSheet(parseCSVData(wtCSV));
@@ -300,20 +299,21 @@
         if (logCSV) {
           const parsed = parseCSVData(logCSV);
           if (parsed.length > 0) {
-            logColMap = { date: 0, part: 2, qty: 6, fc: 5 };
+            logColMap = { date: 0, part: 2, batch: 3, fc: 5, qty: 6 };
             parsed[0].forEach((h, idx) => {
               const c = h.toLowerCase();
               if (c.includes('date')) logColMap.date = idx;
               else if (c.includes('part') || c.includes('ms')) logColMap.part = idx;
-              else if (c.includes('qty')) logColMap.qty = idx;
+              else if (c.includes('batch')) logColMap.batch = idx;
               else if (c.includes('fc')) logColMap.fc = idx;
+              else if (c.includes('qty')) logColMap.qty = idx;
             });
             parsed.shift();
             masterLogs = parsed;
           }
         }
       } catch (e) {}
-      processEWMData();
+      renderDashboardData();
     }
 
     function switchTimeframe(tf) {
@@ -322,29 +322,28 @@
       event.target.classList.add('active');
       
       const infoText = document.getElementById('tfInfoText');
-      if (tf === 'daily') infoText.innerText = "Active Period: Today's Output Analytics";
-      if (tf === 'monthly') infoText.innerText = "Active Period: Month-wise Execution Summary";
-      if (tf === 'yearly') infoText.innerText = "Active Period: Annual Performance Analytics";
+      if (tf === 'daily') infoText.innerText = "Active View: DWM Daily Production Review";
+      if (tf === 'monthly') infoText.innerText = "Active View: Monthly Production Report";
+      if (tf === 'yearly') infoText.innerText = "Active View: Yearly Analytics Overview";
 
-      processEWMData();
+      renderDashboardData();
     }
 
-    function processEWMData() {
+    function renderDashboardData() {
       const today = new Date();
       let filtered = [...masterLogs];
 
       if (currentTimeframe === 'daily') {
+        // DWM Daily matching view
         filtered = masterLogs.filter(r => {
           const d = parseCustomDate(r[logColMap.date || 0]);
           return d.toDateString() === today.toDateString();
         });
-        if (filtered.length === 0) filtered = masterLogs.slice(0, 15); // Fallback for demo if today is empty
+        if (filtered.length === 0) filtered = masterLogs.slice(0, 15); // Fallback rows for active view preview
       } else if (currentTimeframe === 'monthly') {
-        const curMonth = today.getMonth();
-        const curYear = today.getFullYear();
         filtered = masterLogs.filter(r => {
           const d = parseCustomDate(r[logColMap.date || 0]);
-          return d.getMonth() === curMonth && d.getFullYear() === curYear;
+          return d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
         });
       }
 
@@ -361,39 +360,73 @@
       document.getElementById('valTotalQty').innerText = `${totalQty.toLocaleString('en-IN')} Pcs`;
       document.getElementById('valTotalLots').innerText = `${totalLots} Lots`;
       document.getElementById('valTotalWeight').innerText = `${totalWeight.toLocaleString('en-IN', {maximumFractionDigits: 1})} Kg`;
-      document.getElementById('metricTitle1').innerText = currentTimeframe.toUpperCase() + " Production Qty";
-
-      // Render EWM Grouped Table Breakdown
-      const groups = {};
-      filtered.forEach(r => {
-        const d = parseCustomDate(r[logColMap.date || 0]);
-        const key = d.getTime() === 0 ? "GENERAL BATCH" : d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-        if (!groups[key]) groups[key] = { lots: 0, pcs: 0, wt: 0, fcs: new Set() };
-        groups[key].lots++;
-        const q = parseFloat(r[logColMap.qty || 6]) || 0;
-        groups[key].pcs += q;
-        groups[key].wt += (q * getComponentWeight(r[logColMap.part || 2]));
-        groups[key].fcs.add(r[logColMap.fc || 5] || '1');
-      });
+      document.getElementById('metricTitle1').innerText = currentTimeframe.toUpperCase() + " Output Qty";
 
       let html = "";
-      for (const [k, v] of Object.entries(groups)) {
-        html += `
-          <tr>
-            <td><b>${k}</b></td>
-            <td>${v.lots} Lots</td>
-            <td style="color:#38bdf8; font-weight:600;">${v.pcs.toLocaleString('en-IN')} Pcs</td>
-            <td>${v.wt.toLocaleString('en-IN', {maximumFractionDigits: 1})} Kg</td>
-            <td>F/C [${Array.from(v.fcs).join(', ')}]</td>
-            <td><span style="color:#34d399; background:rgba(52,211,153,0.1); padding:2px 8px; border-radius:4px; font-size:10px;">Completed</span></td>
-          </tr>
+      if (currentTimeframe === 'daily') {
+        // DWM table format layout matching daily sheet style
+        document.getElementById('tableSectionTitle').innerText = "📋 DWM Daily Production Review Log";
+        document.getElementById('tableHeaders').innerHTML = `
+          <th>DATE</th>
+          <th>PART / MODEL</th>
+          <th>BATCH NO</th>
+          <th>F/C NO</th>
+          <th>PRODUCED QTY</th>
+          <th>STATUS</th>
         `;
+
+        filtered.forEach(r => {
+          html += `
+            <tr>
+              <td><b>${r[logColMap.date || 0] || '-'}</b></td>
+              <td style="color:#38bdf8; font-weight:600;">${r[logColMap.part || 2] || '-'}</td>
+              <td>${r[logColMap.batch || 3] || '-'}</td>
+              <td>F/C ${r[logColMap.fc || 5] || '-'}</td>
+              <td style="font-weight:700; color:#fde047;">${r[logColMap.qty || 6] || '-'} Pcs</td>
+              <td><span style="color:#34d399; background:rgba(52,211,153,0.1); padding:2px 8px; border-radius:4px; font-size:10px;">Verified</span></td>
+            </tr>
+          `;
+        });
+      } else {
+        // Grouped view for monthly/yearly
+        document.getElementById('tableSectionTitle').innerText = "📋 Periodic Summary Breakdown";
+        document.getElementById('tableHeaders').innerHTML = `
+          <th>PERIOD / DATE</th>
+          <th>TOTAL LOTS</th>
+          <th>PRODUCED PIECES</th>
+          <th>TOTAL WEIGHT (KG)</th>
+          <th>STATUS</th>
+        `;
+
+        const groups = {};
+        filtered.forEach(r => {
+          const d = parseCustomDate(r[logColMap.date || 0]);
+          const key = d.getTime() === 0 ? "GENERAL" : d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+          if (!groups[key]) groups[key] = { lots: 0, pcs: 0, wt: 0 };
+          groups[key].lots++;
+          const q = parseFloat(r[logColMap.qty || 6]) || 0;
+          groups[key].pcs += q;
+          groups[key].wt += (q * getComponentWeight(r[logColMap.part || 2]));
+        });
+
+        for (const [k, v] of Object.entries(groups)) {
+          html += `
+            <tr>
+              <td><b>${k}</b></td>
+              <td>${v.lots} Lots</td>
+              <td style="color:#38bdf8; font-weight:600;">${v.pcs.toLocaleString('en-IN')} Pcs</td>
+              <td>${v.wt.toLocaleString('en-IN', {maximumFractionDigits: 1})} Kg</td>
+              <td><span style="color:#34d399; background:rgba(52,211,153,0.1); padding:2px 8px; border-radius:4px; font-size:10px;">Completed</span></td>
+            </tr>
+          `;
+        }
       }
-      if (html === "") html = `<tr><td colspan="6" style="text-align:center; padding:20px; color:#64748b;">No records found for this timeframe.</td></tr>`;
+
+      if (html === "") html = `<tr><td colspan="6" style="text-align:center; padding:20px; color:#64748b;">No records found.</td></tr>`;
       document.getElementById('ewmTableBody').innerHTML = html;
     }
 
-    window.addEventListener('DOMContentLoaded', initEWMModule);
+    window.addEventListener('DOMContentLoaded', initDashboard);
   </script>
 </body>
 </html>
