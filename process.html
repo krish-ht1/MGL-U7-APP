@@ -21,7 +21,6 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      overflow-x: hidden; /* Stops horizontal page sliding */
     }
 
     /* Top Navigation */
@@ -33,44 +32,50 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 15px;
+      padding: 10px 20px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.8);
       z-index: 1000;
     }
-    .nav-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .nav-left { display: flex; align-items: center; gap: 12px; }
     .back-btn {
       background: #0f172a;
       border: 1px solid #334155;
       color: #f97316;
-      padding: 6px 10px;
+      padding: 6px 12px;
       border-radius: 6px;
       font-weight: 600;
       text-decoration: none;
-      font-size: 11px;
+      font-size: 12px;
       white-space: nowrap;
+      transition: 0.2s;
     }
     .back-btn:hover { background: #f97316; color: white; }
-    .nav-left h1 { font-size: 13.5px; margin: 0; color: #f8fafc; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .nav-left h1 { font-size: 15px; margin: 0; color: #f8fafc; font-weight: 600; }
 
-    .sync-badge-group { display: flex; align-items: flex-end; gap: 4px; flex-direction: column; }
-    .sync-badge-row { display: flex; align-items: center; gap: 6px; }
+    .sync-badge-group { display: flex; align-items: center; gap: 8px; flex-direction: column; align-items: flex-end; }
+    .sync-badge-row { display: flex; align-items: center; gap: 8px; }
     .live-sync-btn {
       background: #0f172a;
       border: 1px solid #34d399;
       color: #34d399;
-      padding: 4px 8px;
+      padding: 5px 10px;
       border-radius: 6px;
-      font-size: 10.5px;
+      font-size: 11px;
       font-weight: 600;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: 0.2s;
     }
-    .last-sync-text { font-size: 9px; color: #64748b; }
+    .live-sync-btn:hover { background: #34d399; color: #0f172a; }
+    .last-sync-text { font-size: 9.5px; color: #64748b; }
 
     .dashboard-container {
       max-width: 1600px;
       width: 100%;
       margin: 0 auto;
-      padding: 10px;
+      padding: 12px 16px;
       flex: 1;
     }
 
@@ -85,143 +90,152 @@
       margin-bottom: 10px;
       line-height: 1.5;
     }
+    .file-warning-banner b { color: #fdba74; }
 
     /* Filters Panel */
     .filter-panel {
       background: #1e293b;
       border: 1px solid #334155;
       border-radius: 10px;
-      padding: 10px;
+      padding: 12px 14px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
-    .search-row { display: flex; gap: 8px; align-items: center; }
-    .search-input-wrap { flex: 1; position: relative; min-width: 0; }
+    .search-row { display: flex; gap: 10px; align-items: center; }
+    .search-input-wrap { flex: 1; position: relative; }
     .search-input-wrap input {
       width: 100%;
       background: #0f172a;
       border: 1px solid #475569;
       color: #f8fafc;
-      padding: 8px 12px 8px 32px;
+      padding: 9px 14px 9px 36px;
       border-radius: 6px;
-      font-size: 12px;
+      font-size: 13px;
       outline: none;
+      transition: 0.2s;
       font-family: inherit;
+    }
+    .search-input-wrap input:focus {
+      border-color: #f97316;
+      box-shadow: 0 0 0 2px rgba(249,115,22,0.25);
     }
     .search-icon {
       position: absolute;
-      left: 10px;
+      left: 12px;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 13px;
+      font-size: 14px;
       color: #94a3b8;
     }
     .btn-reset {
       background: #334155;
       color: #cbd5e1;
       border: none;
-      padding: 8px 12px;
+      padding: 9px 14px;
       border-radius: 6px;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 600;
       cursor: pointer;
+      transition: 0.2s;
       white-space: nowrap;
     }
+    .btn-reset:hover { background: #ef4444; color: white; }
 
     .filters-grid {
       display: grid;
-      grid-template-columns: 1.5fr 1fr 1fr 1fr;
-      gap: 8px;
+      grid-template-columns: 1.6fr 1fr 1fr 1fr;
+      gap: 10px;
       align-items: center;
       background: #0f172a;
-      padding: 8px;
+      padding: 10px 12px;
       border-radius: 6px;
       border: 1px solid #334155;
     }
-    .furnace-group { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
-    .furnace-label { font-size: 10.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
+    .furnace-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .furnace-label { font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; margin-right: 4px; }
     .furnace-chip {
       display: flex;
       align-items: center;
-      gap: 3px;
+      gap: 4px;
       background: #1e293b;
       border: 1px solid #475569;
-      padding: 3px 6px;
+      padding: 4px 7px;
       border-radius: 4px;
-      font-size: 10.5px;
+      font-size: 11px;
       cursor: pointer;
+      user-select: none;
     }
-    .furnace-chip input { accent-color: #f97316; margin: 0; }
+    .furnace-chip input { cursor: pointer; accent-color: #f97316; margin: 0; }
 
-    .filter-item { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-    .filter-item label { font-size: 9.5px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
+    .filter-item { display: flex; flex-direction: column; gap: 3px; }
+    .filter-item label { font-size: 10px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
     .filter-item select, .filter-item input {
       background: #1e293b;
       border: 1px solid #475569;
       color: #f8fafc;
-      padding: 5px;
+      padding: 6px 8px;
       border-radius: 4px;
-      font-size: 11px;
+      font-size: 11.5px;
       outline: none;
+      font-family: inherit;
       width: 100%;
     }
 
-    /* KPI Summary Ribbon */
+    /* Clean & Compact KPI Summary Ribbon */
     .summary-ribbon {
       background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%);
       border: 1px solid #334155;
       border-left: 4px solid #f97316;
       border-radius: 8px;
-      padding: 8px;
+      padding: 10px 14px;
       display: grid;
       grid-template-columns: repeat(6, 1fr);
-      gap: 6px;
-      margin-bottom: 10px;
+      gap: 8px;
+      margin-bottom: 12px;
     }
     .ribbon-item { 
       background: #0f172a; 
       border: 1px solid #334155; 
       border-radius: 6px; 
-      padding: 5px; 
+      padding: 6px 8px; 
       display: flex; 
       flex-direction: column; 
       justify-content: center;
-      min-width: 0;
     }
-    .ribbon-meta h5 { margin: 0; font-size: 8.5px; color: #94a3b8; text-transform: uppercase; font-weight: 600; }
-    .ribbon-meta p { margin: 2px 0 0 0; font-size: 11.5px; font-weight: 700; color: #38bdf8; word-break: break-all; }
+    .ribbon-meta h5 { margin: 0; font-size: 9px; color: #94a3b8; text-transform: uppercase; font-weight: 600; letter-spacing: 0.2px; }
+    .ribbon-meta p { margin: 2px 0 0 0; font-size: 12.5px; font-weight: 700; color: #38bdf8; word-break: break-word; }
 
-    /* Strict Mobile-Friendly SIP Specs Ribbon */
+    /* Compact SIP Specs Ribbon with text wrapping */
     .sip-card {
       background: #172033;
       border: 1px solid #0284c7;
       border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 10px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
       gap: 10px;
     }
     .sip-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr); /* 3 columns on mobile to prevent squishing */
-      gap: 6px;
-      width: 100%;
+      grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr 1fr;
+      gap: 8px;
+      flex: 1;
     }
     .sip-param-box {
       background: #0f172a;
       border: 1px solid #334155;
-      padding: 6px;
+      padding: 6px 8px;
       border-radius: 6px;
       text-align: center;
-      min-width: 0;
-      overflow: hidden;
+      min-width: 0; /* Prevents flex/grid blowout */
     }
     .sip-param-box.comp-box {
-      grid-column: span 3; /* Full width for part name & MS No */
       text-align: left;
       border-color: #38bdf8;
       background: rgba(56, 189, 248, 0.05);
@@ -241,10 +255,9 @@
       color: #fde047;
       display: block;
       margin-top: 2px;
-      word-break: break-word; /* Forces long words/ECD/comments to wrap inside mobile screen */
-      overflow-wrap: break-word;
-      white-space: normal;
-      line-height: 1.25;
+      word-break: break-word; /* Breaks long comments/ECD neatly */
+      white-space: normal;     /* Allows multi-line breaking */
+      line-height: 1.3;
     }
     .part-sub-badge {
       display: block;
@@ -260,15 +273,15 @@
       background: #0284c7;
       color: white;
       border: none;
-      padding: 9px;
+      padding: 10px 16px;
       border-radius: 6px;
-      font-size: 11.5px;
+      font-size: 12px;
       font-weight: 700;
       cursor: pointer;
-      width: 100%;
+      transition: 0.2s;
+      white-space: nowrap;
       display: flex;
       align-items: center;
-      justify-content: center;
       gap: 6px;
       text-decoration: none;
     }
@@ -279,23 +292,23 @@
       background: #1e293b;
       border: 1px dashed #f97316;
       border-radius: 10px;
-      padding: 20px 12px;
+      padding: 24px 16px;
       text-align: center;
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
       margin-top: 8px;
     }
-    .locked-icon { font-size: 28px; margin-bottom: 4px; }
-    .locked-title { font-size: 14px; font-weight: 700; color: #f8fafc; margin: 0 0 4px 0; }
-    .locked-desc { font-size: 11px; color: #94a3b8; margin: 0 0 12px 0; }
+    .locked-icon { font-size: 32px; margin-bottom: 6px; }
+    .locked-title { font-size: 15px; font-weight: 700; color: #f8fafc; margin: 0 0 6px 0; }
+    .locked-desc { font-size: 11.5px; color: #94a3b8; margin: 0 0 16px 0; }
     
     .login-form-wrap {
-      max-width: 300px;
+      max-width: 320px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
       background: #0f172a;
-      padding: 12px;
+      padding: 14px;
       border-radius: 8px;
       border: 1px solid #334155;
     }
@@ -303,23 +316,26 @@
       background: #1e293b;
       border: 1px solid #475569;
       color: #f8fafc;
-      padding: 8px;
+      padding: 9px 12px;
       border-radius: 6px;
-      font-size: 11.5px;
+      font-size: 12px;
       outline: none;
-      width: 100%;
+      font-family: inherit;
     }
+    .login-form-wrap input:focus { border-color: #f97316; }
     .btn-login-submit {
       background: #f97316;
       color: white;
       border: none;
-      padding: 8px;
+      padding: 9px;
       border-radius: 6px;
-      font-size: 11.5px;
+      font-size: 12px;
       font-weight: 600;
       cursor: pointer;
+      transition: 0.2s;
     }
-    .login-error-msg { font-size: 10.5px; color: #ef4444; margin: 0; display: none; }
+    .btn-login-submit:hover { background: #ea580c; }
+    .login-error-msg { font-size: 11px; color: #ef4444; margin: 0; display: none; }
 
     /* Unlocked Table Container */
     .table-card {
@@ -332,117 +348,151 @@
       margin-top: 8px;
     }
     .table-top-meta {
-      padding: 8px 10px;
+      padding: 8px 12px;
       background: #111827;
       border-bottom: 1px solid #334155;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 11px;
+      font-size: 12px;
+      flex-wrap: wrap;
+      gap: 6px;
     }
     .btn-lock-again {
       background: #334155;
       color: #f87171;
       border: 1px solid #ef4444;
-      padding: 3px 6px;
+      padding: 4px 8px;
       border-radius: 4px;
-      font-size: 10px;
+      font-size: 10.5px;
       font-weight: 600;
       cursor: pointer;
     }
+    .btn-lock-again:hover { background: #ef4444; color: white; }
 
     .table-scroll-wrap {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
-      max-height: 500px;
+      max-height: 540px;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 10.5px;
+      font-size: 11px;
       white-space: nowrap;
       text-align: center;
     }
     th {
       background: #0284c7;
       color: #ffffff;
-      padding: 7px;
+      padding: 8px;
       font-weight: 600;
       position: sticky;
       top: 0;
       border-right: 1px solid #0369a1;
       border-bottom: 1px solid #0369a1;
       z-index: 10;
+      vertical-align: middle;
     }
     .th-sub-box {
       display: block;
       background: rgba(15, 23, 42, 0.4);
       border: 1px solid rgba(255,255,255,0.2);
       border-radius: 3px;
-      padding: 1px 2px;
+      padding: 1px 3px;
       margin-top: 2px;
-      font-size: 8px;
+      font-size: 8.5px;
       color: #e0f2fe;
+      font-weight: 400;
+      text-transform: uppercase;
     }
     td {
-      padding: 5px 7px;
+      padding: 6px 8px;
       border-bottom: 1px solid #334155;
       border-right: 1px solid #334155;
       color: #cbd5e1;
     }
     tr:nth-child(even) td { background: #1e293b; }
     tr:nth-child(odd) td { background: #0f172a; }
+    tr:hover td { background: rgba(249, 115, 22, 0.12); color: #ffffff; }
 
     /* Monthly Divider Banner */
     .month-divider-row td {
       background: linear-gradient(90deg, #0f172a 0%, #172554 50%, #0f172a 100%) !important;
       border-top: 2px solid #f97316;
       border-bottom: 2px solid #38bdf8;
-      padding: 6px 10px;
+      padding: 8px 12px;
       text-align: left;
     }
     .month-divider-content {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 16px;
       flex-wrap: wrap;
     }
     .month-title {
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 800;
       color: #f97316;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     .month-stat {
       background: rgba(15, 23, 42, 0.7);
       border: 1px solid #334155;
-      padding: 2px 8px;
+      padding: 3px 10px;
       border-radius: 20px;
-      font-size: 10px;
+      font-size: 11px;
       color: #cbd5e1;
     }
-    .month-stat strong { color: #38bdf8; }
+    .month-stat strong { color: #38bdf8; font-weight: 700; }
 
     .badge-fc {
       background: rgba(56, 189, 248, 0.15);
       color: #38bdf8;
       border: 1px solid rgba(56, 189, 248, 0.35);
-      padding: 1px 4px;
+      padding: 1px 5px;
       border-radius: 4px;
       font-weight: 600;
     }
-    .no-data { padding: 20px; color: #94a3b8; font-size: 11.5px; text-align: center; }
+    .no-data { padding: 30px; color: #94a3b8; font-size: 12.5px; text-align: center; }
 
-    /* Media query for tighter mobile layout */
+    @media (max-width: 1200px) {
+      .sip-grid { grid-template-columns: repeat(3, 1fr); }
+    }
     @media (max-width: 768px) {
+      .top-bar { padding: 8px 12px; flex-wrap: wrap; }
+      .nav-left h1 { font-size: 13.5px; }
+      .dashboard-container { padding: 8px 10px; }
+      .search-row { flex-direction: row; }
+      .search-input-wrap input { padding: 8px 10px 8px 32px; font-size: 12px; }
+      .btn-reset { padding: 8px 10px; font-size: 11px; }
+
       .filters-grid {
         grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding: 8px;
       }
       .furnace-group {
         grid-column: span 2;
+        justify-content: flex-start;
+        border-bottom: 1px solid #334155;
+        padding-bottom: 6px;
       }
+      .filter-item select, .filter-item input { padding: 6px; font-size: 11px; }
+
       .summary-ribbon {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+        padding: 8px;
       }
+      .sip-grid { grid-template-columns: 1fr 1fr; }
+      .locked-section-box { padding: 18px 10px; }
+      .login-form-wrap { width: 100%; }
+      .table-top-meta { font-size: 11px; }
+      .month-divider-content { gap: 8px; }
     }
   </style>
 </head>
@@ -451,12 +501,12 @@
   <header class="top-bar">
     <div class="nav-left">
       <a href="index.html" class="back-btn">⬅ Home</a>
-      <h1>📊 Process & Metallurgical Dashboard</h1>
+      <h1>📊 Process & Metallurgical Master Dashboard</h1>
     </div>
     <div class="sync-badge-group">
       <div class="sync-badge-row">
-        <span id="dataSourceBadge" style="font-size: 10px; font-weight: 600; color: #34d399;">🟢 LIVE</span>
-        <button class="live-sync-btn" onclick="loadAllLiveSheets(true)">⚡ Sync</button>
+        <span id="dataSourceBadge" style="font-size: 11px; font-weight: 600; color: #34d399;">🟢 LIVE</span>
+        <button class="live-sync-btn" onclick="loadAllLiveSheets(true)" title="Force sync latest entries">⚡ Sync</button>
       </div>
       <span class="last-sync-text" id="lastSyncText">Synced</span>
     </div>
@@ -465,7 +515,7 @@
   <div class="dashboard-container">
 
     <div class="file-warning-banner" id="fileModeWarning">
-      ⚠️ Local server से open करें (e.g. <code>python -m http.server 8000</code>).
+      ⚠️ <b>Ye file abhi seedhe C: drive से (file://) खुल रही है।</b> Local server से open करें (e.g. <code>python -m http.server 8000</code>).
     </div>
 
     <!-- 1. Search and Filters -->
@@ -476,7 +526,7 @@
           <input 
             type="text" 
             id="searchBox" 
-            placeholder="Search MS No, Part No, Batch, Customer..." 
+            placeholder="Search MS No / Part No (e.g. 459/50205, 33003), Batch, Heat Code, Customer..." 
             oninput="applyAllFilters()"
           >
         </div>
@@ -493,18 +543,26 @@
         </div>
 
         <div class="filter-item">
-          <label>Date</label>
+          <label>Specific Date</label>
           <input type="date" id="dateFilter" onchange="applyAllFilters()">
         </div>
 
         <div class="filter-item">
-          <label>Month</label>
+          <label>Month Wise</label>
           <select id="monthFilter" onchange="applyAllFilters()">
             <option value="">All Months</option>
-            <option value="01">Jan</option><option value="02">Feb</option><option value="03">Mar</option>
-            <option value="04">Apr</option><option value="05">May</option><option value="06">Jun</option>
-            <option value="07">Jul</option><option value="08">Aug</option><option value="09">Sep</option>
-            <option value="10">Oct</option><option value="11">Nov</option><option value="12">Dec</option>
+            <option value="01">January</option>
+            <option value="02">February</option>
+            <option value="03">March</option>
+            <option value="04">April</option>
+            <option value="05">May</option>
+            <option value="06">June</option>
+            <option value="07">July</option>
+            <option value="08">August</option>
+            <option value="09">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
           </select>
         </div>
 
@@ -520,47 +578,52 @@
       </div>
     </div>
 
-    <!-- 2. KPI Summary Ribbon -->
+    <!-- 2. Clean & Compact KPI Summary Ribbon -->
     <div class="summary-ribbon">
       <div class="ribbon-item">
         <div class="ribbon-meta">
-          <h5>Pieces</h5>
+          <h5>Total Pieces</h5>
           <p id="kpiTotalQty">0 Pcs</p>
         </div>
       </div>
+
       <div class="ribbon-item">
         <div class="ribbon-meta">
-          <h5>Lots</h5>
+          <h5>Total Lots</h5>
           <p id="kpiTotalLots">0 Lots</p>
         </div>
       </div>
+
       <div class="ribbon-item">
         <div class="ribbon-meta">
-          <h5>Weight</h5>
+          <h5>Est. Weight</h5>
           <p id="kpiTotalWeight">0 Kg</p>
         </div>
       </div>
+
       <div class="ribbon-item">
         <div class="ribbon-meta">
-          <h5>Wt / Pc</h5>
+          <h5>Wt / Piece</h5>
           <p id="kpiWeightPerPiece">-</p>
         </div>
       </div>
+
       <div class="ribbon-item">
         <div class="ribbon-meta">
-          <h5>Lot Wt</h5>
+          <h5>Total Lot Wt</h5>
           <p id="kpiTotalBatchWeight">-</p>
         </div>
       </div>
+
       <div class="ribbon-item">
         <div class="ribbon-meta">
-          <h5>Batch Qty</h5>
+          <h5>Lot Qty (Batch)</h5>
           <p id="kpiLotQuantity">-</p>
         </div>
       </div>
     </div>
 
-    <!-- 3. Dynamic Live SIP Specs Ribbon (Wrapped & Mobile Optimized) -->
+    <!-- 3. Dynamic Live SIP Specs Ribbon (Wrapped for Mobile) -->
     <div class="sip-card">
       <div class="sip-grid">
         <div class="sip-param-box comp-box">
@@ -580,7 +643,7 @@
         </div>
 
         <div class="sip-param-box">
-          <span>Surface Hardness</span>
+          <span>Surface Hardness (S.H)</span>
           <strong id="sipSH">-</strong>
         </div>
 
@@ -598,7 +661,7 @@
       <button id="viewSipBtn" class="view-sip-btn" onclick="openSipPdfDirect()">📑 View SIP (PDF)</button>
     </div>
 
-    <!-- 4. Locked Section for Process Matrix -->
+    <!-- 4. Hidden / Locked Section for Process Matrix -->
     <div class="locked-section-box" id="lockedSection">
       <div class="locked-icon">🔒</div>
       <h3 class="locked-title">Treatment & Metallurgy Process Matrix</h3>
@@ -612,7 +675,7 @@
       </form>
     </div>
 
-    <!-- 5. Main Data Table -->
+    <!-- 5. Main Data Table with Monthly Breakdowns -->
     <div class="table-card" id="unlockedTableSection">
       <div class="table-top-meta">
         <span style="color:#34d399; font-weight: 600;">🔓 Cycle Matrix (<span id="activeUserBadge">Authorized</span>)</span>
@@ -1133,9 +1196,9 @@
             <td colspan="21">
               <div class="month-divider-content">
                 <span class="month-title">📅 ${monthTitle}</span>
-                <span class="month-stat">🔢 Lots: <strong>${mLots}</strong></span>
-                <span class="month-stat">📦 Pcs: <strong>${mPcs.toLocaleString('en-IN')}</strong></span>
-                <span class="month-stat">🏗️ Wt: <strong>${mWt.toLocaleString('en-IN', {maximumFractionDigits: 1})} Kg</strong></span>
+                <span class="month-stat">🔢 Total Lots: <strong>${mLots}</strong></span>
+                <span class="month-stat">📦 Treated Pieces: <strong>${mPcs.toLocaleString('en-IN')} Pcs</strong></span>
+                <span class="month-stat">🏗️ Hardened Weight: <strong>${mWt.toLocaleString('en-IN', {maximumFractionDigits: 1})} Kg</strong></span>
               </div>
             </td>
           </tr>
@@ -1266,7 +1329,7 @@
       applyAllFilters();
     }
 
-    // Direct Auto-Construct Popup Preview for Mobile & Web
+    // Auto-Construct Drive URL without needing manual links in sheet
     function openSipPdfDirect() {
       if (!currentActivePart || currentActivePart === "-") {
         alert("Please search or select a component first.");
@@ -1277,7 +1340,7 @@
       if (currentActivePdfLink && currentActivePdfLink.trim() !== "") {
         targetUrl = normalizeDriveLink(currentActivePdfLink);
       } else {
-        // Automatically searches drive folder popup for the part number
+        // Auto-construct search query or direct view link pattern based on part/MS number
         const cleanPart = encodeURIComponent(currentActivePart.trim());
         targetUrl = `https://drive.google.com/drive/search?q=${cleanPart}`;
       }
