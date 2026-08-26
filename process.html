@@ -721,7 +721,6 @@
   </div>
 
   <script>
-    // Separate Independent Google Sheet URLs (No Data Mixing)
     const PROCESS_LOG_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=529980778&single=true&output=csv";
     const WEIGHT_LIST_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=373153751&single=true&output=csv";
     const MASTER_SIP_CSV_URL  = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR2XoCQTy6ylgyNHQHqSy8pO4KU7GvDhh1sINw_FMzDQ1Ryl3oqc6cXl8sx--wxF211TQI6OinrkXNA/pub?gid=1496498963&single=true&output=csv";
@@ -835,7 +834,6 @@
       return null;
     }
 
-    // 1. Process Weight List Sheet
     function processWeightListSheet(parsedRows) {
       if (!parsedRows || parsedRows.length < 2) return;
 
@@ -899,26 +897,28 @@
       }
     }
 
-    // 2. Process Master SIP Sheet (User's New Google Sheet)
+    // Mapping strictly to your exact headers: MS No, Part Name, Part No, Customer, Material, Surface Hardness, ECD, Core Hardness
     function processMasterSIPSheet(parsedRows) {
       if (!parsedRows || parsedRows.length < 2) return;
 
       let headerIdx = 0;
-      let partCol = 0, nameCol = -1, gradeCol = -1, shCol = -1, ecdCol = -1, coreCol = -1, pdfCol = -1;
+      let msNoCol = 0, partNameCol = -1, partNoCol = -1, custCol = -1, matCol = -1, shCol = -1, ecdCol = -1, coreCol = -1, pdfCol = -1;
 
       for (let i = 0; i < Math.min(parsedRows.length, 6); i++) {
         const rowStr = parsedRows[i].join(' ').toLowerCase();
-        if (rowStr.includes('ms') || rowStr.includes('part') || rowStr.includes('sip') || rowStr.includes('grade')) {
+        if (rowStr.includes('ms no') || rowStr.includes('part name') || rowStr.includes('material')) {
           headerIdx = i;
           parsedRows[i].forEach((h, colIdx) => {
-            const cleanH = h.toLowerCase().trim();
-            if (cleanH.includes('ms') || cleanH.includes('sip no') || cleanH.includes('part no') || cleanH.includes('code')) partCol = colIdx;
-            else if (cleanH.includes('name') || cleanH.includes('desc')) nameCol = colIdx;
-            else if (cleanH.includes('grade') || cleanH.includes('material')) gradeCol = colIdx;
-            else if (cleanH.includes('surface') || cleanH.includes('s.h') || cleanH.includes('hardness')) shCol = colIdx;
-            else if (cleanH.includes('ecd') || cleanH.includes('depth')) ecdCol = colIdx;
-            else if (cleanH.includes('core')) coreCol = colIdx;
-            else if (cleanH.includes('pdf') || cleanH.includes('link') || cleanH.includes('drive')) pdfCol = colIdx;
+            const cleanH = h.toLowerCase().replace(/[^a-z0-9]/g, '');
+            if (cleanH === 'msno' || cleanH === 'ms') msNoCol = colIdx;
+            else if (cleanH.includes('partname')) partNameCol = colIdx;
+            else if (cleanH.includes('partno')) partNoCol = colIdx;
+            else if (cleanH.includes('customer')) custCol = colIdx;
+            else if (cleanH.includes('material')) matCol = colIdx;
+            else if (cleanH.includes('surfacehardness') || cleanH.includes('sh')) shCol = colIdx;
+            else if (cleanH.includes('ecd')) ecdCol = colIdx;
+            else if (cleanH.includes('corehardness') || cleanH.includes('core')) coreCol = colIdx;
+            else if (cleanH.includes('pdf') || cleanH.includes('link') || cleanH.includes('sip')) pdfCol = colIdx;
           });
           break;
         }
@@ -928,26 +928,33 @@
 
       for (let i = headerIdx + 1; i < parsedRows.length; i++) {
         const r = parsedRows[i];
-        if (!r || r.length <= partCol) continue;
+        if (!r || r.length <= msNoCol) continue;
 
-        const pNo = String(r[partCol] || '').trim().toUpperCase();
-        if (!pNo) continue;
+        const msNo = String(r[msNoCol] || '').trim().toUpperCase();
+        const partNo = partNoCol !== -1 ? String(r[partNoCol] || '').trim().toUpperCase() : '';
+        
+        if (!msNo && !partNo) continue;
 
-        const pName = (nameCol !== -1 && r[nameCol]) ? r[nameCol] : '-';
-        const pGrade = (gradeCol !== -1 && r[gradeCol]) ? r[gradeCol] : '-';
+        const pName = (partNameCol !== -1 && r[partNameCol]) ? r[partNameCol] : '-';
+        const pCust = (custCol !== -1 && r[custCol]) ? r[custCol] : '-';
+        const pGrade = (matCol !== -1 && r[matCol]) ? r[matCol] : '-';
         const pSH = (shCol !== -1 && r[shCol]) ? r[shCol] : '-';
         const pECD = (ecdCol !== -1 && r[ecdCol]) ? r[ecdCol] : '-';
         const pCore = (coreCol !== -1 && r[coreCol]) ? r[coreCol] : '-';
         const pPdf = (pdfCol !== -1 && r[pdfCol]) ? String(r[pdfCol]).trim() : '';
 
-        masterSIPMap[pNo] = {
+        const entryData = {
           desc: pName,
+          cust: pCust,
           grade: pGrade,
           sh: pSH,
           ecd: pECD,
           core: pCore,
           pdfLink: pPdf
         };
+
+        if (msNo) masterSIPMap[msNo] = entryData;
+        if (partNo) masterSIPMap[partNo] = entryData;
       }
     }
 
@@ -995,7 +1002,6 @@
       let wtSuccess = false;
       let sipSuccess = false;
 
-      // 1. Fetch Master SIP Sheet
       try {
         const sipCSV = await fetchCSVData(MASTER_SIP_CSV_URL);
         if (sipCSV) {
@@ -1005,7 +1011,6 @@
         }
       } catch (e) {}
 
-      // 2. Fetch Weight List Sheet
       try {
         const wtCSV = await fetchCSVData(WEIGHT_LIST_CSV_URL);
         if (wtCSV) {
@@ -1015,7 +1020,6 @@
         }
       } catch (e) {}
 
-      // 3. Fetch Process Log Sheet
       try {
         const logCSV = await fetchCSVData(PROCESS_LOG_CSV_URL);
         if (logCSV) {
@@ -1079,15 +1083,15 @@
       return null;
     }
 
-    // Strict Fallback: Shows '-' if data is missing, no junk values
     function getComponentDetails(partNo) {
-      if (!partNo) return { desc: '-', grade: '-', sh: '-', core: '-', ecd: '-', pdfLink: '' };
+      if (!partNo) return { desc: '-', cust: '-', grade: '-', sh: '-', core: '-', ecd: '-', pdfLink: '' };
       const clean = String(partNo).trim().toUpperCase();
       
       if (masterSIPMap[clean]) {
         const item = masterSIPMap[clean];
         return {
           desc: item.desc && item.desc !== "" ? item.desc : `-`,
+          cust: item.cust && item.cust !== "" ? item.cust : `-`,
           grade: item.grade && item.grade !== "" ? item.grade : `-`,
           sh: item.sh && item.sh !== "" ? item.sh : `-`,
           core: item.core && item.core !== "" ? item.core : `-`,
@@ -1101,6 +1105,7 @@
           const item = masterSIPMap[k];
           return {
             desc: item.desc && item.desc !== "" ? item.desc : `-`,
+            cust: item.cust && item.cust !== "" ? item.cust : `-`,
             grade: item.grade && item.grade !== "" ? item.grade : `-`,
             sh: item.sh && item.sh !== "" ? item.sh : `-`,
             core: item.core && item.core !== "" ? item.core : `-`,
@@ -1110,7 +1115,7 @@
         }
       }
 
-      return { desc: `-`, grade: `-`, sh: `-`, core: `-`, ecd: `-`, pdfLink: '' };
+      return { desc: `-`, cust: `-`, grade: `-`, sh: `-`, core: `-`, ecd: `-`, pdfLink: '' };
     }
 
     function applyAllFilters() {
@@ -1260,7 +1265,6 @@
           const exactMatch = rows.find(r => String(r[m.part || 2] || '').trim().toUpperCase() === typedSearch);
           if (exactMatch) activeRow = exactMatch;
         }
-        const custName = activeRow[m.cust || 1] || '-';
         const partName = activeRow[m.part || 2] || '-';
 
         const compDetails = getComponentDetails(partName);
@@ -1276,7 +1280,7 @@
         document.getElementById('sipCompName').innerText = compDetails.desc;
         document.getElementById('sipMaterialGrade').innerText = compDetails.grade;
         document.getElementById('sipPartNo').innerText = partName;
-        document.getElementById('sipCustomer').innerText = custName;
+        document.getElementById('sipCustomer').innerText = compDetails.cust;
         document.getElementById('sipSH').innerText = compDetails.sh;
         document.getElementById('sipCore').innerText = compDetails.core;
         document.getElementById('sipECD').innerText = compDetails.ecd;
