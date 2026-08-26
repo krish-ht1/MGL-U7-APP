@@ -184,7 +184,7 @@
       width: 100%;
     }
 
-    /* KPI Summary Ribbon (Updated to include Total Lot Weight compactly) */
+    /* Clean & Compact KPI Summary Ribbon */
     .summary-ribbon {
       background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%);
       border: 1px solid #334155;
@@ -192,25 +192,21 @@
       border-radius: 8px;
       padding: 10px 14px;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+      grid-template-columns: repeat(6, 1fr);
       gap: 8px;
       margin-bottom: 12px;
     }
-    .ribbon-item { display: flex; align-items: center; gap: 6px; }
-    .ribbon-icon {
-      font-size: 14px;
-      background: rgba(249, 115, 22, 0.1);
-      width: 28px;
-      height: 28px;
-      display: flex;
-      align-items: center;
+    .ribbon-item { 
+      background: #0f172a; 
+      border: 1px solid #334155; 
+      border-radius: 6px; 
+      padding: 6px 8px; 
+      display: flex; 
+      flex-direction: column; 
       justify-content: center;
-      border-radius: 6px;
-      color: #f97316;
-      flex-shrink: 0;
     }
-    .ribbon-meta h5 { margin: 0; font-size: 9px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.2px; }
-    .ribbon-meta p { margin: 2px 0 0 0; font-size: 12px; font-weight: 700; color: #38bdf8; }
+    .ribbon-meta h5 { margin: 0; font-size: 9px; color: #94a3b8; text-transform: uppercase; font-weight: 600; letter-spacing: 0.2px; }
+    .ribbon-meta p { margin: 2px 0 0 0; font-size: 12.5px; font-weight: 700; color: #38bdf8; }
 
     /* Compact SIP Specs Ribbon */
     .sip-card {
@@ -461,6 +457,9 @@
     }
     .no-data { padding: 30px; color: #94a3b8; font-size: 12.5px; text-align: center; }
 
+    @media (max-width: 1024px) {
+      .summary-ribbon { grid-template-columns: repeat(3, 1fr); }
+    }
     @media (max-width: 900px) {
       .sip-grid { grid-template-columns: 1fr 1fr; }
       .sip-card { flex-direction: column; align-items: stretch; }
@@ -492,11 +491,8 @@
         gap: 6px;
         padding: 8px;
       }
-      .summary-ribbon .ribbon-item:last-child {
-        grid-column: span 2;
-      }
       .ribbon-meta h5 { font-size: 8.5px; }
-      .ribbon-meta p { font-size: 11.5px; }
+      .ribbon-meta p { font-size: 11px; }
       .locked-section-box { padding: 18px 10px; }
       .login-form-wrap { width: 100%; }
       .table-top-meta { font-size: 11px; }
@@ -523,7 +519,7 @@
   <div class="dashboard-container">
 
     <div class="file-warning-banner" id="fileModeWarning">
-      ⚠️ <b>Ye file abhi seedhe C: drive se (file://) khul rahi hai.</b> Is mode mein browser Google Sheet ka data strongly cache kar leta hai. <b>Fix:</b> Local server se open karo (e.g. <code>python -m http.server 8000</code>).
+      ⚠️ <b>Ye file abhi seedhe C: drive se (file://) khul rahi hai.</b> Local server se open karo (e.g. <code>python -m http.server 8000</code>).
     </div>
 
     <!-- 1. Search and Filters -->
@@ -586,10 +582,9 @@
       </div>
     </div>
 
-    <!-- 2. KPI Summary Ribbon (Updated with Unit Weight & Total Batch/Lot Weight side-by-side) -->
+    <!-- 2. Clean & Compact KPI Summary Ribbon (6 items arranged neatly) -->
     <div class="summary-ribbon">
       <div class="ribbon-item">
-        <div class="ribbon-icon">📦</div>
         <div class="ribbon-meta">
           <h5>Total Pieces</h5>
           <p id="kpiTotalQty">0 Pcs</p>
@@ -597,7 +592,6 @@
       </div>
 
       <div class="ribbon-item">
-        <div class="ribbon-icon">📑</div>
         <div class="ribbon-meta">
           <h5>Total Lots</h5>
           <p id="kpiTotalLots">0 Lots</p>
@@ -605,7 +599,6 @@
       </div>
 
       <div class="ribbon-item">
-        <div class="ribbon-icon">🏗️</div>
         <div class="ribbon-meta">
           <h5>Est. Weight</h5>
           <p id="kpiTotalWeight">0 Kg</p>
@@ -613,7 +606,6 @@
       </div>
 
       <div class="ribbon-item">
-        <div class="ribbon-icon">⚖️</div>
         <div class="ribbon-meta">
           <h5>Wt / Piece</h5>
           <p id="kpiWeightPerPiece">0.00 Kg</p>
@@ -621,7 +613,6 @@
       </div>
 
       <div class="ribbon-item">
-        <div class="ribbon-icon">⚖️</div>
         <div class="ribbon-meta">
           <h5>Total Lot Wt</h5>
           <p id="kpiTotalBatchWeight">0.00 Kg</p>
@@ -629,7 +620,6 @@
       </div>
 
       <div class="ribbon-item">
-        <div class="ribbon-icon">🔢</div>
         <div class="ribbon-meta">
           <h5>Lot Qty (Batch)</h5>
           <p id="kpiLotQuantity">0 Nos</p>
@@ -849,24 +839,24 @@
       return null;
     }
 
-    // Weight List Sheet Processor: Distinguishes between Total Batch Weight and Unit Per-Piece Weight
+    // Precise Weight List Processor matching "MS NO" and exact columns: Weight Per Piece, Batch Qty, Total Wt
     function processWeightListSheet(parsedRows) {
       if (!parsedRows || parsedRows.length < 2) return;
 
       let headerIdx = 0;
-      let partCol = 0, weightCol = 1, batchCol = 2, descCol = -1, pdfCol = -1;
+      let partCol = 0, weightPerPieceCol = -1, batchQtyCol = -1, totalWtCol = -1, pdfCol = -1;
 
       for (let i = 0; i < Math.min(parsedRows.length, 6); i++) {
         const rowStr = parsedRows[i].join(' ').toLowerCase();
-        if (rowStr.includes('part') || rowStr.includes('ms') || rowStr.includes('weight') || rowStr.includes('wt') || rowStr.includes('item')) {
+        if (rowStr.includes('ms') || rowStr.includes('part') || rowStr.includes('weight') || rowStr.includes('wt') || rowStr.includes('batch')) {
           headerIdx = i;
           parsedRows[i].forEach((h, colIdx) => {
             const cleanH = h.toLowerCase().trim();
-            if (cleanH.includes('part') || cleanH.includes('item') || cleanH.includes('code') || cleanH.includes('pnr') || cleanH.includes('ms')) partCol = colIdx;
-            if (cleanH.includes('wt') || cleanH.includes('weight') || cleanH.includes('unit')) weightCol = colIdx;
-            if (cleanH.includes('batch') || cleanH.includes('lot') || cleanH.includes('qty')) batchCol = colIdx;
-            if (cleanH.includes('desc') || cleanH.includes('name') || cleanH.includes('component')) descCol = colIdx;
-            if (cleanH.includes('pdf') || cleanH.includes('sip') || cleanH.includes('link') || cleanH.includes('drive') || cleanH.includes('url')) pdfCol = colIdx;
+            if (cleanH.includes('ms') || cleanH.includes('part') || cleanH.includes('code') || cleanH.includes('item')) partCol = colIdx;
+            if (cleanH.includes('weight per piece') || cleanH.includes('wt/pc') || (cleanH.includes('weight') && !cleanH.includes('total') && !cleanH.includes('batch'))) weightPerPieceCol = colIdx;
+            if (cleanH.includes('batch') || cleanH.includes('lot') || cleanH.includes('qty') || cleanH.includes('nos')) batchQtyCol = colIdx;
+            if (cleanH.includes('total wt') || cleanH.includes('total weight') || cleanH.includes('batch wt')) totalWtCol = colIdx;
+            if (cleanH.includes('pdf') || cleanH.includes('sip') || cleanH.includes('link') || cleanH.includes('drive')) pdfCol = colIdx;
           });
           break;
         }
@@ -881,39 +871,35 @@
         const pNo = String(r[partCol] || '').trim().toUpperCase();
         if (!pNo) continue;
 
-        let rawWt = 0;
-        if (weightCol !== -1 && r[weightCol]) {
-          const parsedNum = parseFloat(String(r[weightCol]).replace(/[^0-9.]/g, ''));
-          if (!isNaN(parsedNum) && parsedNum > 0) rawWt = parsedNum;
+        let unitWt = 0;
+        if (weightPerPieceCol !== -1 && r[weightPerPieceCol]) {
+          const parsedU = parseFloat(String(r[weightPerPieceCol]).replace(/[^0-9.]/g, ''));
+          if (!isNaN(parsedU)) unitWt = parsedU;
         }
 
         let pBatch = 0;
-        if (batchCol !== -1 && r[batchCol]) {
-          const parsedB = parseFloat(String(r[batchCol]).replace(/[^0-9.]/g, ''));
-          if (!isNaN(parsedB) && parsedB > 0) pBatch = parsedB;
+        if (batchQtyCol !== -1 && r[batchQtyCol]) {
+          const parsedB = parseFloat(String(r[batchQtyCol]).replace(/[^0-9.]/g, ''));
+          if (!isNaN(parsedB)) pBatch = parsedB;
         }
 
-        // Logic to store both unit weight and total batch weight cleanly
-        let unitWt = rawWt;
-        let totalBatchWt = rawWt;
-
-        if (pBatch > 0) {
-          // If sheet has total batch weight entered in weight column
-          if (rawWt > pBatch * 2) { 
-            unitWt = rawWt / pBatch;
-            totalBatchWt = rawWt;
-          } else {
-            // If sheet has per-piece weight entered in weight column
-            unitWt = rawWt;
-            totalBatchWt = rawWt * pBatch;
-          }
+        let totalBatchWt = 0;
+        if (totalWtCol !== -1 && r[totalWtCol]) {
+          const parsedT = parseFloat(String(r[totalWtCol]).replace(/[^0-9.]/g, ''));
+          if (!isNaN(parsedT)) totalBatchWt = parsedT;
         }
 
-        const pDesc = (descCol !== -1 && r[descCol]) ? r[descCol] : `MS PART ${pNo}`;
+        // Fallbacks if columns are structured slightly differently
+        if (unitWt === 0 && totalBatchWt > 0 && pBatch > 0) {
+          unitWt = totalBatchWt / pBatch;
+        }
+        if (totalBatchWt === 0 && unitWt > 0 && pBatch > 0) {
+          totalBatchWt = unitWt * pBatch;
+        }
+
         const pPdf = (pdfCol !== -1 && r[pdfCol]) ? String(r[pdfCol]).trim() : '';
 
         liveWeightMaster[pNo] = {
-          desc: pDesc,
           weight: unitWt,
           totalBatchWeight: totalBatchWt,
           batchQty: pBatch,
@@ -933,7 +919,7 @@
         const clean = String(h || '').toLowerCase().replace(/[^a-z0-9]/g, '');
         if (clean.includes('date')) logColMap.date = idx;
         else if (clean.includes('cust')) logColMap.cust = idx;
-        else if (clean.includes('part') || clean.includes('item') || clean.includes('pnr') || clean.includes('ms')) logColMap.part = idx;
+        else if (clean.includes('part') || clean.includes('ms')) logColMap.part = idx;
         else if (clean.includes('batch')) logColMap.batch = idx;
         else if (clean.includes('heat')) logColMap.heat = idx;
         else if (clean.includes('fc') || clean.includes('furnace')) logColMap.fc = idx;
@@ -1061,20 +1047,6 @@
         return liveWeightMaster[clean].batchQty;
       }
       return fallbackQty;
-    }
-
-    function getComponentDescription(partNo) {
-      if (!partNo) return "COMPONENT";
-      const clean = String(partNo).trim().toUpperCase();
-      if (liveWeightMaster[clean] && liveWeightMaster[clean].desc) {
-        return liveWeightMaster[clean].desc;
-      }
-      for (const k in liveWeightMaster) {
-        if (clean.includes(k) || k.includes(clean)) {
-          return liveWeightMaster[k].desc;
-        }
-      }
-      return `MS PART ${partNo}`;
     }
 
     function getComponentPdfLink(partNo) {
@@ -1247,7 +1219,6 @@
 
         const mappedBatchQty = getComponentBatchQty(partName, rawLotQty);
         const totalBatchWt = getComponentTotalBatchWeight(partName);
-        const compDesc = getComponentDescription(partName);
 
         let liveSH = activeRow[m.sh !== undefined ? m.sh : 7] ? String(activeRow[m.sh || 7]).trim() : '-';
         if (liveSH !== '-' && !liveSH.toUpperCase().includes('HRC') && !liveSH.toUpperCase().includes('HV')) {
@@ -1267,7 +1238,7 @@
 
         document.getElementById('kpiLotQuantity').innerText = `${mappedBatchQty} Nos`;
         document.getElementById('kpiTotalBatchWeight').innerText = `${totalBatchWt.toFixed(2)} Kg`;
-        document.getElementById('sipCompName').innerText = compDesc;
+        document.getElementById('sipCompName').innerText = `MS PART ${partName}`;
         document.getElementById('sipPartNo').innerText = partName;
         document.getElementById('sipCustomer').innerText = custName;
         document.getElementById('sipSH').innerText = liveSH;
@@ -1336,7 +1307,9 @@
       }
 
       if (!currentActivePdfLink) {
-        alert("⚠️ No Google Drive PDF link found for MS No: " + currentActivePart + " in the Weight/SIP List sheet. Please ensure the PDF link is pasted in the sheet against this MS number.");
+        // Fallback: Opens Google Drive file search specifically for this MS number if no link is provided in sheet
+        const searchFallbackUrl = `https://drive.google.com/drive/search?q=${encodeURIComponent(currentActivePart)}`;
+        window.open(searchFallbackUrl, '_blank');
         return;
       }
 
