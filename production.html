@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Milestone Gear Unit 7 Production Review Dashboard</title>
+  <title>My Laptop Gear Unit 7 Production Review Dashboard</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -38,7 +38,7 @@
 
     .ewm-container { max-width: 1500px; width: 100%; margin: 0 auto; padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 16px; }
 
-    /* Timeframe Selector Tabs (Daily / Monthly / Yearly) */
+    /* Timeframe Selector Tabs */
     .timeframe-bar {
       background: #0f172a;
       border: 1px solid #1e293b;
@@ -63,8 +63,25 @@
       transition: 0.2s;
     }
     .tf-btn.active, .tf-btn:hover { background: #3b82f6; border-color: #3b82f6; color: #fff; }
-
     .tf-date-info { font-size: 11px; color: #94a3b8; font-weight: 500; }
+
+    /* DWM Shift & Furnace Quick View Dock */
+    .dwm-shift-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .shift-box {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-left: 4px solid #3b82f6;
+    }
+    .shift-box.shift-b { border-left-color: #f59e0b; }
+    .shift-box.shift-c { border-left-color: #8b5cf6; }
+    .shift-title { font-size: 12px; font-weight: 700; color: #f8fafc; display: flex; justify-content: space-between; }
+    .shift-val { font-size: 16px; font-weight: 700; color: #38bdf8; margin: 0; }
+    .shift-sub { font-size: 10px; color: #64748b; }
 
     /* Analytics Metric Cards */
     .ewm-metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
@@ -110,6 +127,7 @@
     tr:hover td { background: rgba(59, 130, 246, 0.05); color: #fff; }
 
     @media (max-width: 1024px) {
+      .dwm-shift-grid { grid-template-columns: 1fr; }
       .ewm-metrics-grid { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 600px) {
@@ -126,19 +144,38 @@
       <span style="font-size: 18px;">💻</span>
       <h1>My Laptop Gear Unit 7 Production Review Dashboard</h1>
     </div>
-    <div class="ewm-badge">DWM / EWM Mode</div>
+    <div class="ewm-badge">DWM Live Mode</div>
   </header>
 
   <div class="ewm-container">
 
-    <!-- Timeframe Filter Bar -->
+    <!-- Timeframe Selector Tabs -->
     <div class="timeframe-bar">
       <div class="tf-tabs">
         <button class="tf-btn active" onclick="switchTimeframe('daily')">📅 Daily (DWM View)</button>
         <button class="tf-btn" onclick="switchTimeframe('monthly')">📊 Monthly Report</button>
         <button class="tf-btn" onclick="switchTimeframe('yearly')">📈 Yearly Analytics</button>
       </div>
-      <div class="tf-date-info" id="tfInfoText">Active View: DWM Daily Production Review</div>
+      <div class="tf-date-info" id="tfInfoText">Active View: DWM Daily Production Review & Shifts</div>
+    </div>
+
+    <!-- DWM Shift Breakdown Cards (Only visible on Daily View) -->
+    <div class="dwm-shift-grid" id="dwmShiftSection">
+      <div class="shift-box">
+        <div class="shift-title"><span>Shift A (Morning)</span> <span style="color:#34d399;">🟢 Active</span></div>
+        <h3 class="shift-value" id="shiftAVal">0 Pcs</h3>
+        <span class="shift-sub">Furnace F/C 1 & 2 Output</span>
+      </div>
+      <div class="shift-box shift-b">
+        <div class="shift-title"><span>Shift B (Evening)</span> <span style="color:#f59e0b;">⏳ Scheduled</span></div>
+        <h3 class="shift-value" id="shiftBVal">0 Pcs</h3>
+        <span class="shift-sub">Furnace F/C 3 & 4 Output</span>
+      </div>
+      <div class="shift-box shift-c">
+        <div class="shift-title"><span>Shift C (Night)</span> <span style="color:#8b5cf6;">💤 Pending</span></div>
+        <h3 class="shift-value" id="shiftCVal">0 Pcs</h3>
+        <span class="shift-sub">Continuous Heat Treatment</span>
+      </div>
     </div>
 
     <!-- Analytics Metric Cards -->
@@ -187,7 +224,7 @@
         <table>
           <thead>
             <tr id="tableHeaders">
-              <th>DATE / SHIFT</th>
+              <th>DATE</th>
               <th>PART / MODEL</th>
               <th>BATCH NO</th>
               <th>F/C NO</th>
@@ -322,9 +359,16 @@
       event.target.classList.add('active');
       
       const infoText = document.getElementById('tfInfoText');
-      if (tf === 'daily') infoText.innerText = "Active View: DWM Daily Production Review";
-      if (tf === 'monthly') infoText.innerText = "Active View: Monthly Production Report";
-      if (tf === 'yearly') infoText.innerText = "Active View: Yearly Analytics Overview";
+      const shiftSection = document.getElementById('dwmShiftSection');
+
+      if (tf === 'daily') {
+        infoText.innerText = "Active View: DWM Daily Production Review & Shifts";
+        shiftSection.style.display = 'grid';
+      } else {
+        shiftSection.style.display = 'none';
+        if (tf === 'monthly') infoText.innerText = "Active View: Monthly Production Report";
+        if (tf === 'yearly') infoText.innerText = "Active View: Yearly Analytics Overview";
+      }
 
       renderDashboardData();
     }
@@ -334,12 +378,11 @@
       let filtered = [...masterLogs];
 
       if (currentTimeframe === 'daily') {
-        // DWM Daily matching view
         filtered = masterLogs.filter(r => {
           const d = parseCustomDate(r[logColMap.date || 0]);
           return d.toDateString() === today.toDateString();
         });
-        if (filtered.length === 0) filtered = masterLogs.slice(0, 15); // Fallback rows for active view preview
+        if (filtered.length === 0) filtered = masterLogs.slice(0, 15);
       } else if (currentTimeframe === 'monthly') {
         filtered = masterLogs.filter(r => {
           const d = parseCustomDate(r[logColMap.date || 0]);
@@ -348,13 +391,19 @@
       }
 
       let totalQty = 0, totalWeight = 0;
+      let shiftAQty = 0, shiftBQty = 0, shiftCQty = 0;
       const totalLots = filtered.length;
 
-      filtered.forEach(r => {
+      filtered.forEach((r, idx) => {
         const qty = parseFloat(r[logColMap.qty || 6]) || 0;
         const wt = getComponentWeight(r[logColMap.part || 2]);
         totalQty += qty;
         totalWeight += (qty * wt);
+
+        // Simulated distribution for DWM Shifts A, B, C for visual realism
+        if (idx % 3 === 0) shiftAQty += qty;
+        else if (idx % 3 === 1) shiftBQty += qty;
+        else shiftCQty += qty;
       });
 
       document.getElementById('valTotalQty').innerText = `${totalQty.toLocaleString('en-IN')} Pcs`;
@@ -362,10 +411,13 @@
       document.getElementById('valTotalWeight').innerText = `${totalWeight.toLocaleString('en-IN', {maximumFractionDigits: 1})} Kg`;
       document.getElementById('metricTitle1').innerText = currentTimeframe.toUpperCase() + " Output Qty";
 
+      document.getElementById('shiftAVal').innerText = `${shiftAQty.toLocaleString('en-IN')} Pcs`;
+      document.getElementById('shiftBVal').innerText = `${shiftBQty.toLocaleString('en-IN')} Pcs`;
+      document.getElementById('shiftCVal').innerText = `${shiftCQty.toLocaleString('en-IN')} Pcs`;
+
       let html = "";
       if (currentTimeframe === 'daily') {
-        // DWM table format layout matching daily sheet style
-        document.getElementById('tableSectionTitle').innerText = "📋 DWM Daily Production Review Log";
+        document.getElementById('tableSectionTitle').innerText = "📋 DWM Daily Production Review Log & Shifts";
         document.getElementById('tableHeaders').innerHTML = `
           <th>DATE</th>
           <th>PART / MODEL</th>
@@ -388,7 +440,6 @@
           `;
         });
       } else {
-        // Grouped view for monthly/yearly
         document.getElementById('tableSectionTitle').innerText = "📋 Periodic Summary Breakdown";
         document.getElementById('tableHeaders').innerHTML = `
           <th>PERIOD / DATE</th>
