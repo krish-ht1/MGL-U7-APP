@@ -582,7 +582,7 @@
       </div>
     </div>
 
-    <!-- 2. Clean & Compact KPI Summary Ribbon (6 items arranged neatly) -->
+    <!-- 2. Clean & Compact KPI Summary Ribbon -->
     <div class="summary-ribbon">
       <div class="ribbon-item">
         <div class="ribbon-meta">
@@ -608,26 +608,26 @@
       <div class="ribbon-item">
         <div class="ribbon-meta">
           <h5>Wt / Piece</h5>
-          <p id="kpiWeightPerPiece">0.00 Kg</p>
+          <p id="kpiWeightPerPiece">-</p>
         </div>
       </div>
 
       <div class="ribbon-item">
         <div class="ribbon-meta">
           <h5>Total Lot Wt</h5>
-          <p id="kpiTotalBatchWeight">0.00 Kg</p>
+          <p id="kpiTotalBatchWeight">-</p>
         </div>
       </div>
 
       <div class="ribbon-item">
         <div class="ribbon-meta">
           <h5>Lot Qty (Batch)</h5>
-          <p id="kpiLotQuantity">0 Nos</p>
+          <p id="kpiLotQuantity">-</p>
         </div>
       </div>
     </div>
 
-    <!-- 3. Dynamic Live SIP Specs Ribbon -->
+    <!-- 3. Dynamic Live SIP Specs Ribbon (Strictly independent, no wrong log assumptions) -->
     <div class="sip-card">
       <div class="sip-grid">
         <div class="sip-param-box comp-box">
@@ -663,7 +663,6 @@
       </div>
 
       <button id="viewSipBtn" class="view-sip-btn" onclick="openSipPdfDirect()">📑 View Full SIP (PDF)</button>
-      <span id="pdfLinkStatus" style="font-size: 10px; color: #94a3b8; white-space: nowrap;">-</span>
     </div>
 
     <!-- 4. Hidden / Locked Section for Process Matrix -->
@@ -785,6 +784,7 @@
       return r.map(cols => cols.map(col => (col || '').trim()));
     }
 
+    // Converts standard Google Drive links into direct preview/popup links
     function normalizeDriveLink(raw) {
       if (!raw) return "";
       const link = String(raw).trim();
@@ -801,7 +801,8 @@
       }
       if (!fileId && /^[a-zA-Z0-9_-]{20,}$/.test(link)) fileId = link;
       if (fileId) {
-        return `https://drive.google.com/file/d/${fileId}/view`;
+        // Using /preview forces Google Drive to open it as a clean popup document instead of full website/folders
+        return `https://drive.google.com/file/d/${fileId}/preview`;
       }
       return link;
     }
@@ -839,7 +840,7 @@
       return null;
     }
 
-    // Precise Weight List Processor matching "MS NO" and exact columns: Weight Per Piece, Batch Qty, Total Wt
+    // Strict Weight List Processor: Only picks exact values if available, leaves empty/dash if missing
     function processWeightListSheet(parsedRows) {
       if (!parsedRows || parsedRows.length < 2) return;
 
@@ -871,30 +872,22 @@
         const pNo = String(r[partCol] || '').trim().toUpperCase();
         if (!pNo) continue;
 
-        let unitWt = 0;
-        if (weightPerPieceCol !== -1 && r[weightPerPieceCol]) {
+        let unitWt = null;
+        if (weightPerPieceCol !== -1 && r[weightPerPieceCol] !== undefined && r[weightPerPieceCol].trim() !== '') {
           const parsedU = parseFloat(String(r[weightPerPieceCol]).replace(/[^0-9.]/g, ''));
           if (!isNaN(parsedU)) unitWt = parsedU;
         }
 
-        let pBatch = 0;
-        if (batchQtyCol !== -1 && r[batchQtyCol]) {
+        let pBatch = null;
+        if (batchQtyCol !== -1 && r[batchQtyCol] !== undefined && r[batchQtyCol].trim() !== '') {
           const parsedB = parseFloat(String(r[batchQtyCol]).replace(/[^0-9.]/g, ''));
           if (!isNaN(parsedB)) pBatch = parsedB;
         }
 
-        let totalBatchWt = 0;
-        if (totalWtCol !== -1 && r[totalWtCol]) {
+        let totalBatchWt = null;
+        if (totalWtCol !== -1 && r[totalWtCol] !== undefined && r[totalWtCol].trim() !== '') {
           const parsedT = parseFloat(String(r[totalWtCol]).replace(/[^0-9.]/g, ''));
           if (!isNaN(parsedT)) totalBatchWt = parsedT;
-        }
-
-        // Fallbacks if columns are structured slightly differently
-        if (unitWt === 0 && totalBatchWt > 0 && pBatch > 0) {
-          unitWt = totalBatchWt / pBatch;
-        }
-        if (totalBatchWt === 0 && unitWt > 0 && pBatch > 0) {
-          totalBatchWt = unitWt * pBatch;
         }
 
         const pPdf = (pdfCol !== -1 && r[pdfCol]) ? String(r[pdfCol]).trim() : '';
@@ -1015,38 +1008,43 @@
     function getComponentWeight(partNo) {
       if (!partNo) return 0;
       const clean = String(partNo).trim().toUpperCase();
-      if (liveWeightMaster[clean] && liveWeightMaster[clean].weight > 0) {
+      if (liveWeightMaster[clean] && liveWeightMaster[clean].weight !== null && liveWeightMaster[clean].weight > 0) {
         return liveWeightMaster[clean].weight;
       }
       for (const k in liveWeightMaster) {
         if (clean.includes(k) || k.includes(clean)) {
-          if (liveWeightMaster[k].weight > 0) return liveWeightMaster[k].weight;
+          if (liveWeightMaster[k].weight !== null && liveWeightMaster[k].weight > 0) return liveWeightMaster[k].weight;
         }
       }
       return 0;
     }
 
     function getComponentTotalBatchWeight(partNo) {
-      if (!partNo) return 0;
+      if (!partNo) return null;
       const clean = String(partNo).trim().toUpperCase();
-      if (liveWeightMaster[clean] && liveWeightMaster[clean].totalBatchWeight > 0) {
+      if (liveWeightMaster[clean] && liveWeightMaster[clean].totalBatchWeight !== null && liveWeightMaster[clean].totalBatchWeight !== undefined) {
         return liveWeightMaster[clean].totalBatchWeight;
       }
       for (const k in liveWeightMaster) {
         if (clean.includes(k) || k.includes(clean)) {
-          if (liveWeightMaster[k].totalBatchWeight > 0) return liveWeightMaster[k].totalBatchWeight;
+          if (liveWeightMaster[k].totalBatchWeight !== null && liveWeightMaster[k].totalBatchWeight !== undefined) return liveWeightMaster[k].totalBatchWeight;
         }
       }
-      return 0;
+      return null;
     }
 
-    function getComponentBatchQty(partNo, fallbackQty) {
-      if (!partNo) return fallbackQty;
+    function getComponentBatchQty(partNo) {
+      if (!partNo) return null;
       const clean = String(partNo).trim().toUpperCase();
-      if (liveWeightMaster[clean] && liveWeightMaster[clean].batchQty > 0) {
+      if (liveWeightMaster[clean] && liveWeightMaster[clean].batchQty !== null && liveWeightMaster[clean].batchQty !== undefined) {
         return liveWeightMaster[clean].batchQty;
       }
-      return fallbackQty;
+      for (const k in liveWeightMaster) {
+        if (clean.includes(k) || k.includes(clean)) {
+          if (liveWeightMaster[k].batchQty !== null && liveWeightMaster[k].batchQty !== undefined) return liveWeightMaster[k].batchQty;
+        }
+      }
+      return null;
     }
 
     function getComponentPdfLink(partNo) {
@@ -1201,7 +1199,7 @@
       document.getElementById('kpiTotalQty').innerText = `${totalProceedPiece.toLocaleString('en-IN')} Pcs`;
       document.getElementById('kpiTotalLots').innerText = `${totalProceedLot} Lots`;
       document.getElementById('kpiTotalWeight').innerText = `${totalWeight.toLocaleString('en-IN', {maximumFractionDigits: 1})} Kg`;
-      document.getElementById('kpiWeightPerPiece').innerText = `${avgWeightPerPiece.toFixed(2)} Kg`;
+      document.getElementById('kpiWeightPerPiece').innerText = avgWeightPerPiece > 0 ? `${avgWeightPerPiece.toFixed(2)} Kg` : '-';
 
       if (rows.length > 0) {
         const typedSearch = document.getElementById('searchBox').value.trim().toUpperCase();
@@ -1210,59 +1208,38 @@
           const exactMatch = rows.find(r => String(r[m.part || 2] || '').trim().toUpperCase() === typedSearch);
           if (exactMatch) activeRow = exactMatch;
         }
-        const custName = activeRow[m.cust || 1] || 'CUSTOMER';
+        const custName = activeRow[m.cust || 1] || '-';
         const partName = activeRow[m.part || 2] || '-';
-        const rawLotQty = activeRow[m.qty || 6] || '0';
 
         currentActivePart = partName;
         currentActivePdfLink = getComponentPdfLink(partName);
 
-        const mappedBatchQty = getComponentBatchQty(partName, rawLotQty);
+        const mappedBatchQty = getComponentBatchQty(partName);
         const totalBatchWt = getComponentTotalBatchWeight(partName);
 
-        let liveSH = activeRow[m.sh !== undefined ? m.sh : 7] ? String(activeRow[m.sh || 7]).trim() : '-';
-        if (liveSH !== '-' && !liveSH.toUpperCase().includes('HRC') && !liveSH.toUpperCase().includes('HV')) {
-          liveSH += ' HRC';
-        }
-
-        let liveCore = activeRow[m.core !== undefined ? m.core : 10] ? String(activeRow[m.core || 10]).trim() : '-';
-        if (liveCore !== '-' && !liveCore.toUpperCase().includes('HRC') && !liveCore.toUpperCase().includes('HV')) {
-          liveCore += ' HRC';
-        }
-
-        let liveECD = activeRow[m.ecd !== undefined ? m.ecd : 11] ? String(activeRow[m.ecd || 11]).trim() : '-';
-        if (liveECD !== '-' && !liveECD.includes('mm')) liveECD += ' mm';
-
-        let liveBeforeGrind = activeRow[m.grind !== undefined ? m.grind : 13] ? String(activeRow[m.grind || 13]).trim() : (activeRow[m.pcd || 8] ? String(activeRow[m.pcd || 8]).trim() : '-');
-        if (liveBeforeGrind !== '-' && !liveBeforeGrind.includes('mm')) liveBeforeGrind += ' mm';
-
-        document.getElementById('kpiLotQuantity').innerText = `${mappedBatchQty} Nos`;
-        document.getElementById('kpiTotalBatchWeight').innerText = `${totalBatchWt.toFixed(2)} Kg`;
-        document.getElementById('sipCompName').innerText = `MS PART ${partName}`;
+        // SIP Specs: Strictly dash if empty, no assumptions
+        document.getElementById('kpiLotQuantity').innerText = (mappedBatchQty !== null && mappedBatchQty !== undefined) ? `${mappedBatchQty} Nos` : '-';
+        document.getElementById('kpiTotalBatchWeight').innerText = (totalBatchWt !== null && totalBatchWt !== undefined) ? `${totalBatchWt.toFixed(2)} Kg` : '-';
+        
+        document.getElementById('sipCompName').innerText = partName !== '-' ? `MS PART ${partName}` : '-';
         document.getElementById('sipPartNo').innerText = partName;
         document.getElementById('sipCustomer').innerText = custName;
-        document.getElementById('sipSH').innerText = liveSH;
-        document.getElementById('sipCore').innerText = liveCore;
-        document.getElementById('sipECD').innerText = liveECD;
-        document.getElementById('sipECDBefore').innerText = liveBeforeGrind;
-
-        const pdfStatusEl = document.getElementById('pdfLinkStatus');
-        if (pdfStatusEl) {
-          pdfStatusEl.innerText = currentActivePdfLink ? '📄 PDF linked (Drive)' : '⚠️ No PDF link in Weight List';
-          pdfStatusEl.style.color = currentActivePdfLink ? '#34d399' : '#f87171';
-        }
+        
+        // Setting parameters to dash (-) unless explicitly loaded from a dedicated reference if needed
+        document.getElementById('sipSH').innerText = '-';
+        document.getElementById('sipCore').innerText = '-';
+        document.getElementById('sipECD').innerText = '-';
+        document.getElementById('sipECDBefore').innerText = '-';
       } else {
-        document.getElementById('kpiLotQuantity').innerText = `0 Nos`;
-        document.getElementById('kpiTotalBatchWeight').innerText = `0.00 Kg`;
-        document.getElementById('sipCompName').innerText = `No Data`;
+        document.getElementById('kpiLotQuantity').innerText = `-`;
+        document.getElementById('kpiTotalBatchWeight').innerText = `-`;
+        document.getElementById('sipCompName').innerText = `-`;
         document.getElementById('sipPartNo').innerText = `-`;
         document.getElementById('sipCustomer').innerText = `-`;
         document.getElementById('sipSH').innerText = `-`;
         document.getElementById('sipCore').innerText = `-`;
         document.getElementById('sipECD').innerText = `-`;
         document.getElementById('sipECDBefore').innerText = `-`;
-        const pdfStatusEl = document.getElementById('pdfLinkStatus');
-        if (pdfStatusEl) { pdfStatusEl.innerText = '-'; pdfStatusEl.style.color = '#94a3b8'; }
       }
     }
 
@@ -1307,13 +1284,14 @@
       }
 
       if (!currentActivePdfLink) {
-        // Fallback: Opens Google Drive file search specifically for this MS number if no link is provided in sheet
+        // Direct popup search on Google Drive for this specific MS Number
         const searchFallbackUrl = `https://drive.google.com/drive/search?q=${encodeURIComponent(currentActivePart)}`;
-        window.open(searchFallbackUrl, '_blank');
+        window.open(searchFallbackUrl, '_blank', 'width=1000,height=700');
         return;
       }
 
-      window.open(bustCache(currentActivePdfLink), '_blank');
+      // Opens direct preview popup window
+      window.open(bustCache(currentActivePdfLink), '_blank', 'width=1000,height=700');
     }
 
     window.addEventListener('DOMContentLoaded', () => {
