@@ -741,14 +741,13 @@
   </div>
 
   <script>
-    // Live Published CSV Links
+    // Live Published CSV Links (Process Log & Weight List)
     const PROCESS_LOG_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=529980778&single=true&output=csv";
     const WEIGHT_LIST_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=373153751&single=true&output=csv";
 
-    // How often to auto re-sync from the sheet in the background (ms). 3 minutes.
+    // Auto re-sync interval (3 minutes)
     const AUTO_REFRESH_MS = 3 * 60 * 1000;
 
-    // Dynamic Live Store
     let liveWeightMaster = {};
     let masterLogs = [];
     let logColMap = {};
@@ -763,8 +762,6 @@
       "SUPERVISOR": "ht2026"
     };
 
-    // Warn the user visibly when this page is opened directly as a local file (file://),
-    // since that is the #1 reason live data/SIP looked "stuck on an old copy".
     if (window.location.protocol === 'file:') {
       const w = document.getElementById('fileModeWarning');
       if (w) w.style.display = 'block';
@@ -803,16 +800,11 @@
       return r.map(cols => cols.map(col => (col || '').trim()));
     }
 
-    // Google Drive PDF links get pasted in many different shapes
-    // (".../file/d/ID/view?usp=sharing", ".../open?id=ID", ".../uc?id=ID", or just the bare ID).
-    // Pull the file ID out of whatever shape it's in and rebuild a link that reliably opens
-    // in a new tab, so a mismatched/old link format never silently fails to open.
     function normalizeDriveLink(raw) {
       if (!raw) return "";
       const link = String(raw).trim();
       if (!link) return "";
 
-      // If it's not a Google Drive URL at all (e.g. some other direct PDF host), leave it as-is.
       if (!link.includes('drive.google.com') && !/^[a-zA-Z0-9_-]{20,}$/.test(link)) {
         return link;
       }
@@ -832,17 +824,11 @@
       return link;
     }
 
-    // Build a fresh, uniquely cache-busted version of a URL every single call.
-    // Date.now() alone isn't always enough (some proxies round/ignore query params),
-    // so a random string is appended too.
     function bustCache(url) {
       const buster = 'nocache=' + Date.now() + '_' + Math.random().toString(36).slice(2);
       return url + (url.includes('?') ? '&' : '?') + buster;
     }
 
-    // Direct & Multi-Proxy Fetch Engine — every attempt (direct AND every proxy)
-    // now gets its OWN fresh cache-buster, so a stale proxy-side cache can no longer
-    // serve back yesterday's data.
     async function fetchCSVData(url) {
       const freshUrl = bustCache(url);
       const endpoints = [
@@ -871,7 +857,6 @@
       return null;
     }
 
-    // Parse Weight List Live
     function processWeightListSheet(parsedRows) {
       if (!parsedRows || parsedRows.length < 2) return;
 
@@ -894,7 +879,6 @@
         }
       }
 
-      // Rebuild fresh each sync so removed/renamed rows in the sheet don't linger.
       liveWeightMaster = {};
 
       for (let i = headerIdx + 1; i < parsedRows.length; i++) {
@@ -928,7 +912,6 @@
       }
     }
 
-    // Parse Process Log Column Headers
     function processLogHeaders(headerRow) {
       logColMap = {
         date: 0, cust: 1, part: 2, batch: 3, heat: 4, fc: 5, qty: 6,
@@ -970,7 +953,6 @@
       el.innerText = (ok ? 'Last synced: ' : 'Last attempt: ') + timeStr;
     }
 
-    // Load Live Sheets
     async function loadAllLiveSheets(forceSync = false) {
       const badge = document.getElementById('dataSourceBadge');
       if (badge) {
@@ -981,7 +963,6 @@
       let logSuccess = false;
       let wtSuccess = false;
 
-      // 1. Fetch Weight List
       try {
         const wtCSV = await fetchCSVData(WEIGHT_LIST_CSV_URL);
         if (wtCSV) {
@@ -991,7 +972,6 @@
         }
       } catch (e) {}
 
-      // 2. Fetch Process Log
       try {
         const logCSV = await fetchCSVData(PROCESS_LOG_CSV_URL);
         if (logCSV) {
@@ -1013,13 +993,12 @@
           badge.innerHTML = "🟢 Live — Process + Weight/PDF List Merged";
           badge.style.color = "#34d399";
         }
-        if (forceSync) alert("✅ Both sheets synced & merged — Process Log (" + masterLogs.length + " rows) + Weight/PDF List (" + Object.keys(liveWeightMaster).length + " parts).");
+        if (forceSync) alert("✅ Both sheets synced & merged.");
       } else if (logSuccess) {
         if (badge) {
           badge.innerHTML = "🟡 Live — Process OK, Weight/PDF List NOT loaded";
           badge.style.color = "#fbbf24";
         }
-        if (forceSync) alert("⚠️ Process Sheet synced, lekin Weight/PDF List sheet load nahi hui — isliye PDF & weight abhi merge nahi honge. Us sheet ka 'Publish to web' CSV link check karo.");
       } else if (wtSuccess) {
         if (badge) {
           badge.innerHTML = "🟡 Live — Weight/PDF List OK, Process log NOT loaded";
@@ -1027,14 +1006,12 @@
         }
       } else {
         if (badge) {
-          badge.innerHTML = "🔴 Connection Issue";
+          badge.innerHTML = "🔴 Connection Issue / Link Required";
           badge.style.color = "#ef4444";
         }
-        if (forceSync) alert("⚠️ Sync fail hua. Agar ye file seedhe C: drive se khuli hai (file://), to upar diya gaya local-server wala fix try karo.");
       }
 
       updateLastSyncText(logSuccess || wtSuccess);
-
       masterLogs.sort((a, b) => parseCustomDate(b[logColMap.date || 0]) - parseCustomDate(a[logColMap.date || 0]));
       applyAllFilters();
     }
@@ -1134,7 +1111,6 @@
       }
     }
 
-    // Monthly Grouped Table Rendering
     function renderTable(rows) {
       const tbody = document.getElementById('tableBody');
       document.getElementById('recordStatus').innerText = `${rows.length} records`;
@@ -1210,7 +1186,6 @@
       tbody.innerHTML = html;
     }
 
-    // Dynamic Live SIP & KPI Calculation from Real Rows
     function updateKPIsAndSIP(rows) {
       let totalProceedPiece = 0;
       let totalWeight = 0;
@@ -1234,9 +1209,6 @@
       document.getElementById('kpiWeightPerPiece').innerText = `${avgWeightPerPiece.toFixed(2)} Kg`;
 
       if (rows.length > 0) {
-        // If the search box has text that exactly matches a part number among the
-        // currently filtered rows, show THAT part's details — not just the most
-        // recent row — so searching an MS/part number reliably surfaces its own SIP.
         const typedSearch = document.getElementById('searchBox').value.trim().toUpperCase();
         let activeRow = rows[0];
         if (typedSearch) {
@@ -1280,7 +1252,7 @@
 
         const pdfStatusEl = document.getElementById('pdfLinkStatus');
         if (pdfStatusEl) {
-          pdfStatusEl.innerText = currentActivePdfLink ? '📄 PDF linked (Drive)' : '⚠️ No PDF link for this part in Weight List sheet';
+          pdfStatusEl.innerText = currentActivePdfLink ? '📄 PDF linked (Drive)' : '⚠️ No PDF link for this part';
           pdfStatusEl.style.color = currentActivePdfLink ? '#34d399' : '#f87171';
         }
       } else {
@@ -1331,8 +1303,6 @@
       applyAllFilters();
     }
 
-    // Direct Dynamic PDF Opener in New Tab — cache-busted so it doesn't
-    // reopen the exact same cached PDF copy every time.
     function openSipPdfDirect() {
       if (!currentActivePart || currentActivePart === "-") {
         alert("Please search or select a component first.");
@@ -1340,18 +1310,14 @@
       }
 
       let targetUrl = currentActivePdfLink;
-
       if (!targetUrl) {
         targetUrl = `sip/${encodeURIComponent(currentActivePart)}.pdf`;
       }
-
       window.open(bustCache(targetUrl), '_blank');
     }
 
     window.addEventListener('DOMContentLoaded', () => {
       loadAllLiveSheets(false);
-      // Keep the dashboard fresh automatically in the background, without
-      // needing the user to click "Sync All" every time.
       setInterval(() => loadAllLiveSheets(false), AUTO_REFRESH_MS);
     });
   </script>
