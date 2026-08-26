@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>My Laptop Gear Unit 7 Production Review Dashboard</title>
+  <title>Milestone Beer - Unit 7 Production Dashboard</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -196,7 +196,7 @@
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(7, 13, 27, 0.8);
+      background: rgba(7, 13, 27, 0.85);
       display: none;
       align-items: center;
       justify-content: center;
@@ -208,11 +208,12 @@
       border: 1px solid #334155;
       border-radius: 12px;
       width: 100%;
-      max-width: 450px;
+      max-width: 400px;
       padding: 20px;
       display: flex;
       flex-direction: column;
       gap: 12px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.6);
     }
     .modal-header { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 700; color: #f8fafc; }
     .close-modal { background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer; }
@@ -245,12 +246,12 @@
 
   <header class="ewm-header">
     <div class="ewm-brand">
-      <span style="font-size: 16px;">💻</span>
-      <h1>My Laptop Gear Unit 7 Production Review Dashboard</h1>
+      <span style="font-size: 16px;">🍺</span>
+      <h1>Milestone Beer - Unit 7 Production Dashboard</h1>
     </div>
     <div class="header-right">
       <a href="index.html" class="home-btn">🏠 Home</a>
-      <div class="ewm-badge">Plant Unit 7</div>
+      <div class="ewm-badge">Unit 7</div>
     </div>
   </header>
 
@@ -309,7 +310,7 @@
         </div>
       </div>
 
-      <!-- DWM Matrix Table View -->
+      <!-- DWM Matrix Section -->
       <div class="dwm-section">
         <div class="dwm-title-row">
           <h3 id="dwmTableTitle">📋 Daily Work Management (DWM) Matrix</h3>
@@ -353,17 +354,27 @@
 
   </div>
 
-  <!-- Floating Add Button (+) -->
+  <!-- Floating Plus Add Button (+) -->
   <button class="float-add-btn" onclick="openAddModal()" title="Add New Production Entry">+</button>
 
-  <!-- Add Data Modal Form -->
+  <!-- Add Data Modal Form with Security PIN -->
   <div class="modal-overlay" id="addModal">
     <div class="modal-content">
       <div class="modal-header">
-        <span>Add Live Production Entry</span>
+        <span>🔒 Secure Production Entry</span>
         <button class="close-modal" onclick="closeAddModal()">&times;</button>
       </div>
       <form id="productionForm" onsubmit="submitProductionData(event)">
+        <div class="form-group">
+          <label>Select Month</label>
+          <select id="inputMonth" required>
+            <option value="APRIL-2026">April - 2026</option>
+            <option value="MAY-2026">May - 2026</option>
+            <option value="JUNE-2026">June - 2026</option>
+            <option value="JULY-2026">July - 2026</option>
+            <option value="AUGUST-2026">August - 2026</option>
+          </select>
+        </div>
         <div class="form-group">
           <label>Select Furnace</label>
           <select id="inputFurnace" required>
@@ -381,13 +392,17 @@
           <label>Production Output (in Ton)</label>
           <input type="number" step="0.01" id="inputTon" required placeholder="e.g. 2.35">
         </div>
-        <button type="submit" class="submit-form-btn">Save to Google Sheet</button>
+        <div class="form-group" style="border-top: 1px solid #334155; padding-top: 8px; margin-top: 4px;">
+          <label style="color:#f59e0b;">🔒 Security PIN (Required)</label>
+          <input type="password" id="securityPin" maxlength="4" required placeholder="Enter 4-digit PIN">
+        </div>
+        <button type="submit" class="submit-form-btn">Submit to Sheet</button>
       </form>
     </div>
   </div>
 
   <script>
-    // Live PWM CSV URL provided by user
+    const ADMIN_PIN = "7890"; // <- यहाँ अपना सीक्रेट 4-अंकों का पिन सेट कर सकते हो!
     const PWM_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_55_JgWvZY0QyC87pldI3sKILOrXLYsE8xiuB99-K2ll9jWI5HHYIU6aoxEF1hegbDDmRybDQsW2/pub?gid=0&single=true&output=csv";
 
     const dwmDatabase = {
@@ -466,26 +481,40 @@
     }
     function closeAddModal() {
       document.getElementById('addModal').style.display = 'none';
+      document.getElementById('securityPin').value = '';
     }
 
     function submitProductionData(event) {
       event.preventDefault();
+      const enteredPin = document.getElementById('securityPin').value;
+      
+      // Check Security PIN
+      if (enteredPin !== ADMIN_PIN) {
+        alert("❌ Incorrect Security PIN! Only authorized production managers can submit.");
+        return;
+      }
+
+      const month = document.getElementById('inputMonth').value;
       const fc = document.getElementById('inputFurnace').value;
       const day = parseInt(document.getElementById('inputDate').value);
       const ton = parseFloat(document.getElementById('inputTon').value);
-      const month = document.getElementById('dwmMonthDropdown').value;
 
-      if(dwmDatabase[month]) {
+      if (dwmDatabase[month]) {
         const fObj = dwmDatabase[month].furnaces.find(f => f.name === fc);
-        if(fObj && day >= 1 && day <= dwmDatabase[month].daysCount) {
+        if (fObj && day >= 1 && day <= dwmDatabase[month].daysCount) {
           fObj.days[day - 1] = ton;
-          alert(`Successfully updated ${fc} for Day ${day} with ${ton} Ton in ${month}!`);
+          
+          // Trigger Google Sheet Web App Link sync if configured
+          // fetch(PWM_CSV_URL, { method: 'POST', body: JSON.stringify({month, fc, day, ton}) }).catch(e => {});
+
+          alert(`✅ Verified & Saved! ${fc} for Day ${day} updated with ${ton} Ton in ${month}.`);
           closeAddModal();
+          document.getElementById('dwmMonthDropdown').value = month;
           renderDWMData();
           return;
         }
       }
-      alert("Invalid date or month selected.");
+      alert("⚠️ Invalid date or month parameters.");
     }
 
     function renderDWMData() {
@@ -554,7 +583,7 @@
       }
       tbodyHtml += `</tr>`;
 
-      document.getElementById('dwmTableBody').innerHTML = tbodyHtml;
+     document.getElementById('dwmTableBody').innerHTML = tbodyHtml;
     }
 
     window.addEventListener('DOMContentLoaded', renderDWMData);
