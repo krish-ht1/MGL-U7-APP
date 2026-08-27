@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Monthly Production - Milestone Gear Unit 7</title>
+  <!-- Chart.js Library for Pop-up Graph -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -20,6 +22,7 @@
       flex-direction: column;
     }
 
+    /* Header */
     .ewm-header {
       background: #0f172a;
       border-bottom: 1px solid #1e293b;
@@ -53,6 +56,7 @@
 
     .ewm-container { max-width: 1600px; width: 100%; margin: 0 auto; padding: 14px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
 
+    /* Navigation Bar */
     .nav-buttons-bar {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -78,6 +82,7 @@
     }
     .nav-main-btn.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
 
+    /* Filter Panel */
     .filter-panel {
       background: #0f172a;
       border: 1px solid #1e293b;
@@ -106,6 +111,24 @@
       cursor: pointer;
     }
 
+    /* Trend Button Style */
+    .trend-btn {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      color: #fff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+      transition: 0.2s;
+    }
+    .trend-btn:hover { transform: translateY(-1px); opacity: 0.95; }
+
     .furnace-filter-group {
       display: flex;
       align-items: center;
@@ -126,6 +149,7 @@
       gap: 4px;
     }
 
+    /* KPI Summary Cards */
     .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
     @media (max-width: 768px) { .kpi-grid { grid-template-columns: 1fr; } }
 
@@ -147,6 +171,7 @@
     .kpi-card span { font-size: 10px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
     .kpi-card h3 { margin: 2px 0 0 0; font-size: 18px; font-weight: 700; color: #f8fafc; }
 
+    /* Table Section */
     .table-section {
       background: #0f172a;
       border: 1px solid #1e293b;
@@ -174,6 +199,56 @@
       z-index: 5;
     }
     table.monthly-table td { background: #0f172a; color: #f1f5f9; }
+
+    /* Popup Modal Styling for Trend Graph */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(3, 7, 18, 0.85);
+      backdrop-filter: blur(4px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      padding: 15px;
+    }
+    .modal-content {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 1000px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header h3 { margin: 0; font-size: 16px; color: #f8fafc; display: flex; align-items: center; gap: 8px; }
+    .close-modal {
+      background: #1e293b;
+      border: 1px solid #475569;
+      color: #f8fafc;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .modal-chart-box {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      background: #0b1120;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 10px;
+    }
   </style>
 </head>
 <body>
@@ -191,6 +266,7 @@
 
   <div class="ewm-container">
 
+    <!-- Sub-Module Navigation -->
     <div class="nav-buttons-bar">
       <a href="production.html" class="nav-main-btn">📅 Daily Production (DWM)</a>
       <a href="monthly.html" class="nav-main-btn active">📊 Monthly Production</a>
@@ -198,6 +274,7 @@
       <a href="breakdown.html" class="nav-main-btn">⚠️ Breakdown & Loss</a>
     </div>
 
+    <!-- Filter Panel with Trend Button -->
     <div class="filter-panel">
       <div class="filter-row">
         <div class="filter-group">
@@ -214,6 +291,11 @@
           </select>
         </div>
 
+        <!-- Trend Button added here -->
+        <button class="trend-btn" onclick="openTrendModal()">
+          📈 26-27 Trend
+        </button>
+
         <div class="furnace-filter-group">
           <span style="font-size: 11.5px; color: #94a3b8; font-weight: 600;">Furnace:</span>
           <label><input type="checkbox" class="sqf-filter" value="SQF-1" checked onchange="renderMonthlyTable()"> SQF-1</label>
@@ -224,6 +306,7 @@
       </div>
     </div>
 
+    <!-- KPI Summary Cards -->
     <div class="kpi-grid">
       <div class="kpi-card">
         <span>Total Quantity (Pcs)</span>
@@ -239,6 +322,7 @@
       </div>
     </div>
 
+    <!-- Monthly Production Table -->
     <div class="table-section">
       <div class="table-scroll">
         <table class="monthly-table">
@@ -261,7 +345,7 @@
             </tr>
           </thead>
           <tbody id="monthlyTableBody">
-            <tr><td colspan="12" style="padding: 20px; color: #94a3b8;">Reading exact cells from Google Sheet...</td></tr>
+            <tr><td colspan="12" style="padding: 20px; color: #94a3b8;">Loading exact live data from Google Sheet...</td></tr>
           </tbody>
         </table>
       </div>
@@ -269,10 +353,24 @@
 
   </div>
 
+  <!-- Trend Chart Popup Modal -->
+  <div class="modal-overlay" id="trendModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>📈 Production Trend in Tonnage (2026-27)</h3>
+        <button class="close-modal" onclick="closeTrendModal()">✕ Close</button>
+      </div>
+      <div class="modal-chart-box">
+        <canvas id="trendChart"></canvas>
+      </div>
+    </div>
+  </div>
+
   <script>
     const MONTHLY_CSV_URL = "https://docs.google.com/spreadsheets/d/1ZKl4Nzxfwrt5MO11Iy-S-Yjiq0t9MHoQrryAE1paqXw/export?format=csv&gid=539352874";
 
     let monthlyData = [];
+    let trendChartInstance = null;
 
     async function fetchMonthlyLive() {
       try {
@@ -292,14 +390,11 @@
         });
 
         monthlyData = [];
-        
-        // Loop through rows to find valid month rows
         for (let i = 0; i < rows.length; i++) {
           let r = rows[i];
           let monthCol = r[0] ? r[0].replace(/["']/g, "").trim() : "";
           
-          // Check if this row represents a valid month entry (e.g., Apr-23, May 2023, etc.)
-          if (monthCol && (monthCol.includes("202") || monthCol.includes("-23") || monthCol.includes("-24") || monthCol.includes("-25") || monthCol.includes("May") || monthCol.includes("Apr") || monthCol.includes("Jun") || monthCol.includes("Jul") || monthCol.includes("Aug") || monthCol.includes("Sep") || monthCol.includes("Oct") || monthCol.includes("Nov") || monthCol.includes("Dec") || monthCol.includes("Jan") || monthCol.includes("Feb") || monthCol.includes("Mar"))) {
+          if (monthCol && (monthCol.includes("202") || monthCol.includes("-23") || monthCol.includes("-24") || monthCol.includes("-25") || monthCol.includes("-26") || monthCol.includes("May") || monthCol.includes("Apr") || monthCol.includes("Jun") || monthCol.includes("Jul") || monthCol.includes("Aug") || monthCol.includes("Sep") || monthCol.includes("Oct") || monthCol.includes("Nov") || monthCol.includes("Dec") || monthCol.includes("Jan") || monthCol.includes("Feb") || monthCol.includes("Mar"))) {
             
             let parseVal = (val) => {
               if (!val) return 0;
@@ -308,18 +403,15 @@
               return isNaN(num) ? 0 : num;
             };
 
-            // Mapping exact columns based on user layout:
-            // Col 0: Month
-            // Col 1: SQF1 Qty, Col 2: SQF1 Wt
-            // Col 3: SQF2 Qty, Col 4: SQF2 Wt
-            // Col 5: SQF3 Qty, Col 6: SQF3 Wt
-            // Col 7: SQF4 Qty, Col 8: SQF4 Wt
+            let totalWtKg = parseVal(r[2]) + parseVal(r[4]) + parseVal(r[6]) + parseVal(r[8]);
+
             monthlyData.push({
               month: monthCol,
               sqf1: { p: parseVal(r[1]), w: parseVal(r[2]) },
               sqf2: { p: parseVal(r[3]), w: parseVal(r[4]) },
               sqf3: { p: parseVal(r[5]), w: parseVal(r[6]) },
-              sqf4: { p: parseVal(r[7]), w: parseVal(r[8]) }
+              sqf4: { p: parseVal(r[7]), w: parseVal(r[8]) },
+              tonnage: totalWtKg / 1000
             });
           }
         }
@@ -338,8 +430,8 @@
       const fromSelect = document.getElementById('fromMonthSelect');
       const toSelect = document.getElementById('toMonthSelect');
       
-      fromSelect.innerHTML = '<option value="">-- Start Month --</option>';
-      toSelect.innerHTML = '<option value="">-- End Month --</option>';
+      fromSelect.innerHTML = '<option value="">-- Start --</option>';
+      toSelect.innerHTML = '<option value="">-- End --</option>';
 
       monthlyData.forEach((row, index) => {
         fromSelect.innerHTML += `<option value="${index}">${row.month}</option>`;
@@ -420,6 +512,68 @@
       document.getElementById('kpiTotalQty').innerText = `${gTotalQty.toLocaleString('en-IN')} Pcs`;
       document.getElementById('kpiTotalWeight').innerText = `${gTotalWeight.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})} Kg`;
       document.getElementById('kpiTotalTonnage').innerText = `${(gTotalWeight / 1000).toFixed(2)} Ton`;
+    }
+
+    /* Modal Open/Close Logic & Chart Rendering */
+    function openTrendModal() {
+      document.getElementById('trendModal').style.display = 'flex';
+      renderTrendChart();
+    }
+
+    function closeTrendModal() {
+      document.getElementById('trendModal').style.display = 'none';
+    }
+
+    function renderTrendChart() {
+      const ctx = document.getElementById('trendChart').getContext('2d');
+
+      // Month labels (April to March)
+      const monthsList = ["APRIL", "MAY", "JUNE", "JULY", "AUG", "SEP", "OCT", "NOV", "DEC", "JAN", "FEB", "MARCH"];
+      
+      // Match data from sheet or map them
+      let chartValues = monthsList.map(mName => {
+        let found = monthlyData.find(d => d.month.toUpperCase().includes(mName));
+        return found ? parseFloat(found.tonnage.toFixed(2)) : 0;
+      });
+
+      if (trendChartInstance) {
+        trendChartInstance.destroy();
+      }
+
+      trendChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: monthsList,
+          datasets: [
+            {
+              label: 'Monthly Values (FY: 2026-27)',
+              data: chartValues,
+              backgroundColor: '#ec4899', // Matching pink from your reference image
+              borderRadius: 6,
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: { color: '#cbd5e1', font: { family: 'Inter', size: 11 } }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#94a3b8', font: { size: 10 } },
+              grid: { display: false }
+            },
+            y: {
+              ticks: { color: '#94a3b8', font: { size: 10 } },
+              grid: { color: '#1e293b' }
+            }
+          }
+        }
+      });
     }
 
     window.addEventListener('DOMContentLoaded', fetchMonthlyLive);
