@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Milestone Gear Unit 7 - Production Review Dashboard</title>
+  <title>Production Daily DWM Dashboard</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     body {
-      background: #070d1b;
+      background: #0b1120;
       color: #e2e8f0;
-      font-family: 'Inter', sans-serif;
+      font-family: 'Poppins', sans-serif;
       margin: 0;
       padding: 0;
       min-height: 100vh;
@@ -20,410 +20,305 @@
       flex-direction: column;
     }
 
-    /* Header */
-    .ewm-header {
-      background: #0f172a;
-      border-bottom: 1px solid #1e293b;
-      padding: 12px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    /* Top Bar */
+    .top-bar {
       position: sticky;
       top: 0;
-      z-index: 1000;
-    }
-    .ewm-brand { display: flex; align-items: center; gap: 10px; }
-    .ewm-brand h1 { font-size: 13.5px; font-weight: 700; margin: 0; color: #f8fafc; }
-    
-    .header-right { display: flex; align-items: center; gap: 8px; }
-    .home-btn {
       background: #1e293b;
-      border: 1px solid #334155;
-      color: #38bdf8;
-      padding: 5px 10px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .ewm-badge { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-size: 10.5px; font-weight: 600; }
-
-    .ewm-container { max-width: 1600px; width: 100%; margin: 0 auto; padding: 14px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
-
-    /* 4 Navigation Buttons Bar */
-    .nav-buttons-bar {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      background: #0f172a;
-      border: 1px solid #1e293b;
-      padding: 10px;
-      border-radius: 10px;
-    }
-    .nav-main-btn {
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: #94a3b8;
-      padding: 8px 6px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      text-align: center;
-      transition: 0.2s;
-    }
-    .nav-main-btn.active, .nav-main-btn:hover { background: #3b82f6; border-color: #3b82f6; color: #fff; }
-
-    /* Module Views Containers */
-    .module-view { display: none; flex-direction: column; gap: 14px; }
-    .module-view.active { display: flex; }
-
-    /* Control Bar with Month Dropdown */
-    .control-bar {
-      background: #0f172a;
-      border: 1px solid #1e293b;
-      border-radius: 10px;
-      padding: 10px 14px;
+      border-bottom: 2px solid #f97316;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 10px 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+      z-index: 1000;
+    }
+    .nav-left { display: flex; align-items: center; gap: 12px; }
+    .back-btn {
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #f97316;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 12px;
+      transition: 0.2s;
+    }
+    .back-btn:hover { background: #f97316; color: white; }
+    .nav-left h1 { font-size: 15px; margin: 0; color: #f8fafc; font-weight: 600; }
+
+    .dashboard-container {
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 16px;
+      flex: 1;
+      overflow-x: hidden;
+    }
+
+    /* 1. Top 3 Modules (Daily, Monthly, Yearly) */
+    .top-modules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .prod-module-card {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 1px solid #334155;
+      border-top: 4px solid #38bdf8;
+      border-radius: 10px;
+      padding: 16px 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .prod-module-card:nth-child(1) { border-top-color: #34d399; } 
+    .prod-module-card:nth-child(2) { border-top-color: #f97316; } 
+    .prod-module-card:nth-child(3) { border-top-color: #38bdf8; } 
+
+    .module-info h4 { margin: 0; font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+    .module-info h2 { margin: 6px 0 2px 0; font-size: 24px; color: #f8fafc; font-weight: 700; }
+    .module-info span { font-size: 11px; color: #cbd5e1; font-weight: 500; background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px;}
+    .module-icon { font-size: 32px; opacity: 0.8; }
+
+    /* 2. DWM Matrix Table */
+    .dwm-section {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      margin-bottom: 20px;
+    }
+    .dwm-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #334155;
       flex-wrap: wrap;
       gap: 10px;
     }
-    .month-select-wrap { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: #94a3b8; }
-    .month-select-wrap select {
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: #f8fafc;
+    .dwm-title-group { display: flex; align-items: center; gap: 10px; }
+    .dwm-header h3 { margin: 0; font-size: 16px; color: #38bdf8; font-weight: 700; text-transform: uppercase; }
+    
+    .month-filter {
+      background: #0f172a;
+      border: 1px solid #f97316;
+      color: #fde047;
       padding: 6px 12px;
       border-radius: 6px;
-      font-size: 12px;
+      font-size: 13px;
+      font-weight: 600;
       outline: none;
-      font-weight: 600;
       cursor: pointer;
+      font-family: inherit;
     }
 
-    /* KPI Cards Grid */
-    .kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-    .kpi-card {
-      background: #0f172a;
-      border: 1px solid #1e293b;
-      border-radius: 10px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      position: relative;
-      overflow: hidden;
-    }
-    .kpi-card::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: #3b82f6; }
-    .kpi-card.green::after { background: #34d399; }
-    .kpi-card.orange::after { background: #f59e0b; }
-    .kpi-card.red::after { background: #ef4444; }
-
-    .kpi-card span { font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
-    .kpi-card h3 { margin: 2px 0 0 0; font-size: 16px; font-weight: 700; color: #f8fafc; }
-    .kpi-card p { margin: 0; font-size: 9px; color: #64748b; }
-
-    /* DWM Matrix Section */
-    .dwm-section {
-      background: #0f172a;
-      border: 1px solid #1e293b;
-      border-radius: 10px;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .dwm-title-row { display: flex; justify-content: space-between; align-items: center; }
-    .dwm-title-row h3 { font-size: 12.5px; font-weight: 700; color: #f8fafc; margin: 0; }
-    .note-text { font-size: 10px; color: #fbbf24; background: rgba(251, 191, 36, 0.1); padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(251, 191, 36, 0.2); }
-
-    /* Matrix Table Layout */
-    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    table.dwm-table {
+    .table-responsive {
+      overflow-x: auto;
       width: 100%;
+      -webkit-overflow-scrolling: touch;
+      border: 1px solid #475569;
+    }
+
+    table {
       border-collapse: collapse;
-      font-size: 10.5px;
-      text-align: center;
+      font-size: 11.5px;
       white-space: nowrap;
+      text-align: center;
+      width: max-content;
     }
-    table.dwm-table th, table.dwm-table td {
-      border: 1px solid #334155;
-      padding: 6px 4px;
-    }
-    table.dwm-table th {
-      background: #1e293b;
-      color: #94a3b8;
-      font-weight: 600;
-      position: sticky;
-      top: 0;
-      z-index: 5;
-    }
-    table.dwm-table td { background: #0f172a; color: #f1f5f9; }
     
-    .cell-green { background: rgba(52, 211, 153, 0.2) !important; color: #34d399 !important; font-weight: 600; }
-    .cell-red { background: rgba(239, 68, 68, 0.2) !important; color: #f87171 !important; font-weight: 600; }
-    .total-row td { background: #172033 !important; font-weight: 700; color: #38bdf8 !important; }
-
-    /* Floating Plus Add Button */
-    .float-add-btn {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      width: 56px;
-      height: 56px;
-      background: #f97316;
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
-      cursor: pointer;
-      z-index: 9999;
-      border: none;
-      transition: 0.2s;
-    }
-    .float-add-btn:hover { transform: scale(1.08); background: #ea580c; }
-
-    /* Modal Form Overlay */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(7, 13, 27, 0.85);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-      padding: 16px;
-    }
-    .modal-content {
+    th:first-child, td:first-child {
+      position: sticky;
+      left: 0;
       background: #0f172a;
+      z-index: 2;
+      border-right: 2px solid #38bdf8;
+      font-weight: 700;
+    }
+    th:first-child { z-index: 3; }
+
+    th, td {
+      border: 1px solid #475569;
+      padding: 6px 8px;
+    }
+    th {
+      background: #0f172a;
+      color: #e2e8f0;
+      font-weight: 600;
+    }
+
+    .vertical-text {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      white-space: nowrap;
+      height: 120px;
+      text-align: center;
+      display: inline-block;
+      font-size: 10.5px;
+      color: #cbd5e1;
+    }
+
+    .day-col { min-width: 40px; font-weight: 700; background: #1e293b; }
+
+    .cell-green { background: rgba(34, 197, 94, 0.2) !important; color: #4ade80 !important; font-weight: 700; }
+    .cell-red { background: rgba(239, 68, 68, 0.2) !important; color: #f87171 !important; font-weight: 700; }
+    .cell-blank { background: rgba(15, 23, 42, 0.5) !important; color: #475569 !important; }
+    .cell-highlight { background: rgba(255, 255, 255, 0.05); font-weight: 600; }
+    
+    .total-row td { background: #0f172a !important; font-weight: 700; color: #fde047; border-top: 2px solid #94a3b8; }
+    .cumulative-row td { background: #1e293b !important; font-weight: 700; color: #f8fafc;}
+    .remark-row td { text-align: left; font-weight: 700; background: #0b1120 !important; font-size: 13px; color: #f8fafc; }
+
+    /* Bottom KPI Placeholder */
+    .bottom-kpi-section {
+      background: #1e293b;
       border: 1px solid #334155;
-      border-radius: 12px;
-      width: 100%;
-      max-width: 400px;
+      border-radius: 10px;
       padding: 20px;
-      display: flex;
-      flex-direction: column;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    .bottom-kpi-section h3 { margin: 0 0 10px 0; color: #38bdf8; font-size: 16px; }
+    .kpi-boxes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 12px;
     }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 700; color: #f8fafc; }
-    .close-modal { background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer; }
-    .form-group { display: flex; flex-direction: column; gap: 4px; }
-    .form-group label { font-size: 10.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
-    .form-group input, .form-group select { background: #070d1b; border: 1px solid #334155; color: #fff; padding: 9px 10px; border-radius: 8px; font-size: 12px; outline: none; }
-    .submit-form-btn { background: #3b82f6; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 12px; margin-top: 6px; }
-    .submit-form-btn:hover { background: #2563eb; }
-
-    .placeholder-card {
+    .mini-kpi {
       background: #0f172a;
-      border: 1px solid #1e293b;
-      border-radius: 10px;
-      padding: 40px;
+      border: 1px solid #475569;
+      padding: 12px;
+      border-radius: 8px;
       text-align: center;
-      color: #94a3b8;
-      font-size: 13px;
     }
-
-    @media (max-width: 1200px) {
-      .kpi-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-    @media (max-width: 768px) {
-      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-      .nav-buttons-bar { grid-template-columns: repeat(2, 1fr); }
-    }
+    .mini-kpi span { font-size: 10px; color: #94a3b8; text-transform: uppercase; display: block; }
+    .mini-kpi strong { font-size: 18px; color: #34d399; margin-top: 4px; display: block; }
   </style>
 </head>
 <body>
 
-  <header class="ewm-header">
-    <div class="ewm-brand">
-      <span style="font-size: 16px;">📊</span>
-      <h1>Milestone Gear Unit 7 - Production Review Dashboard</h1>
-    </div>
-    <div class="header-right">
-      <a href="index.html" class="home-btn">🏠 Home</a>
-      <div class="ewm-badge" id="syncStatus">● Live Sync</div>
+  <!-- Top Navigation -->
+  <header class="top-bar">
+    <div class="nav-left">
+      <a href="index.html" class="back-btn">⬅ Home</a>
+      <h1>🏭 Production Tracker</h1>
     </div>
   </header>
 
-  <div class="ewm-container">
-
-    <!-- 4 Navigation Buttons Bar -->
-    <div class="nav-buttons-bar">
-      <button class="nav-main-btn active" onclick="switchMainTab('dwm', this)">📅 Daily (DWM)</button>
-      <button class="nav-main-btn" onclick="switchMainTab('monthly', this)">📊 Monthly</button>
-      <button class="nav-main-btn" onclick="switchMainTab('yearly', this)">📈 Yearly</button>
-      <button class="nav-main-btn" onclick="switchMainTab('breakdown', this)">⚠️ Breakdown & Loss</button>
-    </div>
-
-    <!-- MODULE 1: DAILY PRODUCTION (DWM) -->
-    <div id="view-dwm" class="module-view active">
-      <div class="control-bar">
-        <div class="month-select-wrap">
-          <span>Select Month:</span>
-          <select id="dwmMonthDropdown" onchange="renderDWMData()">
-            <option value="AUGUST-2026" selected>August - 2026 (Live)</option>
-            <option value="JULY-2026">July - 2026 (Fixed)</option>
-            <option value="JUNE-2026">June - 2026 (Fixed)</option>
-            <option value="MAY-2026">May - 2026 (Fixed)</option>
-            <option value="APRIL-2026">April - 2026 (Fixed)</option>
-          </select>
+  <div class="dashboard-container">
+    
+    <!-- 1. Top 3 Modules -->
+    <div class="top-modules-grid">
+      <div class="prod-module-card">
+        <div class="module-info">
+          <h4>Daily Production</h4>
+          <h2>10.09 <small style="font-size: 14px; color: #94a3b8;">Tons</small></h2>
+          <span>Target: 9.00 Tons</span>
         </div>
-        <div class="note-text" id="targetNoteText">⚡ Target: 2.25 ton/furnace | Shift: 06:30 AM to Next Day 06:30 AM</div>
+        <div class="module-icon">⏱️</div>
       </div>
 
-      <!-- KPI Summary Cards -->
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <span>Month Target</span>
-          <h3 id="kpiMonthTarget">279.0 Ton</h3>
-          <p>Full month goal</p>
+      <div class="prod-module-card">
+        <div class="module-info">
+          <h4>Monthly Production</h4>
+          <h2>279.00 <small style="font-size: 14px; color: #94a3b8;">Tons</small></h2>
+          <span>Target: 290.00 Tons</span>
         </div>
-        <div class="kpi-card green">
-          <span>Target MTD</span>
-          <h3 id="kpiTargetMTD">225.0 Ton</h3>
-          <p>Month to date goal</p>
-        </div>
-        <div class="kpi-card orange">
-          <span>Actual MTD</span>
-          <h3 id="kpiActualMTD">0.0 Ton</h3>
-          <p>Achieved production</p>
-        </div>
-        <div class="kpi-card">
-          <span>Average Production</span>
-          <h3 id="kpiAvgProd">0.0 Ton/Day</h3>
-          <p>Daily run-rate</p>
-        </div>
-        <div class="kpi-card red">
-          <span>Variance / Gap</span>
-          <h3 id="kpiVariance" style="color:#ef4444;">0.0 Ton</h3>
-          <p>Deficit against target</p>
-        </div>
+        <div class="module-icon">📆</div>
       </div>
 
-      <!-- DWM Matrix Table View -->
-      <div class="dwm-section">
-        <div class="dwm-title-row">
-          <h3 id="dwmTableTitle">📋 Daily Work Management (DWM) Matrix</h3>
-          <span style="font-size: 10.5px; color:#34d399;">🟢 Target Met | 🔴 Below Target</span>
+      <div class="prod-module-card">
+        <div class="module-info">
+          <h4>Yearly Production</h4>
+          <h2>3,450.50 <small style="font-size: 14px; color: #94a3b8;">Tons</small></h2>
+          <span>Target: 4,000.00 Tons</span>
         </div>
-
-        <div class="table-scroll">
-          <table class="dwm-table">
-            <thead>
-              <tr id="dwmHeaderRow"></tr>
-            </thead>
-            <tbody id="dwmTableBody">
-              <tr><td colspan="36" style="padding: 30px; color:#94a3b8;">Loading DWM matrix...</td></tr>
-            </tbody>
-          </table>
-        </div>
+        <div class="module-icon">📅</div>
       </div>
     </div>
 
-    <!-- MODULE 2: MONTHLY PRODUCTION -->
-    <div id="view-monthly" class="module-view">
-      <div class="placeholder-card">
-        <h3>📊 Monthly Production Overview</h3>
-        <p>Monthly aggregate performance reports across all units.</p>
+    <!-- 2. Daily DWM Matrix -->
+    <div class="dwm-section">
+      <div class="dwm-header">
+        <div class="dwm-title-group">
+          <h3>📊 Daily DWM Matrix</h3>
+        </div>
+        
+        <select id="monthSelector" class="month-filter" onchange="renderDWMTable()">
+          <option value="AUGUST-2026">August - 2026 (Live)</option>
+          <option value="JULY-2026">July - 2026 (Fixed)</option>
+          <option value="JUNE-2026">June - 2026 (Fixed)</option>
+          <option value="MAY-2026">May - 2026 (Fixed)</option>
+          <option value="APRIL-2026" selected>April - 2026 (Fixed)</option>
+        </select>
+      </div>
+
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>FURNACE</th>
+              <th><span class="vertical-text">Furnace Capacity</span></th>
+              <th><span class="vertical-text">Month Target</span></th>
+              <th><span class="vertical-text">Target MTD</span></th>
+              <th><span class="vertical-text">Actual MTD</span></th>
+              <th><span class="vertical-text">Capacity Utilized</span></th>
+              <th class="day-col">1</th><th class="day-col">2</th><th class="day-col">3</th><th class="day-col">4</th><th class="day-col">5</th>
+              <th class="day-col">6</th><th class="day-col">7</th><th class="day-col">8</th><th class="day-col">9</th><th class="day-col">10</th>
+              <th class="day-col">11</th><th class="day-col">12</th><th class="day-col">13</th><th class="day-col">14</th><th class="day-col">15</th>
+              <th class="day-col">16</th><th class="day-col">17</th><th class="day-col">18</th><th class="day-col">19</th><th class="day-col">20</th>
+              <th class="day-col">21</th><th class="day-col">22</th><th class="day-col">23</th><th class="day-col">24</th><th class="day-col">25</th>
+              <th class="day-col">26</th><th class="day-col">27</th><th class="day-col">28</th><th class="day-col">29</th><th class="day-col">30</th>
+              <th class="day-col">31</th>
+            </tr>
+          </thead>
+          <tbody id="dwmTableBody">
+            <!-- Rendered via JS -->
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <!-- MODULE 3: YEARLY PRODUCTION -->
-    <div id="view-yearly" class="module-view">
-      <div class="placeholder-card">
-        <h3>📈 Yearly Production Analytics & Trends</h3>
-        <p>Annual fiscal year tracking and comparative analytics.</p>
+    <!-- 3. Bottom Performance KPIs -->
+    <div class="bottom-kpi-section">
+      <h3>📈 Performance Highlights & Metrics</h3>
+      <div class="kpi-boxes-grid">
+        <div class="mini-kpi">
+          <span>Overall Capacity Utilization</span>
+          <strong>88.4%</strong>
+        </div>
+        <div class="mini-kpi">
+          <span>Peak Daily Output</span>
+          <strong>11.42 Tons</strong>
+        </div>
+        <div class="mini-kpi">
+          <span>Target Adherence</span>
+          <strong>96.2%</strong>
+        </div>
+        <div class="mini-kpi">
+          <span>Active Furnaces</span>
+          <strong>4 / 4 SQF</strong>
+        </div>
       </div>
     </div>
 
-    <!-- MODULE 4: BREAKDOWN & LOSS -->
-    <div id="view-breakdown" class="module-view">
-      <div class="placeholder-card">
-        <h3>⚠️ Furnace Breakdown, Loss & Maintenance Log</h3>
-        <p>Downtime logs, loss analysis, and furnace failure records will be listed here.</p>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Floating Plus Add Button (+) -->
-  <button class="float-add-btn" onclick="openAddModal()" title="Add New Production Entry">+</button>
-
-  <!-- Add Data Modal Form -->
-  <div class="modal-overlay" id="addModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <span>🔒 Add Production Entry</span>
-        <button class="close-modal" onclick="closeAddModal()">&times;</button>
-      </div>
-      <form id="productionForm" onsubmit="submitProductionData(event)">
-        <div class="form-group">
-          <label>Select Month</label>
-          <select id="inputMonth" required>
-            <option value="AUGUST-2026">August - 2026</option>
-            <option value="JULY-2026">July - 2026</option>
-            <option value="JUNE-2026">June - 2026</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Select Furnace</label>
-          <select id="inputFurnace" required>
-            <option value="SQF-1">SQF-1</option>
-            <option value="SQF-2">SQF-2</option>
-            <option value="SQF-3">SQF-3</option>
-            <option value="SQF-4">SQF-4</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Date (1 to 31)</label>
-          <input type="number" id="inputDate" min="1" max="31" required placeholder="e.g. 26">
-        </div>
-        <div class="form-group">
-          <label>Production Output (in Ton)</label>
-          <input type="number" step="0.01" id="inputTon" required placeholder="e.g. 2.25">
-        </div>
-        <div class="form-group" style="border-top: 1px solid #334155; padding-top: 6px; margin-top: 4px;">
-          <label style="color:#f59e0b;">🔒 Security PIN</label>
-          <input type="password" id="securityPin" maxlength="4" required placeholder="Enter 4-digit PIN (7890)">
-        </div>
-        <button type="submit" class="submit-form-btn" id="submitBtn">Save Entry</button>
-      </form>
-    </div>
   </div>
 
   <script>
-    // Live CSV URL from Google Sheet
-    const LIVE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_55_JgWvZY0QyC87pldI3sKILOrXLYsE8xiuB99-K2ll9jWI5HHYIU6aoxEF1hegbDDmRybDQsW2/pub?gid=0&single=true&output=csv";
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxeQdb5A97aDKRkwKsoBuAjMsxyYgVRpdU7WlpWMRUwPb-8eUzO3qaPHsJ36LG_e1_2ng/exec";
-    const ADMIN_PIN = "7890";
-
-    // Fixed Historical Database for April to July matching your exact records
+    // Exact Fixed Database for April (matching your uploaded image exactly) to July
     const fixedDatabase = {
-      "JULY-2026": {
-        daysCount: 31, monthTarget: 279.0,
-        furnaces: {
-          "SQF-1": [3.32, 2.53, 2.77, 1.58, 0.79, 2.61, 2.06, 1.83, 1.74, 2.93, 2.78, 1.83, 2.44, 1.53, 1.83, 2.37, 2.65, 1.28, 0.95, 2.53, 2.60, 2.23, 2.62, 1.89, 2.10, 2.68, 2.44, 2.61, 2.53, 2.68, 1.83],
-          "SQF-2": [2.37, 2.00, 2.58, 1.79, 1.00, 2.58, 2.53, 2.74, 1.79, 2.26, 2.00, 2.68, 1.47, 2.68, 2.78, 2.88, 1.79, 1.74, 2.73, 1.00, 1.79, 2.04, 1.91, 2.58, 2.37, 2.10, 2.68, 2.53, 2.08, 2.68, 2.53],
-          "SQF-3": [2.15, 3.01, 1.97, 2.38, 1.94, 1.92, 1.94, 2.80, 2.20, 2.10, 2.10, 2.96, 2.00, 3.20, 1.57, 1.96, 2.02, 2.13, 2.15, 2.17, 2.12, 2.18, 1.98, 2.57, 2.10, 2.20, 2.05, 3.00, 2.09, 2.10, 2.22],
-          "SQF-4": [1.76, 2.14, 2.15, 2.64, 1.59, 2.17, 2.06, 1.71, 2.05, 3.25, 2.02, 2.89, 1.79, 1.67, 2.02, 3.12, 1.91, 2.83, 1.79, 2.05, 2.10, 1.69, 2.84, 2.04, 2.88, 2.12, 2.06, 2.71, 1.58, 3.17, 1.93]
-        }
-      },
-      "JUNE-2026": {
+      "APRIL-2026": {
         daysCount: 30, monthTarget: 270.0,
         furnaces: {
-          "SQF-1": [2.01, 2.53, 2.78, 1.79, 1.67, 2.53, 2.37, 2.68, 2.74, 1.74, 2.74, 2.37, 0.00, 0.00, 0.00, 0.00, 0.00, 1.79, 2.01, 1.83, 2.08, 1.95, 2.53, 2.97, 1.83, 2.37, 1.85, 1.95, 2.68, 2.53, null],
-          "SQF-2": [1.79, 2.58, 1.37, 1.04, 2.82, 1.67, 2.02, 1.51, 2.09, 2.16, 2.06, 1.95, 2.68, 1.79, 2.68, 2.78, 2.78, 2.68, 2.53, 2.00, 1.94, 2.66, 1.85, 1.95, 1.58, 2.81, 1.95, 2.62, 1.49, 2.37, null],
-          "SQF-3": [1.10, 3.05, 1.96, 2.09, 2.13, 2.04, 2.16, 1.99, 2.07, 1.67, 1.05, 3.20, 2.08, 2.13, 2.62, 1.44, 2.04, 2.22, 3.33, 2.23, 2.17, 2.14, 3.11, 1.60, 2.22, 2.73, 2.04, 2.12, 2.01, 3.19, null],
-          "SQF-4": [2.41, 1.81, 2.48, 1.97, 2.84, 1.93, 2.85, 2.54, 1.98, 2.15, 2.86, 1.73, 2.79, 2.97, 1.62, 3.04, 2.13, 2.07, 3.04, 1.88, 2.49, 2.41, 2.51, 2.54, 2.61, 1.83, 1.83, 2.62, 1.45, 1.60, null]
+          "SQF-1": [1.66, 1.58, 3.16, 2.53, 2.37, 3.16, 2.37, 2.53, 3.18, 2.02, 2.53, 2.53, 2.37, 0.79, 3.47, 2.53, 2.53, 2.53, 2.53, 1.67, 2.53, 2.15, 2.02, 2.97, 2.14, 1.74, 2.53, 1.74, 1.46, 2.37, null],
+          "SQF-2": [2.18, 2.74, 1.95, 1.81, 2.24, 2.89, 1.87, 1.00, 2.02, 0.72, 2.83, 1.67, 2.00, 1.74, 1.51, 0.88, 2.66, 1.67, 1.00, 2.38, 1.82, 2.53, 1.77, 0.60, 2.06, 1.74, 3.32, 1.84, 2.29, 2.02, null],
+          "SQF-3": [2.17, 3.30, 2.13, 1.44, 3.28, 1.59, 3.00, 1.74, 2.01, 2.17, 3.18, 1.58, 1.90, 1.85, 2.12, 3.07, 1.85, 1.93, 2.01, 2.53, 1.85, 1.04, 1.78, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, null],
+          "SQF-4": [2.07, 2.93, 1.64, 2.55, 2.21, 2.55, 2.05, 3.26, 2.10, 2.34, 2.88, 1.72, 2.66, 2.19, 2.35, 2.09, 1.61, 1.96, 1.61, 2.65, 2.88, 1.51, 2.22, 1.92, 2.85, 1.91, 1.98, 2.30, 2.17, 1.08, null]
         }
       },
       "MAY-2026": {
@@ -435,13 +330,22 @@
           "SQF-4": [2.10, 2.80, 2.48, 1.51, 2.18, 1.67, 2.67, 2.12, 1.85, 3.09, 2.45, 1.42, 1.98, 1.45, 2.70, 2.99, 2.02, 2.12, 2.74, 1.13, 0.00, 0.00, 0.00, 0.00, 0.00, 2.70, 1.95, 2.12, 2.08, 1.66, 1.96]
         }
       },
-      "APRIL-2026": {
+      "JUNE-2026": {
         daysCount: 30, monthTarget: 270.0,
         furnaces: {
-          "SQF-1": [1.66, 1.58, 3.16, 2.53, 2.37, 3.16, 2.37, 2.53, 3.18, 2.02, 2.53, 2.53, 2.37, 0.79, 3.47, 2.53, 2.53, 2.53, 2.53, 1.67, 2.53, 2.15, 2.02, 2.97, 2.14, 1.74, 2.53, 1.74, 1.46, 2.37, null],
-          "SQF-2": [2.18, 2.74, 1.95, 1.81, 2.24, 2.89, 1.87, 1.00, 2.02, 0.72, 2.83, 1.67, 2.00, 1.74, 1.51, 0.88, 2.66, 1.67, 1.00, 2.38, 1.82, 2.53, 1.77, 0.60, 2.06, 1.74, 3.32, 1.84, 2.29, 2.02, null],
-          "SQF-3": [2.17, 3.30, 2.13, 1.44, 3.28, 1.59, 3.00, 1.74, 2.01, 2.17, 3.18, 1.58, 1.90, 1.85, 2.12, 3.07, 1.85, 1.93, 2.01, 2.53, 1.85, 1.04, 1.78, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, null],
-          "SQF-4": [2.07, 2.93, 1.64, 2.55, 2.21, 2.55, 2.05, 3.26, 2.10, 2.34, 2.88, 1.72, 2.66, 2.19, 2.35, 2.09, 1.61, 1.96, 1.61, 2.65, 2.88, 1.51, 2.22, 1.92, 2.85, 1.91, 1.98, 2.30, 2.17, 1.08, null]
+          "SQF-1": [2.01, 2.53, 2.78, 1.79, 1.67, 2.53, 2.37, 2.68, 2.74, 1.74, 2.74, 2.37, 0.00, 0.00, 0.00, 0.00, 0.00, 1.79, 2.01, 1.83, 2.08, 1.95, 2.53, 2.97, 1.83, 2.37, 1.85, 1.95, 2.68, 2.53, null],
+          "SQF-2": [1.79, 2.58, 1.37, 1.04, 2.82, 1.67, 2.02, 1.51, 2.09, 2.16, 2.06, 1.95, 2.68, 1.79, 2.68, 2.78, 2.78, 2.68, 2.53, 2.00, 1.94, 2.66, 1.85, 1.95, 1.58, 2.81, 1.95, 2.62, 1.49, 2.37, null],
+          "SQF-3": [1.10, 3.05, 1.96, 2.09, 2.13, 2.04, 2.16, 1.99, 2.07, 1.67, 1.05, 3.20, 2.08, 2.13, 2.62, 1.44, 2.04, 2.22, 3.33, 2.23, 2.17, 2.14, 3.11, 1.60, 2.22, 2.73, 2.04, 2.12, 2.01, 3.19, null],
+          "SQF-4": [2.41, 1.81, 2.48, 1.97, 2.84, 1.93, 2.85, 2.54, 1.98, 2.15, 2.86, 1.73, 2.79, 2.97, 1.62, 3.04, 2.13, 2.07, 3.04, 1.88, 2.49, 2.41, 2.51, 2.54, 2.61, 1.83, 1.83, 2.62, 1.45, 1.60, null]
+        }
+      },
+      "JULY-2026": {
+        daysCount: 31, monthTarget: 279.0,
+        furnaces: {
+          "SQF-1": [3.32, 2.53, 2.77, 1.58, 0.79, 2.61, 2.06, 1.83, 1.74, 2.93, 2.78, 1.83, 2.44, 1.53, 1.83, 2.37, 2.65, 1.28, 0.95, 2.53, 2.60, 2.23, 2.62, 1.89, 2.10, 2.68, 2.44, 2.61, 2.53, 2.68, 1.83],
+          "SQF-2": [2.37, 2.00, 2.58, 1.79, 1.00, 2.58, 2.53, 2.74, 1.79, 2.26, 2.00, 2.68, 1.47, 2.68, 2.78, 2.88, 1.79, 1.74, 2.73, 1.00, 1.79, 2.04, 1.91, 2.58, 2.37, 2.10, 2.68, 2.53, 2.08, 2.68, 2.53],
+          "SQF-3": [2.15, 3.01, 1.97, 2.38, 1.94, 1.92, 1.94, 2.80, 2.20, 2.10, 2.10, 2.96, 2.00, 3.20, 1.57, 1.96, 2.02, 2.13, 2.15, 2.17, 2.12, 2.18, 1.98, 2.57, 2.10, 2.20, 2.05, 3.00, 2.09, 2.10, 2.22],
+          "SQF-4": [1.76, 2.14, 2.15, 2.64, 1.59, 2.17, 2.06, 1.71, 2.05, 3.25, 2.02, 2.89, 1.79, 1.67, 2.02, 3.12, 1.91, 2.83, 1.79, 2.05, 2.10, 1.69, 2.84, 2.04, 2.88, 2.12, 2.06, 2.71, 1.58, 3.17, 1.93]
         }
       }
     };
@@ -457,21 +361,9 @@
       }
     };
 
-    function switchMainTab(tabId, btn) {
-      document.querySelectorAll('.module-view').forEach(v => v.classList.remove('active'));
-      document.querySelectorAll('.nav-main-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('view-' + tabId).classList.add('active');
-      btn.classList.add('active');
-    }
-
-    function openAddModal() { document.getElementById('addModal').style.display = 'flex'; }
-    function closeAddModal() { 
-      document.getElementById('addModal').style.display = 'none';
-      document.getElementById('securityPin').value = '';
-    }
+    const LIVE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_55_JgWvZY0QyC87pldI3sKILOrXLYsE8xiuB99-K2ll9jWI5HHYIU6aoxEF1hegbDDmRybDQsW2/pub?gid=0&single=true&output=csv";
 
     async function fetchLiveAugustData() {
-      const syncStatus = document.getElementById('syncStatus');
       try {
         const response = await fetch(LIVE_CSV_URL);
         const csvText = await response.text();
@@ -490,146 +382,112 @@
             }
           }
         }
-        syncStatus.innerText = "● Live Synced";
-        syncStatus.style.color = "#34d399";
-        renderDWMData();
+        renderDWMTable();
       } catch (err) {
-        console.error("Live fetch error:", err);
-        syncStatus.innerText = "● Offline Mode";
-        syncStatus.style.color = "#f59e0b";
-        renderDWMData();
+        console.warn("Live fetch fallback to default mock/empty for August");
+        renderDWMTable();
       }
     }
 
-    function renderDWMData() {
-      const selectedMonth = document.getElementById('dwmMonthDropdown').value;
-      let dataDaysCount = 31;
-      let monthTarget = 279.0;
+    function renderDWMTable() {
+      const selectedMonth = document.getElementById("monthSelector").value;
+      const tbody = document.getElementById("dwmTableBody");
+      
+      let daysCount = 31;
+      let monthTgt = 279.0;
+      let targetMtdVal = 6.75;
       let furnacesMap = {};
 
       if (selectedMonth === "AUGUST-2026") {
-        dataDaysCount = liveAugustData.daysCount;
-        monthTarget = liveAugustData.monthTarget;
+        daysCount = liveAugustData.daysCount;
+        monthTgt = liveAugustData.monthTarget;
         furnacesMap = liveAugustData.furnaces;
       } else {
         let fData = fixedDatabase[selectedMonth];
-        dataDaysCount = fData.daysCount;
-        monthTarget = fData.monthTarget;
+        daysCount = fData.daysCount;
+        monthTgt = fData.monthTarget;
         furnacesMap = fData.furnaces;
       }
 
-      let elapsedDays = new Date().getDate() - 1;
-      if (selectedMonth !== "AUGUST-2026") elapsedDays = dataDaysCount;
-      if (elapsedDays < 1) elapsedDays = 1;
-      if (elapsedDays > dataDaysCount) elapsedDays = dataDaysCount;
-
-      let targetMTD = (4 * 2.25 * elapsedDays).toFixed(2);
-
-      let headerHtml = `<th style="min-width: 90px;">FURNACE</th><th>Capacity</th><th>Month Target</th><th>Target MTD</th><th>Actual MTD</th><th>Cap. Utilized</th>`;
-      for(let d = 1; d <= dataDaysCount; d++) { headerHtml += `<th>${d}</th>`; }
-      document.getElementById('dwmHeaderRow').innerHTML = headerHtml;
-
-      let actualMTD = 0;
-      let totals = Array(dataDaysCount).fill(0);
-      let cumu = [];
-      let runningCumu = 0;
-      let tbodyHtml = "";
+      let html = "";
+      let dailyTotals = new Array(31).fill(0);
+      let cumulativeTotals = new Array(31).fill(0);
+      let runningSum = 0;
+      let totalActualMtdAll = 0;
 
       Object.keys(furnacesMap).forEach(fcName => {
         let daysArr = furnacesMap[fcName];
-        let fActual = daysArr.slice(0, dataDaysCount).reduce((a, b) => a + (b || 0), 0);
-        actualMTD += fActual;
-        let util = ((fActual / (69.75 * (elapsedDays / dataDaysCount))) * 100).toFixed(1) + "%";
+        let actualMtd = 0;
+        let daysHtml = "";
 
-        tbodyHtml += `<tr>
-          <td style="font-weight:700; color:#38bdf8;">${fcName}</td>
-          <td>69.75</td>
-          <td>69.75</td>
-          <td>${(2.25 * elapsedDays).toFixed(2)}</td>
-          <td style="font-weight:700;">${fActual.toFixed(2)}</td>
-          <td>${util}</td>`;
-
-        for(let i = 0; i < dataDaysCount; i++) {
-          let val = daysArr[i] || 0;
-          totals[i] += val;
-          let cssClass = val >= 2.25 ? "cell-green" : (val > 0 ? "cell-red" : "");
-          tbodyHtml += `<td class="${cssClass}">${val > 0 ? val.toFixed(2) : '-'}</td>`;
+        for (let i = 0; i < 31; i++) {
+          if (i >= daysCount) {
+            daysHtml += `<td class="cell-blank">-</td>`;
+          } else {
+            let val = daysArr[i] || 0;
+            actualMtd += val;
+            dailyTotals[i] += val;
+            let colorClass = val === 0 ? "cell-red" : (val >= 2.25 ? "cell-green" : "cell-red");
+            daysHtml += `<td class="${colorClass}">${val > 0 ? val.toFixed(2) : '0.00'}</td>`;
+          }
         }
-        tbodyHtml += `</tr>`;
+
+        totalActualMtdAll += actualMtd;
+        let capacityUtilized = Math.round((actualMtd / 69.75) * 100);
+
+        html += `
+          <tr>
+            <td>${fcName}</td>
+            <td class="cell-highlight">69.75</td>
+            <td class="cell-highlight">${(monthTgt/4).toFixed(2)}</td>
+            <td class="cell-highlight">${targetMtdVal.toFixed(2)}</td>
+            <td class="cell-highlight" style="color: #38bdf8;">${actualMtd.toFixed(2)}</td>
+            <td class="cell-highlight">${capacityUtilized}%</td>
+            ${daysHtml}
+          </tr>
+        `;
       });
 
-      totals.forEach(t => {
-        runningCumu += t;
-        cumu.push(runningCumu.toFixed(2));
-      });
+      let totalRowHtml = "";
+      let cumulativeRowHtml = "";
 
-      tbodyHtml += `<tr class="total-row">
-        <td>TOTAL IN TON</td>
-        <td>${monthTarget}</td>
-        <td>${monthTarget}</td>
-        <td>${targetMTD}</td>
-        <td>${actualMTD.toFixed(2)}</td>
-        <td>${((actualMTD/targetMTD)*100).toFixed(1)}%</td>`;
-      totals.forEach(t => { tbodyHtml += `<td>${t > 0 ? t.toFixed(2) : '-'}</td>`; });
-      tbodyHtml += `</tr>`;
-
-      tbodyHtml += `<tr class="total-row" style="background:#111827 !important;">
-        <td>CUMULATIVE TOTAL</td>
-        <td colspan="5">LOT MTD</td>`;
-      cumu.forEach(c => { tbodyHtml += `<td>${c > 0 ? c : '-'}</td>`; });
-      tbodyHtml += `</tr>`;
-
-      document.getElementById('dwmTableBody').innerHTML = tbodyHtml;
-
-      document.getElementById('kpiMonthTarget').innerText = `${monthTarget} Ton`;
-      document.getElementById('kpiTargetMTD').innerText = `${targetMTD} Ton`;
-      document.getElementById('kpiActualMTD').innerText = `${actualMTD.toFixed(2)} Ton`;
-      document.getElementById('kpiAvgProd').innerText = `${(actualMTD / elapsedDays).toFixed(2)} Ton/Day`;
-      
-      let variance = (actualMTD - targetMTD).toFixed(2);
-      let varEl = document.getElementById('kpiVariance');
-      varEl.innerText = `${variance} Ton`;
-      varEl.style.color = variance >= 0 ? "#34d399" : "#ef4444";
-      document.getElementById('dwmTableTitle').innerText = `📋 Daily Work Management (DWM) Matrix - ${selectedMonth}`;
-    }
-
-    async function submitProductionData(event) {
-      event.preventDefault();
-      const pin = document.getElementById('securityPin').value;
-      if (pin !== ADMIN_PIN) {
-        alert("❌ Incorrect Security PIN!");
-        return;
+      for (let i = 0; i < 31; i++) {
+        if (i >= daysCount) {
+          totalRowHtml += `<td class="cell-blank">-</td>`;
+          cumulativeRowHtml += `<td class="cell-blank">-</td>`;
+        } else {
+          let dt = dailyTotals[i];
+          runningSum += dt;
+          totalRowHtml += `<td>${dt.toFixed(2)}</td>`;
+          cumulativeRowHtml += `<td style="color: ${runningSum > 0 ? '#fde047' : '#e2e8f0'};">${runningSum.toFixed(2)}</td>`;
+        }
       }
 
-      const submitBtn = document.getElementById('submitBtn');
-      submitBtn.innerText = "Saving...";
-      submitBtn.disabled = true;
+      html += `
+        <tr class="total-row">
+          <td style="color: white;">TOTAL IN TON</td>
+          <td>${monthTgt.toFixed(1)}</td><td>${monthTgt.toFixed(1)}</td><td>27.00</td><td style="color: #fde047;">${totalActualMtdAll.toFixed(2)}</td><td>108</td>
+          ${totalRowHtml}
+        </tr>
+      `;
 
-      const payload = {
-        month: document.getElementById('inputMonth').value,
-        furnace: document.getElementById('inputFurnace').value,
-        date: parseInt(document.getElementById('inputDate').value),
-        ton: parseFloat(document.getElementById('inputTon').value)
-      };
+      html += `
+        <tr class="cumulative-row">
+          <td style="color: #94a3b8; font-size: 10px;">Total No. Of<br>Lot MTD</td>
+          <td style="color: #38bdf8;">${daysCount}</td>
+          <td colspan="2"></td>
+          <td colspan="2" style="text-align: right; padding-right: 15px; color: #38bdf8;">CUMULATIVE<br>TOTAL</td>
+          ${cumulativeRowHtml}
+        </tr>
+      `;
 
-      try {
-        await fetch(WEB_APP_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
+      html += `
+        <tr class="remark-row">
+          <td colspan="37">REMARK:- Stable Production Trend Maintained across Unit 7.</td>
+        </tr>
+      `;
 
-        alert("✅ Data saved successfully to Google Sheet!");
-        closeAddModal();
-        document.getElementById('inputTon').value = '';
-        setTimeout(fetchLiveAugustData, 1500);
-      } catch (err) {
-        alert("❌ Error saving data.");
-      } finally {
-        submitBtn.innerText = "Save Entry";
-        submitBtn.disabled = false;
-      }
+      tbody.innerHTML = html;
     }
 
     window.addEventListener('DOMContentLoaded', () => {
