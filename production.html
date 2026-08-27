@@ -230,6 +230,17 @@
       color: #94a3b8;
       font-size: 13px;
     }
+
+    /* Mobile Responsive Fix for KPI Cards */
+    @media (max-width: 768px) {
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .kpi-card:nth-child(5) { grid-column: span 2; }
+      .kpi-card { padding: 8px 10px; gap: 2px; }
+      .kpi-card h3 { font-size: 13.5px; }
+      .kpi-card span { font-size: 8.5px; }
+      .kpi-card p { font-size: 8px; }
+      .nav-buttons-bar { grid-template-columns: repeat(2, 1fr); }
+    }
   </style>
 </head>
 <body>
