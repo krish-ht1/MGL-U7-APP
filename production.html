@@ -20,7 +20,7 @@
       flex-direction: column;
     }
 
-    /* Top Bar */
+    /* टॉप बार */
     .top-bar {
       position: sticky;
       top: 0;
@@ -29,7 +29,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 20px;
+      padding: 12px 20px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.8);
       z-index: 1000;
     }
@@ -46,13 +46,13 @@
       transition: 0.2s;
     }
     .back-btn:hover { background: #f97316; color: white; }
-    .nav-left h1 { font-size: 15px; margin: 0; color: #f8fafc; font-weight: 600; }
+    .nav-left h1 { font-size: 16px; margin: 0; color: #f8fafc; font-weight: 600; }
 
     .add-btn {
       background: #f97316;
       color: white;
       border: none;
-      padding: 7px 14px;
+      padding: 8px 14px;
       border-radius: 6px;
       font-size: 12px;
       font-weight: 600;
@@ -65,49 +65,46 @@
     .add-btn:hover { background: #ea580c; }
 
     .dashboard-container {
-      max-width: 100%;
+      max-width: 1400px;
+      width: 100%;
       margin: 0 auto;
       padding: 16px;
       flex: 1;
-      overflow-x: hidden;
     }
 
-    /* 1. Top 3 Modules (Monthly, Yearly, Breakdown) */
+    /* टॉप मॉड्यूल्स - अट्रैक्टिव और बड़े */
     .top-modules-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 15px;
+      gap: 16px;
       margin-bottom: 20px;
     }
     .prod-module-card {
       background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
       border: 1px solid #334155;
       border-top: 4px solid #38bdf8;
-      border-radius: 10px;
-      padding: 16px 20px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      transition: transform 0.2s, box-shadow 0.2s;
     }
-    .prod-module-card:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(0,0,0,0.6); }
-    
     .prod-module-card:nth-child(1) { border-top-color: #38bdf8; cursor: pointer; } 
     .prod-module-card:nth-child(2) { border-top-color: #f97316; } 
     .prod-module-card:nth-child(3) { border-top-color: #ef4444; } 
 
     .module-info h4 { margin: 0; font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
     .module-info h2 { margin: 6px 0 2px 0; font-size: 24px; color: #f8fafc; font-weight: 700; }
-    .module-info span { font-size: 11px; color: #cbd5e1; font-weight: 500; background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px;}
-    .module-icon { font-size: 32px; opacity: 0.8; }
+    .module-info span { font-size: 11px; color: #cbd5e1; font-weight: 500; background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; }
+    .module-icon { font-size: 32px; opacity: 0.9; }
 
-    /* 2. DWM Matrix Table */
+    /* DWM मैट्रिक्स टेबल */
     .dwm-section {
       background: #1e293b;
       border: 1px solid #334155;
-      border-radius: 10px;
-      padding: 14px;
+      border-radius: 12px;
+      padding: 16px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
       margin-bottom: 20px;
     }
@@ -116,13 +113,10 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 12px;
-      padding-bottom: 10px;
+      padding-bottom: 8px;
       border-bottom: 1px solid #334155;
-      flex-wrap: wrap;
-      gap: 10px;
     }
-    .dwm-title-group { display: flex; align-items: center; gap: 10px; }
-    .dwm-header h3 { margin: 0; font-size: 16px; color: #38bdf8; font-weight: 700; text-transform: uppercase; }
+    .dwm-header h3 { margin: 0; font-size: 15px; color: #38bdf8; font-weight: 700; text-transform: uppercase; }
     
     .month-filter {
       background: #0f172a;
@@ -141,11 +135,12 @@
       width: 100%;
       -webkit-overflow-scrolling: touch;
       border: 1px solid #475569;
+      border-radius: 6px;
     }
 
     table {
       border-collapse: collapse;
-      font-size: 10.5px;
+      font-size: 11px;
       white-space: nowrap;
       text-align: center;
       width: max-content;
@@ -161,72 +156,80 @@
     }
     th:first-child { z-index: 3; }
 
-    th, td { border: 1px solid #475569; padding: 4px 6px; }
+    th, td { border: 1px solid #475569; padding: 5px 7px; }
     th { background: #0f172a; color: #e2e8f0; font-weight: 600; }
 
     .vertical-text {
       writing-mode: vertical-rl;
       transform: rotate(180deg);
       white-space: nowrap;
-      height: 100px;
+      height: 80px;
       text-align: center;
       display: inline-block;
       font-size: 10px;
       color: #cbd5e1;
     }
 
-    .day-col { min-width: 28px; font-weight: 700; background: #1e293b; padding: 4px 2px; }
+    .day-col { min-width: 26px; font-weight: 700; background: #1e293b; padding: 4px 1px; }
 
     .cell-green { background: rgba(34, 197, 94, 0.15) !important; color: #4ade80 !important; font-weight: 700; }
     .cell-red { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; font-weight: 700; }
-    .cell-blank { background: rgba(15, 23, 42, 0.5) !important; color: #475569 !important; }
-    .cell-highlight { background: rgba(255, 255, 255, 0.05); font-weight: 600; }
+    .cell-highlight { background: rgba(255, 255, 255, 0.04); font-weight: 600; }
     
     .total-row td { background: #0f172a !important; font-weight: 700; color: #f8fafc; border-top: 2px solid #94a3b8; }
     .cumulative-row td { background: #1e293b !important; font-weight: 700; color: #f8fafc;}
-    .remark-row td { text-align: left; font-weight: 700; background: #0b1120 !important; font-size: 12px; color: #f8fafc; }
 
-    /* 3. Bottom KPI Section (Till Date Production) */
+    /* नीचे का हिस्सा (KPI और आसान भाषा में स्टेटस) */
+    .kpi-wrapper {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 1024px) {
+      .kpi-wrapper { grid-template-columns: 1fr; }
+    }
+
     .bottom-kpi-section {
       background: #1e293b;
       border: 1px solid #334155;
-      border-radius: 10px;
-      padding: 20px;
+      border-radius: 12px;
+      padding: 16px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
-    .bottom-kpi-section h3 { margin: 0 0 16px 0; color: #fde047; font-size: 16px; border-bottom: 1px solid #334155; padding-bottom: 10px; text-transform: uppercase; }
+    .bottom-kpi-section h3 { margin: 0 0 12px 0; color: #fde047; font-size: 14px; border-bottom: 1px solid #334155; padding-bottom: 6px; text-transform: uppercase; }
     
     .kpi-till-date-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 15px;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 8px;
     }
     .kpi-sqf-box {
       background: #0f172a;
       border: 1px solid #475569;
       border-radius: 8px;
-      padding: 15px;
+      padding: 10px;
       text-align: center;
-      position: relative;
-      overflow: hidden;
     }
-    .kpi-sqf-box::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 3px;
-      background: #38bdf8;
+    .kpi-sqf-box span { display: block; font-size: 10.5px; color: #94a3b8; font-weight: 600; text-transform: uppercase; margin-bottom: 3px; }
+    .kpi-sqf-box strong { display: block; font-size: 16px; color: #f8fafc; font-weight: 700; }
+    .kpi-sqf-box small { color: #cbd5e1; font-size: 9.5px; }
+
+    /* सामान्य हिंदी भाषा वाला एनालिटिक्स बॉक्स */
+    .dwm-analytics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
     }
-    .kpi-sqf-box:nth-child(1)::before { background: #3b82f6; }
-    .kpi-sqf-box:nth-child(2)::before { background: #f97316; }
-    .kpi-sqf-box:nth-child(3)::before { background: #10b981; }
-    .kpi-sqf-box:nth-child(4)::before { background: #a855f7; }
-    .kpi-sqf-box:nth-child(5)::before { background: #fde047; } 
+    .analytics-card {
+      background: #0f172a;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+    .analytics-card span { display: block; font-size: 10px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
+    .analytics-card strong { display: block; font-size: 14px; color: #38bdf8; font-weight: 700; margin-top: 2px; }
 
-    .kpi-sqf-box span { display: block; font-size: 12px; color: #94a3b8; font-weight: 600; text-transform: uppercase; margin-bottom: 5px; }
-    .kpi-sqf-box strong { display: block; font-size: 22px; color: #f8fafc; font-weight: 700; }
-    .kpi-sqf-box small { color: #cbd5e1; font-size: 11px; }
-
-    /* Modal (DWM Entry Form) */
+    /* पॉप-अप मॉडल्स */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -241,9 +244,9 @@
     .modal-content {
       background: #1e293b;
       border: 1px solid #38bdf8;
-      border-radius: 10px;
+      border-radius: 12px;
       width: 100%;
-      max-width: 400px;
+      max-width: 380px;
       box-shadow: 0 20px 50px rgba(0,0,0,0.8);
       display: flex;
       flex-direction: column;
@@ -255,7 +258,7 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid #334155;
-      border-radius: 10px 10px 0 0;
+      border-radius: 12px 12px 0 0;
     }
     .modal-header h3 { margin: 0; color: #38bdf8; font-size: 14px; }
     .close-btn { font-size: 22px; cursor: pointer; color: #94a3b8; line-height: 1; }
@@ -264,258 +267,261 @@
       padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
-    .form-group { display: flex; flex-direction: column; gap: 4px; }
-    .form-group label { font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
+    .form-group { display: flex; flex-direction: column; gap: 3px; }
+    .form-group label { font-size: 10.5px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
     .form-group input {
       background: #0f172a;
       border: 1px solid #475569;
       color: #fde047;
       padding: 8px 10px;
       border-radius: 6px;
-      font-size: 13px;
+      font-size: 12px;
       outline: none;
       font-family: inherit;
       font-weight: 600;
     }
-    .form-group input:focus { border-color: #38bdf8; }
-    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
+    .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
     .submit-btn {
-      background: #34d399;
-      color: #022c22;
-      border: none;
-      padding: 10px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 8px;
-      transition: 0.2s;
+      background: #34d399; color: #022c22; border: none; padding: 9px;
+      border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;
     }
     .submit-btn:hover { background: #10b981; }
+    .clear-btn {
+      background: #ef4444; color: white; border: none; padding: 9px;
+      border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;
+    }
+    .clear-btn:hover { background: #dc2626; }
 
     @media (max-width: 768px) {
       .top-bar { padding: 8px 12px; }
       .dashboard-container { padding: 10px; }
-      .dwm-header { flex-direction: column; align-items: flex-start; }
       .top-modules-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Navigation -->
+  <!-- टॉप नेविगेशन -->
   <header class="top-bar">
     <div class="nav-left">
       <a href="index.html" class="back-btn">⬅ Home</a>
       <h1>🏭 Production Tracker</h1>
     </div>
-    <!-- Entry Button -->
-    <button class="add-btn" onclick="openEntryModal()">➕ Add Daily Entry</button>
+    <button class="add-btn" onclick="openEntryModal()">➕ डेटा भरें / बदलें</button>
   </header>
 
   <div class="dashboard-container">
     
-    <!-- 1. Top 3 Modules -->
+    <!-- 1. टॉप मॉड्यूल्स (आकर्षक और बड़े कार्ड्स) -->
     <div class="top-modules-grid">
-      <div class="prod-module-card" onclick="window.location.href='monthly.html'" title="View Monthly Trends">
+      <div class="prod-module-card" onclick="window.location.href='monthly.html'" title="महीने का ट्रेंड देखें">
         <div class="module-info">
-          <h4>Monthly Production</h4>
-          <h2>255.37 <small style="font-size: 14px; color: #94a3b8;">Tons</small></h2>
-          <span>Target: 270.00 Tons</span>
+          <h4>इस महीने का कुल उत्पादन</h4>
+          <h2 id="cardMonthlyVal">216.53 <small style="font-size: 14px; color: #94a3b8;">टन</small></h2>
+          <span id="cardMonthlyTgt">लक्ष्य: 216.00 टन</span>
         </div>
         <div class="module-icon">📆</div>
       </div>
       
       <div class="prod-module-card">
         <div class="module-info">
-          <h4>Yearly Production</h4>
-          <h2>3,450.50 <small style="font-size: 14px; color: #94a3b8;">Tons</small></h2>
-          <span>Target: 4,000.00 Tons</span>
+          <h4>सालाना कुल उत्पादन</h4>
+          <h2>3,450.50 <small style="font-size: 14px; color: #94a3b8;">टन</small></h2>
+          <span>वित्तीय वर्ष लक्ष्य</span>
         </div>
         <div class="module-icon">📅</div>
       </div>
 
       <div class="prod-module-card">
         <div class="module-info">
-          <h4>Total Breakdown</h4>
-          <h2>45 <small style="font-size: 14px; color: #94a3b8;">Hrs</small></h2>
-          <span>MTD Maintenance</span>
+          <h4>कुल मेंटेनेंस रुकावट</h4>
+          <h2>45 <small style="font-size: 14px; color: #94a3b8;">घंटे</small></h2>
+          <span>इस महीने की डाउनटाइम</span>
         </div>
         <div class="module-icon">🔧</div>
       </div>
     </div>
 
-    <!-- 2. Daily DWM Matrix -->
+    <!-- 2. DWM मैट्रिक्स टेबल -->
     <div class="dwm-section">
       <div class="dwm-header">
-        <div class="dwm-title-group">
-          <h3>📊 Daily DWM</h3>
-        </div>
-        
-        <!-- Month Filter -->
+        <h3>📊 दैनिक उत्पादन रिपोर्ट (DWM)</h3>
+        <!-- अप्रैल से दिसंबर तक का ड्रॉपडाउन -->
         <select id="monthSelector" class="month-filter" onchange="renderDWMTable()">
-          <option value="2026-08">August 2026</option>
-          <option value="2026-07">July 2026</option>
-          <option value="2026-06" selected>June 2026</option>
-          <option value="2026-05">May 2026</option>
-          <option value="2026-04">April 2026</option>
+          <option value="2026-12">दिसंबर 2026</option>
+          <option value="2026-11">नवंबर 2026</option>
+          <option value="2026-10">अक्टूबर 2026</option>
+          <option value="2026-09">सितंबर 2026</option>
+          <option value="2026-08" selected>अगस्त 2026</option>
+          <option value="2026-07">जुलाई 2026</option>
+          <option value="2026-06">जून 2026</option>
+          <option value="2026-05">मई 2026</option>
+          <option value="2026-04">अप्रैल 2026</option>
         </select>
       </div>
 
       <div class="table-responsive">
         <table>
           <thead>
-            <tr>
-              <th>FURNACE</th>
-              <th><span class="vertical-text">Furnace Capacity</span></th>
-              <th><span class="vertical-text">Month Target</span></th>
-              <th><span class="vertical-text">Target MTD</span></th>
-              <th><span class="vertical-text">Actual MTD</span></th>
-              <th><span class="vertical-text">Capacity Utilized</span></th>
-              <!-- Days 1 to 31 -->
-              <th class="day-col">1</th><th class="day-col">2</th><th class="day-col">3</th><th class="day-col">4</th><th class="day-col">5</th>
-              <th class="day-col">6</th><th class="day-col">7</th><th class="day-col">8</th><th class="day-col">9</th><th class="day-col">10</th>
-              <th class="day-col">11</th><th class="day-col">12</th><th class="day-col">13</th><th class="day-col">14</th><th class="day-col">15</th>
-              <th class="day-col">16</th><th class="day-col">17</th><th class="day-col">18</th><th class="day-col">19</th><th class="day-col">20</th>
-              <th class="day-col">21</th><th class="day-col">22</th><th class="day-col">23</th><th class="day-col">24</th><th class="day-col">25</th>
-              <th class="day-col">26</th><th class="day-col">27</th><th class="day-col">28</th><th class="day-col">29</th><th class="day-col">30</th>
-              <th class="day-col" id="col-31">31</th>
+            <tr id="tableHeaderRow">
+              <th>फर्नेस</th>
+              <th><span class="vertical-text">क्षमता</span></th>
+              <th><span class="vertical-text">मासिक लक्ष्य</span></th>
+              <th><span class="vertical-text">अब तक हुआ</span></th>
+              <th><span class="vertical-text">उपयोग (%)</span></th>
             </tr>
           </thead>
-          <tbody id="dwmTableBody">
-            <!-- Rendered by JS -->
-          </tbody>
+          <tbody id="dwmTableBody"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- 3. Bottom KPI Section (Till Date Production) -->
-    <div class="bottom-kpi-section" id="kpiContainer">
-      <h3>🏆 TILL DATE PRODUCTION (APRIL - CURRENT)</h3>
-      <div class="kpi-till-date-grid">
-        <div class="kpi-sqf-box">
-          <span>SQF-1</span>
-          <strong id="kpi-sqf1">0.00 <small>Tons</small></strong>
+    <!-- 3. नीचे का हिस्सा (KPI और आसान भाषा में स्टेटस) -->
+    <div class="kpi-wrapper">
+      <div class="bottom-kpi-section">
+        <h3>🏆 अब तक का कुल उत्पादन (अप्रैल से अभी तक)</h3>
+        <div class="kpi-till-date-grid">
+          <div class="kpi-sqf-box"><span>SQF-1</span><strong id="kpi-sqf1">0.00</strong><small>टन</small></div>
+          <div class="kpi-sqf-box"><span>SQF-2</span><strong id="kpi-sqf2">0.00</strong><small>टन</small></div>
+          <div class="kpi-sqf-box"><span>SQF-3</span><strong id="kpi-sqf3">0.00</strong><small>टन</small></div>
+          <div class="kpi-sqf-box"><span>SQF-4</span><strong id="kpi-sqf4">0.00</strong><small>टन</small></div>
+          <div class="kpi-sqf-box" style="border-color: #fde047;">
+            <span style="color: #fde047;">कुल योग</span>
+            <strong id="kpi-total">0.00</strong><small>टन</small>
+          </div>
         </div>
-        <div class="kpi-sqf-box">
-          <span>SQF-2</span>
-          <strong id="kpi-sqf2">0.00 <small>Tons</small></strong>
-        </div>
-        <div class="kpi-sqf-box">
-          <span>SQF-3</span>
-          <strong id="kpi-sqf3">0.00 <small>Tons</small></strong>
-        </div>
-        <div class="kpi-sqf-box">
-          <span>SQF-4</span>
-          <strong id="kpi-sqf4">0.00 <small>Tons</small></strong>
-        </div>
-        <!-- GRAND TOTAL BOX -->
-        <div class="kpi-sqf-box" style="border-color: #fde047; box-shadow: 0 0 10px rgba(253,224,71,0.1);">
-          <span style="color: #fde047;">GRAND TOTAL</span>
-          <strong id="kpi-total">0.00 <small>Tons</small></strong>
+      </div>
+
+      <div class="bottom-kpi-section">
+        <h3>📈 उत्पादन की स्थिति (आसान भाषा में)</h3>
+        <div class="dwm-analytics-grid">
+          <div class="analytics-card">
+            <span>लक्ष्य से स्थिति</span>
+            <strong id="kpiGap" style="color:#fde047;">0.00 टन</strong>
+          </div>
+          <div class="analytics-card">
+            <span>रोजाना औसत उत्पादन</span>
+            <strong id="kpiAvg">0.00 टन/दिन</strong>
+          </div>
+          <div class="analytics-card">
+            <span>अब रोजाना कितना चाहिए</span>
+            <strong id="kpiReq" style="color:#34d399;">0.00 टन/दिन</strong>
+          </div>
+          <div class="analytics-card">
+            <span>वर्तमान हालत</span>
+            <strong id="kpiStatus">सामान्य</strong>
+          </div>
         </div>
       </div>
     </div>
 
   </div>
 
-  <!-- Entry Form Modal -->
+  <!-- डेटा भरने / साफ करने का मॉडल (फॉर्म) -->
   <div class="modal-overlay" id="entryModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>➕ Add / Update Daily Production</h3>
+        <h3>➕ डेटा जोड़ें या साफ़ करें</h3>
         <span class="close-btn" onclick="closeEntryModal()">&times;</span>
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label>Select Date</label>
+          <label>तारीख चुनें</label>
           <input type="date" id="entryDate" required>
         </div>
 
         <div class="row-2">
           <div class="form-group">
-            <label>SQF-1 (Tons)</label>
+            <label>SQF-1 (टन)</label>
             <input type="number" id="sqf1Qty" placeholder="0.00" step="0.01">
           </div>
           <div class="form-group">
-            <label>SQF-2 (Tons)</label>
+            <label>SQF-2 (टन)</label>
             <input type="number" id="sqf2Qty" placeholder="0.00" step="0.01">
           </div>
         </div>
 
         <div class="row-2">
           <div class="form-group">
-            <label>SQF-3 (Tons)</label>
+            <label>SQF-3 (टन)</label>
             <input type="number" id="sqf3Qty" placeholder="0.00" step="0.01">
           </div>
           <div class="form-group">
-            <label>SQF-4 (Tons)</label>
+            <label>SQF-4 (टन)</label>
             <input type="number" id="sqf4Qty" placeholder="0.00" step="0.01">
           </div>
         </div>
 
         <div class="form-group" style="margin-top: 5px;">
-          <label style="color:#ef4444;">Authorization PIN</label>
-          <input type="password" id="authPin" placeholder="Enter PIN to save..." style="border-color:#ef4444;">
+          <label style="color:#ef4444;">सुरक्षा पिन (PIN)</label>
+          <input type="password" id="authPin" placeholder="पिन दर्ज करें (1234)..." style="border-color:#ef4444;">
         </div>
 
-        <button class="submit-btn" onclick="saveProduction()">💾 Secure Submit</button>
+        <div class="btn-group">
+          <button class="clear-btn" onclick="clearProductionData()">🗑️ दिन साफ़ करें</button>
+          <button class="submit-btn" onclick="saveProduction()">💾 सुरक्षित सेव</button>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    // --- EXACT DATA STORE ---
-    const monthDataStore = {
-      // APRIL 2026 Data
-      "2026-04": {
-        daysInMonth: 30, lotMtd: 275,
-        furnaces: [
-          { name: "SQF-1", cap: 67.5, tgt: 67.5, tgtMtd: 67.5, actualMtd: 69.65, capUtil: 103.186, days: [1.66, 1.58, 3.16, 2.53, 2.37, 3.16, 2.37, 2.53, 3.18, 2.02, 2.53, 2.53, 2.37, 0.79, 3.47, 2.53, 2.53, 2.53, 2.53, 1.67, 2.53, 2.15, 2.02, 2.97, 2.14, 1.74, 2.53, 1.74, 1.46, 2.37, null] },
-          { name: "SQF-2", cap: 67.5, tgt: 67.5, tgtMtd: 67.5, actualMtd: 57.72, capUtil: 85.511, days: [2.18, 2.74, 1.95, 1.81, 2.24, 2.89, 1.87, 1.00, 2.02, 0.72, 2.83, 1.67, 2.00, 1.74, 1.51, 0.88, 2.66, 1.67, 1.00, 2.38, 1.82, 2.53, 1.77, 0.60, 2.06, 1.74, 3.32, 1.84, 2.29, 2.02, null] },
-          { name: "SQF-3", cap: 67.5, tgt: 67.5, tgtMtd: 67.5, actualMtd: 49.56, capUtil: 73.423, days: [2.17, 3.30, 2.13, 1.44, 3.28, 1.59, 3.00, 1.74, 2.01, 2.17, 3.18, 1.58, 1.90, 1.85, 2.12, 3.07, 1.85, 1.93, 2.01, 2.53, 1.85, 1.04, 1.78, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, null] },
-          { name: "SQF-4", cap: 67.5, tgt: 67.5, tgtMtd: 67.5, actualMtd: 66.21, capUtil: 98.094, days: [2.07, 2.93, 1.64, 2.55, 2.21, 2.55, 2.05, 3.26, 2.10, 2.34, 2.88, 1.72, 2.66, 2.19, 2.35, 2.09, 1.61, 1.96, 1.61, 2.65, 2.88, 1.51, 2.22, 1.92, 2.85, 1.91, 1.98, 2.30, 2.17, 1.08, null] }
-        ]
-      },
-      // MAY 2026 Data
-      "2026-05": {
-        daysInMonth: 31, lotMtd: 262,
-        furnaces: [
-          { name: "SQF-1", cap: 69.75, tgt: 69.75, tgtMtd: 69.75, actualMtd: 61.57, capUtil: 88, days: [2.02, 2.49, 0.95, 2.37, 2.52, 3.47, 2.81, 1.89, 2.53, 2.68, 2.37, 2.37, 2.50, 0.00, 0.00, 0.00, 0.00, 0.00, 2.68, 2.04, 2.53, 2.62, 2.04, 2.83, 1.74, 2.68, 2.64, 1.87, 3.02, 1.92, 2.01] },
-          { name: "SQF-2", cap: 69.75, tgt: 69.75, tgtMtd: 69.75, actualMtd: 65.58, capUtil: 94, days: [2.53, 2.94, 1.74, 1.69, 1.03, 2.63, 1.79, 2.58, 1.74, 2.37, 0.95, 1.94, 1.99, 1.58, 2.68, 2.68, 2.54, 2.55, 2.68, 2.79, 1.03, 1.82, 2.37, 2.37, 1.82, 1.74, 2.00, 2.73, 1.91, 1.86, 2.53] },
-          { name: "SQF-3", cap: 69.75, tgt: 69.75, tgtMtd: 69.75, actualMtd: 52.24, capUtil: 75, days: [1.51, 3.14, 2.24, 1.99, 2.14, 2.01, 2.24, 1.91, 2.14, 1.98, 2.71, 1.74, 2.15, 2.17, 1.99, 2.13, 2.06, 2.13, 2.05, 2.46, 1.93, 2.61, 2.09, 2.73, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00] },
-          { name: "SQF-4", cap: 69.75, tgt: 69.75, tgtMtd: 69.75, actualMtd: 55.93, capUtil: 80, days: [2.10, 2.80, 2.48, 1.51, 2.18, 1.67, 2.67, 2.12, 1.85, 3.09, 2.45, 1.42, 1.98, 1.45, 2.70, 2.99, 2.02, 2.12, 2.74, 1.13, 0.00, 0.00, 0.00, 0.00, 0.00, 2.70, 1.95, 2.12, 2.08, 1.66, 1.96] }
-        ]
-      },
-      // JUNE 2026 Data (Exact from uploaded image)
-      "2026-06": {
-        daysInMonth: 30, lotMtd: 285,
-        furnaces: [
-          { name: "SQF-1", cap: 67.5, tgt: 67.5, tgtMtd: 67.5, actualMtd: 56.28, capUtil: 83, days: [2.01, 2.53, 2.78, 1.79, 1.67, 2.53, 2.37, 2.68, 2.74, 1.74, 2.74, 2.37, 0.00, 0.00, 0.00, 0.00, 0.00, 1.79, 2.01, 1.83, 2.08, 1.95, 2.53, 2.97, 1.83, 2.37, 1.85, 1.95, 2.68, 2.53, null] },
-          { name: "SQF-2", cap: 67.5, tgt: 67.5, tgtMtd: 67.5, actualMtd: 64.18, capUtil: 95, days: [1.79, 2.58, 1.37, 1.04, 2.82, 1.67, 2.02, 1.51, 2.09, 2.16, 2.06, 1.95, 2.68, 1.79, 2.68, 2.78, 2.78, 2.68, 2.53, 2.00, 1.94, 2.66, 1.85, 1.95, 1.58, 2.81, 1.95, 2.62, 1.49, 2.37, null] },
-          { name: "SQF-3", cap: 67.5, tgt: 67.5, tgtMtd: 67.5, actualMtd: 65.94, capUtil: 98, days: [1.10, 3.05, 1.96, 2.09, 2.13, 2.04, 2.16, 1.99, 2.07, 1.67, 1.05, 3.20, 2.08, 2.13, 2.62, 1.44, 2.04, 2.22, 3.33, 2.23, 2.17, 2.14, 3.11, 1.60, 2.22, 2.73, 2.04, 2.12, 2.01, 3.19, null] },
-          { name: "SQF-4", cap: 67.5, tgt: 67.5, tgtMtd: 67.5, actualMtd: 68.97, capUtil: 102, days: [2.41, 1.81, 2.48, 1.97, 2.84, 1.93, 2.85, 2.54, 1.98, 2.15, 2.86, 1.73, 2.79, 2.97, 1.62, 3.04, 2.13, 2.07, 3.04, 1.88, 2.49, 2.41, 2.51, 2.54, 2.61, 1.83, 1.83, 2.62, 1.45, 1.60, null] }
-        ]
-      },
-      // Blank templates for upcoming months
-      "2026-07": generateMockData(31), 
-      "2026-08": generateMockData(31)  
-    };
-
-    function generateMockData(days) {
-      let data = { daysInMonth: days, lotMtd: 0, furnaces: [] };
-      for (let i=1; i<=4; i++) {
-        let f = { name: "SQF-"+i, cap: 67.5, tgt: 67.5, tgtMtd: 67.5, actualMtd: 0, capUtil: 0, days: [] };
-        for (let j=1; j<=31; j++) { f.days.push(j > days ? null : 0.00); }
-        data.furnaces.push(f);
-      }
-      return data;
+    // महीने के हिसाब से सटीक दिन निकालने का फ़ंक्शन
+    function getDaysInMonth(year, month) {
+      return new Date(year, month, 0).getDate();
     }
 
-    // --- KPI CALCULATION ---
+    const monthDataStore = {
+      "2026-04": { lotMtd: 275, furnaces: [
+        { name: "SQF-1", cap: 67.5, tgt: 67.5, days: [1.66, 1.58, 3.16, 2.53, 2.37, 3.16, 2.37, 2.53, 3.18, 2.02, 2.53, 2.53, 2.37, 0.79, 3.47, 2.53, 2.53, 2.53, 2.53, 1.67, 2.53, 2.15, 2.02, 2.97, 2.14, 1.74, 2.53, 1.74, 1.46, 2.37] },
+        { name: "SQF-2", cap: 67.5, tgt: 67.5, days: [2.18, 2.74, 1.95, 1.81, 2.24, 2.89, 1.87, 1.00, 2.02, 0.72, 2.83, 1.67, 2.00, 1.74, 1.51, 0.88, 2.66, 1.67, 1.00, 2.38, 1.82, 2.53, 1.77, 0.60, 2.06, 1.74, 3.32, 1.84, 2.29, 2.02] },
+        { name: "SQF-3", cap: 67.5, tgt: 67.5, days: [2.17, 3.30, 2.13, 1.44, 3.28, 1.59, 3.00, 1.74, 2.01, 2.17, 3.18, 1.58, 1.90, 1.85, 2.12, 3.07, 1.85, 1.93, 2.01, 2.53, 1.85, 1.04, 1.78, 0,0,0,0,0,0,0] },
+        { name: "SQF-4", cap: 67.5, tgt: 67.5, days: [2.07, 2.93, 1.64, 2.55, 2.21, 2.55, 2.05, 3.26, 2.10, 2.34, 2.88, 1.72, 2.66, 2.19, 2.35, 2.09, 1.61, 1.96, 1.61, 2.65, 2.88, 1.51, 2.22, 1.92, 2.85, 1.91, 1.98, 2.30, 2.17, 1.08] }
+      ]},
+      "2026-05": { lotMtd: 262, furnaces: [
+        { name: "SQF-1", cap: 69.75, tgt: 69.75, days: [2.02, 2.49, 0.95, 2.37, 2.52, 3.47, 2.81, 1.89, 2.53, 2.68, 2.37, 2.37, 2.50, 0,0,0,0,0, 2.68, 2.04, 2.53, 2.62, 2.04, 2.83, 1.74, 2.68, 2.64, 1.87, 3.02, 1.92, 2.01] },
+        { name: "SQF-2", cap: 69.75, tgt: 69.75, days: [2.53, 2.94, 1.74, 1.69, 1.03, 2.63, 1.79, 2.58, 1.74, 2.37, 0.95, 1.94, 1.99, 1.58, 2.68, 2.68, 2.54, 2.55, 2.68, 2.79, 1.03, 1.82, 2.37, 2.37, 1.82, 1.74, 2.00, 2.73, 1.91, 1.86, 2.53] },
+        { name: "SQF-3", cap: 69.75, tgt: 69.75, days: [1.51, 3.14, 2.24, 1.99, 2.14, 2.01, 2.24, 1.91, 2.14, 1.98, 2.71, 1.74, 2.15, 2.17, 1.99, 2.13, 2.06, 2.13, 2.05, 2.46, 1.93, 2.61, 2.09, 2.73, 0,0,0,0,0,0,0] },
+        { name: "SQF-4", cap: 69.75, tgt: 69.75, days: [2.10, 2.80, 2.48, 1.51, 2.18, 1.67, 2.67, 2.12, 1.85, 3.09, 2.45, 1.42, 1.98, 1.45, 2.70, 2.99, 2.02, 2.12, 2.74, 1.13, 0,0,0,0,0, 2.70, 1.95, 2.12, 2.08, 1.66, 1.96] }
+      ]},
+      "2026-06": { lotMtd: 285, furnaces: [
+        { name: "SQF-1", cap: 67.5, tgt: 67.5, days: [2.01, 2.53, 2.78, 1.79, 1.67, 2.53, 2.37, 2.68, 2.74, 1.74, 2.74, 2.37, 0,0,0,0,0, 1.79, 2.01, 1.83, 2.08, 1.95, 2.53, 2.97, 1.83, 2.37, 1.85, 1.95, 2.68, 2.53] },
+        { name: "SQF-2", cap: 67.5, tgt: 67.5, days: [1.79, 2.58, 1.37, 1.04, 2.82, 1.67, 2.02, 1.51, 2.09, 2.16, 2.06, 1.95, 2.68, 1.79, 2.68, 2.78, 2.78, 2.68, 2.53, 2.00, 1.94, 2.66, 1.85, 1.95, 1.58, 2.81, 1.95, 2.62, 1.49, 2.37] },
+        { name: "SQF-3", cap: 67.5, tgt: 67.5, days: [1.10, 3.05, 1.96, 2.09, 2.13, 2.04, 2.16, 1.99, 2.07, 1.67, 1.05, 3.20, 2.08, 2.13, 2.62, 1.44, 2.04, 2.22, 3.33, 2.23, 2.17, 2.14, 3.11, 1.60, 2.22, 2.73, 2.04, 2.12, 2.01, 3.19] },
+        { name: "SQF-4", cap: 67.5, tgt: 67.5, days: [2.41, 1.81, 2.48, 1.97, 2.84, 1.93, 2.85, 2.54, 1.98, 2.15, 2.86, 1.73, 2.79, 2.97, 1.62, 3.04, 2.13, 2.07, 3.04, 1.88, 2.49, 2.41, 2.51, 2.54, 2.61, 1.83, 1.83, 2.62, 1.45, 1.60] }
+      ]},
+      "2026-07": { lotMtd: 297, furnaces: [
+        { name: "SQF-1", cap: 69.75, tgt: 69.75, days: [3.32, 2.53, 2.77, 1.58, 0.79, 2.61, 2.06, 1.83, 1.74, 2.93, 2.78, 1.83, 2.44, 1.53, 1.83, 2.37, 2.65, 1.28, 0.95, 2.53, 2.60, 2.23, 2.62, 1.89, 2.10, 2.68, 2.44, 2.61, 2.53, 2.68, 1.83] },
+        { name: "SQF-2", cap: 69.75, tgt: 69.75, days: [2.37, 2.00, 2.58, 1.79, 1.00, 2.58, 2.53, 2.74, 1.79, 2.26, 2.00, 2.68, 1.47, 2.68, 2.78, 2.88, 1.79, 1.74, 2.73, 1.00, 1.79, 2.04, 1.91, 2.58, 2.37, 2.10, 2.68, 2.53, 2.08, 2.68, 2.53] },
+        { name: "SQF-3", cap: 69.75, tgt: 69.75, days: [2.15, 3.01, 1.97, 2.38, 1.94, 1.92, 1.94, 2.80, 2.20, 2.10, 2.10, 2.96, 2.00, 3.20, 1.57, 1.96, 2.02, 2.13, 2.15, 2.17, 2.12, 2.18, 1.98, 2.57, 2.10, 2.20, 2.05, 3.00, 2.09, 2.10, 2.22] },
+        { name: "SQF-4", cap: 69.75, tgt: 69.75, days: [1.76, 2.14, 2.15, 2.64, 1.59, 2.17, 2.06, 1.71, 2.05, 3.25, 2.02, 2.89, 1.79, 1.67, 2.02, 3.12, 1.91, 2.83, 1.79, 2.05, 2.10, 1.69, 2.84, 2.04, 2.88, 2.12, 2.06, 2.71, 1.58, 3.17, 1.93] }
+      ]},
+      "2026-08": { lotMtd: 236, furnaces: [
+        { name: "SQF-1", cap: 69.75, tgt: 69.75, days: [1.74, 3.06, 2.23, 2.23, 1.97, 2.53, 2.53, 2.79, 2.53, 1.87, 1.87, 2.53, 2.87, 1.87, 1.99, 0.79, 2.62, 2.53, 2.87, 1.75, 2.53, 1.84, 2.35, 2.38, 0,0,0,0,0,0,0] },
+        { name: "SQF-2", cap: 69.75, tgt: 69.75, days: [2.89, 2.03, 2.53, 1.69, 1.75, 2.97, 1.89, 2.09, 1.74, 1.85, 2.68, 2.64, 1.74, 2.68, 1.87, 1.98, 2.84, 1.66, 2.68, 2.60, 0.87, 2.68, 2.53, 2.45, 0,0,0,0,0,0,0] },
+        { name: "SQF-3", cap: 69.75, tgt: 69.75, days: [2.20, 2.05, 3.25, 2.05, 2.20, 2.20, 2.09, 2.12, 2.13, 2.21, 2.13, 3.14, 2.04, 2.20, 2.04, 2.06, 2.09, 2.04, 2.80, 1.97, 2.07, 2.16, 2.06, 1.96, 0,0,0,0,0,0,0] },
+        { name: "SQF-4", cap: 69.75, tgt: 69.75, days: [3.17, 1.93, 2.09, 2.50, 2.11, 2.30, 1.98, 2.89, 2.07, 3.07, 2.25, 2.50, 2.60, 2.00, 3.19, 1.55, 2.35, 1.13, 2.45, 1.52, 3.00, 1.99, 2.65, 2.43, 0,0,0,0,0,0,0] }
+      ]},
+      /* सितंबर से दिसंबर तक के महीने (ऑटोमैटिक दिन कैलकुलेट होंगे) */
+      "2026-09": { lotMtd: 0, furnaces: generateEmptyFurnaces(30) },
+      "2026-10": { lotMtd: 0, furnaces: generateEmptyFurnaces(31) },
+      "2026-11": { lotMtd: 0, furnaces: generateEmptyFurnaces(30) },
+      "2026-12": { lotMtd: 0, furnaces: generateEmptyFurnaces(31) }
+    };
+
+    function generateEmptyFurnaces(days) {
+      return [
+        { name: "SQF-1", cap: 69.75, tgt: 69.75, days: new Array(days).fill(0) },
+        { name: "SQF-2", cap: 69.75, tgt: 69.75, days: new Array(days).fill(0) },
+        { name: "SQF-3", cap: 69.75, tgt: 69.75, days: new Array(days).fill(0) },
+        { name: "SQF-4", cap: 69.75, tgt: 69.75, days: new Array(days).fill(0) }
+      ];
+    }
+
     function updateTillDateKPI() {
       let totals = [0, 0, 0, 0];
       let grandTotal = 0;
@@ -523,71 +529,72 @@
       for(let monthKey in monthDataStore) {
         monthDataStore[monthKey].furnaces.forEach((f, idx) => {
           let monthSum = f.days.reduce((acc, val) => acc + (val || 0), 0);
-          f.actualMtd = monthSum; 
           totals[idx] += monthSum;
           grandTotal += monthSum;
         });
       }
 
-      document.getElementById('kpi-sqf1').innerHTML = `${totals[0].toFixed(2)} <small>Tons</small>`;
-      document.getElementById('kpi-sqf2').innerHTML = `${totals[1].toFixed(2)} <small>Tons</small>`;
-      document.getElementById('kpi-sqf3').innerHTML = `${totals[2].toFixed(2)} <small>Tons</small>`;
-      document.getElementById('kpi-sqf4').innerHTML = `${totals[3].toFixed(2)} <small>Tons</small>`;
-      document.getElementById('kpi-total').innerHTML = `${grandTotal.toFixed(2)} <small>Tons</small>`;
+      document.getElementById('kpi-sqf1').innerHTML = `${totals[0].toFixed(2)} <small>टन</small>`;
+      document.getElementById('kpi-sqf2').innerHTML = `${totals[1].toFixed(2)} <small>टन</small>`;
+      document.getElementById('kpi-sqf3').innerHTML = `${totals[2].toFixed(2)} <small>टन</small>`;
+      document.getElementById('kpi-sqf4').innerHTML = `${totals[3].toFixed(2)} <small>टन</small>`;
+      document.getElementById('kpi-total').innerHTML = `${grandTotal.toFixed(2)} <small>टन</small>`;
     }
 
-    // --- RENDER DWM TABLE ---
     function renderDWMTable() {
       updateTillDateKPI();
 
       const selectedMonth = document.getElementById("monthSelector").value;
-      const data = monthDataStore[selectedMonth];
-      const tbody = document.getElementById("dwmTableBody");
-      const col31Head = document.getElementById("col-31");
-      
-      if(data.daysInMonth === 30) { col31Head.style.display = "none"; } 
-      else { col31Head.style.display = "table-cell"; }
+      const [yr, mo] = selectedMonth.split('-').map(Number);
+      const totalDays = getDaysInMonth(yr, mo);
 
+      const headerRow = document.getElementById("tableHeaderRow");
+      const tbody = document.getElementById("dwmTableBody");
+      
+      // महीने के दिनों के हिसाब से डायनेमिक कॉलम जनरेट करना
+      let headerHTML = `
+        <th>फर्नेस</th>
+        <th><span class="vertical-text">क्षमता</span></th>
+        <th><span class="vertical-text">मासिक लक्ष्य</span></th>
+        <th><span class="vertical-text">अब तक हुआ</span></th>
+        <th><span class="vertical-text">उपयोग (%)</span></th>
+      `;
+      for(let d=1; d<=totalDays; d++) {
+        headerHTML += `<th class="day-col">${d}</th>`;
+      }
+      headerRow.innerHTML = headerHTML;
+
+      const data = monthDataStore[selectedMonth] || { furnaces: generateEmptyFurnaces(totalDays), lotMtd: 0 };
+      
       let html = "";
-      let dailyTotals = new Array(31).fill(0);
-      let cumulativeTotals = new Array(31).fill(0);
+      let dailyTotals = new Array(totalDays).fill(0);
       let runningSum = 0;
-      let grandCap = 0, grandMonthTgt = 0, grandTgtMtd = 0, grandActualMtd = 0;
+      let grandCap = 0, grandMonthTgt = 0, grandActualMtd = 0;
 
       data.furnaces.forEach(f => {
-        grandCap += f.cap; grandMonthTgt += f.tgt; grandTgtMtd += f.tgtMtd; grandActualMtd += f.actualMtd;
+        let actualMtd = f.days.slice(0, totalDays).reduce((acc, val) => acc + (val || 0), 0);
+        grandCap += f.cap; 
+        grandMonthTgt += f.tgt; 
+        grandActualMtd += actualMtd;
 
         let daysHtml = "";
-        f.days.forEach((val, idx) => {
-          if (idx === 30 && data.daysInMonth === 30) return; 
-
-          if (val === null) {
-            daysHtml += `<td class="cell-blank">-</td>`;
-          } else {
-            dailyTotals[idx] += val;
-            let colorClass = val >= 2.0 ? "cell-green" : "cell-red";
-            if (val === 0) colorClass = "cell-red"; 
-            daysHtml += `<td class="${colorClass}">${val.toFixed(2)}</td>`;
-          }
-        });
-
-        let formattedCapUtil = f.capUtil.toString();
-        
-        if(selectedMonth === "2026-04") {
-            if(f.name === "SQF-1") formattedCapUtil = "103.186";
-            if(f.name === "SQF-2") formattedCapUtil = "85.51086";
-            if(f.name === "SQF-3") formattedCapUtil = "73.42345";
-            if(f.name === "SQF-4") formattedCapUtil = "98.09425";
+        for(let idx=0; idx<totalDays; idx++) {
+          let val = f.days[idx] !== undefined ? f.days[idx] : 0;
+          dailyTotals[idx] += val;
+          let colorClass = val >= 2.0 ? "cell-green" : "cell-red";
+          if (val === 0) colorClass = "cell-red"; 
+          daysHtml += `<td class="${colorClass}">${val.toFixed(2)}</td>`;
         }
+
+        let capUtil = (actualMtd / f.cap) * 100;
 
         html += `
           <tr>
             <td>${f.name}</td>
             <td class="cell-highlight">${f.cap.toFixed(1)}</td>
             <td class="cell-highlight">${f.tgt.toFixed(1)}</td>
-            <td class="cell-highlight">${f.tgtMtd.toFixed(1)}</td>
-            <td class="cell-highlight" style="font-weight:700; color:#fde047;">${f.actualMtd.toFixed(2)}</td>
-            <td class="cell-highlight">${formattedCapUtil}</td>
+            <td class="cell-highlight" style="font-weight:700; color:#fde047;">${actualMtd.toFixed(2)}</td>
+            <td class="cell-highlight">${capUtil.toFixed(1)}%</td>
             ${daysHtml}
           </tr>
         `;
@@ -596,52 +603,64 @@
       let totalRowHtml = "";
       let cumulativeRowHtml = "";
 
-      for (let i = 0; i < 31; i++) {
-        if (i === 30 && data.daysInMonth === 30) continue; 
-
-        if (i >= data.daysInMonth) {
-          totalRowHtml += `<td class="cell-blank">-</td>`;
-          cumulativeRowHtml += `<td class="cell-blank">-</td>`;
-        } else {
-          let dt = dailyTotals[i];
-          runningSum += dt;
-          totalRowHtml += `<td>${dt.toFixed(2)}</td>`;
-          cumulativeRowHtml += `<td style="color: ${runningSum > 0 ? '#f8fafc' : '#475569'};">${runningSum.toFixed(2)}</td>`;
-        }
+      for (let i = 0; i < totalDays; i++) {
+        let dt = dailyTotals[i];
+        runningSum += dt;
+        totalRowHtml += `<td>${dt.toFixed(2)}</td>`;
+        cumulativeRowHtml += `<td style="color: ${runningSum > 0 ? '#f8fafc' : '#475569'};">${runningSum.toFixed(2)}</td>`;
       }
 
-      let totalCapUtil = selectedMonth === "2026-04" ? "90.1" : 
-                         selectedMonth === "2026-05" ? "84" : 
-                         selectedMonth === "2026-06" ? "95" : 
-                         (grandActualMtd / grandCap * 100).toFixed(1);
+      let totalCapUtil = (grandActualMtd / grandCap * 100).toFixed(1);
 
       html += `
         <tr class="total-row">
-          <td style="color: white;">TOTAL IN TON</td>
+          <td style="color: white;">कुल योग (टन)</td>
           <td>${grandCap.toFixed(1)}</td>
           <td>${grandMonthTgt.toFixed(1)}</td>
-          <td>${grandTgtMtd.toFixed(1)}</td>
           <td style="color: #f8fafc;">${grandActualMtd.toFixed(2)}</td>
-          <td>${totalCapUtil}</td>
+          <td>${totalCapUtil}%</td>
           ${totalRowHtml}
         </tr>
       `;
 
       html += `
         <tr class="cumulative-row">
-          <td style="color: #94a3b8; font-size: 10px;">Total No. Of<br>Lot MTD</td>
+          <td style="color: #94a3b8; font-size: 10px;">लॉट MTD<br>संख्या</td>
           <td style="color: #f8fafc; font-size: 14px;">${data.lotMtd || ''}</td>
-          <td colspan="2"></td>
-          <td colspan="2" style="text-align: right; padding-right: 15px; color: #38bdf8;">CUMULATIVE<br>TOTAL</td>
+          <td colspan="1"></td>
+          <td colspan="2" style="text-align: right; padding-right: 15px; color: #38bdf8;">कुल योग<br>(कम्युलेटिव)</td>
           ${cumulativeRowHtml}
         </tr>
-        <tr class="remark-row"><td colspan="37">REMARK:-</td></tr>
       `;
 
       tbody.innerHTML = html;
+
+      // कार्ड्स और साधारण भाषा वाले एनालिटिक्स अपडेट करना
+      document.getElementById('cardMonthlyVal').innerHTML = `${grandActualMtd.toFixed(2)} <small style="font-size: 14px; color: #94a3b8;">टन</small>`;
+      document.getElementById('cardMonthlyTgt').innerText = `लक्ष्य: ${grandMonthTgt.toFixed(2)} टन`;
+
+      let today = new Date();
+      let activeDaysCount = totalDays;
+      if(selectedMonth === "2026-08") {
+        activeDaysCount = Math.min(today.getDate(), totalDays);
+      }
+      let dynamicTargetMtd = activeDaysCount * 9.0;
+
+      let gap = grandActualMtd - dynamicTargetMtd;
+      let currentAvg = activeDaysCount > 0 ? (grandActualMtd / activeDaysCount) : 0;
+      let remainingTarget = grandMonthTgt - grandActualMtd;
+      let remainingDays = totalDays - activeDaysCount;
+      let requiredRate = remainingDays > 0 ? (remainingTarget / remainingDays) : 0;
+
+      document.getElementById('kpiGap').innerText = `${gap >= 0 ? '+' : ''}${gap.toFixed(2)} टन`;
+      document.getElementById('kpiGap').style.color = gap >= 0 ? '#34d399' : '#f87171';
+      document.getElementById('kpiAvg').innerText = `${currentAvg.toFixed(2)} टन/दिन`;
+      document.getElementById('kpiReq').innerText = `${requiredRate > 0 ? requiredRate.toFixed(2) : '0.00'} टन/दिन`;
+      document.getElementById('kpiStatus').innerText = gap >= 0 ? '👍 टारगेट से आगे हैं' : '⚠️ टारगेट से पीछे हैं';
+      document.getElementById('kpiStatus').style.color = gap >= 0 ? '#34d399' : '#f87171';
     }
 
-    // --- MODAL & DATA ENTRY LOGIC ---
+    // मॉडल और डेटा कंट्रोल
     const VALID_PIN = "1234";
 
     function openEntryModal() {
@@ -658,31 +677,46 @@
       document.getElementById('authPin').value = ''; 
     }
 
-    function saveProduction() {
+    function saveProduction() { processEntry(false); }
+    function clearProductionData() { processEntry(true); }
+
+    function processEntry(isClear) {
       const dateStr = document.getElementById('entryDate').value;
-      const q1 = document.getElementById('sqf1Qty').value;
-      const q2 = document.getElementById('sqf2Qty').value;
-      const q3 = document.getElementById('sqf3Qty').value;
-      const q4 = document.getElementById('sqf4Qty').value;
       const pin = document.getElementById('authPin').value;
 
-      if(!dateStr) { alert("Please select a date!"); return; }
-      if(pin !== VALID_PIN) { alert("❌ Invalid PIN! Unauthorized entry."); return; }
+      if(!dateStr) { alert("कृपया तारीख चुनें!"); return; }
+      if(pin !== VALID_PIN) { alert("❌ गलत पिन (PIN)! अनुमति नहीं है।"); return; }
 
       const parts = dateStr.split('-');
       const monthKey = `${parts[0]}-${parts[1]}`; 
       const dayIndex = parseInt(parts[2], 10) - 1; 
 
-      if(!monthDataStore[monthKey]) { alert(`No tracking setup for ${monthKey} yet!`); return; }
-      if(dayIndex >= monthDataStore[monthKey].daysInMonth) { alert("Invalid day for this month!"); return; }
+      if(!monthDataStore[monthKey]) {
+        const [yr, mo] = monthKey.split('-').map(Number);
+        monthDataStore[monthKey] = { lotMtd: 0, furnaces: generateEmptyFurnaces(getDaysInMonth(yr, mo)) };
+      }
 
-      if(q1 !== "") monthDataStore[monthKey].furnaces[0].days[dayIndex] = parseFloat(q1);
-      if(q2 !== "") monthDataStore[monthKey].furnaces[1].days[dayIndex] = parseFloat(q2);
-      if(q3 !== "") monthDataStore[monthKey].furnaces[2].days[dayIndex] = parseFloat(q3);
-      if(q4 !== "") monthDataStore[monthKey].furnaces[3].days[dayIndex] = parseFloat(q4);
+      const totalDaysInThisMonth = monthDataStore[monthKey].furnaces[0].days.length;
+      if(dayIndex >= totalDaysInThisMonth) { alert("इस महीने में यह तारीख मौजूद नहीं है!"); return; }
+
+      if (isClear) {
+        monthDataStore[monthKey].furnaces.forEach(f => f.days[dayIndex] = 0.00);
+        alert("🗑️ उस दिन का डेटा साफ़ कर दिया गया है!");
+      } else {
+        const q1 = document.getElementById('sqf1Qty').value;
+        const q2 = document.getElementById('sqf2Qty').value;
+        const q3 = document.getElementById('sqf3Qty').value;
+        const q4 = document.getElementById('sqf4Qty').value;
+
+        if(q1 !== "") monthDataStore[monthKey].furnaces[0].days[dayIndex] = parseFloat(q1);
+        if(q2 !== "") monthDataStore[monthKey].furnaces[1].days[dayIndex] = parseFloat(q2);
+        if(q3 !== "") monthDataStore[monthKey].furnaces[2].days[dayIndex] = parseFloat(q3);
+        if(q4 !== "") monthDataStore[monthKey].furnaces[3].days[dayIndex] = parseFloat(q4);
+        
+        alert("✅ डेटा सफलतापूर्वक सेव हो गया है!");
+      }
 
       document.getElementById("monthSelector").value = monthKey;
-      
       renderDWMTable();
       closeEntryModal();
       
@@ -690,15 +724,12 @@
       document.getElementById('sqf2Qty').value = "";
       document.getElementById('sqf3Qty').value = "";
       document.getElementById('sqf4Qty').value = "";
-      
-      alert("✅ Data Successfully Saved & KPIs Updated!");
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      document.getElementById("monthSelector").value = "2026-06";
+      document.getElementById("monthSelector").value = "2026-08";
       renderDWMTable();
     });
-
   </script>
 </body>
 </html>
