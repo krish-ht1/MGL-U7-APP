@@ -271,7 +271,7 @@
             </tr>
           </thead>
           <tbody id="monthlyTableBody">
-            <tr><td colspan="12" style="padding: 20px; color: #94a3b8;">Loading monthly production data from Google Sheet...</td></tr>
+            <tr><td colspan="12" style="padding: 20px; color: #94a3b8;">Loading exact live data from Google Sheet...</td></tr>
           </tbody>
         </table>
       </div>
@@ -291,19 +291,25 @@
         const rows = csvText.split('\n').map(r => r.split(',').map(v => v.trim()));
 
         monthlyData = [];
-        // Sheet layout mapping based on your screenshot columns:
+        // Exact mapping based on your sheet layout screenshot:
+        // Row index 0 & 1 are headers. Start from row index 2.
         // Col A (0): Month
         // Col B (1): SQF-1 Qty, Col C (2): SQF-1 Weight
         // Col D (3): SQF-2 Qty, Col E (4): SQF-2 Weight
         // Col F (5): SQF-3 Qty, Col G (6): SQF-3 Weight
         // Col H (7): SQF-4 Qty, Col I (8): SQF-4 Weight
-        for (let i = 2; i < rows.length; i++) { // Starting from row 2 (skipping headers)
+        for (let i = 2; i < rows.length; i++) {
           let r = rows[i];
           if (r.length >= 9 && r[0] && r[0] !== "") {
-            let parseVal = (val) => parseFloat(String(val).replace(/,/g, '')) || 0;
+            let parseVal = (val) => {
+              if (!val) return 0;
+              let clean = String(val).replace(/["']/g, "").replace(/,/g, "").trim();
+              let num = parseFloat(clean);
+              return isNaN(num) ? 0 : num;
+            };
             
             monthlyData.push({
-              month: String(r[0]).trim(),
+              month: String(r[0]).replace(/["']/g, "").trim(),
               sqf1: { p: parseVal(r[1]), w: parseVal(r[2]) },
               sqf2: { p: parseVal(r[3]), w: parseVal(r[4]) },
               sqf3: { p: parseVal(r[5]), w: parseVal(r[6]) },
@@ -316,7 +322,7 @@
         document.getElementById('syncStatus').innerText = "● Live Synced";
         document.getElementById('syncStatus').style.color = "#34d399";
       } catch (err) {
-        console.log("Error fetching monthly CSV data", err);
+        console.log("Error fetching live monthly CSV data", err);
         document.getElementById('syncStatus').innerText = "● Sync Error";
         document.getElementById('syncStatus').style.color = "#ef4444";
       }
@@ -388,12 +394,12 @@
         html += `
           <tr>
             <td style="font-weight:700; color:#38bdf8;">${row.month}</td>
-            <td>${showSqf1 ? s1p.toLocaleString() : '-'}</td><td>${showSqf1 ? s1w.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-'}</td>
-            <td>${showSqf2 ? s2p.toLocaleString() : '-'}</td><td>${showSqf2 ? s2w.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-'}</td>
-            <td>${showSqf3 ? s3p.toLocaleString() : '-'}</td><td>${showSqf3 ? s3w.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-'}</td>
-            <td>${showSqf4 ? s4p.toLocaleString() : '-'}</td><td>${showSqf4 ? s4w.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-'}</td>
-            <td style="font-weight:700; color:#fde047;">${rowTotalQty.toLocaleString()}</td>
-            <td style="font-weight:700; color:#fde047;">${rowTotalWeight.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td>${showSqf1 ? s1p.toLocaleString('en-IN') : '-'}</td><td>${showSqf1 ? s1w.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-'}</td>
+            <td>${showSqf2 ? s2p.toLocaleString('en-IN') : '-'}</td><td>${showSqf2 ? s2w.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-'}</td>
+            <td>${showSqf3 ? s3p.toLocaleString('en-IN') : '-'}</td><td>${showSqf3 ? s3w.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-'}</td>
+            <td>${showSqf4 ? s4p.toLocaleString('en-IN') : '-'}</td><td>${showSqf4 ? s4w.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-'}</td>
+            <td style="font-weight:700; color:#fde047;">${rowTotalQty.toLocaleString('en-IN')}</td>
+            <td style="font-weight:700; color:#fde047;">${rowTotalWeight.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
             <td style="font-weight:700; color:#34d399;">${rowTonnage.toFixed(2)} Ton</td>
           </tr>
         `;
