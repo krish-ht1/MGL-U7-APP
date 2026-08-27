@@ -491,8 +491,8 @@
           fObj.days[day - 1] = ton;
 
           // Google Sheet Web App Sync Call
-          if(WEB_APP_URL) {
-            fetch(WEB_APP_URL, {
+          if("https://script.google.com/macros/s/AKfycbyqsrfYf-x7a9UOJL-t9fNkRxq51SYJQjwJpSWm01LNzTs_OoKZw0rvxNnOsXRAfKFQzQ/exec") {
+            fetch("https://script.google.com/macros/s/AKfycbyqsrfYf-x7a9UOJL-t9fNkRxq51SYJQjwJpSWm01LNzTs_OoKZw0rvxNnOsXRAfKFQzQ/exec", {
               method: 'POST',
               mode: 'no-cors',
               headers: { 'Content-Type': 'application/json' },
