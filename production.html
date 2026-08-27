@@ -196,7 +196,7 @@
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(7, 13, 27, 0.8);
+      background: rgba(7, 13, 27, 0.85);
       display: none;
       align-items: center;
       justify-content: center;
@@ -208,7 +208,7 @@
       border: 1px solid #334155;
       border-radius: 12px;
       width: 100%;
-      max-width: 450px;
+      max-width: 400px;
       padding: 20px;
       display: flex;
       flex-direction: column;
@@ -231,26 +231,18 @@
       color: #94a3b8;
       font-size: 13px;
     }
-
-    @media (max-width: 1200px) {
-      .kpi-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-    @media (max-width: 768px) {
-      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-      .nav-buttons-bar { grid-template-columns: repeat(2, 1fr); }
-    }
   </style>
 </head>
 <body>
 
   <header class="ewm-header">
     <div class="ewm-brand">
-      <span style="font-size: 16px;">💻</span>
+      <span style="font-size: 16px;">📊</span>
       <h1>Milestone Gear Unit 7 - Production Review Dashboard</h1>
     </div>
     <div class="header-right">
       <a href="index.html" class="home-btn">🏠 Home</a>
-      <div class="ewm-badge">Plant Unit 7</div>
+      <div class="ewm-badge" id="syncStatus">● Live Syncing</div>
     </div>
   </header>
 
@@ -269,51 +261,51 @@
       <div class="control-bar">
         <div class="month-select-wrap">
           <span>Select Month:</span>
-          <select id="dwmMonthDropdown" onchange="fetchLiveSheetData()">
-            <option value="AUGUST-2026">August - 2026</option>
+          <select id="dwmMonthDropdown" onchange="renderDWMData()">
+            <option value="AUGUST-2026" selected>August - 2026</option>
             <option value="JULY-2026">July - 2026</option>
             <option value="JUNE-2026">June - 2026</option>
             <option value="MAY-2026">May - 2026</option>
-            <option value="APRIL-2026" selected>April - 2026</option>
+            <option value="APRIL-2026">April - 2026</option>
           </select>
         </div>
-        <div class="note-text" id="targetNoteText">⚡ Target: 2.25 ton/furnace (FY:2026-2027) | <span id="syncStatus" style="color:#34d399;">● Live Syncing</span></div>
+        <div class="note-text" id="targetNoteText">⚡ Target: 2.25 ton/furnace (FY:2026-2027)</div>
       </div>
 
       <!-- KPI Summary Cards -->
       <div class="kpi-grid">
         <div class="kpi-card">
           <span>Month Target</span>
-          <h3 id="kpidMonthTarget">270.0 Ton</h3>
+          <h3 id="kpiMonthTarget">279.0 Ton</h3>
           <p>Full month goal</p>
         </div>
         <div class="kpi-card green">
           <span>Target MTD</span>
-          <h3 id="kpiTargetMTD">270.0 Ton</h3>
+          <h3 id="kpiTargetMTD">0 Ton</h3>
           <p>Month to date goal</p>
         </div>
         <div class="kpi-card orange">
           <span>Actual MTD</span>
-          <h3 id="kpiActualMTD">0.0 Ton</h3>
+          <h3 id="kpiActualMTD">0 Ton</h3>
           <p>Achieved production</p>
         </div>
         <div class="kpi-card">
           <span>Average Production</span>
-          <h3 id="kpiAvgProd">0.0 Ton/Day</h3>
+          <h3 id="kpiAvgProd">0 Ton/Day</h3>
           <p>Daily run-rate</p>
         </div>
         <div class="kpi-card red">
           <span>Variance / Gap</span>
-          <h3 id="kpiVariance" style="color:#ef4444;">0.0 Ton</h3>
+          <h3 id="kpiVariance">0 Ton</h3>
           <p>Deficit against target</p>
         </div>
       </div>
 
-      <!-- DWM Matrix Table View -->
+      <!-- DWM Matrix Section -->
       <div class="dwm-section">
         <div class="dwm-title-row">
           <h3 id="dwmTableTitle">📋 Daily Work Management (DWM) Matrix</h3>
-          <span style="font-size: 10.5px; color:#34d399;">🟢 Target Met | 🔴 Below Target</span>
+          <span style="font-size: 10.5px; color:#34d399;">🟢 Target Met (≥2.25) | 🔴 Below Target</span>
         </div>
 
         <div class="table-scroll">
@@ -322,7 +314,7 @@
               <tr id="dwmHeaderRow"></tr>
             </thead>
             <tbody id="dwmTableBody">
-              <tr><td colspan="35" style="padding: 30px; color:#94a3b8;">Fetching live data from Google Sheet...</td></tr>
+              <tr><td colspan="36" style="padding: 20px; color:#94a3b8;">Loading data...</td></tr>
             </tbody>
           </table>
         </div>
@@ -331,26 +323,17 @@
 
     <!-- MODULE 2: MONTHLY PRODUCTION -->
     <div id="view-monthly" class="module-view">
-      <div class="placeholder-card">
-        <h3>📊 Monthly Production Overview</h3>
-        <p>Monthly aggregate performance reports across all units.</p>
-      </div>
+      <div class="placeholder-card"><h3>📊 Monthly Production Overview</h3><p>Monthly aggregate performance reports.</p></div>
     </div>
 
     <!-- MODULE 3: YEARLY PRODUCTION -->
     <div id="view-yearly" class="module-view">
-      <div class="placeholder-card">
-        <h3>📈 Yearly Production Analytics & Trends</h3>
-        <p>Annual fiscal year tracking and comparative analytics.</p>
-      </div>
+      <div class="placeholder-card"><h3>📈 Yearly Production Analytics & Trends</h3><p>Annual fiscal year tracking.</p></div>
     </div>
 
     <!-- MODULE 4: BREAKDOWN & LOSS -->
     <div id="view-breakdown" class="module-view">
-      <div class="placeholder-card">
-        <h3>⚠️ Furnace Breakdown, Loss & Maintenance Log</h3>
-        <p>Downtime logs, loss analysis, and furnace failure records will be listed here.</p>
-      </div>
+      <div class="placeholder-card"><h3>⚠️ Furnace Breakdown & Loss Log</h3><p>Downtime and maintenance records.</p></div>
     </div>
 
   </div>
@@ -362,10 +345,18 @@
   <div class="modal-overlay" id="addModal">
     <div class="modal-content">
       <div class="modal-header">
-        <span>Add Live Production Entry</span>
+        <span>🔒 Secure Production Entry</span>
         <button class="close-modal" onclick="closeAddModal()">&times;</button>
       </div>
       <form id="productionForm" onsubmit="submitProductionData(event)">
+        <div class="form-group">
+          <label>Select Month</label>
+          <select id="inputMonth" required>
+            <option value="AUGUST-2026">August - 2026</option>
+            <option value="JULY-2026">July - 2026</option>
+            <option value="JUNE-2026">June - 2026</option>
+          </select>
+        </div>
         <div class="form-group">
           <label>Select Furnace</label>
           <select id="inputFurnace" required>
@@ -377,20 +368,50 @@
         </div>
         <div class="form-group">
           <label>Date (1 to 31)</label>
-          <input type="number" id="inputDate" min="1" max="31" required placeholder="e.g. 15">
+          <input type="number" id="inputDate" min="1" max="31" required placeholder="e.g. 26">
         </div>
         <div class="form-group">
           <label>Production Output (in Ton)</label>
-          <input type="number" step="0.01" id="inputTon" required placeholder="e.g. 2.35">
+          <input type="number" step="0.01" id="inputTon" required placeholder="e.g. 2.25">
         </div>
-        <button type="submit" class="submit-form-btn">Save to Google Sheet</button>
+        <div class="form-group" style="border-top: 1px solid #334155; padding-top: 6px; margin-top: 4px;">
+          <label style="color:#f59e0b;">🔒 Security PIN</label>
+          <input type="password" id="securityPin" maxlength="4" required placeholder="Enter 4-digit PIN (7890)">
+        </div>
+        <button type="submit" class="submit-form-btn" id="submitBtn">Save to Google Sheet</button>
       </form>
     </div>
   </div>
 
   <script>
-    // Live PWM CSV URL provided by user
-    const PWM_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_55_JgWvZY0QyC87pldI3sKILOrXLYsE8xiuB99-K2ll9jWI5HHYIU6aoxEF1hegbDDmRybDQsW2/pub?gid=0&single=true&output=csv";
+    // 🔗 यहाँ अपना नया Google Apps Script Web App URL पेस्ट करें
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxeQdb5A97aDKRkwKsoBuAjMsxyYgVRpdU7WlpWMRUwPb-8eUzO3qaPHsJ36LG_e1_2ng/exec";
+    const ADMIN_PIN = "7890";
+
+    // बेस डेटाबेस (जुलाई और अगस्त फिक्स)
+    const dwmDatabase = {
+      "AUGUST-2026": {
+        daysCount: 31, monthTarget: 279.0,
+        furnaces: {
+          "SQF-1": [1.74, 3.06, 2.23, 2.23, 1.97, 2.53, 2.53, 2.79, 2.53, 1.87, 1.87, 2.53, 2.87, 1.87, 1.99, 0.79, 2.62, 2.53, 2.87, 1.75, 2.53, 1.84, 2.35, 2.38, 2.53, 0,0,0,0,0,0],
+          "SQF-2": [2.89, 2.03, 2.53, 1.69, 1.75, 2.97, 1.89, 2.09, 1.74, 1.85, 2.68, 2.64, 1.74, 2.68, 1.87, 1.98, 2.84, 1.66, 2.68, 2.60, 0.87, 2.68, 2.53, 2.45, 1.83, 0,0,0,0,0,0],
+          "SQF-3": [2.20, 2.05, 3.25, 2.05, 2.20, 2.20, 2.09, 2.12, 2.13, 2.21, 2.13, 3.14, 2.04, 2.20, 2.04, 2.06, 2.09, 2.04, 2.80, 1.97, 2.07, 2.16, 2.06, 1.96, 2.08, 0,0,0,0,0,0],
+          "SQF-4": [3.17, 1.93, 2.09, 2.50, 2.11, 2.30, 1.98, 2.89, 2.07, 3.07, 2.25, 2.50, 2.60, 2.00, 3.19, 1.55, 2.35, 1.13, 2.45, 1.52, 3.00, 1.99, 2.65, 2.43, 1.90, 0,0,0,0,0,0]
+        }
+      },
+      "JULY-2026": {
+        daysCount: 31, monthTarget: 279.0,
+        furnaces: {
+          "SQF-1": [3.32, 2.53, 2.77, 1.58, 0.79, 2.61, 2.06, 1.83, 1.74, 2.93, 2.78, 1.83, 2.44, 1.53, 1.83, 2.37, 2.65, 1.28, 0.95, 2.53, 2.60, 2.23, 2.62, 1.89, 2.10, 2.68, 2.44, 2.61, 2.53, 2.68, 1.83],
+          "SQF-2": [2.37, 2.00, 2.58, 1.79, 1.00, 2.58, 2.53, 2.74, 1.79, 2.26, 2.00, 2.68, 1.47, 2.68, 2.78, 2.88, 1.79, 1.74, 2.73, 1.00, 1.79, 2.04, 1.91, 2.58, 2.37, 2.10, 2.68, 2.53, 2.08, 2.68, 2.53],
+          "SQF-3": [2.15, 3.01, 1.97, 2.38, 1.94, 1.92, 1.94, 2.80, 2.20, 2.10, 2.10, 2.96, 2.00, 3.20, 1.57, 1.96, 2.02, 2.13, 2.15, 2.17, 2.12, 2.18, 1.98, 2.57, 2.10, 2.20, 2.05, 3.00, 2.09, 2.10, 2.22],
+          "SQF-4": [1.76, 2.14, 2.15, 2.64, 1.59, 2.17, 2.06, 1.71, 2.05, 3.25, 2.02, 2.89, 1.79, 1.67, 2.02, 3.12, 1.91, 2.83, 1.79, 2.05, 2.10, 1.69, 2.84, 2.04, 2.88, 2.12, 2.06, 2.71, 1.58, 3.17, 1.93]
+        }
+      },
+      "JUNE-2026": { daysCount: 30, monthTarget: 270.0, furnaces: { "SQF-1": Array(30).fill(2.2), "SQF-2": Array(30).fill(2.2), "SQF-3": Array(30).fill(2.2), "SQF-4": Array(30).fill(2.2) } },
+      "MAY-2026": { daysCount: 31, monthTarget: 279.0, furnaces: { "SQF-1": Array(31).fill(2.2), "SQF-2": Array(31).fill(2.2), "SQF-3": Array(31).fill(2.2), "SQF-4": Array(31).fill(2.2) } },
+      "APRIL-2026": { daysCount: 30, monthTarget: 270.0, furnaces: { "SQF-1": Array(30).fill(2.2), "SQF-2": Array(30).fill(2.2), "SQF-3": Array(30).fill(2.2), "SQF-4": Array(30).fill(2.2) } }
+    };
 
     function switchMainTab(tabId, btn) {
       document.querySelectorAll('.module-view').forEach(v => v.classList.remove('active'));
@@ -400,45 +421,151 @@
     }
 
     function openAddModal() { document.getElementById('addModal').style.display = 'flex'; }
-    function closeAddModal() { document.getElementById('addModal').style.display = 'none'; }
+    function closeAddModal() { 
+      document.getElementById('addModal').style.display = 'none';
+      document.getElementById('securityPin').value = '';
+    }
 
     async function fetchLiveSheetData() {
-      const syncStatus = document.getElementById('syncStatus');
-      syncStatus.innerText = "● Syncing...";
-      syncStatus.style.color = "#fbbf24";
-
+      if(!WEB_APP_URL) return;
       try {
-        const response = await fetch(PWM_CSV_URL);
-        const csvText = await response.text();
-        
-        // Parse CSV data lines
-        const rows = csvText.split('\n').map(row => row.split(',').map(val => val.trim()));
-        
-        // Process live data mapping here based on your sheet structure
-        syncStatus.innerText = "● Live Synced";
-        syncStatus.style.color = "#34d399";
-      } catch (error) {
-        console.error("Error fetching live sheet:", error);
-        syncStatus.innerText = "● Sync Failed";
-        syncStatus.style.color = "#ef4444";
+        const res = await fetch(WEB_APP_URL);
+        const rows = await res.json();
+        // Skip header row
+        for(let i = 1; i < rows.length; i++) {
+          let r = rows[i];
+          if(r.length >= 4) {
+            let m = String(r[0]).trim();
+            let fc = String(r[1]).trim();
+            let day = parseInt(r[2]) - 1;
+            let ton = parseFloat(r[3]) || 0;
+            if(dwmDatabase[m] && dwmDatabase[m].furnaces[fc] && day >= 0) {
+              dwmDatabase[m].furnaces[fc][day] = ton;
+            }
+          }
+        }
+        renderDWMData();
+      } catch(e) {
+        console.error("Live fetch error", e);
       }
     }
 
-    function submitProductionData(event) {
+    async function submitProductionData(event) {
       event.preventDefault();
-      const fc = document.getElementById('inputFurnace').value;
-      const day = document.getElementById('inputDate').value;
-      const ton = document.getElementById('inputTon').value;
+      const pin = document.getElementById('securityPin').value;
+      if (pin !== ADMIN_PIN) {
+        alert("❌ Incorrect Security PIN!");
+        return;
+      }
 
-      alert(`Data captured for ${fc}, Day ${day} -> ${ton} Ton. Link your Google Apps Script Web App URL here for automatic row insertion.`);
-      closeAddModal();
-      document.getElementById('inputTon').value = '';
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.innerText = "Saving...";
+      submitBtn.disabled = true;
+
+      const payload = {
+        month: document.getElementById('inputMonth').value,
+        furnace: document.getElementById('inputFurnace').value,
+        date: parseInt(document.getElementById('inputDate').value),
+        ton: parseFloat(document.getElementById('inputTon').value)
+      };
+
+      try {
+        await fetch(WEB_APP_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        alert("✅ Data saved successfully to Google Sheet!");
+        closeAddModal();
+        document.getElementById('inputTon').value = '';
+        setTimeout(fetchLiveSheetData, 1500); // Re-sync
+      } catch (err) {
+        alert("❌ Error saving data.");
+      } finally {
+        submitBtn.innerText = "Save to Google Sheet";
+        submitBtn.disabled = false;
+      }
+    }
+
+    function renderDWMData() {
+      const selectedMonth = document.getElementById('dwmMonthDropdown').value;
+      const data = dwmDatabase[selectedMonth];
+      
+      let elapsedDays = new Date().getDate() - 1;
+      if(elapsedDays < 1) elapsedDays = 1;
+      if(elapsedDays > data.daysCount) elapsedDays = data.daysCount;
+      const targetMTD = (4 * 2.25 * elapsedDays).toFixed(2);
+
+      let actualMTD = 0;
+      let totals = Array(data.daysCount).fill(0);
+      let cumu = [];
+      let runningCumu = 0;
+
+      let headerHtml = `<th style="min-width: 90px;">FURNACE</th><th>Capacity</th><th>Month Target</th><th>Target MTD</th><th>Actual MTD</th><th>Cap. Utilized</th>`;
+      for(let d = 1; d <= data.daysCount; d++) { headerHtml += `<th>${d}</th>`; }
+      document.getElementById('dwmHeaderRow').innerHTML = headerHtml;
+
+      let tbodyHtml = "";
+      Object.keys(data.furnaces).forEach(fcName => {
+        let daysArr = data.furnaces[fcName];
+        let fActual = daysArr.reduce((a, b) => a + (b || 0), 0);
+        actualMTD += fActual;
+        let util = ((fActual / (69.75 * (elapsedDays / data.daysCount))) * 100).toFixed(1) + "%";
+
+        tbodyHtml += `<tr>
+          <td style="font-weight:700; color:#38bdf8;">${fcName}</td>
+          <td>69.75</td>
+          <td>69.75</td>
+          <td>${(2.25 * elapsedDays).toFixed(2)}</td>
+          <td style="font-weight:700;">${fActual.toFixed(2)}</td>
+          <td>${util}</td>`;
+
+        for(let i = 0; i < data.daysCount; i++) {
+          let val = daysArr[i] || 0;
+          totals[i] += val;
+          let cssClass = val >= 2.25 ? "cell-green" : (val > 0 ? "cell-red" : "");
+          tbodyHtml += `<td class="${cssClass}">${val > 0 ? val.toFixed(2) : '-'}</td>`;
+        }
+        tbodyHtml += `</tr>`;
+      });
+
+      totals.forEach(t => {
+        runningCumu += t;
+        cumu.push(runningCumu.toFixed(2));
+      });
+
+      // Total Row
+      tbodyHtml += `<tr class="total-row">
+        <td>TOTAL IN TON</td><td>${data.monthTarget}</td><td>${data.monthTarget}</td><td>${targetMTD}</td><td>${actualMTD.toFixed(2)}</td><td>${((actualMTD/targetMTD)*100).toFixed(1)}%</td>`;
+      totals.forEach(t => { tbodyHtml += `<td>${t > 0 ? t.toFixed(2) : '-'}</td>`; });
+      tbodyHtml += `</tr>`;
+
+      // Cumulative Row
+      tbodyHtml += `<tr class="total-row" style="background:#111827 !important;">
+        <td>CUMULATIVE TOTAL</td><td colspan="5">LOT MTD</td>`;
+      cumu.forEach(c => { tbodyHtml += `<td>${c > 0 ? c : '-'}</td>`; });
+      tbodyHtml += `</tr>`;
+
+      document.getElementById('dwmTableBody').innerHTML = tbodyHtml;
+
+      // Update KPIs
+      document.getElementById('kpiMonthTarget').innerText = `${data.monthTarget} Ton`;
+      document.getElementById('kpiTargetMTD').innerText = `${targetMTD} Ton`;
+      document.getElementById('kpiActualMTD').innerText = `${actualMTD.toFixed(2)} Ton`;
+      document.getElementById('kpiAvgProd').innerText = `${(actualMTD / elapsedDays).toFixed(2)} Ton/Day`;
+      
+      let variance = (actualMTD - targetMTD).toFixed(2);
+      let varEl = document.getElementById('kpiVariance');
+      varEl.innerText = `${variance} Ton`;
+      varEl.style.color = variance >= 0 ? "#34d399" : "#ef4444";
+      document.getElementById('dwmTableTitle').innerText = `📋 Daily Work Management (DWM) - ${selectedMonth}`;
     }
 
     window.addEventListener('DOMContentLoaded', () => {
       fetchLiveSheetData();
-      // Auto re-sync every 3 minutes
-      setInterval(fetchLiveSheetData, 3 * 60 * 1000);
+      renderDWMData();
     });
   </script>
 </body>
