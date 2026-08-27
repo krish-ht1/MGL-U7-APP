@@ -359,10 +359,13 @@
   <button class="float-add-btn" onclick="openAddModal()" title="Add New Production Entry">+</button>
 
   <!-- Add Data Modal Form -->
+  <button class="float-add-btn" onclick="openAddModal()" title="Add New Production Entry">+</button>
+
+  <!-- Add Data Modal Form -->
   <div class="modal-overlay" id="addModal">
     <div class="modal-content">
       <div class="modal-header">
-        <span>Add Live Production Entry</span>
+        <span>🔒 Add Production Entry</span>
         <button class="close-modal" onclick="closeAddModal()">&times;</button>
       </div>
       <form id="productionForm" onsubmit="submitProductionData(event)">
@@ -384,12 +387,16 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Date (1 to 31) [Shift: 06:30 AM to 06:30 AM]</label>
+          <label>Date (1 to 31)</label>
           <input type="number" id="inputDate" min="1" max="31" required placeholder="e.g. 26">
         </div>
         <div class="form-group">
           <label>Production Output (in Ton)</label>
           <input type="number" step="0.01" id="inputTon" required placeholder="e.g. 2.25">
+        </div>
+        <div class="form-group" style="border-top: 1px solid #334155; padding-top: 6px; margin-top: 4px;">
+          <label style="color:#f59e0b;">🔒 Security PIN</label>
+          <input type="password" id="securityPin" maxlength="4" required placeholder="Enter 4-digit PIN (7890)">
         </div>
         <button type="submit" class="submit-form-btn" id="submitBtn">Save Entry</button>
       </form>
@@ -399,6 +406,8 @@
   <script>
     // Live CSV URL from Google Sheet
     const LIVE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_55_JgWvZY0QyC87pldI3sKILOrXLYsE8xiuB99-K2ll9jWI5HHYIU6aoxEF1hegbDDmRybDQsW2/pub?gid=0&single=true&output=csv";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzqCNkTaR9QJ8VDlqPN0BJKg4wARZ44d88_mQ4CpItJAUEU6C3pK0SRFQfdNSkVjGxlXQ/exec";
+    const ADMIN_PIN = "7890";
 
     // Fixed Historical Database for April to July
     const fixedDatabase = {
@@ -459,7 +468,10 @@
     }
 
     function openAddModal() { document.getElementById('addModal').style.display = 'flex'; }
-    function closeAddModal() { document.getElementById('addModal').style.display = 'none'; }
+    function closeAddModal() { 
+      document.getElementById('addModal').style.display = 'none';
+      document.getElementById('securityPin').value = '';
+    }
 
     async function fetchLiveAugustData() {
       const syncStatus = document.getElementById('syncStatus');
@@ -509,15 +521,13 @@
         furnacesMap = fData.furnaces;
       }
 
-      // Elapsed Days & Target MTD Calculation (Shift 06:30 AM logic)
-      let elapsedDays = new Date().getDate() - 1; // 26th data for 27th morning
-      if (selectedMonth !== "AUGUST-2026") elapsedDays = dataDaysCount; // Full month for past months
+      let elapsedDays = new Date().getDate() - 1;
+      if (selectedMonth !== "AUGUST-2026") elapsedDays = dataDaysCount;
       if (elapsedDays < 1) elapsedDays = 1;
       if (elapsedDays > dataDaysCount) elapsedDays = dataDaysCount;
 
       let targetMTD = (4 * 2.25 * elapsedDays).toFixed(2);
 
-      // Build Headers
       let headerHtml = `<th style="min-width: 90px;">FURNACE</th><th>Capacity</th><th>Month Target</th><th>Target MTD</th><th>Actual MTD</th><th>Cap. Utilized</th>`;
       for(let d = 1; d <= dataDaysCount; d++) { headerHtml += `<th>${d}</th>`; }
       document.getElementById('dwmHeaderRow').innerHTML = headerHtml;
@@ -556,7 +566,6 @@
         cumu.push(runningCumu.toFixed(2));
       });
 
-      // Total Row
       tbodyHtml += `<tr class="total-row">
         <td>TOTAL IN TON</td>
         <td>${monthTarget}</td>
@@ -567,7 +576,6 @@
       totals.forEach(t => { tbodyHtml += `<td>${t > 0 ? t.toFixed(2) : '-'}</td>`; });
       tbodyHtml += `</tr>`;
 
-      // Cumulative Row
       tbodyHtml += `<tr class="total-row" style="background:#111827 !important;">
         <td>CUMULATIVE TOTAL</td>
         <td colspan="5">LOT MTD</td>`;
@@ -576,7 +584,6 @@
 
       document.getElementById('dwmTableBody').innerHTML = tbodyHtml;
 
-      // Update KPIs
       document.getElementById('kpiMonthTarget').innerText = `${monthTarget} Ton`;
       document.getElementById('kpiTargetMTD').innerText = `${targetMTD} Ton`;
       document.getElementById('kpiActualMTD').innerText = `${actualMTD.toFixed(2)} Ton`;
@@ -589,21 +596,42 @@
       document.getElementById('dwmTableTitle').innerText = `📋 Daily Work Management (DWM) Matrix - ${selectedMonth}`;
     }
 
-    function submitProductionData(event) {
+    async function submitProductionData(event) {
       event.preventDefault();
-      const m = document.getElementById('inputMonth').value;
-      const fc = document.getElementById('inputFurnace').value;
-      const day = parseInt(document.getElementById('inputDate').value) - 1;
-      const ton = parseFloat(document.getElementById('inputTon').value);
+      const pin = document.getElementById('securityPin').value;
+      if (pin !== ADMIN_PIN) {
+        alert("❌ Incorrect Security PIN!");
+        return;
+      }
 
-      if(m === "AUGUST-2026" && day >= 0 && day < 31) {
-        liveAugustData.furnaces[fc][day] = ton;
-        renderDWMData();
-        alert(`✅ Production entry saved successfully for ${fc}, Day ${day+1} (${ton} Ton)!`);
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.innerText = "Saving...";
+      submitBtn.disabled = true;
+
+      const payload = {
+        month: document.getElementById('inputMonth').value,
+        furnace: document.getElementById('inputFurnace').value,
+        date: parseInt(document.getElementById('inputDate').value),
+        ton: parseFloat(document.getElementById('inputTon').value)
+      };
+
+      try {
+        await fetch(WEB_APP_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        alert("✅ Data saved successfully to Google Sheet!");
         closeAddModal();
         document.getElementById('inputTon').value = '';
-      } else {
-        alert("⚠️ You can only add/edit entries for the active live month (August 2026). Past months are locked.");
+        setTimeout(fetchLiveAugustData, 1500);
+      } catch (err) {
+        alert("❌ Error saving data.");
+      } finally {
+        submitBtn.innerText = "Save Entry";
+        submitBtn.disabled = false;
       }
     }
 
