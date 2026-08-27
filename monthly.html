@@ -20,7 +20,6 @@
       flex-direction: column;
     }
 
-    /* Header */
     .ewm-header {
       background: #0f172a;
       border-bottom: 1px solid #1e293b;
@@ -54,7 +53,6 @@
 
     .ewm-container { max-width: 1600px; width: 100%; margin: 0 auto; padding: 14px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
 
-    /* Navigation Bar */
     .nav-buttons-bar {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -80,7 +78,6 @@
     }
     .nav-main-btn.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
 
-    /* Filter Panel */
     .filter-panel {
       background: #0f172a;
       border: 1px solid #1e293b;
@@ -129,7 +126,6 @@
       gap: 4px;
     }
 
-    /* KPI Summary Cards */
     .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
     @media (max-width: 768px) { .kpi-grid { grid-template-columns: 1fr; } }
 
@@ -151,7 +147,6 @@
     .kpi-card span { font-size: 10px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
     .kpi-card h3 { margin: 2px 0 0 0; font-size: 18px; font-weight: 700; color: #f8fafc; }
 
-    /* Table Section */
     .table-section {
       background: #0f172a;
       border: 1px solid #1e293b;
@@ -179,7 +174,6 @@
       z-index: 5;
     }
     table.monthly-table td { background: #0f172a; color: #f1f5f9; }
-    .total-row td { background: #172033 !important; font-weight: 700; color: #38bdf8 !important; }
   </style>
 </head>
 <body>
@@ -197,7 +191,6 @@
 
   <div class="ewm-container">
 
-    <!-- Sub-Module Navigation -->
     <div class="nav-buttons-bar">
       <a href="production.html" class="nav-main-btn">📅 Daily Production (DWM)</a>
       <a href="monthly.html" class="nav-main-btn active">📊 Monthly Production</a>
@@ -205,7 +198,6 @@
       <a href="breakdown.html" class="nav-main-btn">⚠️ Breakdown & Loss</a>
     </div>
 
-    <!-- Filter Panel (From Month, To Month & SQF Filters) -->
     <div class="filter-panel">
       <div class="filter-row">
         <div class="filter-group">
@@ -232,7 +224,6 @@
       </div>
     </div>
 
-    <!-- KPI Summary Cards -->
     <div class="kpi-grid">
       <div class="kpi-card">
         <span>Total Quantity (Pcs)</span>
@@ -248,7 +239,6 @@
       </div>
     </div>
 
-    <!-- Monthly Production Table -->
     <div class="table-section">
       <div class="table-scroll">
         <table class="monthly-table">
@@ -271,7 +261,7 @@
             </tr>
           </thead>
           <tbody id="monthlyTableBody">
-            <tr><td colspan="12" style="padding: 20px; color: #94a3b8;">Loading data from Google Sheet...</td></tr>
+            <tr><td colspan="12" style="padding: 20px; color: #94a3b8;">Reading exact cells from Google Sheet...</td></tr>
           </tbody>
         </table>
       </div>
@@ -288,27 +278,44 @@
       try {
         const response = await fetch(MONTHLY_CSV_URL);
         const csvText = await response.text();
-        const rows = csvText.split('\n').map(r => r.split(',').map(v => v.trim()));
+        const rows = csvText.split('\n').map(r => {
+          let row = [];
+          let insideQuote = false;
+          let entry = '';
+          for (let char of r) {
+            if (char === '"') { insideQuote = !insideQuote; }
+            else if (char === ',' && !insideQuote) { row.push(entry.trim()); entry = ''; }
+            else { entry += char; }
+          }
+          row.push(entry.trim());
+          return row;
+        });
 
         monthlyData = [];
-        // Teri sheet ke mutabik row 0 aur 1 header hain, row 2 se data shuru hota hai:
-        // Index 0: Month
-        // Index 1: SQF-1 Qty, Index 2: SQF-1 Wt
-        // Index 3: SQF-2 Qty, Index 4: SQF-2 Wt
-        // Index 5: SQF-3 Qty, Index 6: SQF-3 Wt
-        // Index 7: SQF-4 Qty, Index 8: SQF-4 Wt
-        for (let i = 2; i < rows.length; i++) {
+        
+        // Loop through rows to find valid month rows
+        for (let i = 0; i < rows.length; i++) {
           let r = rows[i];
-          if (r.length >= 9 && r[0] && r[0] !== "") {
+          let monthCol = r[0] ? r[0].replace(/["']/g, "").trim() : "";
+          
+          // Check if this row represents a valid month entry (e.g., Apr-23, May 2023, etc.)
+          if (monthCol && (monthCol.includes("202") || monthCol.includes("-23") || monthCol.includes("-24") || monthCol.includes("-25") || monthCol.includes("May") || monthCol.includes("Apr") || monthCol.includes("Jun") || monthCol.includes("Jul") || monthCol.includes("Aug") || monthCol.includes("Sep") || monthCol.includes("Oct") || monthCol.includes("Nov") || monthCol.includes("Dec") || monthCol.includes("Jan") || monthCol.includes("Feb") || monthCol.includes("Mar"))) {
+            
             let parseVal = (val) => {
               if (!val) return 0;
               let clean = String(val).replace(/["']/g, "").replace(/,/g, "").trim();
               let num = parseFloat(clean);
               return isNaN(num) ? 0 : num;
             };
-            
+
+            // Mapping exact columns based on user layout:
+            // Col 0: Month
+            // Col 1: SQF1 Qty, Col 2: SQF1 Wt
+            // Col 3: SQF2 Qty, Col 4: SQF2 Wt
+            // Col 5: SQF3 Qty, Col 6: SQF3 Wt
+            // Col 7: SQF4 Qty, Col 8: SQF4 Wt
             monthlyData.push({
-              month: String(r[0]).replace(/["']/g, "").trim(),
+              month: monthCol,
               sqf1: { p: parseVal(r[1]), w: parseVal(r[2]) },
               sqf2: { p: parseVal(r[3]), w: parseVal(r[4]) },
               sqf3: { p: parseVal(r[5]), w: parseVal(r[6]) },
@@ -321,7 +328,7 @@
         document.getElementById('syncStatus').innerText = "● Live Synced";
         document.getElementById('syncStatus').style.color = "#34d399";
       } catch (err) {
-        console.log("Error fetching live monthly CSV data", err);
+        console.log("Error parsing CSV:", err);
         document.getElementById('syncStatus').innerText = "● Sync Error";
         document.getElementById('syncStatus').style.color = "#ef4444";
       }
@@ -410,7 +417,6 @@
 
       tbody.innerHTML = html;
 
-      // Update KPIs
       document.getElementById('kpiTotalQty').innerText = `${gTotalQty.toLocaleString('en-IN')} Pcs`;
       document.getElementById('kpiTotalWeight').innerText = `${gTotalWeight.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})} Kg`;
       document.getElementById('kpiTotalTonnage').innerText = `${(gTotalWeight / 1000).toFixed(2)} Ton`;
