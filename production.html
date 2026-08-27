@@ -232,14 +232,22 @@
       color: #94a3b8;
       font-size: 13px;
     }
+
+    @media (max-width: 1200px) {
+      .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .nav-buttons-bar { grid-template-columns: repeat(2, 1fr); }
+    }
   </style>
 </head>
 <body>
 
   <header class="ewm-header">
     <div class="ewm-brand">
-      <span style="font-size: 16px;">⚙️</span>
-      <h1>Milestone Gear - Unit 7 Production Dashboard</h1>
+      <span style="font-size: 16px;">🍺</span>
+      <h1>Milestone Beer - Unit 7 Production Dashboard</h1>
     </div>
     <div class="header-right">
       <a href="index.html" class="home-btn">🏠 Home</a>
@@ -249,7 +257,7 @@
 
   <div class="ewm-container">
 
-    <!-- 4 Navigation Buttons -->
+    <!-- 4 Main Navigation Buttons -->
     <div class="nav-buttons-bar">
       <button class="nav-main-btn active" onclick="switchMainTab('dwm', this)">📅 Daily (DWM)</button>
       <button class="nav-main-btn" onclick="switchMainTab('monthly', this)">📊 Monthly</button>
@@ -283,7 +291,7 @@
         <div class="kpi-card green">
           <span>Target MTD (Auto)</span>
           <h3 id="kpiTargetMTD">0 Ton</h3>
-          <p>2.25 × Elapsed Days</p>
+          <p>2.25 × Elapsed Days (6:30 AM Shift)</p>
         </div>
         <div class="kpi-card orange">
           <span>Actual MTD</span>
@@ -320,23 +328,36 @@
       </div>
     </div>
 
-    <!-- MODULES 2, 3, 4 -->
+    <!-- MODULE 2: MONTHLY PRODUCTION -->
     <div id="view-monthly" class="module-view">
-      <div class="placeholder-card"><h3>📊 Monthly Production Overview</h3><p>Monthly aggregate performance reports.</p></div>
+      <div class="placeholder-card">
+        <h3>📊 Monthly Production Overview</h3>
+        <p>Monthly aggregate performance reports across all units.</p>
+      </div>
     </div>
+
+    <!-- MODULE 3: YEARLY PRODUCTION -->
     <div id="view-yearly" class="module-view">
-      <div class="placeholder-card"><h3>📈 Yearly Production Analytics</h3><p>Annual fiscal year tracking.</p></div>
+      <div class="placeholder-card">
+        <h3>📈 Yearly Production Analytics & Trends</h3>
+        <p>Annual fiscal year tracking and comparative analytics.</p>
+      </div>
     </div>
+
+    <!-- MODULE 4: BREAKDOWN & LOSS -->
     <div id="view-breakdown" class="module-view">
-      <div class="placeholder-card"><h3>⚠️ Furnace Breakdown & Loss Log</h3><p>Downtime logs and furnace failure records.</p></div>
+      <div class="placeholder-card">
+        <h3>⚠️ Furnace Breakdown, Loss & Maintenance Log</h3>
+        <p>Downtime logs, loss analysis, and furnace failure records will be listed here.</p>
+      </div>
     </div>
 
   </div>
 
-  <!-- Floating Plus Add Button -->
+  <!-- Floating Plus Add Button (+) -->
   <button class="float-add-btn" onclick="openAddModal()" title="Add New Production Entry">+</button>
 
-  <!-- Modal Form with Secure PIN -->
+  <!-- Add Data Modal Form with Security PIN -->
   <div class="modal-overlay" id="addModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -364,7 +385,7 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Date (1 to 31) [Shift 6:30 AM Rule]</label>
+          <label>Date (1 to 31) [Shift 6:30 AM to Next Day 6:30 AM]</label>
           <input type="number" id="inputDate" min="1" max="31" required placeholder="e.g. 26">
         </div>
         <div class="form-group">
@@ -373,49 +394,68 @@
         </div>
         <div class="form-group" style="border-top: 1px solid #334155; padding-top: 8px; margin-top: 4px;">
           <label style="color:#f59e0b;">🔒 Security PIN (Required)</label>
-          <input type="password" id="securityPin" maxlength="4" required placeholder="Enter PIN (7890)">
+          <input type="password" id="securityPin" maxlength="4" required placeholder="Enter 4-digit PIN (7890)">
         </div>
-        <button type="submit" class="submit-form-btn">Submit to Google Sheet</button>
+        <button type="submit" class="submit-form-btn">Submit Production</button>
       </form>
     </div>
   </div>
 
   <script>
-    const ADMIN_PIN = "7890"; 
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzqCNkTaR9QJ8VDlqPN0BJKg4wARZ44d88_mQ4CpItJAUEU6C3pK0SRFQfdNSkVjGxlXQ/exec";
-    const PWM_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_55_JgWvZY0QyC87pldI3sKILOrXLYsE8xiuB99-K2ll9jWI5HHYIU6aoxEF1hegbDDmRybDQsW2/pub?gid=0&single=true&output=csv";
+    const ADMIN_PIN = "7890"; // 4-Digit Secure PIN
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyqsrfYf-x7a9UOJL-t9fNkRxq51SYJQjwJpSWm01LNzTs_OoKZw0rvxNnOsXRAfKFQzQ/exec";; // <-- यहाँ अपने Google Apps Script को Deploy करके जो URL मिलेगा वो पेस्ट कर देना!
 
-    let dwmDatabase = {
-      "AUGUST-2026": { targetNote: "Target: 2.25 ton/furnace (FY:2026-2027)", monthTarget: 279.0, daysCount: 31, furnaces: [
-        { name: "SQF-1", cap: 69.75, mTarget: 69.75, days: Array(31).fill(0) },
-        { name: "SQF-2", cap: 69.75, mTarget: 69.75, days: Array(31).fill(0) },
-        { name: "SQF-3", cap: 69.75, mTarget: 69.75, days: Array(31).fill(0) },
-        { name: "SQF-4", cap: 69.75, mTarget: 69.75, days: Array(31).fill(0) }
-      ]},
-      "JULY-2026": { targetNote: "Target: 2.25 ton/furnace (FY:2026-2027)", monthTarget: 279.0, daysCount: 31, furnaces: [
-        { name: "SQF-1", cap: 69.75, mTarget: 69.75, days: Array(31).fill(0) },
-        { name: "SQF-2", cap: 69.75, mTarget: 69.75, days: Array(31).fill(0) },
-        { name: "SQF-3", cap: 69.75, mTarget: 69.75, days: Array(31).fill(0) },
-        { name: "SQF-4", cap: 69.75, mTarget: 69.75, days: Array(31).fill(0) }
-      ]},
-      "JUNE-2026": { targetNote: "Target: 2.25 ton/furnace (FY:2026-2027)", monthTarget: 270.0, daysCount: 30, furnaces: [
-        { name: "SQF-1", cap: 67.5, mTarget: 67.5, days: Array(30).fill(0) },
-        { name: "SQF-2", cap: 67.5, mTarget: 67.5, days: Array(30).fill(0) },
-        { name: "SQF-3", cap: 67.5, mTarget: 67.5, days: Array(30).fill(0) },
-        { name: "SQF-4", cap: 67.5, mTarget: 67.5, days: Array(30).fill(0) }
-      ]},
-      "MAY-2026": { targetNote: "Target: 2.25 ton/furnace (FY:2026-2027)", monthTarget: 279.0, daysCount: 31, furnaces: [
-        { name: "SQF-1", cap: 69.75, mTarget: 69.75, days: Array(31).fill(0) },
-        { name: "SQF-2", cap: 69.75, mTarget: 69.75, days: Array(31).fill(0) },
-        { name: "SQF-3", cap: 69.75, mTarget: 69.75, days: Array(31).fill(0) },
-        { name: "SQF-4", cap: 69.75, mTarget: 69.75, days: Array(31).fill(0) }
-      ]},
-      "APRIL-2026": { targetNote: "Target: 2.25 ton/furnace (FY:2026-2027)", monthTarget: 270.0, daysCount: 30, furnaces: [
-        { name: "SQF-1", cap: 67.5, mTarget: 67.5, days: Array(30).fill(0) },
-        { name: "SQF-2", cap: 67.5, mTarget: 67.5, days: Array(30).fill(0) },
-        { name: "SQF-3", cap: 67.5, mTarget: 67.5, days: Array(30).fill(0) },
-        { name: "SQF-4", cap: 67.5, mTarget: 67.5, days: Array(30).fill(0) }
-      ]}
+    const dwmDatabase = {
+      "AUGUST-2026": {
+        targetNote: "Per day production target is 2.25 ton/furnace (FY:2026-2027)",
+        monthTarget: 279.0, daysCount: 31,
+        furnaces: [
+          { name: "SQF-1", cap: 69.75, mTarget: 69.75, days: [1.74, 3.06, 2.23, 2.23, 1.97, 2.53, 2.53, 2.79, 2.53, 1.87, 1.87, 2.53, 2.87, 1.87, 1.99, 0.79, 2.62, 2.53, 2.87, 1.75, 2.53, 1.84, 2.35, 2.38, 2.53, 0,0,0,0,0,0] },
+          { name: "SQF-2", cap: 69.75, mTarget: 69.75, days: [2.89, 2.03, 2.53, 1.69, 1.75, 2.97, 1.89, 2.09, 1.74, 1.85, 2.68, 2.64, 1.74, 2.68, 1.87, 1.98, 2.84, 1.66, 2.68, 2.60, 0.87, 2.68, 2.53, 2.45, 1.83, 0,0,0,0,0,0] },
+          { name: "SQF-3", cap: 69.75, mTarget: 69.75, days: [2.20, 2.05, 3.25, 2.05, 2.20, 2.20, 2.09, 2.12, 2.13, 2.21, 2.13, 3.14, 2.04, 2.20, 2.04, 2.06, 2.09, 2.04, 2.80, 1.97, 2.07, 2.16, 2.06, 1.96, 2.08, 0,0,0,0,0,0] },
+          { name: "SQF-4", cap: 69.75, mTarget: 69.75, days: [3.17, 1.93, 2.09, 2.50, 2.11, 2.30, 1.98, 2.89, 2.07, 3.07, 2.25, 2.50, 2.60, 2.00, 3.19, 1.55, 2.35, 1.13, 2.45, 1.52, 3.00, 1.99, 2.65, 2.43, 1.90, 0,0,0,0,0,0] }
+        ]
+      },
+      "JULY-2026": {
+        targetNote: "Per day production target is 2.25 ton/furnace (FY:2026-2027)",
+        monthTarget: 279.0, daysCount: 31,
+        furnaces: [
+          { name: "SQF-1", cap: 69.75, mTarget: 69.75, days: [3.32, 2.53, 2.77, 1.58, 0.79, 2.61, 2.06, 1.83, 1.74, 2.93, 2.78, 1.83, 2.44, 1.53, 1.83, 2.37, 2.65, 1.28, 0.95, 2.53, 2.60, 2.23, 2.62, 1.89, 2.10, 2.68, 2.44, 2.61, 2.53, 2.68, 1.83] },
+          { name: "SQF-2", cap: 69.75, mTarget: 69.75, days: [2.37, 2.00, 2.58, 1.79, 1.00, 2.58, 2.53, 2.74, 1.79, 2.26, 2.00, 2.68, 1.47, 2.68, 2.78, 2.88, 1.79, 1.74, 2.73, 1.00, 1.79, 2.04, 1.91, 2.58, 2.37, 2.10, 2.68, 2.53, 2.08, 2.68, 2.53] },
+          { name: "SQF-3", cap: 69.75, mTarget: 69.75, days: [2.15, 3.01, 1.97, 2.38, 1.94, 1.92, 1.94, 2.80, 2.20, 2.10, 2.10, 2.96, 2.00, 3.20, 1.57, 1.96, 2.02, 2.13, 2.15, 2.17, 2.12, 2.18, 1.98, 2.57, 2.10, 2.20, 2.05, 3.00, 2.09, 2.10, 2.22] },
+          { name: "SQF-4", cap: 69.75, mTarget: 69.75, days: [1.76, 2.14, 2.15, 2.64, 1.59, 2.17, 2.06, 1.71, 2.05, 3.25, 2.02, 2.89, 1.79, 1.67, 2.02, 3.12, 1.91, 2.83, 1.79, 2.05, 2.10, 1.69, 2.84, 2.04, 2.88, 2.12, 2.06, 2.71, 1.58, 3.17, 1.93] }
+        ]
+      },
+      "JUNE-2026": {
+        targetNote: "Per day production target is 2.25 ton/furnace (FY:2026-2027)",
+        monthTarget: 270.0, daysCount: 30,
+        furnaces: [
+          { name: "SQF-1", cap: 67.5, mTarget: 67.5, days: [2.01, 2.53, 2.78, 1.79, 1.67, 2.53, 2.37, 2.68, 2.74, 1.74, 2.74, 2.37, 0,0,0,0,0, 1.79, 2.01, 1.83, 2.08, 1.95, 2.53, 2.97, 1.83, 2.37, 1.85, 1.95, 2.68, 2.53] },
+          { name: "SQF-2", cap: 67.5, mTarget: 67.5, days: [1.79, 2.58, 1.37, 1.04, 2.82, 1.67, 2.02, 1.51, 2.09, 2.16, 2.06, 1.95, 2.68, 1.79, 2.68, 2.78, 2.78, 2.68, 2.53, 2.00, 1.94, 2.66, 1.85, 1.95, 1.58, 2.81, 1.95, 2.62, 1.49, 2.37] },
+          { name: "SQF-3", cap: 67.5, mTarget: 67.5, days: [1.10, 3.05, 1.96, 2.09, 2.13, 2.04, 2.16, 1.99, 2.07, 1.67, 1.05, 3.20, 2.08, 2.13, 2.62, 1.44, 2.04, 2.22, 3.33, 2.23, 2.17, 2.14, 3.11, 1.60, 2.22, 2.73, 2.04, 2.12, 2.01, 3.19] },
+          { name: "SQF-4", cap: 67.5, mTarget: 67.5, days: [2.41, 1.81, 2.48, 1.97, 2.84, 1.93, 2.85, 2.54, 1.98, 2.15, 2.86, 1.73, 2.79, 2.97, 1.62, 3.04, 2.13, 2.07, 3.04, 1.88, 2.49, 2.41, 2.51, 2.54, 2.61, 1.83, 1.83, 2.62, 1.45, 1.60] }
+        ]
+      },
+      "MAY-2026": {
+        targetNote: "Per day production target is 2.25 ton/furnace (FY:2026-2027)",
+        monthTarget: 279.0, daysCount: 31,
+        furnaces: [
+          { name: "SQF-1", cap: 69.75, mTarget: 69.75, days: [2.02, 2.49, 0.95, 2.37, 2.52, 3.47, 2.81, 1.89, 2.53, 2.68, 2.37, 2.37, 2.50, 0,0,0,0,0, 2.68, 2.04, 2.53, 2.62, 2.04, 2.83, 1.74, 2.68, 2.64, 1.87, 3.02, 1.92, 2.01] },
+          { name: "SQF-2", cap: 69.75, mTarget: 69.75, days: [2.53, 2.94, 1.74, 1.69, 1.03, 2.63, 1.79, 2.58, 1.74, 2.37, 0.95, 1.94, 1.99, 1.58, 2.68, 2.68, 2.54, 2.55, 2.68, 2.79, 1.03, 1.82, 2.37, 2.37, 1.82, 1.74, 2.00, 2.73, 1.91, 1.86, 2.53] },
+          { name: "SQF-3", cap: 69.75, mTarget: 69.75, days: [1.51, 3.14, 2.24, 1.99, 2.14, 2.01, 2.24, 1.91, 2.14, 1.98, 2.71, 1.74, 2.15, 2.17, 1.99, 2.13, 2.06, 2.13, 2.05, 2.46, 1.93, 2.61, 2.09, 2.73, 0,0,0,0,0,0,0] },
+          { name: "SQF-4", cap: 69.75, mTarget: 69.75, days: [2.10, 2.80, 2.48, 1.51, 2.18, 1.67, 2.67, 2.12, 1.85, 3.09, 2.45, 1.42, 1.98, 1.45, 2.70, 2.99, 2.02, 2.12, 2.74, 1.13, 0,0,0,0,0, 2.70, 1.95, 2.12, 2.08, 1.66, 1.96] }
+        ]
+      },
+      "APRIL-2026": {
+        targetNote: "Per day production target is 2.25 ton/furnace (FY:2026-2027)",
+        monthTarget: 270.0, daysCount: 30,
+        furnaces: [
+          { name: "SQF-1", cap: 67.5, mTarget: 67.5, days: [1.66, 1.58, 3.16, 2.53, 2.37, 3.16, 2.37, 2.53, 3.18, 2.02, 2.53, 2.53, 2.37, 0.79, 3.47, 2.53, 2.53, 2.53, 2.53, 1.67, 2.53, 2.15, 2.02, 2.97, 2.14, 1.74, 2.53, 1.74, 1.46, 2.37] },
+          { name: "SQF-2", cap: 67.5, mTarget: 67.5, days: [2.18, 2.74, 1.95, 1.81, 2.24, 2.89, 1.87, 1.00, 2.02, 0.72, 2.83, 1.67, 2.00, 1.74, 1.51, 0.88, 2.66, 1.67, 1.00, 2.38, 1.82, 2.53, 1.77, 0.60, 2.06, 1.74, 3.32, 1.84, 2.29, 2.02] },
+          { name: "SQF-3", cap: 67.5, mTarget: 67.5, days: [2.17, 3.30, 2.13, 1.44, 3.28, 1.59, 3.00, 1.74, 2.01, 2.17, 3.18, 1.58, 1.90, 1.85, 2.12, 3.07, 1.85, 1.93, 2.01, 2.53, 1.85, 1.04, 1.78, 0,0,0,0,0,0,0] },
+          { name: "SQF-4", cap: 67.5, mTarget: 67.5, days: [2.07, 2.93, 1.64, 2.55, 2.21, 2.55, 2.05, 3.26, 2.10, 2.34, 2.88, 1.72, 2.66, 2.19, 2.35, 2.09, 1.61, 1.96, 1.61, 2.65, 2.88, 1.51, 2.22, 1.92, 2.85, 1.91, 1.98, 2.30, 2.17, 1.08] }
+        ]
+      }
     };
 
     function switchMainTab(tabId, btn) {
@@ -431,40 +471,12 @@
       document.getElementById('securityPin').value = '';
     }
 
-    async function fetchLiveSheetData() {
-      try {
-        const response = await fetch(PWM_CSV_URL + '&cache=' + new Date().getTime());
-        const csvText = await response.text();
-        const rows = csvText.split('\n').map(r => r.split(','));
-        
-        // Rows mapping from Google Sheet live data
-        for (let i = 1; i < rows.length; i++) {
-          const r = rows[i];
-          if (r.length >= 4) {
-            const m = r[0]?.replace(/"/g, '').trim();
-            const fc = r[1]?.replace(/"/g, '').trim();
-            const day = parseInt(r[2]?.replace(/"/g, '').trim());
-            const ton = parseFloat(r[3]?.replace(/"/g, '').trim());
-
-            if (dwmDatabase[m] && !isNaN(day) && !isNaN(ton)) {
-              const fObj = dwmDatabase[m].furnaces.find(f => f.name === fc);
-              if (fObj) {
-                fObj.days[day - 1] = ton;
-              }
-            }
-          }
-        }
-      } catch (e) {
-        console.log("Live fetch fallback to default values", e);
-      }
-      renderDWMData();
-    }
-
     function submitProductionData(event) {
       event.preventDefault();
       const enteredPin = document.getElementById('securityPin').value;
+      
       if (enteredPin !== ADMIN_PIN) {
-        alert("❌ Incorrect Security PIN!");
+        alert("❌ Incorrect Security PIN! Authorized personnel only.");
         return;
       }
 
@@ -473,42 +485,55 @@
       const day = parseInt(document.getElementById('inputDate').value);
       const ton = parseFloat(document.getElementById('inputTon').value);
 
-      // Send to Google Sheet Web App
-      fetch(WEB_APP_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ month, furnace: fc, date: day, ton })
-      }).then(() => {
-        alert(`✅ Submitted successfully to Google Sheet!`);
-        closeAddModal();
-        setTimeout(fetchLiveSheetData, 2000); // Refresh data from sheet
-      }).catch(err => {
-        alert("⚠️ Error saving data to sheet.");
-      });
+      if (dwmDatabase[month]) {
+        const fObj = dwmDatabase[month].furnaces.find(f => f.name === fc);
+        if (fObj && day >= 1 && day <= dwmDatabase[month].daysCount) {
+          fObj.days[day - 1] = ton;
+
+          // Google Sheet Web App Sync Call
+          if(WEB_APP_URL) {
+            fetch(WEB_APP_URL, {
+              method: 'POST',
+              mode: 'no-cors',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ month, furnace: fc, date: day, ton })
+            }).catch(err => console.log(err));
+          }
+
+          alert(`✅ Success! ${fc} for Day ${day} updated with ${ton} Ton in ${month}.`);
+          closeAddModal();
+          document.getElementById('dwmMonthDropdown').value = month;
+          renderDWMData();
+          return;
+        }
+      }
+      alert("⚠️ Invalid date or month selection.");
     }
 
     function renderDWMData() {
       const selectedMonth = document.getElementById('dwmMonthDropdown').value;
-      const data = dwmDatabase[selectedMonth];
+      const data = dwmDatabase[selectedMonth] || dwmDatabase["AUGUST-2026"];
 
+      // Automatic Target MTD calculation based on elapsed days (Shift 6:30 AM logic)
+      // यहाँ आज की तारीख या बीते हुए दिन निकाल रहे हैं (जैसे आज 27 तारीख है तो 26 दिन का MTD टारगेट)
       const currentDateObj = new Date();
-      let elapsedDays = currentDateObj.getDate() - 1; 
+      let elapsedDays = currentDateObj.getDate() - 1; // बीता हुआ कल (जैसे 27 है तो 26 दिन)
       if(elapsedDays < 1) elapsedDays = 1;
       if(elapsedDays > data.daysCount) elapsedDays = data.daysCount;
 
+      // Formula: 4 Furnaces * 2.25 Ton * Elapsed Days
       const targetMTD = (4 * 2.25 * elapsedDays).toFixed(2);
 
+      // Calculate Actual MTD & Totals dynamically
       let actualMTD = 0;
       let totals = Array(data.daysCount).fill(0);
       let cumu = [];
       let runningCumu = 0;
 
       data.furnaces.forEach(f => {
-        let fSum = f.days.reduce((a, b) => a + (b || 0), 0);
-        f.aMTD = fSum.toFixed(2);
+        f.aMTD = f.days.reduce((a, b) => a + (b || 0), 0).toFixed(2);
         f.util = ((f.aMTD / (f.mTarget * (elapsedDays / data.daysCount))) * 100).toFixed(1) + "%";
-        actualMTD += fSum;
+        actualMTD += parseFloat(f.aMTD);
 
         f.days.forEach((val, idx) => {
           totals[idx] += (val || 0);
@@ -524,6 +549,7 @@
       const avgProd = (actualMTD / elapsedDays).toFixed(2);
       const variance = (actualMTD - targetMTD).toFixed(2);
 
+      // Update UI KPIs
       document.getElementById('kpiMonthTarget').innerText = `${data.monthTarget} Ton`;
       document.getElementById('kpiTargetMTD').innerText = `${targetMTD} Ton`;
       document.getElementById('kpiActualMTD').innerText = `${actualMTD} Ton`;
@@ -536,31 +562,58 @@
       document.getElementById('targetNoteText').innerText = `⚡ ${data.targetNote}`;
       document.getElementById('dwmTableTitle').innerText = `📋 Daily Work Management (DWM) - ${selectedMonth}`;
 
-      let headerHtml = `<th style="min-width: 90px;">FURNACE</th><th>Capacity</th><th>Month Target</th><th>Target MTD</th><th>Actual MTD</th><th>Cap. Utilized</th>`;
+      // Build Headers
+      let headerHtml = `
+        <th style="min-width: 90px;">FURNACE</th>
+        <th>Furnace Capacity</th>
+        <th>Month Target</th>
+        <th>Target MTD</th>
+        <th>Actual MTD</th>
+        <th>Cap. Utilized</th>
+      `;
       for(let d = 1; d <= data.daysCount; d++) {
         headerHtml += `<th>${d}</th>`;
       }
       document.getElementById('dwmHeaderRow').innerHTML = headerHtml;
 
+      // Build Table Body
       let tbodyHtml = "";
       data.furnaces.forEach(f => {
-        tbodyHtml += `<tr><td style="font-weight:700; color:#38bdf8;">${f.name}</td><td>${f.cap}</td><td>${f.mTarget}</td><td>${(2.25 * elapsedDays).toFixed(2)}</td><td style="font-weight:700;">${f.aMTD}</td><td>${f.util}</td>`;
+        tbodyHtml += `<tr>
+          <td style="font-weight:700; color:#38bdf8;">${f.name}</td>
+          <td>${f.cap}</td>
+          <td>${f.mTarget}</td>
+          <td>${(2.25 * elapsedDays).toFixed(2)}</td>
+          <td style="font-weight:700;">${f.aMTD}</td>
+          <td>${f.util}</td>`;
+
         for(let i = 0; i < data.daysCount; i++) {
           let val = f.days[i] !== undefined ? f.days[i] : 0;
-          let cssClass = val >= 2.25 ? "cell-green" : (val > 0 ? "cell-red" : "");
+          let cssClass = val >= 2.25 ? "cell-green" : "cell-red";
+          if (val === 0) cssClass = "";
           tbodyHtml += `<td class="${cssClass}">${val > 0 ? val.toFixed(2) : '-'}</td>`;
         }
         tbodyHtml += `</tr>`;
       });
 
-      tbodyHtml += `<tr class="total-row"><td>TOTAL IN TON</td><td>-</td><td>${data.monthTarget}</td><td>${targetMTD}</td><td>${actualMTD}</td><td>${((actualMTD / targetMTD)*100).toFixed(1)}%</td>`;
+      // Total in Ton Row
+      tbodyHtml += `<tr class="total-row">
+        <td>TOTAL IN TON</td>
+        <td>${data.monthTarget}</td>
+        <td>${data.monthTarget}</td>
+        <td>${targetMTD}</td>
+        <td>${actualMTD}</td>
+        <td>${((actualMTD / targetMTD)*100).toFixed(1)}%</td>`;
       for(let i = 0; i < data.daysCount; i++) {
         let tVal = totals[i] || 0;
         tbodyHtml += `<td>${tVal > 0 ? tVal.toFixed(2) : '-'}</td>`;
       }
       tbodyHtml += `</tr>`;
 
-      tbodyHtml += `<tr class="total-row" style="background:#111827 !important;"><td>CUMULATIVE TOTAL</td><td colspan="5">LOT MTD</td>`;
+      // Cumulative Total Row
+      tbodyHtml += `<tr class="total-row" style="background:#111827 !important;">
+        <td>CUMULATIVE TOTAL</td>
+        <td colspan="5">LOT MTD</td>`;
       for(let i = 0; i < data.daysCount; i++) {
         let cVal = cumu[i] || 0;
         tbodyHtml += `<td>${cVal > 0 ? cVal : '-'}</td>`;
@@ -570,7 +623,7 @@
       document.getElementById('dwmTableBody').innerHTML = tbodyHtml;
     }
 
-    window.addEventListener('DOMContentLoaded', fetchLiveSheetData);
+    window.addEventListener('DOMContentLoaded', renderDWMData);
   </script>
 </body>
 </html>
