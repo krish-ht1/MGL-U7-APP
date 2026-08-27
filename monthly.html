@@ -205,14 +205,16 @@
       <a href="breakdown.html" class="nav-main-btn">⚠️ Breakdown & Loss</a>
     </div>
 
-    <!-- Filter Panel (Year, Month & SQF Filters) -->
+    <!-- Filter Panel (Financial Year, Month & SQF Filters) -->
     <div class="filter-panel">
       <div class="filter-row">
         <div class="filter-group">
-          <span>Year:</span>
+          <span>Financial Year:</span>
           <select id="yearSelect" onchange="renderMonthlyTable()">
-            <option value="2026" selected>2026</option>
-            <option value="2025">2025</option>
+            <option value="26-27" selected>2026-27</option>
+            <option value="25-26">2025-26</option>
+            <option value="24-25">2024-25</option>
+            <option value="23-24">2023-24</option>
           </select>
         </div>
 
@@ -220,11 +222,18 @@
           <span>Month:</span>
           <select id="monthSelect" onchange="renderMonthlyTable()">
             <option value="ALL" selected>All Months</option>
-            <option value="AUGUST">August</option>
-            <option value="JULY">July</option>
-            <option value="JUNE">June</option>
-            <option value="MAY">May</option>
             <option value="APRIL">April</option>
+            <option value="MAY">May</option>
+            <option value="JUNE">June</option>
+            <option value="JULY">July</option>
+            <option value="AUGUST">August</option>
+            <option value="SEPTEMBER">September</option>
+            <option value="OCTOBER">October</option>
+            <option value="NOVEMBER">November</option>
+            <option value="DECEMBER">December</option>
+            <option value="JANUARY">January</option>
+            <option value="FEBRUARY">February</option>
+            <option value="MARCH">March</option>
           </select>
         </div>
 
@@ -277,7 +286,7 @@
             </tr>
           </thead>
           <tbody id="monthlyTableBody">
-            <tr><td colspan="12" style="padding: 20px; color: #94a3b8;">Loading monthly production data...</td></tr>
+            <tr><td colspan="12" style="padding: 20px; color: #94a3b8;">Fetching monthly production data from sheet...</td></tr>
           </tbody>
         </table>
       </div>
@@ -286,16 +295,9 @@
   </div>
 
   <script>
-    // Tera naya CSV link jo Monthly tab ka hai
     const MONTHLY_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_55_JgWvZY0QyC87pldI3sKILOrXLYsE8xiuB99-K2ll9jWI5HHYIU6aoxEF1hegbDDmRybDQsW2/pub?gid=539352874&single=true&output=csv";
 
-    let monthlyData = [
-      { month: "APRIL", year: "2026", sqf1: {p: 1200, w: 3000}, sqf2: {p: 1100, w: 2750}, sqf3: {p: 950, w: 2375}, sqf4: {p: 1150, w: 2875} },
-      { month: "MAY", year: "2026", sqf1: {p: 1300, w: 3250}, sqf2: {p: 1250, w: 3125}, sqf3: {p: 1000, w: 2500}, sqf4: {p: 1100, w: 2750} },
-      { month: "JUNE", year: "2026", sqf1: {p: 1250, w: 3125}, sqf2: {p: 1300, w: 3250}, sqf3: {p: 1150, w: 2875}, sqf4: {p: 1200, w: 3000} },
-      { month: "JULY", year: "2026", sqf1: {p: 1400, w: 3500}, sqf2: {p: 1350, w: 3375}, sqf3: {p: 1250, w: 3125}, sqf4: {p: 1300, w: 3250} },
-      { month: "AUGUST", year: "2026", sqf1: {p: 1100, w: 2750}, sqf2: {p: 1200, w: 3000}, sqf3: {p: 1100, w: 2750}, sqf4: {p: 1150, w: 2875} }
-    ];
+    let monthlyData = [];
 
     async function fetchMonthlyLive() {
       try {
@@ -303,20 +305,34 @@
         const csvText = await response.text();
         const rows = csvText.split('\n').map(r => r.split(',').map(v => v.trim()));
 
-        // Agar sheet me data parsed format me hai toh yahan dynamically map kar sakte hain
-        if(rows.length > 1) {
-          document.getElementById('syncStatus').innerText = "● Live Synced";
-          document.getElementById('syncStatus').style.color = "#34d399";
+        monthlyData = [];
+        // Assuming CSV structure: [FinancialYear, Month, S1_Qty, S1_Wt, S2_Qty, S2_Wt, S3_Qty, S3_Wt, S4_Qty, S4_Wt]
+        for (let i = 1; i < rows.length; i++) {
+          let r = rows[i];
+          if (r.length >= 10 && r[0]) {
+            monthlyData.push({
+              fy: String(r[0]).trim(),
+              month: String(r[1]).trim().toUpperCase(),
+              sqf1: { p: parseFloat(r[2]) || 0, w: parseFloat(r[3]) || 0 },
+              sqf2: { p: parseFloat(r[4]) || 0, w: parseFloat(r[5]) || 0 },
+              sqf3: { p: parseFloat(r[6]) || 0, w: parseFloat(r[7]) || 0 },
+              sqf4: { p: parseFloat(r[8]) || 0, w: parseFloat(r[9]) || 0 }
+            });
+          }
         }
+
+        document.getElementById('syncStatus').innerText = "● Live Synced";
+        document.getElementById('syncStatus').style.color = "#34d399";
       } catch (err) {
-        console.log("Using local dataset fallback", err);
-        document.getElementById('syncStatus').innerText = "● Ready Mode";
+        console.log("Error fetching monthly CSV data", err);
+        document.getElementById('syncStatus').innerText = "● Sync Error";
+        document.getElementById('syncStatus').style.color = "#ef4444";
       }
       renderMonthlyTable();
     }
 
     function renderMonthlyTable() {
-      const selectedYear = document.getElementById('yearSelect').value;
+      const selectedFY = document.getElementById('yearSelect').value;
       const selectedMonth = document.getElementById('monthSelect').value;
       
       const showSqf1 = document.querySelector('.sqf-filter[value="SQF-1"]').checked;
@@ -330,10 +346,13 @@
       let gTotalQty = 0;
       let gTotalWeight = 0;
 
-      monthlyData.forEach(row => {
-        if (row.year !== selectedYear) return;
-        if (selectedMonth !== "ALL" && row.month !== selectedMonth) return;
+      const filteredRows = monthlyData.filter(row => {
+        if (row.fy !== selectedFY) return false;
+        if (selectedMonth !== "ALL" && row.month !== selectedMonth) return false;
+        return true;
+      });
 
+      filteredRows.forEach(row => {
         let s1p = showSqf1 ? row.sqf1.p : 0;
         let s1w = showSqf1 ? row.sqf1.w : 0;
         let s2p = showSqf2 ? row.sqf2.p : 0;
@@ -365,7 +384,7 @@
       });
 
       if (!html) {
-        html = `<tr><td colspan="12" style="padding: 20px; color: #94a3b8;">No records found for selected filters.</td></tr>`;
+        html = `<tr><td colspan="12" style="padding: 20px; color: #94a3b8;">No records found for Financial Year ${selectedFY}.</td></tr>`;
       }
 
       tbody.innerHTML = html;
