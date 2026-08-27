@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Milestone Gear Unit 7 - Production Review Dashboard</title>
+  <title>Milestone Gear - Unit 7 Production Dashboard</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -33,7 +33,7 @@
       z-index: 1000;
     }
     .ewm-brand { display: flex; align-items: center; gap: 10px; }
-    .ewm-brand h1 { font-size: 13.5px; font-weight: 700; margin: 0; color: #f8fafc; }
+    .ewm-brand h1 { font-size: 14px; font-weight: 700; margin: 0; color: #f8fafc; }
     
     .header-right { display: flex; align-items: center; gap: 8px; }
     .home-btn {
@@ -54,7 +54,7 @@
 
     .ewm-container { max-width: 1600px; width: 100%; margin: 0 auto; padding: 14px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
 
-    /* 4 Navigation Buttons Bar */
+    /* Navigation Buttons */
     .nav-buttons-bar {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -78,11 +78,10 @@
     }
     .nav-main-btn.active, .nav-main-btn:hover { background: #3b82f6; border-color: #3b82f6; color: #fff; }
 
-    /* Module Views Containers */
     .module-view { display: none; flex-direction: column; gap: 14px; }
     .module-view.active { display: flex; }
 
-    /* Control Bar with Month Dropdown */
+    /* Control Bar */
     .control-bar {
       background: #0f172a;
       border: 1px solid #1e293b;
@@ -107,7 +106,7 @@
       cursor: pointer;
     }
 
-    /* KPI Cards Grid */
+    /* KPI Cards */
     .kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
     .kpi-card {
       background: #0f172a;
@@ -143,7 +142,6 @@
     .dwm-title-row h3 { font-size: 12.5px; font-weight: 700; color: #f8fafc; margin: 0; }
     .note-text { font-size: 10px; color: #fbbf24; background: rgba(251, 191, 36, 0.1); padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(251, 191, 36, 0.2); }
 
-    /* Matrix Table Layout */
     .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     table.dwm-table {
       width: 100%;
@@ -213,6 +211,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.6);
     }
     .modal-header { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 700; color: #f8fafc; }
     .close-modal { background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer; }
@@ -231,22 +230,14 @@
       color: #94a3b8;
       font-size: 13px;
     }
-
-    @media (max-width: 1200px) {
-      .kpi-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-    @media (max-width: 768px) {
-      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-      .nav-buttons-bar { grid-template-columns: repeat(2, 1fr); }
-    }
   </style>
 </head>
 <body>
 
   <header class="ewm-header">
     <div class="ewm-brand">
-      <span style="font-size: 16px;">📊</span>
-      <h1>Milestone Gear Unit 7 - Production Review Dashboard</h1>
+      <span style="font-size: 16px;">⚙️</span>
+      <h1>Milestone Gear - Unit 7 Production Dashboard</h1>
     </div>
     <div class="header-right">
       <a href="index.html" class="home-btn">🏠 Home</a>
@@ -256,7 +247,6 @@
 
   <div class="ewm-container">
 
-    <!-- 4 Navigation Buttons Bar -->
     <div class="nav-buttons-bar">
       <button class="nav-main-btn active" onclick="switchMainTab('dwm', this)">📅 Daily (DWM)</button>
       <button class="nav-main-btn" onclick="switchMainTab('monthly', this)">📊 Monthly</button>
@@ -277,7 +267,7 @@
             <option value="APRIL-2026">April - 2026 (Fixed)</option>
           </select>
         </div>
-        <div class="note-text" id="targetNoteText">⚡ Target: 2.25 ton/furnace | Shift: 06:30 AM to Next Day 06:30 AM</div>
+        <div class="note-text" id="targetNoteText">⚡ Target: 2.25 ton/furnace (FY:2026-2027)</div>
       </div>
 
       <!-- KPI Summary Cards -->
@@ -288,32 +278,32 @@
           <p>Full month goal</p>
         </div>
         <div class="kpi-card green">
-          <span>Target MTD</span>
-          <h3 id="kpiTargetMTD">225.0 Ton</h3>
-          <p>Month to date goal</p>
+          <span>Target MTD (Auto)</span>
+          <h3 id="kpiTargetMTD">0 Ton</h3>
+          <p>2.25 × Elapsed Days</p>
         </div>
         <div class="kpi-card orange">
           <span>Actual MTD</span>
-          <h3 id="kpiActualMTD">0.0 Ton</h3>
+          <h3 id="kpiActualMTD">0 Ton</h3>
           <p>Achieved production</p>
         </div>
         <div class="kpi-card">
           <span>Average Production</span>
-          <h3 id="kpiAvgProd">0.0 Ton/Day</h3>
+          <h3 id="kpiAvgProd">0 Ton/Day</h3>
           <p>Daily run-rate</p>
         </div>
         <div class="kpi-card red">
           <span>Variance / Gap</span>
-          <h3 id="kpiVariance" style="color:#ef4444;">0.0 Ton</h3>
+          <h3 id="kpiVariance">0 Ton</h3>
           <p>Deficit against target</p>
         </div>
       </div>
 
-      <!-- DWM Matrix Table View -->
+      <!-- DWM Matrix Section -->
       <div class="dwm-section">
         <div class="dwm-title-row">
           <h3 id="dwmTableTitle">📋 Daily Work Management (DWM) Matrix</h3>
-          <span style="font-size: 10.5px; color:#34d399;">🟢 Target Met | 🔴 Below Target</span>
+          <span style="font-size: 10.5px; color:#34d399;">🟢 Target Met (≥2.25 Ton) | 🔴 Below Target</span>
         </div>
 
         <div class="table-scroll">
@@ -321,48 +311,33 @@
             <thead>
               <tr id="dwmHeaderRow"></tr>
             </thead>
-            <tbody id="dwmTableBody">
-              <tr><td colspan="36" style="padding: 30px; color:#94a3b8;">Loading DWM matrix...</td></tr>
-            </tbody>
+            <tbody id="dwmTableBody"></tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- MODULE 2: MONTHLY PRODUCTION -->
+    <!-- MODULES 2, 3, 4 -->
     <div id="view-monthly" class="module-view">
-      <div class="placeholder-card">
-        <h3>📊 Monthly Production Overview</h3>
-        <p>Monthly aggregate performance reports across all units.</p>
-      </div>
+      <div class="placeholder-card"><h3>📊 Monthly Production Overview</h3><p>Monthly aggregate performance reports.</p></div>
     </div>
-
-    <!-- MODULE 3: YEARLY PRODUCTION -->
     <div id="view-yearly" class="module-view">
-      <div class="placeholder-card">
-        <h3>📈 Yearly Production Analytics & Trends</h3>
-        <p>Annual fiscal year tracking and comparative analytics.</p>
-      </div>
+      <div class="placeholder-card"><h3>📈 Yearly Production Analytics</h3><p>Annual fiscal year tracking.</p></div>
     </div>
-
-    <!-- MODULE 4: BREAKDOWN & LOSS -->
     <div id="view-breakdown" class="module-view">
-      <div class="placeholder-card">
-        <h3>⚠️ Furnace Breakdown, Loss & Maintenance Log</h3>
-        <p>Downtime logs, loss analysis, and furnace failure records will be listed here.</p>
-      </div>
+      <div class="placeholder-card"><h3>⚠️ Furnace Breakdown & Loss Log</h3><p>Downtime logs and furnace failure records.</p></div>
     </div>
 
   </div>
 
-  <!-- Floating Plus Add Button (+) -->
+  <!-- Floating Plus Button -->
   <button class="float-add-btn" onclick="openAddModal()" title="Add New Production Entry">+</button>
 
-  <!-- Add Data Modal Form -->
+  <!-- Modal Form -->
   <div class="modal-overlay" id="addModal">
     <div class="modal-content">
       <div class="modal-header">
-        <span>🔒 Add Production Entry</span>
+        <span>🔒 Secure Production Entry</span>
         <button class="close-modal" onclick="closeAddModal()">&times;</button>
       </div>
       <form id="productionForm" onsubmit="submitProductionData(event)">
@@ -386,29 +361,28 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Date (1 to 31)</label>
+          <label>Date (1 to 31) [Shift 6:30 AM Rule]</label>
           <input type="number" id="inputDate" min="1" max="31" required placeholder="e.g. 26">
         </div>
         <div class="form-group">
           <label>Production Output (in Ton)</label>
           <input type="number" step="0.01" id="inputTon" required placeholder="e.g. 2.25">
         </div>
-        <div class="form-group" style="border-top: 1px solid #334155; padding-top: 6px; margin-top: 4px;">
-          <label style="color:#f59e0b;">🔒 Security PIN</label>
-          <input type="password" id="securityPin" maxlength="4" required placeholder="Enter 4-digit PIN (7890)">
+        <div class="form-group" style="border-top: 1px solid #334155; padding-top: 8px; margin-top: 4px;">
+          <label style="color:#f59e0b;">🔒 Security PIN (Required)</label>
+          <input type="password" id="securityPin" maxlength="4" required placeholder="Enter PIN (7890)">
         </div>
-        <button type="submit" class="submit-form-btn" id="submitBtn">Save Entry</button>
+        <button type="submit" class="submit-form-btn">Submit to Google Sheet</button>
       </form>
     </div>
   </div>
 
   <script>
-    // Live CSV URL from Google Sheet (Exact Link Provided)
-    const LIVE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_55_JgWvZY0QyC87pldI3sKILOrXLYsE8xiuB99-K2ll9jWI5HHYIU6aoxEF1hegbDDmRybDQsW2/pub?gid=0&single=true&output=csv";
+    const ADMIN_PIN = "7890"; 
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzqCNkTaR9QJ8VDlqPN0BJKg4wARZ44d88_mQ4CpItJAUEU6C3pK0SRFQfdNSkVjGxlXQ/exec";
-    const ADMIN_PIN = "7890";
+    const LIVE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_55_JgWvZY0QyC87pldI3sKILOrXLYsE8xiuB99-K2ll9jWI5HHYIU6aoxEF1hegbDDmRybDQsW2/pub?gid=0&single=true&output=csv";
 
-    // Fixed Historical Database for April to July
+    // Fixed Historical Database for April to July matching exact records
     const fixedDatabase = {
       "JULY-2026": {
         daysCount: 31, monthTarget: 279.0,
@@ -448,7 +422,6 @@
       }
     };
 
-    // Live August Data Storage
     let liveAugustData = {
       daysCount: 31, monthTarget: 279.0,
       furnaces: {
@@ -467,7 +440,10 @@
     }
 
     function openAddModal() { document.getElementById('addModal').style.display = 'flex'; }
-    function closeAddModal() { document.getElementById('addModal').style.display = 'none'; document.getElementById('securityPin').value = ''; }
+    function closeAddModal() { 
+      document.getElementById('addModal').style.display = 'none';
+      document.getElementById('securityPin').value = '';
+    }
 
     async function fetchLiveAugustData() {
       const syncStatus = document.getElementById('syncStatus');
@@ -489,13 +465,17 @@
             }
           }
         }
-        syncStatus.innerText = "● Live Synced";
-        syncStatus.style.color = "#34d399";
+        if(syncStatus) {
+          syncStatus.innerText = "● Live Synced";
+          syncStatus.style.color = "#34d399";
+        }
         renderDWMData();
       } catch (err) {
         console.error("Live fetch error:", err);
-        syncStatus.innerText = "● Offline Mode";
-        syncStatus.style.color = "#f59e0b";
+        if(syncStatus) {
+          syncStatus.innerText = "● Offline Mode";
+          syncStatus.style.color = "#f59e0b";
+        }
         renderDWMData();
       }
     }
@@ -626,7 +606,7 @@
       } catch (err) {
         alert("❌ Error saving data.");
       } finally {
-        submitBtn.innerText = "Save Entry";
+        submitBtn.innerText = "Submit to Google Sheet";
         submitBtn.disabled = false;
       }
     }
