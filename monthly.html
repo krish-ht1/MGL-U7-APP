@@ -271,7 +271,7 @@
             </tr>
           </thead>
           <tbody id="monthlyTableBody">
-            <tr><td colspan="12" style="padding: 20px; color: #94a3b8;">Loading exact live data from Google Sheet...</td></tr>
+            <tr><td colspan="12" style="padding: 20px; color: #94a3b8;">Loading data from Google Sheet...</td></tr>
           </tbody>
         </table>
       </div>
@@ -280,7 +280,7 @@
   </div>
 
   <script>
-   const MONTHLY_CSV_URL = "https://docs.google.com/spreadsheets/d/1ZKl4Nzxfwrt5MO11Iy-S-Yjiq0t9MHoQrryAE1paqXw/export?format=csv&gid=539352874";
+    const MONTHLY_CSV_URL = "https://docs.google.com/spreadsheets/d/1ZKl4Nzxfwrt5MO11Iy-S-Yjiq0t9MHoQrryAE1paqXw/export?format=csv&gid=539352874";
 
     let monthlyData = [];
 
@@ -291,13 +291,12 @@
         const rows = csvText.split('\n').map(r => r.split(',').map(v => v.trim()));
 
         monthlyData = [];
-        // Exact mapping based on your sheet layout screenshot:
-        // Row index 0 & 1 are headers. Start from row index 2.
-        // Col A (0): Month
-        // Col B (1): SQF-1 Qty, Col C (2): SQF-1 Weight
-        // Col D (3): SQF-2 Qty, Col E (4): SQF-2 Weight
-        // Col F (5): SQF-3 Qty, Col G (6): SQF-3 Weight
-        // Col H (7): SQF-4 Qty, Col I (8): SQF-4 Weight
+        // Teri sheet ke mutabik row 0 aur 1 header hain, row 2 se data shuru hota hai:
+        // Index 0: Month
+        // Index 1: SQF-1 Qty, Index 2: SQF-1 Wt
+        // Index 3: SQF-2 Qty, Index 4: SQF-2 Wt
+        // Index 5: SQF-3 Qty, Index 6: SQF-3 Wt
+        // Index 7: SQF-4 Qty, Index 8: SQF-4 Wt
         for (let i = 2; i < rows.length; i++) {
           let r = rows[i];
           if (r.length >= 9 && r[0] && r[0] !== "") {
