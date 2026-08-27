@@ -205,35 +205,20 @@
       <a href="breakdown.html" class="nav-main-btn">⚠️ Breakdown & Loss</a>
     </div>
 
-    <!-- Filter Panel (Financial Year, Month & SQF Filters) -->
+    <!-- Filter Panel (From Month, To Month & SQF Filters) -->
     <div class="filter-panel">
       <div class="filter-row">
         <div class="filter-group">
-          <span>Financial Year:</span>
-          <select id="yearSelect" onchange="renderMonthlyTable()">
-            <option value="26-27" selected>2026-27</option>
-            <option value="25-26">2025-26</option>
-            <option value="24-25">2024-25</option>
-            <option value="23-24">2023-24</option>
+          <span>From Month:</span>
+          <select id="fromMonthSelect" onchange="renderMonthlyTable()">
+            <option value="">-- Select Start --</option>
           </select>
         </div>
 
         <div class="filter-group">
-          <span>Month:</span>
-          <select id="monthSelect" onchange="renderMonthlyTable()">
-            <option value="ALL" selected>All Months</option>
-            <option value="APRIL">April</option>
-            <option value="MAY">May</option>
-            <option value="JUNE">June</option>
-            <option value="JULY">July</option>
-            <option value="AUGUST">August</option>
-            <option value="SEPTEMBER">September</option>
-            <option value="OCTOBER">October</option>
-            <option value="NOVEMBER">November</option>
-            <option value="DECEMBER">December</option>
-            <option value="JANUARY">January</option>
-            <option value="FEBRUARY">February</option>
-            <option value="MARCH">March</option>
+          <span>To Month:</span>
+          <select id="toMonthSelect" onchange="renderMonthlyTable()">
+            <option value="">-- Select End --</option>
           </select>
         </div>
 
@@ -306,34 +291,57 @@
         const rows = csvText.split('\n').map(r => r.split(',').map(v => v.trim()));
 
         monthlyData = [];
-        // Assuming CSV structure: [FinancialYear, Month, S1_Qty, S1_Wt, S2_Qty, S2_Wt, S3_Qty, S3_Wt, S4_Qty, S4_Wt]
+        // Assuming CSV structure based on your sheet columns:
+        // [0: Month/Date, 1: S1_Qty, 2: S1_Wt, 3: S2_Qty, 4: S2_Wt, 5: S3_Qty, 6: S3_Wt, 7: S4_Qty, 8: S4_Wt, ...]
         for (let i = 1; i < rows.length; i++) {
           let r = rows[i];
-          if (r.length >= 10 && r[0]) {
+          if (r.length >= 9 && r[0]) {
             monthlyData.push({
-              fy: String(r[0]).trim(),
-              month: String(r[1]).trim().toUpperCase(),
-              sqf1: { p: parseFloat(r[2]) || 0, w: parseFloat(r[3]) || 0 },
-              sqf2: { p: parseFloat(r[4]) || 0, w: parseFloat(r[5]) || 0 },
-              sqf3: { p: parseFloat(r[6]) || 0, w: parseFloat(r[7]) || 0 },
-              sqf4: { p: parseFloat(r[8]) || 0, w: parseFloat(r[9]) || 0 }
+              originalIndex: i, // row order maintain karne ke liye
+              month: String(r[0]).trim(),
+              sqf1: { p: parseFloat(r[1]) || 0, w: parseFloat(r[2]) || 0 },
+              sqf2: { p: parseFloat(r[3]) || 0, w: parseFloat(r[4]) || 0 },
+              sqf3: { p: parseFloat(r[5]) || 0, w: parseFloat(r[6]) || 0 },
+              sqf4: { p: parseFloat(r[7]) || 0, w: parseFloat(r[8]) || 0 }
             });
           }
         }
 
+        populateMonthDropdowns();
         document.getElementById('syncStatus').innerText = "● Live Synced";
         document.getElementById('syncStatus').style.color = "#34d399";
       } catch (err) {
         console.log("Error fetching monthly CSV data", err);
         document.getElementById('syncStatus').innerText = "● Sync Error";
         document.getElementById('syncStatus').style.color = "#ef4444";
+        renderMonthlyTable();
       }
+    }
+
+    function populateMonthDropdowns() {
+      const fromSelect = document.getElementById('fromMonthSelect');
+      const toSelect = document.getElementById('toMonthSelect');
+      
+      fromSelect.innerHTML = '<option value="">-- Select Start Month --</option>';
+      toSelect.innerHTML = '<option value="">-- Select End Month --</option>';
+
+      monthlyData.forEach((row, index) => {
+        fromSelect.innerHTML += `<option value="${index}">${row.month}</option>`;
+        toSelect.innerHTML += `<option value="${index}">${row.month}</option>`;
+      });
+
+      // By default: full range select kar le ya pehla aur aakhri select kar le
+      if(monthlyData.length > 0) {
+        fromSelect.value = 0;
+        toSelect.value = monthlyData.length - 1;
+      }
+
       renderMonthlyTable();
     }
 
     function renderMonthlyTable() {
-      const selectedFY = document.getElementById('yearSelect').value;
-      const selectedMonth = document.getElementById('monthSelect').value;
+      const fromIdx = document.getElementById('fromMonthSelect').value;
+      const toIdx = document.getElementById('toMonthSelect').value;
       
       const showSqf1 = document.querySelector('.sqf-filter[value="SQF-1"]').checked;
       const showSqf2 = document.querySelector('.sqf-filter[value="SQF-2"]').checked;
@@ -346,11 +354,18 @@
       let gTotalQty = 0;
       let gTotalWeight = 0;
 
-      const filteredRows = monthlyData.filter(row => {
-        if (row.fy !== selectedFY) return false;
-        if (selectedMonth !== "ALL" && row.month !== selectedMonth) return false;
-        return true;
-      });
+      // Filter rows based on selected index range (From Month to To Month)
+      let startIndex = fromIdx !== "" ? parseInt(fromIdx) : 0;
+      let endIndex = toIdx !== "" ? parseInt(toIdx) : monthlyData.length - 1;
+
+      if (startIndex > endIndex) {
+        // Agar user ne ulta select kar liya toh swap kar do
+        let temp = startIndex;
+        startIndex = endIndex;
+        endIndex = temp;
+      }
+
+      const filteredRows = monthlyData.slice(startIndex, endIndex + 1);
 
       filteredRows.forEach(row => {
         let s1p = showSqf1 ? row.sqf1.p : 0;
@@ -372,26 +387,26 @@
         html += `
           <tr>
             <td style="font-weight:700; color:#38bdf8;">${row.month}</td>
-            <td>${showSqf1 ? s1p : '-'}</td><td>${showSqf1 ? s1w : '-'}</td>
-            <td>${showSqf2 ? s2p : '-'}</td><td>${showSqf2 ? s2w : '-'}</td>
-            <td>${showSqf3 ? s3p : '-'}</td><td>${showSqf3 ? s3w : '-'}</td>
-            <td>${showSqf4 ? s4p : '-'}</td><td>${showSqf4 ? s4w : '-'}</td>
-            <td style="font-weight:700; color:#fde047;">${rowTotalQty}</td>
-            <td style="font-weight:700; color:#fde047;">${rowTotalWeight}</td>
+            <td>${showSqf1 ? s1p.toLocaleString() : '-'}</td><td>${showSqf1 ? s1w.toLocaleString() : '-'}</td>
+            <td>${showSqf2 ? s2p.toLocaleString() : '-'}</td><td>${showSqf2 ? s2w.toLocaleString() : '-'}</td>
+            <td>${showSqf3 ? s3p.toLocaleString() : '-'}</td><td>${showSqf3 ? s3w.toLocaleString() : '-'}</td>
+            <td>${showSqf4 ? s4p.toLocaleString() : '-'}</td><td>${showSqf4 ? s4w.toLocaleString() : '-'}</td>
+            <td style="font-weight:700; color:#fde047;">${rowTotalQty.toLocaleString()}</td>
+            <td style="font-weight:700; color:#fde047;">${rowTotalWeight.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
             <td style="font-weight:700; color:#34d399;">${rowTonnage.toFixed(2)} Ton</td>
           </tr>
         `;
       });
 
       if (!html) {
-        html = `<tr><td colspan="12" style="padding: 20px; color: #94a3b8;">No records found for Financial Year ${selectedFY}.</td></tr>`;
+        html = `<tr><td colspan="12" style="padding: 20px; color: #94a3b8;">No records found for the selected month range.</td></tr>`;
       }
 
       tbody.innerHTML = html;
 
       // Update KPIs
       document.getElementById('kpiTotalQty').innerText = `${gTotalQty.toLocaleString('en-IN')} Pcs`;
-      document.getElementById('kpiTotalWeight').innerText = `${gTotalWeight.toLocaleString('en-IN', {maximumFractionDigits: 2})} Kg`;
+      document.getElementById('kpiTotalWeight').innerText = `${gTotalWeight.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})} Kg`;
       document.getElementById('kpiTotalTonnage').innerText = `${(gTotalWeight / 1000).toFixed(2)} Ton`;
     }
 
