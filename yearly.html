@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Yearly Production & Analytics - Milestone Gear Unit 7</title>
-  <!-- Chart.js Library for Graphs -->
+  <!-- Chart.js Library -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -35,96 +35,86 @@
       z-index: 1000;
     }
     .ewm-brand { display: flex; align-items: center; gap: 10px; }
-    .ewm-brand h1 { font-size: 14px; font-weight: 700; margin: 0; color: #f8fafc; }
+    .ewm-brand h1 { font-size: 13.5px; font-weight: 700; margin: 0; color: #f8fafc; }
     
-    .header-right { display: flex; align-items: center; gap: 8px; }
     .home-btn {
       background: #1e293b;
       border: 1px solid #334155;
       color: #38bdf8;
-      padding: 6px 12px;
+      padding: 5px 10px;
       border-radius: 6px;
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 600;
-      cursor: pointer;
       text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 5px;
     }
-    .ewm-badge { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-size: 10.5px; font-weight: 600; }
+    .ewm-badge { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 600; }
 
-    .ewm-container { max-width: 1600px; width: 100%; margin: 0 auto; padding: 14px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
+    .ewm-container { max-width: 1600px; width: 100%; margin: 0 auto; padding: 12px; flex: 1; display: flex; flex-direction: column; gap: 12px; }
 
     /* Navigation Bar */
     .nav-buttons-bar {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
+      gap: 6px;
       background: #0f172a;
       border: 1px solid #1e293b;
-      padding: 10px;
+      padding: 8px;
       border-radius: 10px;
     }
     .nav-main-btn {
       background: #1e293b;
       border: 1px solid #334155;
       color: #94a3b8;
-      padding: 8px 6px;
+      padding: 7px 4px;
       border-radius: 8px;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
-      cursor: pointer;
       text-align: center;
       text-decoration: none;
       display: block;
-      transition: 0.2s;
     }
     .nav-main-btn.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
 
-    /* Section Wrapper */
+    /* Section Cards */
     .section-card {
       background: #0f172a;
       border: 1px solid #1e293b;
       border-radius: 10px;
-      padding: 16px;
+      padding: 12px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
-    .section-title { font-size: 13px; font-weight: 700; color: #f8fafc; margin: 0; display: flex; justify-content: space-between; align-items: center; }
+    .section-title { font-size: 12px; font-weight: 700; color: #f8fafc; display: flex; justify-content: space-between; align-items: center; }
 
     /* Table Styling */
     .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     table.yearly-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 11.5px;
+      font-size: 10.5px;
       text-align: center;
       white-space: nowrap;
     }
     table.yearly-table th, table.yearly-table td {
       border: 1px solid #334155;
-      padding: 9px 8px;
+      padding: 7px 6px;
     }
-    table.yearly-table th {
-      background: #1e293b;
-      color: #94a3b8;
-      font-weight: 600;
-      position: sticky;
-      top: 0;
-    }
+    table.yearly-table th { background: #1e293b; color: #94a3b8; font-weight: 600; }
     table.yearly-table td { background: #0f172a; color: #f1f5f9; }
 
-    /* Chart Container Styling */
+    /* Mobile-Optimized Attractive Chart Container */
     .chart-container {
       position: relative;
       width: 100%;
-      height: 420px;
+      height: 320px;
       background: #0b1120;
       border: 1px solid #334155;
       border-radius: 8px;
-      padding: 10px;
+      padding: 6px;
+    }
+    @media (min-width: 768px) {
+      .chart-container { height: 420px; }
     }
   </style>
 </head>
@@ -132,53 +122,52 @@
 
   <header class="ewm-header">
     <div class="ewm-brand">
-      <span style="font-size: 16px;">📈</span>
-      <h1>Milestone Gear Unit 7 - Yearly Production & Analytics</h1>
+      <span style="font-size: 15px;">📈</span>
+      <h1>Milestone Gear - Yearly Analytics</h1>
     </div>
     <div class="header-right">
       <a href="index.html" class="home-btn">🏠 Home</a>
-      <div class="ewm-badge" id="syncStatus">● Active</div>
+      <div class="ewm-badge" id="syncStatus">● Syncing...</div>
     </div>
   </header>
 
   <div class="ewm-container">
 
-    <!-- Sub-Module Navigation -->
     <div class="nav-buttons-bar">
-      <a href="production.html" class="nav-main-btn">📅 Daily Production (DWM)</a>
-      <a href="monthly.html" class="nav-main-btn">📊 Monthly Production</a>
-      <a href="yearly.html" class="nav-main-btn active">📈 Yearly Production</a>
-      <a href="breakdown.html" class="nav-main-btn">⚠️ Breakdown & Loss</a>
+      <a href="production.html" class="nav-main-btn">📅 Daily</a>
+      <a href="monthly.html" class="nav-main-btn">📊 Monthly</a>
+      <a href="yearly.html" class="nav-main-btn active">📈 Yearly</a>
+      <a href="breakdown.html" class="nav-main-btn">⚠️ Losses</a>
     </div>
 
-    <!-- Yearly Data Table Section -->
+    <!-- Yearly Data Table -->
     <div class="section-card">
       <div class="section-title">
-        <span>📋 Fiscal Year Performance Summary</span>
-        <span style="font-size: 10.5px; color: #38bdf8;">Values in MT (Metric Tons)</span>
+        <span>📋 Fiscal Year Performance</span>
+        <span style="font-size: 9.5px; color: #38bdf8;">Values in MT</span>
       </div>
       <div class="table-scroll">
         <table class="yearly-table">
           <thead>
             <tr>
               <th>Financial Year</th>
-              <th>Actual Production (MT)</th>
-              <th>Total Capacity / Target (MT)</th>
-              <th>Avg Production / Month (MT)</th>
-              <th>Achievement %</th>
+              <th>Actual Prod (MT)</th>
+              <th>Target (MT)</th>
+              <th>Avg/Month (MT)</th>
+              <th>Achievement</th>
             </tr>
           </thead>
           <tbody id="yearlyTableBody">
-            <!-- Dynamically injected -->
+            <tr><td colspan="5" style="padding: 15px; color:#94a3b8;">Loading data from Google Sheet...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- Graphical Dashboard Section -->
+    <!-- Attractive Chart Dashboard -->
     <div class="section-card">
       <div class="section-title">
-        <span>📊 Production vs Target Trend Analysis</span>
+        <span>📊 Production & Target Trend Chart</span>
       </div>
       <div class="chart-container">
         <canvas id="yearlyChart"></canvas>
@@ -188,17 +177,62 @@
   </div>
 
   <script>
-    // Master Yearly Data matching your exact reference chart
-    const yearlyData = [
-      { fy: "FY-2021~22", production: 1479, target: 1920, avgMonth: 123.25 },
-      { fy: "FY-2022~23", production: 2080, target: 2340, avgMonth: 173.34 },
-      { fy: "FY-2023~24", production: 1843, target: 2400, avgMonth: 152.84 },
-      { fy: "FY-2024~25", production: 2245, target: 2760, avgMonth: 187.17 },
-      { fy: "FY-2025~26", production: 3032, target: 3000, avgMonth: 252.70 },
-      { fy: "FY-2026~27 (MTD)", production: 1009, target: 3120, avgMonth: 252.27 }
-    ];
+    // Tera naya Yearly tab ka CSV link
+    const YEARLY_CSV_URL = "https://docs.google.com/spreadsheets/d/1ZKl4Nzxfwrt5MO11Iy-S-Yjiq0t9MHoQrryAE1paqXw/export?format=csv&gid=1784889536";
 
-    function renderYearlyDashboard() {
+    let myChartInstance = null;
+
+    async function fetchYearlyLiveData() {
+      try {
+        const response = await fetch(YEARLY_CSV_URL);
+        const csvText = await response.text();
+        const rows = csvText.split('\n').map(r => r.split(',').map(v => v.trim()));
+
+        let yearlyData = [];
+
+        // Sheet se data parse karna (Assuming structure: FY, Production, Target, AvgMonth)
+        for (let i = 1; i < rows.length; i++) {
+          let r = rows[i];
+          if (r.length >= 4 && r[0] && r[0] !== "") {
+            let parseVal = (val) => {
+              if (!val) return 0;
+              let clean = String(val).replace(/["']/g, "").replace(/,/g, "").trim();
+              let num = parseFloat(clean);
+              return isNaN(num) ? 0 : num;
+            };
+
+            yearlyData.push({
+              fy: String(r[0]).replace(/["']/g, "").trim(),
+              production: parseVal(r[1]),
+              target: parseVal(r[2]),
+              avgMonth: parseVal(r[3])
+            });
+          }
+        }
+
+        // Agar sheet blank ho toh fallback data dikhaye taaki layout kharab na ho
+        if (yearlyData.length === 0) {
+          yearlyData = [
+            { fy: "FY-2021~22", production: 1479, target: 1920, avgMonth: 123.25 },
+            { fy: "FY-2022~23", production: 2080, target: 2340, avgMonth: 173.34 },
+            { fy: "FY-2023~24", production: 1843, target: 2400, avgMonth: 152.84 },
+            { fy: "FY-2024~25", production: 2245, target: 2760, avgMonth: 187.17 },
+            { fy: "FY-2025~26", production: 3032, target: 3000, avgMonth: 252.70 },
+            { fy: "FY-2026~27", production: 1009, target: 3120, avgMonth: 252.27 }
+          ];
+        }
+
+        renderYearlyDashboard(yearlyData);
+        document.getElementById('syncStatus').innerText = "● Live Synced";
+        document.getElementById('syncStatus').style.color = "#34d399";
+      } catch (err) {
+        console.log("Error loading yearly data:", err);
+        document.getElementById('syncStatus').innerText = "● Sync Error";
+        document.getElementById('syncStatus').style.color = "#ef4444";
+      }
+    }
+
+    function renderYearlyDashboard(yearlyData) {
       const tbody = document.getElementById('yearlyTableBody');
       let tableHtml = "";
 
@@ -208,14 +242,14 @@
       let avgData = [];
 
       yearlyData.forEach(row => {
-        let achievePct = ((row.production / row.target) * 100).toFixed(1) + "%";
+        let achievePct = row.target > 0 ? ((row.production / row.target) * 100).toFixed(1) + "%" : "0%";
         
         tableHtml += `
           <tr>
             <td style="font-weight:700; color:#38bdf8;">${row.fy}</td>
-            <td style="font-weight:700; color:#3b82f6;">${row.production.toLocaleString()} MT</td>
-            <td style="font-weight:700; color:#f97316;">${row.target.toLocaleString()} MT</td>
-            <td style="font-weight:700; color:#34d399;">${row.avgMonth} MT</td>
+            <td style="font-weight:700; color:#3b82f6;">${row.production.toLocaleString()}</td>
+            <td style="font-weight:700; color:#f97316;">${row.target.toLocaleString()}</td>
+            <td style="font-weight:700; color:#34d399;">${row.avgMonth}</td>
             <td style="font-weight:700; color:${parseFloat(achievePct) >= 100 ? '#34d399' : '#f59e0b'};">${achievePct}</td>
           </tr>
         `;
@@ -228,37 +262,41 @@
 
       tbody.innerHTML = tableHtml;
 
-      // Render Chart.js Graph
       const ctx = document.getElementById('yearlyChart').getContext('2d');
-      new Chart(ctx, {
+      
+      if (myChartInstance) {
+        myChartInstance.destroy();
+      }
+
+      myChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
           labels: labels,
           datasets: [
             {
-              label: 'Production (MT)',
+              label: 'Actual Prod (MT)',
               data: prodData,
               backgroundColor: '#3b82f6',
-              borderRadius: 4,
+              borderRadius: 6,
               order: 2,
               yAxisID: 'y'
             },
             {
-              label: 'Avg Production / Month (MT)',
+              label: 'Avg/Month (MT)',
               data: avgData,
-              backgroundColor: '#34d399',
-              borderRadius: 4,
+              backgroundColor: '#10b981',
+              borderRadius: 6,
               order: 3,
               yAxisID: 'y1'
             },
             {
-              label: 'Total Capacity / Target (MT)',
+              label: 'Target (MT)',
               data: targetData,
               type: 'line',
-              borderColor: '#f97316',
-              backgroundColor: '#f97316',
-              borderWidth: 3,
-              pointRadius: 5,
+              borderColor: '#f59e0b',
+              backgroundColor: '#f59e0b',
+              borderWidth: 2.5,
+              pointRadius: 4,
               order: 1,
               yAxisID: 'y'
             }
@@ -269,34 +307,33 @@
           maintainAspectRatio: false,
           plugins: {
             legend: {
-              labels: { color: '#cbd5e1', font: { family: 'Inter', size: 11 } }
+              position: 'bottom',
+              labels: { color: '#cbd5e1', font: { family: 'Inter', size: 10 }, boxWidth: 12 }
             }
           },
           scales: {
             x: {
-              ticks: { color: '#94a3b8' },
-              grid: { color: '#1e293b' }
+              ticks: { color: '#94a3b8', font: { size: 9 } },
+              grid: { display: false }
             },
             y: {
               type: 'linear',
               position: 'left',
-              title: { display: true, text: 'Production (MT)', color: '#38bdf8' },
-              ticks: { color: '#94a3b8' },
+              ticks: { color: '#94a3b8', font: { size: 9 } },
               grid: { color: '#1e293b' }
             },
             y1: {
               type: 'linear',
               position: 'right',
-              title: { display: true, text: 'Avg Prod / Month (MT)', color: '#34d399' },
-              ticks: { color: '#94a3b8' },
-              grid: { drawOnChartArea: false }
+              ticks: { color: '#94a3b8', font: { size: 9 } },
+              grid: { display: false }
             }
           }
         }
       });
     }
 
-    window.addEventListener('DOMContentLoaded', renderYearlyDashboard);
+    window.addEventListener('DOMContentLoaded', fetchYearlyLiveData);
   </script>
 </body>
 </html>
