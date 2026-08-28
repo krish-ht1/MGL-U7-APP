@@ -366,6 +366,7 @@
             <option value="JUNE-2026">June - 2026</option>
             <option value="MAY-2026">May - 2026</option>
             <option value="APRIL-2026">April - 2026</option>
+            =TEXT(TODAY(), "MMMM yyyy")
           </select>
         </div>
         <div class="form-group">
@@ -397,7 +398,7 @@
   <script>
     // Live CSV URL from Google Sheet (Specifically pulling from 'dwm' tab)
     const LIVE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_55_JgWvZY0QyC87pldI3sKILOrXLYsE8xiuB99-K2ll9jWI5HHYIU6aoxEF1hegbDDmRybDQsW2/pub?gid=0&single=true&output=csv";
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzqCNkTaR9QJ8VDlqPN0BJKg4wARZ44d88_mQ4CpItJAUEU6C3pK0SRFQfdNSkVjGxlXQ/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx-ZIqhNA0mqs-nUBVAsIKKaptlHoFhMTxoywB3BPzKSW65Jj7BQ0_ztMukf0ddjcqbzg/exec";
     const ADMIN_PIN = "7890";
 
     // Fixed Historical Database for April to July
@@ -439,6 +440,39 @@
         }
       }
     };
+    // Form khulte hi automatic current month set karne ke liye
+  function setDefaultMonthInForm() {
+    const now = new Date();
+    const months = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+    const currentMonthName = months[now.getMonth()];
+    const currentYear = now.getFullYear();
+    const formattedVal = `${currentMonthName}-${currentYear}`; // Jaise: AUGUST-2026
+    
+    const inputMonthSelect = document.getElementById('inputMonth');
+    if (inputMonthSelect) {
+      // Check karo ki kya yeh option dropdown me available hai, agar nahi toh naya add kar do
+      let exists = false;
+      for(let opt of inputMonthSelect.options) {
+        if(opt.value === formattedVal) {
+          exists = true;
+          break;
+        }
+      }
+      if(!exists) {
+        let newOpt = document.createElement('option');
+        newOpt.value = formattedVal;
+        newOpt.text = `${currentMonthName} - ${currentYear} (Auto)`;
+        inputMonthSelect.add(newOpt, inputMonthSelect.firstChild);
+      }
+      inputMonthSelect.value = formattedVal;
+    }
+  }
+
+  // Aur ise openAddModal() ke andar call kar lo taaki jab bhi form khule, current month apne aap aa jaye:
+  function openAddModal() { 
+    document.getElementById('addModal').style.display = 'flex'; 
+    setDefaultMonthInForm(); // Yeh automatic current month select kar lega
+  }
 
     // Live August Data Storage (Pulls dynamically from 'dwm' tab CSV)
     let liveAugustData = {
