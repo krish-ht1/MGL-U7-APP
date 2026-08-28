@@ -407,7 +407,7 @@
 
             let totalWtKg = parseVal(r[2]) + parseVal(r[4]) + parseVal(r[6]) + parseVal(r[8]);
             
-            // Check if Tonnage column (index 9 or 10 depending on sheet, or calculate from total weight)
+            // Sheet ke aakhri column (Weight in Tonnage, index 9 ya uske baad) se exact decimal value uthana
             let explicitTonnage = r.length > 9 ? parseVal(r[9]) : 0;
             let finalTonnage = explicitTonnage > 0 ? explicitTonnage : (totalWtKg / 1000);
 
@@ -520,7 +520,7 @@
       document.getElementById('kpiTotalTonnage').innerText = `${(gTotalWeight / 1000).toFixed(2)} Ton`;
     }
 
-    /* Fully Dynamic Trend Chart Modal Logic */
+    /* Dynamic Trend Chart Modal Logic with Average Bar/Line */
     function openTrendModal() {
       document.getElementById('trendModal').style.display = 'flex';
       renderDynamicTrendChart();
@@ -545,15 +545,25 @@
         endIndex = temp;
       }
 
-      // Filtered range data based on table dropdown selection
+      // Table filter range data
       const rangeData = monthlyData.slice(startIndex, endIndex + 1);
 
       let labels = rangeData.map(d => d.month);
       let values = rangeData.map(d => parseFloat(d.tonnage.toFixed(2)));
 
-      // Dynamic Title showing start and end month
+      // Calculate Average of selected range
+      let sum = values.reduce((a, b) => a + b, 0);
+      let avg = values.length > 0 ? (sum / values.length) : 0;
+
+      // Add "Average" label and value at the end of the graph data
+      labels.push("AVERAGE");
+      values.push(parseFloat(avg.toFixed(2)));
+
+      // Colors array: normal months in pink, average bar in distinctive green/orange
+      let bgColors = values.map((val, idx) => idx === values.length - 1 ? '#10b981' : '#ec4899');
+
       let rangeText = rangeData.length > 0 ? `${rangeData[0].month} to ${rangeData[rangeData.length - 1].month}` : "Selected Range";
-      document.getElementById('modalTitle').innerText = `📈 PRODUCTION TREND IN TONNAGE (${rangeText})`;
+      document.getElementById('modalTitle').innerText = `📈 PRODUCTION TREND IN TONNAGE (${rangeText}) | Avg: ${avg.toFixed(2)} T`;
 
       if (trendChartInstance) {
         trendChartInstance.destroy();
@@ -565,9 +575,9 @@
           labels: labels,
           datasets: [
             {
-              label: 'Weight in Tonnage (Ton)',
+              label: 'Tonnage',
               data: values,
-              backgroundColor: '#ec4899', // Pink theme
+              backgroundColor: bgColors,
               borderRadius: 6,
             }
           ]
@@ -577,10 +587,7 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: {
-              position: 'top',
-              labels: { color: '#cbd5e1', font: { family: 'Inter', size: 11 }, boxWidth: 12 }
-            },
+            legend: { display: false },
             datalabels: {
               anchor: 'end',
               align: 'top',
