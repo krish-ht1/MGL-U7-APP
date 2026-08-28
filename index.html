@@ -584,19 +584,19 @@
   <script src="data.js"></script>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHFSaT4iJebNYGwdoxyI_qP3CYLXf4zYHwDJD5NRkJk_AhQK-Qz6954GIWoUjFsjQQ/exec";
+    // 💡 Tera naya Apps Script Web App URL yahan lag gaya hai
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwvxFM0Vo2jCKmYQRTfTkI2_2-GZLDiCtDXa-LomruzQUOSbuSfQFXccy3tKMP1hGDC/exec";
     const CORRECT_PIN = "7860"; 
     const ADMIN_PASSWORD = "admin@123";
 
-    // Direct Live CSV Links from Master Sheet
-    const CALIBRATION_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?output=csv";
+    // Direct Live CSV Link for D-Shooting
     const DSHOOTING_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=476482279&single=true&output=csv";
-    const UPDATES_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=1182340030&single=true&output=csv";
 
     let isAdminLoggedIn = false;
     let cachedUpdates = [];
     let liveTemp = "31°C";
 
+    // 1. Weather Fetch
     async function fetchRealWeather() {
       try {
         const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=30.9578&longitude=76.7914&current=temperature_2m");
@@ -607,6 +607,7 @@
     fetchRealWeather();
     setInterval(fetchRealWeather, 600000);
 
+    // 2. Date & Time
     function updateDateTime() {
       const now = new Date();
       const day = String(now.getDate()).padStart(2, '0');
@@ -620,7 +621,7 @@
     setInterval(updateDateTime, 1000);
     updateDateTime();
 
-    // Robust CSV Parser
+    // 3. CSV Parser helper
     function parseCSV(text) {
       const rows = text.split('\n').map(r => {
         let row = [];
@@ -637,13 +638,12 @@
       return rows;
     }
 
-    // Exact string/date cleaner
-    formatOnlyDate = function(val) {
+    function formatOnlyDate(val) {
       if (!val || val === '-' || val === 'N/A') return '-';
       return String(val).replace(/["']/g, "").trim();
     }
 
-    // 1. Fully Live D-Shooting Fetch (Bypassing dummy data.js)
+    // 4. Live D-Shooting Fetch
     async function fetchDShootingLive() {
       try {
         const timestamp = new Date().getTime();
@@ -671,9 +671,8 @@
               let bgStyle = (index % 2 === 0) ? "background: #1e293b;" : "background: #0f172a;";
               dHtml += `<tr style="${bgStyle} border-bottom: 1px solid #334155;">`;
               row.forEach((cell, idx) => {
-                let cleanCell = cell.replace(/["']/g, "");
                 let isMachineCol = (idx === 0);
-                let cellVal = cleanCell; 
+                let cellVal = cell.replace(/["']/g, ""); 
                 let isDueCol = (idx === row.length - 1);
                 let style = isDueCol ? "color: #38bdf8; font-weight: bold;" : "color: #cbd5e1;";
                 if (isMachineCol) style = "text-align: left; font-weight: 600; color: #f8fafc;";
@@ -682,54 +681,66 @@
               dHtml += `</tr>`;
             }
           });
-          tbody.innerHTML = dHtml || "<tr><td colspan='10' style='padding:15px; color:#94a3b8;'>No D-shooting records found.</td></tr>";
+          tbody.innerHTML = dHtml || "<tr><td colspan='10' style='padding:15px; color:#94a3b8;'>No records found.</td></tr>";
         }
       } catch (err) {
-        console.log("Error loading D-Shooting live:", err);
+        console.log("Error loading D-Shooting:", err);
       }
     }
 
-    // 2. Fully Live Calibration Fetch (Showing actual due items accurately)
+    // 5. Live Calibration Fetch via Apps Script (Auto detects Calibration / calibration)
     async function fetchCalibrationLive() {
+      const alertContainer = document.getElementById('popupAlertsList');
+      if (!alertContainer) return;
+      
       try {
         const timestamp = new Date().getTime();
-        const res = await fetch(`${CALIBRATION_CSV_URL}&_t=${timestamp}`);
-        const text = await res.text();
-        const rows = parseCSV(text);
+        const res = await fetch(`${SCRIPT_URL}?action=calibration&_t=${timestamp}`);
+        const rows = await res.json();
 
-        const alertContainer = document.getElementById('popupAlertsList');
-        if (rows.length > 1) {
+        if (rows && rows.length > 1) {
+          let headers = rows[0].map(h => String(h).trim().toLowerCase());
+          
+          let nameIdx = headers.findIndex(h => h.includes("instrument") || h.includes("name"));
+          let makeIdx = headers.findIndex(h => h.includes("make"));
+          let idIdx = headers.findIndex(h => h.includes("id") || h.includes("inst"));
+          let locationIdx = headers.findIndex(h => h.includes("location"));
+          let dueDateIdx = headers.findIndex(h => h.includes("due date") || h.includes("calibration due"));
+          let statusIdx = headers.findIndex(h => h.includes("done") || h.includes("status"));
+
           let dataRows = rows.slice(1);
           let today = new Date();
           today.setHours(0, 0, 0, 0);
           let alertItems = [];
 
           dataRows.forEach(r => {
-            if (r.length > 1 && r[1]) {
-              let instrumentId = r[0] ? `ID: ${r[0].replace(/["']/g, "")}` : '';
-              let instrumentName = r[1] ? r[1].replace(/["']/g, "") : 'Instrument';
-              
-              // Let's check all columns in this row to see if it says "Done" or "Completed"
-              let rowString = r.join(" ").toLowerCase();
-              if (rowString.includes("done") || rowString.includes("completed") || rowString.includes("closed")) {
-                return; // Skip if already done
+            if (r.length > 1) {
+              let instrumentName = nameIdx !== -1 && r[nameIdx] ? String(r[nameIdx]).trim() : (r[1] ? String(r[1]).trim() : 'Instrument');
+              let instrumentMake = makeIdx !== -1 && r[makeIdx] ? String(r[makeIdx]).trim() : '';
+              let instrumentId = idIdx !== -1 && r[idIdx] ? `ID: ${String(r[idIdx]).trim()}` : (r[2] ? `ID: ${String(r[2]).trim()}` : '');
+              let instrumentLocation = locationIdx !== -1 && r[locationIdx] ? ` | Loc: ${String(r[locationIdx]).trim()}` : '';
+
+              if (statusIdx !== -1 && r[statusIdx]) {
+                let statusVal = String(r[statusIdx]).toLowerCase();
+                if (statusVal.includes("done") || statusVal.includes("completed") || statusVal.includes("closed")) {
+                  return; 
+                }
               }
 
-              let rawDateStr = r[3] || r[2]; // Due date column
-              if (rawDateStr) rawDateStr = rawDateStr.replace(/["']/g, "").trim();
-              
+              let rawDateStr = dueDateIdx !== -1 ? r[dueDateIdx] : (r[7] || r[6] || r[3] || r[2]);
               let targetDueDate = new Date(rawDateStr);
 
               if (!isNaN(targetDueDate.getTime())) {
                 targetDueDate.setHours(0, 0, 0, 0);
                 let diffDays = Math.round((targetDueDate - today) / (1000 * 60 * 60 * 24));
                 
-                // Show items that are overdue, due today, or due within next 30 days
                 if (diffDays <= 30) {
                   alertItems.push({ 
                     id: instrumentId, 
                     name: instrumentName, 
-                    dueDateFormatted: rawDateStr, 
+                    make: instrumentMake ? `(${instrumentMake})` : '',
+                    location: instrumentLocation,
+                    dueDateFormatted: String(rawDateStr).split('T')[0], 
                     diffDays: diffDays 
                   });
                 }
@@ -748,7 +759,8 @@
               html += `
                 <div style="background:#0f172a; padding:10px 14px; border-radius:6px; margin-bottom:8px; border-left:4px solid ${badgeColor}; display: flex; justify-content: space-between; align-items: center;">
                   <div>
-                    <strong style="color: #f8fafc; font-size: 13px;">${item.name}</strong> <span style="color: #94a3b8; font-size: 11px;">(${item.id})</span>
+                    <strong style="color: #f8fafc; font-size: 13px;">${item.name} ${item.make}</strong> 
+                    <span style="color: #94a3b8; font-size: 11px;">(${item.id} ${item.location})</span>
                     <div style="font-size: 11.5px; color: #38bdf8; margin-top: 3px;">Due Date: <strong>${item.dueDateFormatted}</strong></div>
                   </div>
                   <span style="color: ${badgeColor}; font-weight: bold; font-size: 12px; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 4px;">${statusText}</span>
@@ -761,17 +773,17 @@
           }
         }
       } catch (err) {
-        console.log("Error loading calibration live:", err);
+        console.log("Error loading calibration:", err);
       }
     }
 
-    // Master Render Trigger bypassing dummy data.js dependencies for these sections
+    // 6. Master Render Trigger
     function renderApp() {
       fetchDShootingLive();
       fetchCalibrationLive();
     }
 
-    // Toggle Form & Submit functions
+    // Toggle Form & Submit Update
     function toggleUpdateForm() {
       const formBox = document.getElementById('updateFormContainer');
       const btn = document.getElementById('toggleFormBtn');
@@ -829,7 +841,8 @@
       listDiv.innerHTML = "<div style='color: #38bdf8;'>Syncing live updates...</div>";
 
       try {
-        const response = await fetch(SCRIPT_URL + "?action=get");
+        const timestamp = new Date().getTime();
+        const response = await fetch(`${SCRIPT_URL}?action=get&_t=${timestamp}`);
         const data = await response.json();
         cachedUpdates = data; 
         renderUpdatesUI();
@@ -879,6 +892,7 @@
       }
     }
 
+    // Modals Handling
     function openAdminLoginModal() {
       document.getElementById('adminModal').style.display = 'flex';
       if (!isAdminLoggedIn) {
@@ -912,15 +926,6 @@
       renderUpdatesUI();
     }
 
-    function openModuleData(moduleKey, title) {
-      document.getElementById('universalModalTitle').innerText = title;
-      const data = plantMasterData[moduleKey] || [];
-      const thead = document.getElementById('universalThead');
-      const tbody = document.getElementById('universalTbody');
-      document.getElementById('universalSheetModal').style.display = 'flex';
-    }
-
-    function closeUniversalModal() { document.getElementById('universalSheetModal').style.display = 'none'; }
     function openAboutUs() { document.getElementById('about-modal').style.display = 'flex'; }
     function closeAboutUs() { document.getElementById('about-modal').style.display = 'none'; }
     
