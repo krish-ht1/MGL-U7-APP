@@ -4,8 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Monthly Production - Milestone Gear Unit 7</title>
-  <!-- Chart.js Library for Pop-up Graph -->
+  <!-- Chart.js Library -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Chart.js DataLabels Plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -113,7 +115,7 @@
 
     /* Trend Button Style */
     .trend-btn {
-      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      background: linear-gradient(135deg, #ec4899, #db2777);
       color: #fff;
       border: none;
       padding: 6px 14px;
@@ -124,7 +126,7 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
       transition: 0.2s;
     }
     .trend-btn:hover { transform: translateY(-1px); opacity: 0.95; }
@@ -200,7 +202,7 @@
     }
     table.monthly-table td { background: #0f172a; color: #f1f5f9; }
 
-    /* Popup Modal Styling for Trend Graph */
+    /* Popup Modal Styling */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -217,7 +219,7 @@
       border: 1px solid #334155;
       border-radius: 12px;
       width: 100%;
-      max-width: 1000px;
+      max-width: 1050px;
       padding: 20px;
       display: flex;
       flex-direction: column;
@@ -229,12 +231,12 @@
       justify-content: space-between;
       align-items: center;
     }
-    .modal-header h3 { margin: 0; font-size: 16px; color: #f8fafc; display: flex; align-items: center; gap: 8px; }
+    .modal-header h3 { margin: 0; font-size: 14px; color: #f8fafc; display: flex; align-items: center; gap: 8px; }
     .close-modal {
       background: #1e293b;
       border: 1px solid #475569;
       color: #f8fafc;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       padding: 4px 10px;
       border-radius: 6px;
@@ -243,7 +245,7 @@
     .modal-chart-box {
       position: relative;
       width: 100%;
-      height: 400px;
+      height: 420px;
       background: #0b1120;
       border: 1px solid #1e293b;
       border-radius: 8px;
@@ -291,9 +293,9 @@
           </select>
         </div>
 
-        <!-- Trend Button added here -->
+        <!-- Trend Button -->
         <button class="trend-btn" onclick="openTrendModal()">
-          📈 26-27 Trend
+          📈 Trend
         </button>
 
         <div class="furnace-filter-group">
@@ -345,7 +347,7 @@
             </tr>
           </thead>
           <tbody id="monthlyTableBody">
-            <tr><td colspan="12" style="padding: 20px; color: #94a3b8;">Loading exact live data from Google Sheet...</td></tr>
+            <tr><td colspan="12" style="padding: 20px; color: #94a3b8;">Loading data from Google Sheet...</td></tr>
           </tbody>
         </table>
       </div>
@@ -357,7 +359,7 @@
   <div class="modal-overlay" id="trendModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>📈 Production Trend in Tonnage (2026-27)</h3>
+        <h3 id="modalTitle">📈 PRODUCTION TREND IN TONNAGE</h3>
         <button class="close-modal" onclick="closeTrendModal()">✕ Close</button>
       </div>
       <div class="modal-chart-box">
@@ -404,6 +406,10 @@
             };
 
             let totalWtKg = parseVal(r[2]) + parseVal(r[4]) + parseVal(r[6]) + parseVal(r[8]);
+            
+            // Check if Tonnage column (index 9 or 10 depending on sheet, or calculate from total weight)
+            let explicitTonnage = r.length > 9 ? parseVal(r[9]) : 0;
+            let finalTonnage = explicitTonnage > 0 ? explicitTonnage : (totalWtKg / 1000);
 
             monthlyData.push({
               month: monthCol,
@@ -411,7 +417,7 @@
               sqf2: { p: parseVal(r[3]), w: parseVal(r[4]) },
               sqf3: { p: parseVal(r[5]), w: parseVal(r[6]) },
               sqf4: { p: parseVal(r[7]), w: parseVal(r[8]) },
-              tonnage: totalWtKg / 1000
+              tonnage: finalTonnage
             });
           }
         }
@@ -514,27 +520,40 @@
       document.getElementById('kpiTotalTonnage').innerText = `${(gTotalWeight / 1000).toFixed(2)} Ton`;
     }
 
-    /* Modal Open/Close Logic & Chart Rendering */
+    /* Fully Dynamic Trend Chart Modal Logic */
     function openTrendModal() {
       document.getElementById('trendModal').style.display = 'flex';
-      renderTrendChart();
+      renderDynamicTrendChart();
     }
 
     function closeTrendModal() {
       document.getElementById('trendModal').style.display = 'none';
     }
 
-    function renderTrendChart() {
+    function renderDynamicTrendChart() {
       const ctx = document.getElementById('trendChart').getContext('2d');
 
-      // Month labels (April to March)
-      const monthsList = ["APRIL", "MAY", "JUNE", "JULY", "AUG", "SEP", "OCT", "NOV", "DEC", "JAN", "FEB", "MARCH"];
-      
-      // Match data from sheet or map them
-      let chartValues = monthsList.map(mName => {
-        let found = monthlyData.find(d => d.month.toUpperCase().includes(mName));
-        return found ? parseFloat(found.tonnage.toFixed(2)) : 0;
-      });
+      const fromIdx = document.getElementById('fromMonthSelect').value;
+      const toIdx = document.getElementById('toMonthSelect').value;
+
+      let startIndex = fromIdx !== "" ? parseInt(fromIdx) : 0;
+      let endIndex = toIdx !== "" ? parseInt(toIdx) : monthlyData.length - 1;
+
+      if (startIndex > endIndex) {
+        let temp = startIndex;
+        startIndex = endIndex;
+        endIndex = temp;
+      }
+
+      // Filtered range data based on table dropdown selection
+      const rangeData = monthlyData.slice(startIndex, endIndex + 1);
+
+      let labels = rangeData.map(d => d.month);
+      let values = rangeData.map(d => parseFloat(d.tonnage.toFixed(2)));
+
+      // Dynamic Title showing start and end month
+      let rangeText = rangeData.length > 0 ? `${rangeData[0].month} to ${rangeData[rangeData.length - 1].month}` : "Selected Range";
+      document.getElementById('modalTitle').innerText = `📈 PRODUCTION TREND IN TONNAGE (${rangeText})`;
 
       if (trendChartInstance) {
         trendChartInstance.destroy();
@@ -543,23 +562,31 @@
       trendChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: monthsList,
+          labels: labels,
           datasets: [
             {
-              label: 'Monthly Values (FY: 2026-27)',
-              data: chartValues,
-              backgroundColor: '#ec4899', // Matching pink from your reference image
+              label: 'Weight in Tonnage (Ton)',
+              data: values,
+              backgroundColor: '#ec4899', // Pink theme
               borderRadius: 6,
             }
           ]
         },
+        plugins: [ChartDataLabels],
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
             legend: {
               position: 'top',
-              labels: { color: '#cbd5e1', font: { family: 'Inter', size: 11 } }
+              labels: { color: '#cbd5e1', font: { family: 'Inter', size: 11 }, boxWidth: 12 }
+            },
+            datalabels: {
+              anchor: 'end',
+              align: 'top',
+              color: '#38bdf8',
+              font: { family: 'Inter', size: 10, weight: 'bold' },
+              formatter: (value) => value > 0 ? value + ' T' : ''
             }
           },
           scales: {
@@ -569,7 +596,7 @@
             },
             y: {
               ticks: { color: '#94a3b8', font: { size: 10 } },
-              grid: { color: '#1e293b' }
+              grid: { display: false }
             }
           }
         }
