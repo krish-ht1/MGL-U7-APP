@@ -231,7 +231,7 @@
     .about-text-sec p { color: #e2e8f0; font-size: 13px; line-height: 1.5; margin-bottom: 10px; }
     .about-text-sec .highlight-tpg { background: rgba(249,115,22,0.1); border-left: 3px solid #f97316; padding: 8px 12px; color: #fde047; font-size: 12.5px; }
 
-    /* Footer Scroller with Fixed Working Hover Pause */
+    /* Footer Scroller with Fixed Hover Pause */
     .main-footer { background: #111827; border-top: 1px solid #1f2937; padding: 14px 20px 10px 20px; width: 100%; margin-top: auto; }
     .footer-grid { display: flex; flex-direction: column; gap: 10px; max-width: 1200px; margin: 0 auto; width: 100%; }
     .showcase-row h4 { margin: 0 0 5px 0; color: #94a3b8; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -247,7 +247,6 @@
     }
     .track { display: inline-flex; align-items: center; animation: scrollLeft 32s linear infinite; }
     
-    /* Fixed Hover Pause Effect */
     .scroller:hover .track { 
       animation-play-state: paused !important; 
     }
@@ -381,7 +380,7 @@
         <!-- Live Feed Container -->
         <div style="flex: 1; overflow-y: auto; max-height: 380px;">
           <h4 style="margin: 0 0 8px 0; color: #94a3b8; font-size: 11.5px; text-transform: uppercase;">Recent Plant Updates (Live)</h4>
-          <div id="liveUpdatesList" style="font-size: 13px; color: #cbd5e1;">Loading live updates...</div>
+          <div id="liveUpdatesList" style="font-size: 13px; color: #cbd5e1;">Loading live updates from Google Sheet...</div>
         </div>
 
         <!-- Toggle Button for Drop Message Form -->
@@ -415,17 +414,16 @@
       </div>
       <div class="modal-body">
         <div id="adminLoginForm">
-          <p style="font-size: 12px; color: #94a3b8; margin-top: 0;">Enter Admin Password to access plant management controls:</p>
+          <p style="font-size: 12px; color: #94a3b8; margin-top: 0;">Enter Admin Password to manage announcements:</p>
           <input type="password" id="adminPasswordInput" placeholder="Enter Admin Password" style="width: 100%; background: #0f172a; border: 1px solid #334155; color: white; padding: 8px 12px; border-radius: 6px; font-size: 13px; margin-bottom: 10px; outline: none;">
           <button onclick="verifyAdminLogin()" style="width: 100%; background: #10b981; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: 600; cursor: pointer;">Login as Admin</button>
         </div>
         
         <div id="adminDashboard" style="display: none; flex-direction: column; gap: 12px;">
           <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 10px; border-radius: 6px; color: #34d399; font-size: 12px; font-weight: 600;">
-            ✅ Admin Mode Active: You have full control.
+            ✅ Admin Mode Active: You can delete any update directly from the feed!
           </div>
-          <button onclick="clearAllUpdatesFromScreen()" style="background: #ef4444; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer;">🗑️ Clear Live Feed Cache</button>
-          <p style="font-size: 11.5px; color: #94a3b8; margin: 0;">Tip: To delete an update from Google Sheet, open your MASTER1 'updates' tab and delete the respective row directly.</p>
+          <button onclick="adminLogout()" style="background: #ef4444; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer;">🔒 Logout Admin</button>
         </div>
       </div>
     </div>
@@ -586,11 +584,13 @@
   <script src="data.js"></script>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw2ixjhGDAuHp61_A7ToqdIag7JUTEQdpf8ZYW1ND9IvL8dcnVEvyo8pg-KiBCzXMfZ/exec";
+    // 💡 Tera naya Apps Script Web App URL yahan set hai
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHFSaT4iJebNYGwdoxyI_qP3CYLXf4zYHwDJD5NRkJk_AhQK-Qz6954GIWoUjFsjQQ/exec";
     const CORRECT_PIN = "7860"; 
-    const ADMIN_PASSWORD = "admin@123"; // Yahan tu apna admin password badal sakta hai bhai
-    const UPDATES_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=1182340030&single=true&output=csv";
+    const ADMIN_PASSWORD = "admin@123";
 
+    let isAdminLoggedIn = false;
+    let cachedUpdates = [];
     let liveTemp = "31°C";
 
     async function fetchRealWeather() {
@@ -655,7 +655,7 @@
       return String(val).split('T')[0];
     }
 
-    // Submit Update with Instant UI Update
+    // Submit Update and Fetch from Web App directly
     async function submitUpdate(e) {
       e.preventDefault();
       const author = document.getElementById('updateAuthor').value.trim();
@@ -673,13 +673,10 @@
       submitBtn.innerText = "Posting...";
       submitBtn.disabled = true;
 
-      const currentTime = new Date().toLocaleString();
-
       try {
         const formData = new URLSearchParams();
         formData.append('author', author);
         formData.append('message', message);
-        formData.append('date', currentTime);
 
         await fetch(SCRIPT_URL, {
           method: 'POST',
@@ -691,7 +688,8 @@
         document.getElementById('updateForm').reset();
         toggleUpdateForm();
         
-        prependInstantUpdate(author, message, currentTime);
+        // Refresh live feed after 1.5 seconds
+        setTimeout(fetchLiveUpdatesFromWebapp, 1500);
       } catch (err) {
         console.error("Error submitting update:", err);
         alert("❌ Failed to publish update.");
@@ -701,99 +699,109 @@
       }
     }
 
-    function prependInstantUpdate(author, message, date) {
+    // True Live Fetch directly from Apps Script Web App (Bypasses Google Sheet Cache)
+    async function fetchLiveUpdatesFromWebapp() {
       const listDiv = document.getElementById('liveUpdatesList');
       if (!listDiv) return;
 
-      let newHtml = `
-        <div style="background:#0f172a; padding:10px 12px; border-radius:6px; margin-bottom:8px; border-left:4px solid #3b82f6;">
-          <div style="display:flex; justify-content:space-between; font-size:11px; color:#38bdf8; margin-bottom:3px;">
-            <strong>👤 ${author}</strong>
-            <span>${date}</span>
-          </div>
-          <div style="color:#f8fafc; font-size:12.5px;">${message}</div>
-        </div>
-      `;
-
-      if (listDiv.innerHTML.includes("Loading") || listDiv.innerHTML.includes("No announcements")) {
-        listDiv.innerHTML = newHtml;
-      } else {
-        listDiv.innerHTML = newHtml + listDiv.innerHTML;
-      }
-    }
-
-    // Live Fetch with aggressive cache busting
-    async function fetchLiveUpdates() {
-      const listDiv = document.getElementById('liveUpdatesList');
-      if (!listDiv) return;
+      listDiv.innerHTML = "<div style='color: #38bdf8;'>Syncing live updates...</div>";
 
       try {
-        const timestamp = new Date().getTime();
-        const response = await fetch(`${UPDATES_CSV_URL}&_t=${timestamp}`);
-        const csvText = await response.text();
-        const rows = csvText.split('\n').map(r => {
-          let row = [];
-          let insideQuote = false;
-          let entry = '';
-          for (let char of r) {
-            if (char === '"') { insideQuote = !insideQuote; }
-            else if (char === ',' && !insideQuote) { row.push(entry.trim()); entry = ''; }
-            else { entry += char; }
-          }
-          row.push(entry.trim());
-          return row;
-        });
-
-        let html = "";
-        for (let i = rows.length - 1; i >= 0; i--) {
-          let r = rows[i];
-          if (r && r.length >= 3 && r[1] && r[1] !== "author" && r[1] !== "Name") {
-            let date = r[0] ? r[0].replace(/["']/g, "") : "";
-            let author = r[1] ? r[1].replace(/["']/g, "") : "";
-            let msg = r[2] ? r[2].replace(/["']/g, "") : "";
-
-            html += `
-              <div style="background:#0f172a; padding:10px 12px; border-radius:6px; margin-bottom:8px; border-left:4px solid #3b82f6;">
-                <div style="display:flex; justify-content:space-between; font-size:11px; color:#38bdf8; margin-bottom:3px;">
-                  <strong>👤 ${author}</strong>
-                  <span>${date}</span>
-                </div>
-                <div style="color:#f8fafc; font-size:12.5px;">${msg}</div>
-              </div>
-            `;
-          }
-        }
-
-        listDiv.innerHTML = html || "<div style='color: #94a3b8;'>No announcements currently.</div>";
+        const response = await fetch(SCRIPT_URL + "?action=get");
+        const data = await response.json();
+        cachedUpdates = data; 
+        renderUpdatesUI();
       } catch (err) {
-        console.log("Error fetching updates live:", err);
+        console.log("Fetch error:", err);
+        listDiv.innerHTML = "<div style='color: #ef4444;'>Unable to load updates from server.</div>";
       }
     }
 
-    // Admin Control Logic
+    function renderUpdatesUI() {
+      const listDiv = document.getElementById('liveUpdatesList');
+      if (!listDiv) return;
+
+      if (!cachedUpdates || cachedUpdates.length === 0) {
+        listDiv.innerHTML = "<div style='color: #94a3b8;'>No announcements currently.</div>";
+        return;
+      }
+
+      let html = "";
+      for (let i = cachedUpdates.length - 1; i >= 0; i--) {
+        let item = cachedUpdates[i];
+        let deleteBtnHtml = "";
+
+        if (isAdminLoggedIn) {
+          deleteBtnHtml = `<button onclick="adminDeleteRow(${item.row})" style="background: #ef4444; color: white; border: none; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; float: right;">🗑️ Delete</button>`;
+        }
+
+        html += `
+          <div style="background:#0f172a; padding:10px 12px; border-radius:6px; margin-bottom:8px; border-left:4px solid #3b82f6;">
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:#38bdf8; margin-bottom:3px;">
+              <strong>👤 ${item.author}</strong>
+              <span>${item.date} ${deleteBtnHtml}</span>
+            </div>
+            <div style="color:#f8fafc; font-size:12.5px; margin-top:4px;">${item.message}</div>
+          </div>
+        `;
+      }
+      listDiv.innerHTML = html;
+    }
+
+    // Admin Delete Action
+    async function adminDeleteRow(rowNum) {
+      if (!confirm("Are you sure you want to delete this update from Google Sheet?")) return;
+
+      try {
+        const formData = new URLSearchParams();
+        formData.append('action', 'delete');
+        formData.append('row', rowNum);
+
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: formData,
+          mode: 'no-cors'
+        });
+
+        alert("✅ Update deleted successfully!");
+        setTimeout(fetchLiveUpdatesFromWebapp, 1500);
+      } catch (err) {
+        alert("❌ Failed to delete.");
+      }
+    }
+
+    // Admin Login / Logout Modal
     function openAdminLoginModal() {
       document.getElementById('adminModal').style.display = 'flex';
-      document.getElementById('adminPasswordInput').value = "";
-      document.getElementById('adminLoginForm').style.display = 'block';
-      document.getElementById('adminDashboard').style.display = 'none';
+      if (!isAdminLoggedIn) {
+        document.getElementById('adminLoginForm').style.display = 'block';
+        document.getElementById('adminDashboard').style.display = 'none';
+        document.getElementById('adminPasswordInput').value = "";
+      } else {
+        document.getElementById('adminLoginForm').style.display = 'none';
+        document.getElementById('adminDashboard').style.display = 'flex';
+      }
     }
     function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; }
 
     function verifyAdminLogin() {
       const pwd = document.getElementById('adminPasswordInput').value.trim();
       if (pwd === ADMIN_PASSWORD) {
+        isAdminLoggedIn = true;
         document.getElementById('adminLoginForm').style.display = 'none';
         document.getElementById('adminDashboard').style.display = 'flex';
+        alert("🔓 Admin Mode Unlocked! You can now delete any update.");
+        renderUpdatesUI(); // Show delete buttons instantly
       } else {
         alert("❌ Incorrect Admin Password!");
       }
     }
 
-    function clearAllUpdatesFromScreen() {
-      document.getElementById('liveUpdatesList').innerHTML = "<div style='color: #94a3b8;'>Feed cache cleared. Refreshing from sheet...</div>";
-      fetchLiveUpdates();
-      alert("✅ Feed cache cleared successfully!");
+    function adminLogout() {
+      isAdminLoggedIn = false;
+      alert("🔒 Logged out from Admin Mode.");
       closeAdminModal();
+      renderUpdatesUI();
     }
 
     function renderApp() {
@@ -913,7 +921,7 @@
     
     function openUpdatesModal() { 
       document.getElementById('updatesModal').style.display = 'flex'; 
-      fetchLiveUpdates(); 
+      fetchLiveUpdatesFromWebapp(); // Ab yeh seedha server se fresh data layega
     }
     function closeUpdatesModal() { document.getElementById('updatesModal').style.display = 'none'; }
     
