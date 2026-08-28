@@ -363,7 +363,7 @@
     <button class="action-btn alerts" onclick="openAlertsModal()">⚠️ System & Calibration Alerts</button>
   </div>
 
-  <!-- 1. Daily Updates Modal (With PIN Protection & Live Feed) -->
+  <!-- 1. Daily Updates Modal (Live Feed on Top, Toggle Button & Compact Submit Button at Bottom) -->
   <div id="updatesModal" class="custom-modal">
     <div class="modal-content-box">
       <div class="modal-header">
@@ -372,27 +372,31 @@
       </div>
       <div class="modal-body" style="display: flex; flex-direction: column; gap: 12px;">
         
-        <!-- Toggle Button for Drop Message Form -->
-        <button onclick="toggleUpdateForm()" id="toggleFormBtn" style="background: #1e293b; border: 1px dashed #3b82f6; color: #38bdf8; padding: 9px; border-radius: 8px; font-weight: 600; font-size: 12px; cursor: pointer; text-align: center; transition: 0.2s;">
-          ✍️ Drop Your Message / Post Update
-        </button>
-
-        <!-- Hidden Form Container with PIN Protection -->
-        <div id="updateFormContainer" style="display: none; background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155;">
-          <form id="updateForm" onsubmit="submitUpdate(event)" style="display: flex; flex-direction: column; gap: 8px;">
-            <input type="text" id="updateAuthor" placeholder="Your Name & Designation (e.g. Rahul - Supervisor)" required style="background: #1e293b; border: 1px solid #475569; color: white; padding: 7px 10px; border-radius: 6px; font-size: 12px; outline: none;">
-            <textarea id="updateMessage" placeholder="Type your daily update here..." rows="2" required style="background: #1e293b; border: 1px solid #475569; color: white; padding: 7px 10px; border-radius: 6px; font-size: 12px; outline: none; resize: none;"></textarea>
-            <!-- Security PIN Input -->
-            <input type="password" id="securityPin" placeholder="Enter Security PIN to Post" required style="background: #1e293b; border: 1px solid #ef4444; color: white; padding: 7px 10px; border-radius: 6px; font-size: 12px; outline: none;">
-            <button type="submit" id="submitBtn" style="background: #3b82f6; color: white; border: none; padding: 7px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer;">🚀 Publish Update</button>
-          </form>
-        </div>
-        
-        <!-- Live Feed Container (Fetched Live from Sheet) -->
-        <div style="flex: 1; overflow-y: auto;">
+        <!-- Live Feed Container (Sabse Upar) -->
+        <div style="flex: 1; overflow-y: auto; max-height: 380px;">
           <h4 style="margin: 0 0 8px 0; color: #94a3b8; font-size: 11.5px; text-transform: uppercase;">Recent Plant Updates (Live)</h4>
           <div id="liveUpdatesList" style="font-size: 13px; color: #cbd5e1;">Loading live updates from sheet...</div>
         </div>
+
+        <!-- Toggle Button for Drop Message Form -->
+        <button onclick="toggleUpdateForm()" id="toggleFormBtn" style="background: #1e293b; border: 1px dashed #3b82f6; color: #38bdf8; padding: 8px; border-radius: 8px; font-weight: 600; font-size: 12px; cursor: pointer; text-align: center; transition: 0.2s;">
+          ✍️ Drop Your Message / Post Update
+        </button>
+
+        <!-- Hidden Form Container (Compact & Submit Button at Bottom) -->
+        <div id="updateFormContainer" style="display: none; background: #0f172a; padding: 10px; border-radius: 8px; border: 1px solid #334155;">
+          <form id="updateForm" onsubmit="submitUpdate(event)" style="display: flex; flex-direction: column; gap: 8px;">
+            <input type="text" id="updateAuthor" placeholder="Your Name & Designation (e.g. Rahul - Supervisor)" required style="background: #1e293b; border: 1px solid #475569; color: white; padding: 6px 10px; border-radius: 6px; font-size: 12px; outline: none;">
+            <textarea id="updateMessage" placeholder="Type your daily update here..." rows="2" required style="background: #1e293b; border: 1px solid #475569; color: white; padding: 6px 10px; border-radius: 6px; font-size: 12px; outline: none; resize: none;"></textarea>
+            
+            <!-- Security PIN & Compact Submit Button side by side or stacked -->
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <input type="password" id="securityPin" placeholder="Security PIN" required style="flex: 1; background: #1e293b; border: 1px solid #ef4444; color: white; padding: 6px 10px; border-radius: 6px; font-size: 12px; outline: none;">
+              <button type="submit" id="submitBtn" style="background: #3b82f6; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; white-space: nowrap;">🚀 Submit</button>
+            </div>
+          </form>
+        </div>
+
       </div>
     </div>
   </div>
@@ -463,17 +467,17 @@
       
       <div class="card" onclick="openModuleData('weightlist', '📦 Material Weightlist & Specs')">
         <div class="card-icon">📦</div>
-        <div class="card-title">SAP</div>
-        <div class="card-desc">Material movement in ward & out ward.</div>
+        <div class="card-title">Weightlist / SAP</div>
+        <div class="card-desc">Material weights & job parameters.</div>
       </div>
       
-      <div class="card" onclick="openModuleData('costing', '💰 Plant Costing')">
+      <div class="card" onclick="openModuleData('costing', '💰 Plant Costing & Energy Logs')">
         <div class="card-icon">💰</div>
         <div class="card-title">Costing</div>
         <div class="card-desc">Power, fuel & consumables tracking.</div>
       </div>
       
-      <div class="card" onclick="alert('🏆 Milestone Unit 7 Achievements:\n- UGA Best Heat Treatment Award\n- Full CQI-9 Certified Facility')">
+      <div class="card" onclick="alert('🏆 Milestone Achievements:\n- UGA Best Heat Treatment Award\n- Full CQI-9 Certified Facility')">
         <div class="card-icon">🏆</div>
         <div class="card-title">Achievements</div>
         <div class="card-desc">UGA Award & CQI-9 certificates.</div>
@@ -538,7 +542,7 @@
       </div>
 
       <div class="footer-bottom">
-        <div class="copyright">&copy; 2026 Milestone Gear Limited U7</div>
+        <div class="copyright">&copy; 2026 Milestone Gear Limited</div>
         <div class="footer-location">📍 Milestone Gears Unit 7, Barotiwala Road, Baddi, Solan</div>
         <div class="managed-by">
           <span>Managed by <strong class="managed-name">M Singh</strong></span>
@@ -552,18 +556,12 @@
   <script src="data.js"></script>
 
   <script>
-    // 💡 Tera Google Apps Script Web App URL yahan set hai
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw2ixjhGDAuHp61_A7ToqdIag7JUTEQdpf8ZYW1ND9IvL8dcnVEvyo8pg-KiBCzXMfZ/exec";
-    
-    // 🔒 Apna secret PIN yahan daal le bhai (jaise "7860" ya jo tu chahe)
-    const CORRECT_PIN = "2020"; 
-
-    // 📊 Tera 'updates' tab ka live CSV link yahan set hai
+    const CORRECT_PIN = "7860"; 
     const UPDATES_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=1182340030&single=true&output=csv";
 
     let liveTemp = "31°C";
 
-    // 1. Weather Fetch
     async function fetchRealWeather() {
       try {
         const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=30.9578&longitude=76.7914&current=temperature_2m");
@@ -574,7 +572,6 @@
     fetchRealWeather();
     setInterval(fetchRealWeather, 600000);
 
-    // 2. Date & Time
     function updateDateTime() {
       const now = new Date();
       const day = String(now.getDate()).padStart(2, '0');
@@ -588,7 +585,6 @@
     setInterval(updateDateTime, 1000);
     updateDateTime();
 
-    // Toggle Form Function
     function toggleUpdateForm() {
       const formBox = document.getElementById('updateFormContainer');
       const btn = document.getElementById('toggleFormBtn');
@@ -601,7 +597,6 @@
       }
     }
 
-    // 3. Date Parsing Helpers
     function parseDateObj(val) {
       if (!val) return null;
       let str = String(val).trim();
@@ -629,7 +624,6 @@
       return String(val).split('T')[0];
     }
 
-    // 4. Submit Update Form Data to Google Sheet with PIN verification
     async function submitUpdate(e) {
       e.preventDefault();
       const author = document.getElementById('updateAuthor').value.trim();
@@ -637,7 +631,6 @@
       const enteredPin = document.getElementById('securityPin').value.trim();
       const submitBtn = document.getElementById('submitBtn');
 
-      // PIN Verification
       if (enteredPin !== CORRECT_PIN) {
         alert("❌ Incorrect Security PIN! You are not authorized to post updates.");
         return;
@@ -645,7 +638,7 @@
 
       if (!author || !message) return;
 
-      submitBtn.innerText = "Publishing...";
+      submitBtn.innerText = "Posting...";
       submitBtn.disabled = true;
 
       try {
@@ -664,24 +657,25 @@
         document.getElementById('updateForm').reset();
         toggleUpdateForm();
         
-        // Thoda wait karke live updates refresh karlo taaki turant dikhe
+        // Refresh live feed after 2 seconds to allow sheet sync
         setTimeout(fetchLiveUpdates, 2000);
       } catch (err) {
         console.error("Error submitting update:", err);
         alert("❌ Failed to publish update. Please try again.");
       } finally {
-        submitBtn.innerText = "🚀 Publish Update";
+        submitBtn.innerText = "🚀 Submit";
         submitBtn.disabled = false;
       }
     }
 
-    // Fetch Live Updates from Google Sheet Tab to show everyone
+    // Live Fetch with Cache Busting so fresh data is loaded every time
     async function fetchLiveUpdates() {
       const listDiv = document.getElementById('liveUpdatesList');
       if (!listDiv) return;
 
       try {
-        const response = await fetch(UPDATES_CSV_URL);
+        const timestamp = new Date().getTime();
+        const response = await fetch(`${UPDATES_CSV_URL}&_t=${timestamp}`);
         const csvText = await response.text();
         const rows = csvText.split('\n').map(r => {
           let row = [];
@@ -697,7 +691,6 @@
         });
 
         let html = "";
-        // Rows ko ulta chalayenge taaki naya update sabse upar dikhe (skip header if any)
         for (let i = rows.length - 1; i >= 0; i--) {
           let r = rows[i];
           if (r && r.length >= 3 && r[1] && r[1] !== "author") {
@@ -724,14 +717,9 @@
       }
     }
 
-    // 5. Instant Local Data Render & D-Shooting / Calibration
     function renderApp() {
-      if (typeof plantMasterData === 'undefined') {
-        console.error("data.js not loaded properly.");
-        return;
-      }
+      if (typeof plantMasterData === 'undefined') return;
 
-      // (B) D-Shooting Schedule
       const dShootingRows = plantMasterData.dShooting || [];
       const thead = document.getElementById('dShootingThead');
       const tbody = document.getElementById('dShootingTableBody');
@@ -764,7 +752,6 @@
         tbody.innerHTML = dHtml;
       }
 
-      // (C) Calibration Alerts
       const calibrationRows = plantMasterData.calibration || [];
       const alertContainer = document.getElementById('popupAlertsList');
 
@@ -814,7 +801,6 @@
       }
     }
 
-    // 6. Open Module Sheets
     function openModuleData(moduleKey, title) {
       document.getElementById('universalModalTitle').innerText = title;
       const data = plantMasterData[moduleKey] || [];
@@ -848,7 +834,7 @@
     
     function openUpdatesModal() { 
       document.getElementById('updatesModal').style.display = 'flex'; 
-      fetchLiveUpdates(); // Modal khulte hi live sheet se updates fetch honge
+      fetchLiveUpdates(); 
     }
     function closeUpdatesModal() { document.getElementById('updatesModal').style.display = 'none'; }
     
