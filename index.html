@@ -363,7 +363,7 @@
     <button class="action-btn alerts" onclick="openAlertsModal()">⚠️ System & Calibration Alerts</button>
   </div>
 
-  <!-- 1. Daily Updates Modal (Clean List + Drop Message Toggle Button) -->
+  <!-- 1. Daily Updates Modal (With PIN Protection & Live Feed) -->
   <div id="updatesModal" class="custom-modal">
     <div class="modal-content-box">
       <div class="modal-header">
@@ -377,19 +377,21 @@
           ✍️ Drop Your Message / Post Update
         </button>
 
-        <!-- Hidden Form Container (Opens on Click) -->
+        <!-- Hidden Form Container with PIN Protection -->
         <div id="updateFormContainer" style="display: none; background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155;">
           <form id="updateForm" onsubmit="submitUpdate(event)" style="display: flex; flex-direction: column; gap: 8px;">
             <input type="text" id="updateAuthor" placeholder="Your Name & Designation (e.g. Rahul - Supervisor)" required style="background: #1e293b; border: 1px solid #475569; color: white; padding: 7px 10px; border-radius: 6px; font-size: 12px; outline: none;">
             <textarea id="updateMessage" placeholder="Type your daily update here..." rows="2" required style="background: #1e293b; border: 1px solid #475569; color: white; padding: 7px 10px; border-radius: 6px; font-size: 12px; outline: none; resize: none;"></textarea>
+            <!-- Security PIN Input -->
+            <input type="password" id="securityPin" placeholder="Enter Security PIN to Post" required style="background: #1e293b; border: 1px solid #ef4444; color: white; padding: 7px 10px; border-radius: 6px; font-size: 12px; outline: none;">
             <button type="submit" id="submitBtn" style="background: #3b82f6; color: white; border: none; padding: 7px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer;">🚀 Publish Update</button>
           </form>
         </div>
         
-        <!-- Live Feed Container -->
+        <!-- Live Feed Container (Fetched Live from Sheet) -->
         <div style="flex: 1; overflow-y: auto;">
-          <h4 style="margin: 0 0 8px 0; color: #94a3b8; font-size: 11.5px; text-transform: uppercase;">Recent Plant Updates</h4>
-          <div id="popupUpdatesList" style="font-size: 13px; color: #cbd5e1;">Loading live updates...</div>
+          <h4 style="margin: 0 0 8px 0; color: #94a3b8; font-size: 11.5px; text-transform: uppercase;">Recent Plant Updates (Live)</h4>
+          <div id="liveUpdatesList" style="font-size: 13px; color: #cbd5e1;">Loading live updates from sheet...</div>
         </div>
       </div>
     </div>
@@ -550,8 +552,14 @@
   <script src="data.js"></script>
 
   <script>
-    // 💡 APna Google Apps Script Web App URL yahan daal lena
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIN4MBjZshhJkPs8tz7uHqac5l5WR2DiWVvSR4NYQIS-ZKimBF5f8Mwxlye_yQdYKg/exec";
+    // 💡 Tera Google Apps Script Web App URL yahan set hai
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw2ixjhGDAuHp61_A7ToqdIag7JUTEQdpf8ZYW1ND9IvL8dcnVEvyo8pg-KiBCzXMfZ/exec";
+    
+    // 🔒 Apna secret PIN yahan daal le bhai (jaise "7860" ya jo tu chahe)
+    const CORRECT_PIN = "7860"; 
+
+    // 📊 Tera 'updates' tab ka live CSV link yahan set hai
+    const UPDATES_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=1182340030&single=true&output=csv";
 
     let liveTemp = "31°C";
 
@@ -621,12 +629,19 @@
       return String(val).split('T')[0];
     }
 
-    // 4. Submit Update Form Data to Google Sheet via Apps Script
+    // 4. Submit Update Form Data to Google Sheet with PIN verification
     async function submitUpdate(e) {
       e.preventDefault();
       const author = document.getElementById('updateAuthor').value.trim();
       const message = document.getElementById('updateMessage').value.trim();
+      const enteredPin = document.getElementById('securityPin').value.trim();
       const submitBtn = document.getElementById('submitBtn');
+
+      // PIN Verification
+      if (enteredPin !== CORRECT_PIN) {
+        alert("❌ Incorrect Security PIN! You are not authorized to post updates.");
+        return;
+      }
 
       if (!author || !message) return;
 
@@ -648,6 +663,9 @@
         alert("✅ Update published successfully!");
         document.getElementById('updateForm').reset();
         toggleUpdateForm();
+        
+        // Thoda wait karke live updates refresh karlo taaki turant dikhe
+        setTimeout(fetchLiveUpdates, 2000);
       } catch (err) {
         console.error("Error submitting update:", err);
         alert("❌ Failed to publish update. Please try again.");
@@ -657,26 +675,60 @@
       }
     }
 
-    // 5. Instant Local Data Render & Live Updates
+    // Fetch Live Updates from Google Sheet Tab to show everyone
+    async function fetchLiveUpdates() {
+      const listDiv = document.getElementById('liveUpdatesList');
+      if (!listDiv) return;
+
+      try {
+        const response = await fetch(UPDATES_CSV_URL);
+        const csvText = await response.text();
+        const rows = csvText.split('\n').map(r => {
+          let row = [];
+          let insideQuote = false;
+          let entry = '';
+          for (let char of r) {
+            if (char === '"') { insideQuote = !insideQuote; }
+            else if (char === ',' && !insideQuote) { row.push(entry.trim()); entry = ''; }
+            else { entry += char; }
+          }
+          row.push(entry.trim());
+          return row;
+        });
+
+        let html = "";
+        // Rows ko ulta chalayenge taaki naya update sabse upar dikhe (skip header if any)
+        for (let i = rows.length - 1; i >= 0; i--) {
+          let r = rows[i];
+          if (r && r.length >= 3 && r[1] && r[1] !== "author") {
+            let date = r[0] ? r[0].replace(/["']/g, "") : "";
+            let author = r[1] ? r[1].replace(/["']/g, "") : "";
+            let msg = r[2] ? r[2].replace(/["']/g, "") : "";
+
+            html += `
+              <div style="background:#0f172a; padding:10px 12px; border-radius:6px; margin-bottom:8px; border-left:4px solid #3b82f6;">
+                <div style="display:flex; justify-content:space-between; font-size:11px; color:#38bdf8; margin-bottom:3px;">
+                  <strong>👤 ${author}</strong>
+                  <span>${date}</span>
+                </div>
+                <div style="color:#f8fafc; font-size:12.5px;">${msg}</div>
+              </div>
+            `;
+          }
+        }
+
+        listDiv.innerHTML = html || "<div style='color: #94a3b8;'>No announcements currently.</div>";
+      } catch (err) {
+        console.log("Error fetching updates live:", err);
+        listDiv.innerHTML = "<div style='color: #ef4444;'>Unable to load live updates.</div>";
+      }
+    }
+
+    // 5. Instant Local Data Render & D-Shooting / Calibration
     function renderApp() {
       if (typeof plantMasterData === 'undefined') {
         console.error("data.js not loaded properly.");
         return;
-      }
-
-      // (A) Daily Updates
-      const updates = plantMasterData.updates || [];
-      const listDiv = document.getElementById('popupUpdatesList');
-      if (listDiv) {
-        if (updates.length > 0) {
-          let html = "";
-          updates.forEach((msg, i) => {
-            html += `<div style="background:#0f172a; padding:10px 12px; border-radius:6px; margin-bottom:8px; border-left:4px solid #3b82f6;"><strong>Update ${i+1}:</strong> ${msg}</div>`;
-          });
-          listDiv.innerHTML = html;
-        } else {
-          listDiv.innerHTML = "<div style='color: #94a3b8;'>No announcements currently.</div>";
-        }
       }
 
       // (B) D-Shooting Schedule
@@ -793,8 +845,13 @@
     function closeUniversalModal() { document.getElementById('universalSheetModal').style.display = 'none'; }
     function openAboutUs() { document.getElementById('about-modal').style.display = 'flex'; }
     function closeAboutUs() { document.getElementById('about-modal').style.display = 'none'; }
-    function openUpdatesModal() { document.getElementById('updatesModal').style.display = 'flex'; renderApp(); }
+    
+    function openUpdatesModal() { 
+      document.getElementById('updatesModal').style.display = 'flex'; 
+      fetchLiveUpdates(); // Modal khulte hi live sheet se updates fetch honge
+    }
     function closeUpdatesModal() { document.getElementById('updatesModal').style.display = 'none'; }
+    
     function openAlertsModal() { document.getElementById('alertsModal').style.display = 'flex'; renderApp(); }
     function closeAlertsModal() { document.getElementById('alertsModal').style.display = 'none'; }
 
