@@ -359,31 +359,36 @@
 
   <!-- Action Buttons -->
   <div class="action-buttons-bar">
-    <button class="action-btn updates" onclick="openUpdatesModal()">📢 Daily Updates & Form</button>
+    <button class="action-btn updates" onclick="openUpdatesModal()">📢 Daily Updates</button>
     <button class="action-btn alerts" onclick="openAlertsModal()">⚠️ System & Calibration Alerts</button>
   </div>
 
-  <!-- 1. Daily Updates & Form Modal -->
+  <!-- 1. Daily Updates Modal (Clean List + Drop Message Toggle Button) -->
   <div id="updatesModal" class="custom-modal">
     <div class="modal-content-box">
       <div class="modal-header">
         <h3 style="color: #3b82f6; margin: 0; font-size: 15px;">📢 Daily Updates & Announcements</h3>
         <span class="modal-close" onclick="closeUpdatesModal()">&times;</span>
       </div>
-      <div class="modal-body" style="display: flex; flex-direction: column; gap: 15px;">
-        <!-- Post Update Form -->
-        <div style="background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155;">
-          <h4 style="margin: 0 0 8px 0; color: #38bdf8; font-size: 13px;">✍️ Post New Plant Update</h4>
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 12px;">
+        
+        <!-- Toggle Button for Drop Message Form -->
+        <button onclick="toggleUpdateForm()" id="toggleFormBtn" style="background: #1e293b; border: 1px dashed #3b82f6; color: #38bdf8; padding: 9px; border-radius: 8px; font-weight: 600; font-size: 12px; cursor: pointer; text-align: center; transition: 0.2s;">
+          ✍️ Drop Your Message / Post Update
+        </button>
+
+        <!-- Hidden Form Container (Opens on Click) -->
+        <div id="updateFormContainer" style="display: none; background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155;">
           <form id="updateForm" onsubmit="submitUpdate(event)" style="display: flex; flex-direction: column; gap: 8px;">
             <input type="text" id="updateAuthor" placeholder="Your Name & Designation (e.g. Rahul - Supervisor)" required style="background: #1e293b; border: 1px solid #475569; color: white; padding: 7px 10px; border-radius: 6px; font-size: 12px; outline: none;">
-            <textarea id="updateMessage" placeholder="Type your daily update or announcement here..." rows="2" required style="background: #1e293b; border: 1px solid #475569; color: white; padding: 7px 10px; border-radius: 6px; font-size: 12px; outline: none; resize: none;"></textarea>
+            <textarea id="updateMessage" placeholder="Type your daily update here..." rows="2" required style="background: #1e293b; border: 1px solid #475569; color: white; padding: 7px 10px; border-radius: 6px; font-size: 12px; outline: none; resize: none;"></textarea>
             <button type="submit" id="submitBtn" style="background: #3b82f6; color: white; border: none; padding: 7px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer;">🚀 Publish Update</button>
           </form>
         </div>
         
         <!-- Live Feed Container -->
-        <div>
-          <h4 style="margin: 0 0 8px 0; color: #94a3b8; font-size: 12px; text-transform: uppercase;">Recent Live Updates</h4>
+        <div style="flex: 1; overflow-y: auto;">
+          <h4 style="margin: 0 0 8px 0; color: #94a3b8; font-size: 11.5px; text-transform: uppercase;">Recent Plant Updates</h4>
           <div id="popupUpdatesList" style="font-size: 13px; color: #cbd5e1;">Loading live updates...</div>
         </div>
       </div>
@@ -545,8 +550,8 @@
   <script src="data.js"></script>
 
   <script>
-    // 💡 APNA GOOGLE APPS SCRIPT WEB APP URL YAHAN DAAL LENA JAB AAP DEPLOY KAROGE
-    const SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+    // 💡 APna Google Apps Script Web App URL yahan daal lena
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw2ixjhGDAuHp61_A7ToqdIag7JUTEQdpf8ZYW1ND9IvL8dcnVEvyo8pg-KiBCzXMfZ/exec";
 
     let liveTemp = "31°C";
 
@@ -574,6 +579,19 @@
     }
     setInterval(updateDateTime, 1000);
     updateDateTime();
+
+    // Toggle Form Function
+    function toggleUpdateForm() {
+      const formBox = document.getElementById('updateFormContainer');
+      const btn = document.getElementById('toggleFormBtn');
+      if (formBox.style.display === 'none') {
+        formBox.style.display = 'block';
+        btn.innerText = "✕ Close Form";
+      } else {
+        formBox.style.display = 'none';
+        btn.innerText = "✍️ Drop Your Message / Post Update";
+      }
+    }
 
     // 3. Date Parsing Helpers
     function parseDateObj(val) {
@@ -612,11 +630,10 @@
 
       if (!author || !message) return;
 
-      submitBtn.innerText = "Submitting...";
+      submitBtn.innerText = "Publishing...";
       submitBtn.disabled = true;
 
       try {
-        // FormData format to send via POST to Apps Script Web App
         const formData = new URLSearchParams();
         formData.append('author', author);
         formData.append('message', message);
@@ -625,11 +642,12 @@
         await fetch(SCRIPT_URL, {
           method: 'POST',
           body: formData,
-          mode: 'no-cors' // Google Apps Script ke liye no-cors zaroori hota hai
+          mode: 'no-cors'
         });
 
-        alert("✅ Update published successfully! It will reflect shortly.");
+        alert("✅ Update published successfully!");
         document.getElementById('updateForm').reset();
+        toggleUpdateForm();
       } catch (err) {
         console.error("Error submitting update:", err);
         alert("❌ Failed to publish update. Please try again.");
@@ -646,7 +664,7 @@
         return;
       }
 
-      // (A) Daily Updates (Local Fallback + Sheet sync preview)
+      // (A) Daily Updates
       const updates = plantMasterData.updates || [];
       const listDiv = document.getElementById('popupUpdatesList');
       if (listDiv) {
@@ -694,7 +712,7 @@
         tbody.innerHTML = dHtml;
       }
 
-      // (C) Calibration Alerts (Auto-calculated with Today's Date)
+      // (C) Calibration Alerts
       const calibrationRows = plantMasterData.calibration || [];
       const alertContainer = document.getElementById('popupAlertsList');
 
@@ -744,7 +762,7 @@
       }
     }
 
-    // 6. Open Module Sheets (Production, Costing, Weightlist)
+    // 6. Open Module Sheets
     function openModuleData(moduleKey, title) {
       document.getElementById('universalModalTitle').innerText = title;
       const data = plantMasterData[moduleKey] || [];
@@ -757,13 +775,11 @@
         return;
       }
 
-      // Render Head
       let thHtml = "<tr>";
       data[0].forEach(h => { thHtml += `<th>${h}</th>`; });
       thHtml += "</tr>";
       thead.innerHTML = thHtml;
 
-      // Render Body
       let tbHtml = "";
       data.slice(1).forEach(r => {
         tbHtml += "<tr>";
