@@ -708,6 +708,13 @@
             if (r.length > 1 && r[1]) {
               let instrumentId = r[0] ? `ID: ${r[0].replace(/["']/g, "")}` : '';
               let instrumentName = r[1] ? r[1].replace(/["']/g, "") : 'Instrument';
+              
+              // Let's check all columns in this row to see if it says "Done" or "Completed"
+              let rowString = r.join(" ").toLowerCase();
+              if (rowString.includes("done") || rowString.includes("completed") || rowString.includes("closed")) {
+                return; // Skip if already done
+              }
+
               let rawDateStr = r[3] || r[2]; // Due date column
               if (rawDateStr) rawDateStr = rawDateStr.replace(/["']/g, "").trim();
               
@@ -716,7 +723,8 @@
               if (!isNaN(targetDueDate.getTime())) {
                 targetDueDate.setHours(0, 0, 0, 0);
                 let diffDays = Math.round((targetDueDate - today) / (1000 * 60 * 60 * 24));
-                // Show items that are overdue or due within next 30 days (or even all active items if needed)
+                
+                // Show items that are overdue, due today, or due within next 30 days
                 if (diffDays <= 30) {
                   alertItems.push({ 
                     id: instrumentId, 
