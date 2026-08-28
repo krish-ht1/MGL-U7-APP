@@ -405,10 +405,19 @@
               return isNaN(num) ? 0 : num;
             };
 
-            let totalWtKg = parseVal(r[2]) + parseVal(r[4]) + parseVal(r[6]) + parseVal(r[8]);
+            // Column L (index 11) ya aakhri column se सीधे "Weight in Tonnage" (Column L) uthana
+            // Col 0: Month, 1-2: SQF1, 3-4: SQF2, 5-6: SQF3, 7-8: SQF4, 9-10: Month Total, 11: Weight in Tonnage (Column L)
+            let explicitTonnage = r.length > 11 ? parseVal(r[11]) : (r.length > 10 ? parseVal(r[10]) : 0);
             
-            // Sheet ke aakhri column (Weight in Tonnage, index 9 ya uske baad) se exact decimal value uthana
-            let explicitTonnage = r.length > 9 ? parseVal(r[9]) : 0;
+            // Fallback agar column index me thoda upar-niche ho toh last index utha lo ya calculate karo
+            if (explicitTonnage === 0 && r.length > 9) {
+              for (let c = r.length - 1; c >= 9; c--) {
+                let v = parseVal(r[c]);
+                if (v > 0) { explicitTonnage = v; break; }
+              }
+            }
+
+            let totalWtKg = parseVal(r[2]) + parseVal(r[4]) + parseVal(r[6]) + parseVal(r[8]);
             let finalTonnage = explicitTonnage > 0 ? explicitTonnage : (totalWtKg / 1000);
 
             monthlyData.push({
@@ -520,7 +529,7 @@
       document.getElementById('kpiTotalTonnage').innerText = `${(gTotalWeight / 1000).toFixed(2)} Ton`;
     }
 
-    /* Dynamic Trend Chart Modal Logic with Average Bar/Line */
+    /* Fully Dynamic Trend Chart Modal Logic with Column L (Tonnage) */
     function openTrendModal() {
       document.getElementById('trendModal').style.display = 'flex';
       renderDynamicTrendChart();
@@ -545,7 +554,7 @@
         endIndex = temp;
       }
 
-      // Table filter range data
+      // Filtered range data based on table dropdown selection
       const rangeData = monthlyData.slice(startIndex, endIndex + 1);
 
       let labels = rangeData.map(d => d.month);
@@ -555,11 +564,10 @@
       let sum = values.reduce((a, b) => a + b, 0);
       let avg = values.length > 0 ? (sum / values.length) : 0;
 
-      // Add "Average" label and value at the end of the graph data
+      // Append Average label and value at the end
       labels.push("AVERAGE");
       values.push(parseFloat(avg.toFixed(2)));
 
-      // Colors array: normal months in pink, average bar in distinctive green/orange
       let bgColors = values.map((val, idx) => idx === values.length - 1 ? '#10b981' : '#ec4899');
 
       let rangeText = rangeData.length > 0 ? `${rangeData[0].month} to ${rangeData[rangeData.length - 1].month}` : "Selected Range";
@@ -575,7 +583,7 @@
           labels: labels,
           datasets: [
             {
-              label: 'Tonnage',
+              label: 'Weight in Tonnage',
               data: values,
               backgroundColor: bgColors,
               borderRadius: 6,
@@ -593,7 +601,7 @@
               align: 'top',
               color: '#38bdf8',
               font: { family: 'Inter', size: 10, weight: 'bold' },
-              formatter: (value) => value > 0 ? value + ' T' : ''
+              formatter: (value) => value > 0 ? value : ''
             }
           },
           scales: {
