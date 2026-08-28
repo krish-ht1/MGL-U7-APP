@@ -135,6 +135,7 @@
     }
     .action-btn.updates { color: #3b82f6; border: 1px solid #3b82f6; }
     .action-btn.alerts { color: #ef4444; border: 1px solid #ef4444; }
+    .action-btn.admin { color: #10b981; border: 1px solid #10b981; }
 
     /* Modules Grid */
     .main-content { display: flex; justify-content: center; padding: 5px 20px 25px 20px; flex: 1; }
@@ -230,7 +231,7 @@
     .about-text-sec p { color: #e2e8f0; font-size: 13px; line-height: 1.5; margin-bottom: 10px; }
     .about-text-sec .highlight-tpg { background: rgba(249,115,22,0.1); border-left: 3px solid #f97316; padding: 8px 12px; color: #fde047; font-size: 12.5px; }
 
-    /* Footer Scroller with Working Hover Effect Restored */
+    /* Footer Scroller with Fixed Working Hover Pause */
     .main-footer { background: #111827; border-top: 1px solid #1f2937; padding: 14px 20px 10px 20px; width: 100%; margin-top: auto; }
     .footer-grid { display: flex; flex-direction: column; gap: 10px; max-width: 1200px; margin: 0 auto; width: 100%; }
     .showcase-row h4 { margin: 0 0 5px 0; color: #94a3b8; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -246,8 +247,10 @@
     }
     .track { display: inline-flex; align-items: center; animation: scrollLeft 32s linear infinite; }
     
-    /* Hover pause restored here */
-    .scroller:hover .track { animation-play-state: paused; }
+    /* Fixed Hover Pause Effect */
+    .scroller:hover .track { 
+      animation-play-state: paused !important; 
+    }
 
     .track img.customer-img {
       height: 38px;
@@ -363,6 +366,7 @@
   <div class="action-buttons-bar">
     <button class="action-btn updates" onclick="openUpdatesModal()">📢 Daily Updates</button>
     <button class="action-btn alerts" onclick="openAlertsModal()">⚠️ System & Calibration Alerts</button>
+    <button class="action-btn admin" onclick="openAdminLoginModal()">🔑 Admin Mode</button>
   </div>
 
   <!-- 1. Daily Updates Modal -->
@@ -374,7 +378,7 @@
       </div>
       <div class="modal-body" style="display: flex; flex-direction: column; gap: 12px;">
         
-        <!-- Live Feed Container (Sabse Upar) -->
+        <!-- Live Feed Container -->
         <div style="flex: 1; overflow-y: auto; max-height: 380px;">
           <h4 style="margin: 0 0 8px 0; color: #94a3b8; font-size: 11.5px; text-transform: uppercase;">Recent Plant Updates (Live)</h4>
           <div id="liveUpdatesList" style="font-size: 13px; color: #cbd5e1;">Loading live updates...</div>
@@ -402,7 +406,32 @@
     </div>
   </div>
 
-  <!-- 2. D-shooting & Calibration Modal -->
+  <!-- 2. Admin Login & Management Modal -->
+  <div id="adminModal" class="custom-modal">
+    <div class="modal-content-box" style="max-width: 500px; height: auto;">
+      <div class="modal-header">
+        <h3 style="color: #10b981; margin: 0; font-size: 15px;">🔑 Admin Control Panel</h3>
+        <span class="modal-close" onclick="closeAdminModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div id="adminLoginForm">
+          <p style="font-size: 12px; color: #94a3b8; margin-top: 0;">Enter Admin Password to access plant management controls:</p>
+          <input type="password" id="adminPasswordInput" placeholder="Enter Admin Password" style="width: 100%; background: #0f172a; border: 1px solid #334155; color: white; padding: 8px 12px; border-radius: 6px; font-size: 13px; margin-bottom: 10px; outline: none;">
+          <button onclick="verifyAdminLogin()" style="width: 100%; background: #10b981; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: 600; cursor: pointer;">Login as Admin</button>
+        </div>
+        
+        <div id="adminDashboard" style="display: none; flex-direction: column; gap: 12px;">
+          <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 10px; border-radius: 6px; color: #34d399; font-size: 12px; font-weight: 600;">
+            ✅ Admin Mode Active: You have full control.
+          </div>
+          <button onclick="clearAllUpdatesFromScreen()" style="background: #ef4444; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer;">🗑️ Clear Live Feed Cache</button>
+          <p style="font-size: 11.5px; color: #94a3b8; margin: 0;">Tip: To delete an update from Google Sheet, open your MASTER1 'updates' tab and delete the respective row directly.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. D-shooting & Calibration Modal -->
   <div id="alertsModal" class="custom-modal">
     <div class="modal-content-box">
       <div class="modal-header">
@@ -428,7 +457,7 @@
     </div>
   </div>
 
-  <!-- 3. Universal Module Modal -->
+  <!-- 4. Universal Module Modal -->
   <div id="universalSheetModal" class="custom-modal">
     <div class="modal-content-box">
       <div class="modal-header">
@@ -559,6 +588,7 @@
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw2ixjhGDAuHp61_A7ToqdIag7JUTEQdpf8ZYW1ND9IvL8dcnVEvyo8pg-KiBCzXMfZ/exec";
     const CORRECT_PIN = "7860"; 
+    const ADMIN_PASSWORD = "admin@123"; // Yahan tu apna admin password badal sakta hai bhai
     const UPDATES_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=1182340030&single=true&output=csv";
 
     let liveTemp = "31°C";
@@ -625,7 +655,7 @@
       return String(val).split('T')[0];
     }
 
-    // Submit Update with Instant UI Update (Optimistic rendering)
+    // Submit Update with Instant UI Update
     async function submitUpdate(e) {
       e.preventDefault();
       const author = document.getElementById('updateAuthor').value.trim();
@@ -634,7 +664,7 @@
       const submitBtn = document.getElementById('submitBtn');
 
       if (enteredPin !== CORRECT_PIN) {
-        alert("❌ Incorrect Security PIN! You are not authorized to post updates.");
+        alert("❌ Incorrect Security PIN!");
         return;
       }
 
@@ -661,18 +691,16 @@
         document.getElementById('updateForm').reset();
         toggleUpdateForm();
         
-        // INSTANTLY UI me naya message sabse upar dikha do bina sheet ka wait kiye
         prependInstantUpdate(author, message, currentTime);
       } catch (err) {
         console.error("Error submitting update:", err);
-        alert("❌ Failed to publish update. Please try again.");
+        alert("❌ Failed to publish update.");
       } finally {
         submitBtn.innerText = "🚀 Submit";
         submitBtn.disabled = false;
       }
     }
 
-    // Function to instantly show update on screen right after submit
     function prependInstantUpdate(author, message, date) {
       const listDiv = document.getElementById('liveUpdatesList');
       if (!listDiv) return;
@@ -687,7 +715,6 @@
         </div>
       `;
 
-      // Agar pehle 'Loading...' likha ho toh hata kar naya daal do
       if (listDiv.innerHTML.includes("Loading") || listDiv.innerHTML.includes("No announcements")) {
         listDiv.innerHTML = newHtml;
       } else {
@@ -695,7 +722,7 @@
       }
     }
 
-    // Live Fetch with Cache Busting
+    // Live Fetch with aggressive cache busting
     async function fetchLiveUpdates() {
       const listDiv = document.getElementById('liveUpdatesList');
       if (!listDiv) return;
@@ -720,7 +747,7 @@
         let html = "";
         for (let i = rows.length - 1; i >= 0; i--) {
           let r = rows[i];
-          if (r && r.length >= 3 && r[1] && r[1] !== "author") {
+          if (r && r.length >= 3 && r[1] && r[1] !== "author" && r[1] !== "Name") {
             let date = r[0] ? r[0].replace(/["']/g, "") : "";
             let author = r[1] ? r[1].replace(/["']/g, "") : "";
             let msg = r[2] ? r[2].replace(/["']/g, "") : "";
@@ -741,6 +768,32 @@
       } catch (err) {
         console.log("Error fetching updates live:", err);
       }
+    }
+
+    // Admin Control Logic
+    function openAdminLoginModal() {
+      document.getElementById('adminModal').style.display = 'flex';
+      document.getElementById('adminPasswordInput').value = "";
+      document.getElementById('adminLoginForm').style.display = 'block';
+      document.getElementById('adminDashboard').style.display = 'none';
+    }
+    function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; }
+
+    function verifyAdminLogin() {
+      const pwd = document.getElementById('adminPasswordInput').value.trim();
+      if (pwd === ADMIN_PASSWORD) {
+        document.getElementById('adminLoginForm').style.display = 'none';
+        document.getElementById('adminDashboard').style.display = 'flex';
+      } else {
+        alert("❌ Incorrect Admin Password!");
+      }
+    }
+
+    function clearAllUpdatesFromScreen() {
+      document.getElementById('liveUpdatesList').innerHTML = "<div style='color: #94a3b8;'>Feed cache cleared. Refreshing from sheet...</div>";
+      fetchLiveUpdates();
+      alert("✅ Feed cache cleared successfully!");
+      closeAdminModal();
     }
 
     function renderApp() {
