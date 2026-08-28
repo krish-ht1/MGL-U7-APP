@@ -588,7 +588,7 @@
     const CORRECT_PIN = "7860"; 
     const ADMIN_PASSWORD = "admin@123";
 
-    // Live CSV Links for Calibration & D-Shooting
+    // Direct Live CSV Links from Master Sheet
     const CALIBRATION_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?output=csv";
     const DSHOOTING_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=476482279&single=true&output=csv";
     const UPDATES_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=1182340030&single=true&output=csv";
@@ -620,7 +620,7 @@
     setInterval(updateDateTime, 1000);
     updateDateTime();
 
-    // CSV Parser helper function
+    // Robust CSV Parser
     function parseCSV(text) {
       const rows = text.split('\n').map(r => {
         let row = [];
@@ -637,21 +637,13 @@
       return rows;
     }
 
-    // Strict Date Formatter (DD-MM-YYYY)
-    function formatOnlyDate(val) {
+    // Exact string/date cleaner
+    formatOnlyDate = function(val) {
       if (!val || val === '-' || val === 'N/A') return '-';
-      let cleanVal = String(val).replace(/["']/g, "").trim();
-      let d = new Date(cleanVal);
-      if (!isNaN(d.getTime())) {
-        let day = String(d.getDate()).padStart(2, '0');
-        let month = String(d.getMonth() + 1).padStart(2, '0');
-        let year = d.getFullYear();
-        return `${day}-${month}-${year}`;
-      }
-      return cleanVal; // Return as is if it's a formatted string already
+      return String(val).replace(/["']/g, "").trim();
     }
 
-    // Fetch and Render D-Shooting Live Data
+    // 1. Fully Live D-Shooting Fetch (Bypassing dummy data.js)
     async function fetchDShootingLive() {
       try {
         const timestamp = new Date().getTime();
@@ -667,7 +659,7 @@
           let thHtml = `<tr style="background: #0284c7; color: white;">`;
           headerRow.forEach((col, idx) => {
             let align = (idx === 0) ? "text-align: left;" : "text-align: center;";
-            thHtml += `<th style="padding: 8px 10px; ${align} border-right: 1px solid #334155;">${col}</th>`;
+            thHtml += `<th style="padding: 8px 10px; ${align} border-right: 1px solid #334155;">${col.replace(/["']/g, "")}</th>`;
           });
           thHtml += `</tr>`;
           thead.innerHTML = thHtml;
@@ -679,8 +671,9 @@
               let bgStyle = (index % 2 === 0) ? "background: #1e293b;" : "background: #0f172a;";
               dHtml += `<tr style="${bgStyle} border-bottom: 1px solid #334155;">`;
               row.forEach((cell, idx) => {
+                let cleanCell = cell.replace(/["']/g, "");
                 let isMachineCol = (idx === 0);
-                let cellVal = isMachineCol ? cell : formatOnlyDate(cell);
+                let cellVal = cleanCell; 
                 let isDueCol = (idx === row.length - 1);
                 let style = isDueCol ? "color: #38bdf8; font-weight: bold;" : "color: #cbd5e1;";
                 if (isMachineCol) style = "text-align: left; font-weight: 600; color: #f8fafc;";
@@ -689,14 +682,14 @@
               dHtml += `</tr>`;
             }
           });
-          tbody.innerHTML = dHtml;
+          tbody.innerHTML = dHtml || "<tr><td colspan='10' style='padding:15px; color:#94a3b8;'>No D-shooting records found.</td></tr>";
         }
       } catch (err) {
         console.log("Error loading D-Shooting live:", err);
       }
     }
 
-    // Fetch and Render Calibration Alerts Live (Next 30 Days Due)
+    // 2. Fully Live Calibration Fetch (Showing actual due items accurately)
     async function fetchCalibrationLive() {
       try {
         const timestamp = new Date().getTime();
@@ -713,19 +706,22 @@
 
           dataRows.forEach(r => {
             if (r.length > 1 && r[1]) {
-              let instrumentId = r[0] ? `ID: ${r[0]}` : '';
-              let instrumentName = r[1] || 'Instrument';
+              let instrumentId = r[0] ? `ID: ${r[0].replace(/["']/g, "")}` : '';
+              let instrumentName = r[1] ? r[1].replace(/["']/g, "") : 'Instrument';
               let rawDateStr = r[3] || r[2]; // Due date column
+              if (rawDateStr) rawDateStr = rawDateStr.replace(/["']/g, "").trim();
+              
               let targetDueDate = new Date(rawDateStr);
 
               if (!isNaN(targetDueDate.getTime())) {
                 targetDueDate.setHours(0, 0, 0, 0);
                 let diffDays = Math.round((targetDueDate - today) / (1000 * 60 * 60 * 24));
+                // Show items that are overdue or due within next 30 days (or even all active items if needed)
                 if (diffDays <= 30) {
                   alertItems.push({ 
                     id: instrumentId, 
                     name: instrumentName, 
-                    dueDateFormatted: formatOnlyDate(rawDateStr), 
+                    dueDateFormatted: rawDateStr, 
                     diffDays: diffDays 
                   });
                 }
@@ -761,13 +757,13 @@
       }
     }
 
-    // Master Render Trigger
+    // Master Render Trigger bypassing dummy data.js dependencies for these sections
     function renderApp() {
       fetchDShootingLive();
       fetchCalibrationLive();
     }
 
-    // Toggle Form & Submit functions remain same...
+    // Toggle Form & Submit functions
     function toggleUpdateForm() {
       const formBox = document.getElementById('updateFormContainer');
       const btn = document.getElementById('toggleFormBtn');
@@ -913,7 +909,6 @@
       const data = plantMasterData[moduleKey] || [];
       const thead = document.getElementById('universalThead');
       const tbody = document.getElementById('universalTbody');
-      // Render implementation...
       document.getElementById('universalSheetModal').style.display = 'flex';
     }
 
