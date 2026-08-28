@@ -230,7 +230,7 @@
     .about-text-sec p { color: #e2e8f0; font-size: 13px; line-height: 1.5; margin-bottom: 10px; }
     .about-text-sec .highlight-tpg { background: rgba(249,115,22,0.1); border-left: 3px solid #f97316; padding: 8px 12px; color: #fde047; font-size: 12.5px; }
 
-    /* Footer Scroller */
+    /* Footer Scroller with Working Hover Effect Restored */
     .main-footer { background: #111827; border-top: 1px solid #1f2937; padding: 14px 20px 10px 20px; width: 100%; margin-top: auto; }
     .footer-grid { display: flex; flex-direction: column; gap: 10px; max-width: 1200px; margin: 0 auto; width: 100%; }
     .showcase-row h4 { margin: 0 0 5px 0; color: #94a3b8; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -245,6 +245,8 @@
       position: relative; 
     }
     .track { display: inline-flex; align-items: center; animation: scrollLeft 32s linear infinite; }
+    
+    /* Hover pause restored here */
     .scroller:hover .track { animation-play-state: paused; }
 
     .track img.customer-img {
@@ -363,7 +365,7 @@
     <button class="action-btn alerts" onclick="openAlertsModal()">⚠️ System & Calibration Alerts</button>
   </div>
 
-  <!-- 1. Daily Updates Modal (Live Feed on Top, Toggle Button & Compact Submit Button at Bottom) -->
+  <!-- 1. Daily Updates Modal -->
   <div id="updatesModal" class="custom-modal">
     <div class="modal-content-box">
       <div class="modal-header">
@@ -375,7 +377,7 @@
         <!-- Live Feed Container (Sabse Upar) -->
         <div style="flex: 1; overflow-y: auto; max-height: 380px;">
           <h4 style="margin: 0 0 8px 0; color: #94a3b8; font-size: 11.5px; text-transform: uppercase;">Recent Plant Updates (Live)</h4>
-          <div id="liveUpdatesList" style="font-size: 13px; color: #cbd5e1;">Loading live updates from sheet...</div>
+          <div id="liveUpdatesList" style="font-size: 13px; color: #cbd5e1;">Loading live updates...</div>
         </div>
 
         <!-- Toggle Button for Drop Message Form -->
@@ -383,13 +385,12 @@
           ✍️ Drop Your Message / Post Update
         </button>
 
-        <!-- Hidden Form Container (Compact & Submit Button at Bottom) -->
+        <!-- Hidden Form Container -->
         <div id="updateFormContainer" style="display: none; background: #0f172a; padding: 10px; border-radius: 8px; border: 1px solid #334155;">
           <form id="updateForm" onsubmit="submitUpdate(event)" style="display: flex; flex-direction: column; gap: 8px;">
             <input type="text" id="updateAuthor" placeholder="Your Name & Designation (e.g. Rahul - Supervisor)" required style="background: #1e293b; border: 1px solid #475569; color: white; padding: 6px 10px; border-radius: 6px; font-size: 12px; outline: none;">
             <textarea id="updateMessage" placeholder="Type your daily update here..." rows="2" required style="background: #1e293b; border: 1px solid #475569; color: white; padding: 6px 10px; border-radius: 6px; font-size: 12px; outline: none; resize: none;"></textarea>
             
-            <!-- Security PIN & Compact Submit Button side by side or stacked -->
             <div style="display: flex; gap: 8px; align-items: center;">
               <input type="password" id="securityPin" placeholder="Security PIN" required style="flex: 1; background: #1e293b; border: 1px solid #ef4444; color: white; padding: 6px 10px; border-radius: 6px; font-size: 12px; outline: none;">
               <button type="submit" id="submitBtn" style="background: #3b82f6; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; white-space: nowrap;">🚀 Submit</button>
@@ -427,7 +428,7 @@
     </div>
   </div>
 
-  <!-- 3. Universal Module Modal (Production, Costing, Weightlist) -->
+  <!-- 3. Universal Module Modal -->
   <div id="universalSheetModal" class="custom-modal">
     <div class="modal-content-box">
       <div class="modal-header">
@@ -624,6 +625,7 @@
       return String(val).split('T')[0];
     }
 
+    // Submit Update with Instant UI Update (Optimistic rendering)
     async function submitUpdate(e) {
       e.preventDefault();
       const author = document.getElementById('updateAuthor').value.trim();
@@ -641,11 +643,13 @@
       submitBtn.innerText = "Posting...";
       submitBtn.disabled = true;
 
+      const currentTime = new Date().toLocaleString();
+
       try {
         const formData = new URLSearchParams();
         formData.append('author', author);
         formData.append('message', message);
-        formData.append('date', new Date().toLocaleString());
+        formData.append('date', currentTime);
 
         await fetch(SCRIPT_URL, {
           method: 'POST',
@@ -657,8 +661,8 @@
         document.getElementById('updateForm').reset();
         toggleUpdateForm();
         
-        // Refresh live feed after 2 seconds to allow sheet sync
-        setTimeout(fetchLiveUpdates, 2000);
+        // INSTANTLY UI me naya message sabse upar dikha do bina sheet ka wait kiye
+        prependInstantUpdate(author, message, currentTime);
       } catch (err) {
         console.error("Error submitting update:", err);
         alert("❌ Failed to publish update. Please try again.");
@@ -668,7 +672,30 @@
       }
     }
 
-    // Live Fetch with Cache Busting so fresh data is loaded every time
+    // Function to instantly show update on screen right after submit
+    function prependInstantUpdate(author, message, date) {
+      const listDiv = document.getElementById('liveUpdatesList');
+      if (!listDiv) return;
+
+      let newHtml = `
+        <div style="background:#0f172a; padding:10px 12px; border-radius:6px; margin-bottom:8px; border-left:4px solid #3b82f6;">
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:#38bdf8; margin-bottom:3px;">
+            <strong>👤 ${author}</strong>
+            <span>${date}</span>
+          </div>
+          <div style="color:#f8fafc; font-size:12.5px;">${message}</div>
+        </div>
+      `;
+
+      // Agar pehle 'Loading...' likha ho toh hata kar naya daal do
+      if (listDiv.innerHTML.includes("Loading") || listDiv.innerHTML.includes("No announcements")) {
+        listDiv.innerHTML = newHtml;
+      } else {
+        listDiv.innerHTML = newHtml + listDiv.innerHTML;
+      }
+    }
+
+    // Live Fetch with Cache Busting
     async function fetchLiveUpdates() {
       const listDiv = document.getElementById('liveUpdatesList');
       if (!listDiv) return;
@@ -713,7 +740,6 @@
         listDiv.innerHTML = html || "<div style='color: #94a3b8;'>No announcements currently.</div>";
       } catch (err) {
         console.log("Error fetching updates live:", err);
-        listDiv.innerHTML = "<div style='color: #ef4444;'>Unable to load live updates.</div>";
       }
     }
 
