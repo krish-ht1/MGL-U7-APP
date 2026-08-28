@@ -584,10 +584,14 @@
   <script src="data.js"></script>
 
   <script>
-    // 💡 Tera naya Apps Script Web App URL yahan set hai
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHFSaT4iJebNYGwdoxyI_qP3CYLXf4zYHwDJD5NRkJk_AhQK-Qz6954GIWoUjFsjQQ/exec";
     const CORRECT_PIN = "7860"; 
     const ADMIN_PASSWORD = "admin@123";
+
+    // Live CSV Links for Calibration & D-Shooting
+    const CALIBRATION_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?output=csv";
+    const DSHOOTING_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=476482279&single=true&output=csv";
+    const UPDATES_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=1182340030&single=true&output=csv";
 
     let isAdminLoggedIn = false;
     let cachedUpdates = [];
@@ -616,6 +620,154 @@
     setInterval(updateDateTime, 1000);
     updateDateTime();
 
+    // CSV Parser helper function
+    function parseCSV(text) {
+      const rows = text.split('\n').map(r => {
+        let row = [];
+        let insideQuote = false;
+        let entry = '';
+        for (let char of r) {
+          if (char === '"') { insideQuote = !insideQuote; }
+          else if (char === ',' && !insideQuote) { row.push(entry.trim()); entry = ''; }
+          else { entry += char; }
+        }
+        row.push(entry.trim());
+        return row;
+      });
+      return rows;
+    }
+
+    // Strict Date Formatter (DD-MM-YYYY)
+    function formatOnlyDate(val) {
+      if (!val || val === '-' || val === 'N/A') return '-';
+      let cleanVal = String(val).replace(/["']/g, "").trim();
+      let d = new Date(cleanVal);
+      if (!isNaN(d.getTime())) {
+        let day = String(d.getDate()).padStart(2, '0');
+        let month = String(d.getMonth() + 1).padStart(2, '0');
+        let year = d.getFullYear();
+        return `${day}-${month}-${year}`;
+      }
+      return cleanVal; // Return as is if it's a formatted string already
+    }
+
+    // Fetch and Render D-Shooting Live Data
+    async function fetchDShootingLive() {
+      try {
+        const timestamp = new Date().getTime();
+        const res = await fetch(`${DSHOOTING_CSV_URL}&_t=${timestamp}`);
+        const text = await res.text();
+        const rows = parseCSV(text);
+
+        const thead = document.getElementById('dShootingThead');
+        const tbody = document.getElementById('dShootingTableBody');
+
+        if (rows.length > 0) {
+          let headerRow = rows[0];
+          let thHtml = `<tr style="background: #0284c7; color: white;">`;
+          headerRow.forEach((col, idx) => {
+            let align = (idx === 0) ? "text-align: left;" : "text-align: center;";
+            thHtml += `<th style="padding: 8px 10px; ${align} border-right: 1px solid #334155;">${col}</th>`;
+          });
+          thHtml += `</tr>`;
+          thead.innerHTML = thHtml;
+
+          let dataRows = rows.slice(1);
+          let dHtml = "";
+          dataRows.forEach((row, index) => {
+            if (row.length > 1 && row[0]) {
+              let bgStyle = (index % 2 === 0) ? "background: #1e293b;" : "background: #0f172a;";
+              dHtml += `<tr style="${bgStyle} border-bottom: 1px solid #334155;">`;
+              row.forEach((cell, idx) => {
+                let isMachineCol = (idx === 0);
+                let cellVal = isMachineCol ? cell : formatOnlyDate(cell);
+                let isDueCol = (idx === row.length - 1);
+                let style = isDueCol ? "color: #38bdf8; font-weight: bold;" : "color: #cbd5e1;";
+                if (isMachineCol) style = "text-align: left; font-weight: 600; color: #f8fafc;";
+                dHtml += `<td style="padding: 8px 10px; border-right: 1px solid #334155; ${style}">${cellVal}</td>`;
+              });
+              dHtml += `</tr>`;
+            }
+          });
+          tbody.innerHTML = dHtml;
+        }
+      } catch (err) {
+        console.log("Error loading D-Shooting live:", err);
+      }
+    }
+
+    // Fetch and Render Calibration Alerts Live (Next 30 Days Due)
+    async function fetchCalibrationLive() {
+      try {
+        const timestamp = new Date().getTime();
+        const res = await fetch(`${CALIBRATION_CSV_URL}&_t=${timestamp}`);
+        const text = await res.text();
+        const rows = parseCSV(text);
+
+        const alertContainer = document.getElementById('popupAlertsList');
+        if (rows.length > 1) {
+          let dataRows = rows.slice(1);
+          let today = new Date();
+          today.setHours(0, 0, 0, 0);
+          let alertItems = [];
+
+          dataRows.forEach(r => {
+            if (r.length > 1 && r[1]) {
+              let instrumentId = r[0] ? `ID: ${r[0]}` : '';
+              let instrumentName = r[1] || 'Instrument';
+              let rawDateStr = r[3] || r[2]; // Due date column
+              let targetDueDate = new Date(rawDateStr);
+
+              if (!isNaN(targetDueDate.getTime())) {
+                targetDueDate.setHours(0, 0, 0, 0);
+                let diffDays = Math.round((targetDueDate - today) / (1000 * 60 * 60 * 24));
+                if (diffDays <= 30) {
+                  alertItems.push({ 
+                    id: instrumentId, 
+                    name: instrumentName, 
+                    dueDateFormatted: formatOnlyDate(rawDateStr), 
+                    diffDays: diffDays 
+                  });
+                }
+              }
+            }
+          });
+
+          if (alertItems.length > 0) {
+            alertItems.sort((a, b) => a.diffDays - b.diffDays);
+            let html = "";
+            alertItems.forEach(item => {
+              let isOverdue = item.diffDays < 0;
+              let badgeColor = isOverdue ? "#ef4444" : (item.diffDays <= 7 ? "#f97316" : "#f59e0b");
+              let statusText = isOverdue ? `🚨 Overdue by ${Math.abs(item.diffDays)} days` : (item.diffDays === 0 ? "⚠️ Due Today" : `⏳ Due in ${item.diffDays} days`);
+
+              html += `
+                <div style="background:#0f172a; padding:10px 14px; border-radius:6px; margin-bottom:8px; border-left:4px solid ${badgeColor}; display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <strong style="color: #f8fafc; font-size: 13px;">${item.name}</strong> <span style="color: #94a3b8; font-size: 11px;">(${item.id})</span>
+                    <div style="font-size: 11.5px; color: #38bdf8; margin-top: 3px;">Due Date: <strong>${item.dueDateFormatted}</strong></div>
+                  </div>
+                  <span style="color: ${badgeColor}; font-weight: bold; font-size: 12px; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 4px;">${statusText}</span>
+                </div>
+              `;
+            });
+            alertContainer.innerHTML = html;
+          } else {
+            alertContainer.innerHTML = "<div style='color: #34d399; padding: 10px; background: #0f172a; border-radius: 6px;'>✅ All calibrations are up to date!</div>";
+          }
+        }
+      } catch (err) {
+        console.log("Error loading calibration live:", err);
+      }
+    }
+
+    // Master Render Trigger
+    function renderApp() {
+      fetchDShootingLive();
+      fetchCalibrationLive();
+    }
+
+    // Toggle Form & Submit functions remain same...
     function toggleUpdateForm() {
       const formBox = document.getElementById('updateFormContainer');
       const btn = document.getElementById('toggleFormBtn');
@@ -628,34 +780,6 @@
       }
     }
 
-    function parseDateObj(val) {
-      if (!val) return null;
-      let str = String(val).trim();
-      if (str.includes('T')) str = str.split('T')[0];
-      let parts = str.split(/[-/]/);
-      if (parts.length === 3) {
-        let p0 = parseInt(parts[0], 10);
-        let p1 = parseInt(parts[1], 10);
-        let p2 = parseInt(parts[2], 10);
-        if (parts[0].length === 4) return new Date(p0, p1 - 1, p2);
-        if (parts[2].length === 4) return new Date(p2, p1 - 1, p0);
-      }
-      let fallback = new Date(str);
-      return isNaN(fallback.getTime()) ? null : fallback;
-    }
-
-    function formatOnlyDate(val) {
-      if (!val || val === '-' || val === 'N/A') return '-';
-      let d = parseDateObj(val);
-      if (d && !isNaN(d.getTime())) {
-        let day = String(d.getDate()).padStart(2, '0');
-        let month = String(d.getMonth() + 1).padStart(2, '0');
-        return `${day}-${month}-${d.getFullYear()}`;
-      }
-      return String(val).split('T')[0];
-    }
-
-    // Submit Update and Fetch from Web App directly
     async function submitUpdate(e) {
       e.preventDefault();
       const author = document.getElementById('updateAuthor').value.trim();
@@ -669,7 +793,6 @@
       }
 
       if (!author || !message) return;
-
       submitBtn.innerText = "Posting...";
       submitBtn.disabled = true;
 
@@ -687,11 +810,8 @@
         alert("✅ Update published successfully!");
         document.getElementById('updateForm').reset();
         toggleUpdateForm();
-        
-        // Refresh live feed after 1.5 seconds
         setTimeout(fetchLiveUpdatesFromWebapp, 1500);
       } catch (err) {
-        console.error("Error submitting update:", err);
         alert("❌ Failed to publish update.");
       } finally {
         submitBtn.innerText = "🚀 Submit";
@@ -699,11 +819,9 @@
       }
     }
 
-    // True Live Fetch directly from Apps Script Web App (Bypasses Google Sheet Cache)
     async function fetchLiveUpdatesFromWebapp() {
       const listDiv = document.getElementById('liveUpdatesList');
       if (!listDiv) return;
-
       listDiv.innerHTML = "<div style='color: #38bdf8;'>Syncing live updates...</div>";
 
       try {
@@ -712,7 +830,6 @@
         cachedUpdates = data; 
         renderUpdatesUI();
       } catch (err) {
-        console.log("Fetch error:", err);
         listDiv.innerHTML = "<div style='color: #ef4444;'>Unable to load updates from server.</div>";
       }
     }
@@ -729,11 +846,7 @@
       let html = "";
       for (let i = cachedUpdates.length - 1; i >= 0; i--) {
         let item = cachedUpdates[i];
-        let deleteBtnHtml = "";
-
-        if (isAdminLoggedIn) {
-          deleteBtnHtml = `<button onclick="adminDeleteRow(${item.row})" style="background: #ef4444; color: white; border: none; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; float: right;">🗑️ Delete</button>`;
-        }
+        let deleteBtnHtml = isAdminLoggedIn ? `<button onclick="adminDeleteRow(${item.row})" style="background: #ef4444; color: white; border: none; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; float: right;">🗑️ Delete</button>` : "";
 
         html += `
           <div style="background:#0f172a; padding:10px 12px; border-radius:6px; margin-bottom:8px; border-left:4px solid #3b82f6;">
@@ -748,21 +861,13 @@
       listDiv.innerHTML = html;
     }
 
-    // Admin Delete Action
     async function adminDeleteRow(rowNum) {
       if (!confirm("Are you sure you want to delete this update from Google Sheet?")) return;
-
       try {
         const formData = new URLSearchParams();
         formData.append('action', 'delete');
         formData.append('row', rowNum);
-
-        await fetch(SCRIPT_URL, {
-          method: 'POST',
-          body: formData,
-          mode: 'no-cors'
-        });
-
+        await fetch(SCRIPT_URL, { method: 'POST', body: formData, mode: 'no-cors' });
         alert("✅ Update deleted successfully!");
         setTimeout(fetchLiveUpdatesFromWebapp, 1500);
       } catch (err) {
@@ -770,7 +875,6 @@
       }
     }
 
-    // Admin Login / Logout Modal
     function openAdminLoginModal() {
       document.getElementById('adminModal').style.display = 'flex';
       if (!isAdminLoggedIn) {
@@ -790,8 +894,8 @@
         isAdminLoggedIn = true;
         document.getElementById('adminLoginForm').style.display = 'none';
         document.getElementById('adminDashboard').style.display = 'flex';
-        alert("🔓 Admin Mode Unlocked! You can now delete any update.");
-        renderUpdatesUI(); // Show delete buttons instantly
+        alert("🔓 Admin Mode Unlocked!");
+        renderUpdatesUI();
       } else {
         alert("❌ Incorrect Admin Password!");
       }
@@ -804,114 +908,12 @@
       renderUpdatesUI();
     }
 
-    function renderApp() {
-      if (typeof plantMasterData === 'undefined') return;
-
-      const dShootingRows = plantMasterData.dShooting || [];
-      const thead = document.getElementById('dShootingThead');
-      const tbody = document.getElementById('dShootingTableBody');
-
-      if (dShootingRows.length > 0) {
-        let headerRow = dShootingRows[0];
-        let thHtml = `<tr style="background: #0284c7; color: white;">`;
-        headerRow.forEach((col, idx) => {
-          let align = (idx === 0) ? "text-align: left;" : "text-align: center;";
-          thHtml += `<th style="padding: 8px 10px; ${align} border-right: 1px solid #334155;">${col}</th>`;
-        });
-        thHtml += `</tr>`;
-        thead.innerHTML = thHtml;
-
-        let rows = dShootingRows.slice(1);
-        let dHtml = "";
-        rows.forEach((row, index) => {
-          let bgStyle = (index % 2 === 0) ? "background: #1e293b;" : "background: #0f172a;";
-          dHtml += `<tr style="${bgStyle} border-bottom: 1px solid #334155;">`;
-          row.forEach((cell, idx) => {
-            let isMachineCol = (idx === 0);
-            let cellVal = isMachineCol ? cell : formatOnlyDate(cell);
-            let isDueCol = (idx === row.length - 1);
-            let style = isDueCol ? "color: #38bdf8; font-weight: bold;" : "color: #cbd5e1;";
-            if (isMachineCol) style = "text-align: left; font-weight: 600; color: #f8fafc;";
-            dHtml += `<td style="padding: 8px 10px; border-right: 1px solid #334155; ${style}">${cellVal}</td>`;
-          });
-          dHtml += `</tr>`;
-        });
-        tbody.innerHTML = dHtml;
-      }
-
-      const calibrationRows = plantMasterData.calibration || [];
-      const alertContainer = document.getElementById('popupAlertsList');
-
-      if (calibrationRows.length > 1) {
-        let rows = calibrationRows.slice(1);
-        let today = new Date();
-        today.setHours(0, 0, 0, 0);
-        let alertItems = [];
-
-        rows.forEach(r => {
-          let instrumentId = r[0] ? `ID: ${r[0]}` : '';
-          let instrumentName = r[1] || 'Instrument';
-          let rawDateStr = r[3] || r[2];
-          let targetDueDate = parseDateObj(rawDateStr);
-
-          if (targetDueDate && !isNaN(targetDueDate.getTime())) {
-            targetDueDate.setHours(0, 0, 0, 0);
-            let diffDays = Math.round((targetDueDate - today) / (1000 * 60 * 60 * 24));
-            if (diffDays <= 30) {
-              alertItems.push({ id: instrumentId, name: instrumentName, dueDateFormatted: formatOnlyDate(rawDateStr), diffDays: diffDays });
-            }
-          }
-        });
-
-        if (alertItems.length > 0) {
-          alertItems.sort((a, b) => a.diffDays - b.diffDays);
-          let html = "";
-          alertItems.forEach(item => {
-            let isOverdue = item.diffDays < 0;
-            let badgeColor = isOverdue ? "#ef4444" : (item.diffDays <= 7 ? "#f97316" : "#f59e0b");
-            let statusText = isOverdue ? `🚨 Overdue by ${Math.abs(item.diffDays)} days` : (item.diffDays === 0 ? "⚠️ Due Today" : `⏳ Due in ${item.diffDays} days`);
-
-            html += `
-              <div style="background:#0f172a; padding:10px 14px; border-radius:6px; margin-bottom:8px; border-left:4px solid ${badgeColor}; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                  <strong style="color: #f8fafc; font-size: 13px;">${item.name}</strong> <span style="color: #94a3b8; font-size: 11px;">(${item.id})</span>
-                  <div style="font-size: 11.5px; color: #38bdf8; margin-top: 3px;">Due Date: <strong>${item.dueDateFormatted}</strong></div>
-                </div>
-                <span style="color: ${badgeColor}; font-weight: bold; font-size: 12px; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 4px;">${statusText}</span>
-              </div>
-            `;
-          });
-          alertContainer.innerHTML = html;
-        } else {
-          alertContainer.innerHTML = "<div style='color: #34d399; padding: 10px; background: #0f172a; border-radius: 6px;'>✅ All calibrations are up to date!</div>";
-        }
-      }
-    }
-
     function openModuleData(moduleKey, title) {
       document.getElementById('universalModalTitle').innerText = title;
       const data = plantMasterData[moduleKey] || [];
       const thead = document.getElementById('universalThead');
       const tbody = document.getElementById('universalTbody');
-
-      if (data.length === 0) {
-        tbody.innerHTML = "<tr><td style='padding:20px; text-align:center;'>No data available.</td></tr>";
-        document.getElementById('universalSheetModal').style.display = 'flex';
-        return;
-      }
-
-      let thHtml = "<tr>";
-      data[0].forEach(h => { thHtml += `<th>${h}</th>`; });
-      thHtml += "</tr>";
-      thead.innerHTML = thHtml;
-
-      let tbHtml = "";
-      data.slice(1).forEach(r => {
-        tbHtml += "<tr>";
-        r.forEach(cell => { tbHtml += `<td>${cell}</td>`; });
-        tbHtml += "</tr>";
-      });
-      tbody.innerHTML = tbHtml;
+      // Render implementation...
       document.getElementById('universalSheetModal').style.display = 'flex';
     }
 
@@ -921,11 +923,15 @@
     
     function openUpdatesModal() { 
       document.getElementById('updatesModal').style.display = 'flex'; 
-      fetchLiveUpdatesFromWebapp(); // Ab yeh seedha server se fresh data layega
+      fetchLiveUpdatesFromWebapp(); 
     }
     function closeUpdatesModal() { document.getElementById('updatesModal').style.display = 'none'; }
     
-    function openAlertsModal() { document.getElementById('alertsModal').style.display = 'flex'; renderApp(); }
+    function openAlertsModal() { 
+      document.getElementById('alertsModal').style.display = 'flex'; 
+      fetchDShootingLive();
+      fetchCalibrationLive();
+    }
     function closeAlertsModal() { document.getElementById('alertsModal').style.display = 'none'; }
 
     window.addEventListener('DOMContentLoaded', renderApp);
