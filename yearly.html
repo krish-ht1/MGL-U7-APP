@@ -298,7 +298,7 @@
         console.log("Error loading CSV:", err);
         document.getElementById('syncStatus').innerText = "● Error";
         document.getElementById('syncStatus').style.color = "#ef4444";
-        document.getElementById('yearlyTableBody').innerHTML = `<tr><td colspan="5" style="padding: 16px; color: #ef4444;">Error loading live data. Check connection.</td></tr>`;
+        document.getElementById('yearlyTableBody').innerHTML = `<tr><td colspan="5" style="padding: 16px; color: #ef4444;">Error loading live data.</td></tr>`;
       }
     }
 
@@ -401,8 +401,15 @@
           plugins: {
             legend: { display: false },
             datalabels: {
-              anchor: 'end',
-              align: 'top',
+              anchor: function(context) {
+                // Target ke liye value upar (top) rahegi, baaki bars ke liye mobile par center aur web par top rahegi
+                if (context.dataset.type === 'line') return 'end';
+                return isMobile ? 'center' : 'end';
+              },
+              align: function(context) {
+                if (context.dataset.type === 'line') return 'top';
+                return isMobile ? 'center' : 'top';
+              },
               color: function(context) {
                 return context.dataset.type === 'line' ? '#fb923c' : '#f8fafc';
               },
