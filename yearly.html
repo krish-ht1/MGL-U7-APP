@@ -6,7 +6,7 @@
   <title>Yearly Production - Milestone Gear Unit 7</title>
   <!-- Chart.js Library -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Chart.js DataLabels Plugin for values on bars -->
+  <!-- Chart.js DataLabels Plugin -->
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -84,7 +84,7 @@
     }
     .nav-main-btn.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
 
-    /* Yearly Table Section */
+    /* Simple Clean Yearly Table Section */
     .table-section {
       background: #0f172a;
       border: 1px solid #1e293b;
@@ -95,18 +95,18 @@
     table.yearly-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 11px;
+      font-size: 11.5px;
       text-align: center;
       white-space: nowrap;
     }
     table.yearly-table th, table.yearly-table td {
       border: 1px solid #334155;
-      padding: 10px 12px;
+      padding: 10px 14px;
     }
     table.yearly-table th {
-      background: #1e293b;
+      background: #162032;
       color: #94a3b8;
-      font-weight: 600;
+      font-weight: 700;
       position: sticky;
       top: 0;
       z-index: 5;
@@ -163,16 +163,16 @@
       <a href="breakdown.html" class="nav-main-btn">⚠️ Breakdown & Loss</a>
     </div>
 
-    <!-- Correct Yearly Production Table matching the CSV layout -->
+    <!-- Simple Target Match Yearly Table -->
     <div class="table-section">
       <div class="table-scroll">
         <table class="yearly-table">
           <thead>
             <tr>
-              <th>Financial Year</th>
-              <th>Production (MT)</th>
-              <th>Total Capacity / Target (MT)</th>
-              <th>Avg Production / Month (MT)</th>
+              <th>Year</th>
+              <th>PROD. IN TONNAGE</th>
+              <th>TOTAL CAPACITY / Target</th>
+              <th>Avg Prod / Month</th>
             </tr>
           </thead>
           <tbody id="yearlyTableBody">
@@ -223,7 +223,6 @@
         });
 
         yearlyData = [];
-        // Skipping header row (i = 1) assuming row 0 is headers
         for (let i = 1; i < rows.length; i++) {
           let r = rows[i];
           let yearCol = r[0] ? r[0].replace(/["']/g, "").trim() : "";
