@@ -698,12 +698,31 @@
           maintainAspectRatio: false,
           plugins: {
             legend: { display: false },
-            datalabels: {
-              anchor: 'end',
-              align: 'top',
-              color: '#f8fafc',
-              font: { family: 'Inter', size: 11, weight: '700' },
-              formatter: (value) => value > 0 ? value + ' T' : ''
+           datalabels: {
+              anchor: function(context) {
+                if (context.dataset.type === 'line') return 'end';
+                return window.innerWidth <= 768 ? 'center' : 'end';
+              },
+              align: function(context) {
+                if (context.dataset.type === 'line') return 'top';
+                return window.innerWidth <= 768 ? 'center' : 'top';
+              },
+              color: function(context) {
+                return context.dataset.type === 'line' ? '#fb923c' : '#f8fafc';
+              },
+              font: { 
+                family: 'Inter', 
+                size: window.innerWidth <= 768 ? 8 : 11, 
+                weight: '700' 
+              },
+              rotation: function(context) {
+                const isMobile = window.innerWidth <= 768;
+                if (isMobile && context.dataset.type !== 'line') return -90;
+                return 0;
+              },
+              formatter: function(value) {
+                return value > 0 ? value + (window.innerWidth <= 768 ? '' : ' T') : '';
+              }
             }
           },
           scales: {
