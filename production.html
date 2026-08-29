@@ -50,7 +50,7 @@
       padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; outline: none; cursor: pointer;
     }
     
-    /* Super Compact & Attractive KPI Cards for Mobile */
+    /* Enhanced KPI Cards with Color Themes */
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -60,14 +60,23 @@
       .kpi-grid { grid-template-columns: repeat(5, 1fr); }
     }
     .kpi-card-mini {
-      background: #0f172a;
-      border: 1px solid #1e293b;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      border: 1px solid #334155;
       border-radius: 6px;
       padding: 8px 10px;
       display: flex;
       flex-direction: column;
       justify-content: center;
+      position: relative;
+      overflow: hidden;
     }
+    /* Unique Accent Borders for Visual Range/Color Scheme */
+    .kpi-card-mini:nth-child(1) { border-left: 3px solid #3b82f6; } /* Month Target - Blue */
+    .kpi-card-mini:nth-child(2) { border-left: 3px solid #8b5cf6; } /* Target MTD - Purple */
+    .kpi-card-mini:nth-child(3) { border-left: 3px solid #10b981; } /* Actual MTD - Green */
+    .kpi-card-mini:nth-child(4) { border-left: 3px solid #f59e0b; } /* Avg / Day - Amber */
+    .kpi-card-mini:nth-child(5) { border-left: 3px solid #ef4444; } /* Variance - Red/Dynamic */
+
     .kpi-title-mini {
       font-size: 9.5px;
       font-weight: 600;
@@ -81,23 +90,6 @@
       color: #f8fafc;
       margin-top: 2px;
     }
-
-    .dwm-section {
-      background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;
-    }
-    .dwm-title-row { display: flex; justify-content: space-between; align-items: center; }
-    .dwm-title-row h3 { font-size: 11.5px; font-weight: 700; color: #f8fafc; margin: 0; }
-    
-    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; max-height: 350px; }
-    table.dwm-table { width: 100%; border-collapse: collapse; font-size: 10px; text-align: center; white-space: nowrap; }
-    table.dwm-table th, table.dwm-table td { border: 1px solid #334155; padding: 4px 6px; }
-    table.dwm-table th { background: #1e293b; color: #94a3b8; font-weight: 600; position: sticky; top: 0; z-index: 5; }
-    table.dwm-table td { background: #0f172a; color: #f1f5f9; }
-    
-    .cell-green { background: rgba(16, 185, 129, 0.2) !important; color: #34d399 !important; font-weight: 600; }
-    .cell-red { background: rgba(239, 68, 68, 0.2) !important; color: #f87171 !important; font-weight: 600; }
-    .total-row { background: #1e293b !important; font-weight: 700; color: #38bdf8 !important; }
-
     /* Graph Section Container */
     .graph-section {
       background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 6px;
