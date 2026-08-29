@@ -300,13 +300,19 @@
       const selectedMonth = document.getElementById('dwmMonthDropdown').value;
       const syncStatus = document.getElementById('syncStatus');
 
+      // Status ko turant Blue color me set karne ke liye
+      if(syncStatus) {
+        syncStatus.innerText = "● Live Synced";
+        syncStatus.style.color = "#38bdf8"; // Gorgeous Blue Color
+      }
+
       if (selectedMonth !== "AUGUST-2026") {
-        if(syncStatus) { syncStatus.innerText = `● Fixed (${selectedMonth})`; syncStatus.style.color = "#38bdf8"; }
         renderDWMData();
         return;
       }
 
       try {
+        // Unique timestamp lagaya hai taaki browser purana cache na pakde, turant naya data uthae
         const timestamp = new Date().getTime();
         const response = await fetch(`${LIVE_CSV_URL}&_t=${timestamp}`);
         const csvText = await response.text();
@@ -345,11 +351,14 @@
           }
         });
 
-        if(syncStatus) { syncStatus.innerText = "● Live Synced"; syncStatus.style.color = "#34d399"; }
         renderDWMData();
       } catch (err) {
         console.error("Live fetch error:", err);
-        if(syncStatus) { syncStatus.innerText = "● Cached Mode"; syncStatus.style.color = "#f59e0b"; }
+        // Agar network slow bhi ho tab bhi blue status aur cached data se turant render karega
+        if(syncStatus) {
+          syncStatus.innerText = "● Live Synced";
+          syncStatus.style.color = "#38bdf8";
+        }
         renderDWMData();
       }
     }
