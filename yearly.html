@@ -106,7 +106,7 @@
       box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); 
     }
 
-    /* Ultra Fancy Glassmorphism Table Section */
+    /* Table Section */
     .table-section {
       background: rgba(15, 23, 42, 0.75);
       backdrop-filter: blur(12px);
@@ -150,7 +150,7 @@
       box-shadow: inset 0 0 10px rgba(56, 189, 248, 0.1);
     }
 
-    /* 4D/8D High-End Glowing Graph Card */
+    /* Graph Card */
     .graph-card {
       background: linear-gradient(145deg, #0b1120 0%, #0f172a 100%);
       border: 1px solid rgba(56, 189, 248, 0.25);
@@ -225,7 +225,7 @@
       </div>
     </div>
 
-    <!-- Ultra-Attractive 4D Glowing Graph Section -->
+    <!-- Ultra-Attractive Clean Graph Section (No Grid Lines, Dark Pink Theme) -->
     <div class="graph-card">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
         <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: #f8fafc; letter-spacing: 0.5px;">✨ Advanced High-Definition Performance & Target Matrix</h3>
@@ -233,7 +233,7 @@
       <div class="graph-legend">
         <div class="legend-item" style="color: #38bdf8;"><span style="width: 14px; height: 14px; background: linear-gradient(135deg, #38bdf8, #1d4ed8); display: inline-block; border-radius: 4px; box-shadow: 0 0 10px #38bdf8;"></span> PRODUCTION (MT)</div>
         <div class="legend-item" style="color: #fb923c;"><span style="width: 14px; height: 14px; background: #fb923c; display: inline-block; border-radius: 50%; box-shadow: 0 0 12px #fb923c;"></span> TOTAL CAPACITY / TARGET (MT)</div>
-        <div class="legend-item" style="color: #34d399;"><span style="width: 14px; height: 14px; background: linear-gradient(135deg, #34d399, #059669); display: inline-block; border-radius: 4px; box-shadow: 0 0 10px #34d399;"></span> AVG PRODUCTION / MONTH (MT)</div>
+        <div class="legend-item" style="color: #ec4899;"><span style="width: 14px; height: 14px; background: linear-gradient(135deg, #f472b6, #db2777); display: inline-block; border-radius: 4px; box-shadow: 0 0 10px #ec4899;"></span> AVG PRODUCTION / MONTH (MT)</div>
       </div>
       <div class="graph-container">
         <canvas id="yearlyChart"></canvas>
@@ -325,7 +325,7 @@
             <td style="font-weight:800; color:#38bdf8; text-shadow: 0 0 10px rgba(56,189,248,0.3);">${row.year}</td>
             <td style="font-weight:700; color:#60a5fa;">${row.production.toLocaleString('en-IN')}</td>
             <td style="font-weight:700; color:#fb923c;">${row.target.toLocaleString('en-IN')}</td>
-            <td style="font-weight:700; color:#34d399;">${row.avgMonth.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td style="font-weight:700; color:#ec4899;">${row.avgMonth.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
             <td><span style="background: rgba(52, 211, 153, 0.15); color: ${badgeColor}; padding: 5px 12px; border-radius: 8px; font-weight: 800; border: 1px solid rgba(52, 211, 153, 0.4); box-shadow: 0 0 10px rgba(52,211,153,0.2);">${row.percentage}%</span></td>
           </tr>
         `;
@@ -342,14 +342,15 @@
     function renderYearly3DChart(labels, production, targets, avgs) {
       const ctx = document.getElementById('yearlyChart').getContext('2d');
 
-      // Stunning Ultra-Glow Gradients
+      // Production Blue Gradient
       let gradProd = ctx.createLinearGradient(0, 0, 0, 400);
       gradProd.addColorStop(0, '#38bdf8');
       gradProd.addColorStop(1, '#1e40af');
 
-      let gradAvg = ctx.createLinearGradient(0, 0, 0, 400);
-      gradAvg.addColorStop(0, '#34d399');
-      gradAvg.addColorStop(1, '#065f46');
+      // Dark Pink / Hot Pink Gradient for Average Production
+      let gradPink = ctx.createLinearGradient(0, 0, 0, 400);
+      gradPink.addColorStop(0, '#f472b6');
+      gradPink.addColorStop(1, '#be185d');
 
       if (yearlyChartInstance) {
         yearlyChartInstance.destroy();
@@ -372,7 +373,7 @@
             {
               label: 'AVG PRODUCTION / MONTH (MT)',
               data: avgs,
-              backgroundColor: gradAvg,
+              backgroundColor: gradPink,
               borderRadius: 8,
               borderWidth: 0,
               yAxisID: 'y1',
@@ -424,20 +425,20 @@
           },
           scales: {
             x: { 
-              grid: { display: false }, 
+              grid: { display: false }, // फालतू ग्रिड लाइन हटाई गई
               ticks: { color: '#94a3b8', font: { size: 11.5, weight: '700' } } 
             },
             y: {
               type: 'linear',
               position: 'left',
-              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              grid: { display: false }, // यहाँ से भी ग्रिड लाइन पूरी तरह हटा दी गई है
               ticks: { color: '#38bdf8', font: { size: 10.5, weight: '600' } }
             },
             y1: {
               type: 'linear',
               position: 'right',
-              grid: { display: false },
-              ticks: { color: '#34d399', font: { size: 10.5, weight: '600' } }
+              grid: { display: false }, // यहाँ से भी ग्रिड लाइन पूरी तरह हटा दी गई है
+              ticks: { color: '#ec4899', font: { size: 10.5, weight: '600' } }
             }
           }
         }
