@@ -111,7 +111,7 @@
       outline: none;
       cursor: pointer;
     }
-    .graph-container { position: relative; width: 100%; height: 280px; }
+    .graph-container { position: relative; width: 100%; height: 290px; }
 
     /* Super Compact Single-Row Filter Panel */
     .filter-panel {
@@ -125,9 +125,9 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      flex-wrap: nowrap; /* Ek hi line mein rakhne ke liye */
+      flex-wrap: nowrap;
       width: 100%;
-      overflow-x: auto; /* Agar choti screen ho toh smooth scroll ho jaye bina toote */
+      overflow-x: auto;
       padding-bottom: 2px;
     }
     .filter-group { display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; color: #94a3b8; white-space: nowrap; }
@@ -434,22 +434,35 @@
     let trendChartInstance = null;
     let mainBarChartInstance = null;
 
-    function getMonthOrder(monthStr) {
+    // Strict chronological date/month parsing to maintain April 23 onwards sequence correctly
+    function parseMonthYearSequence(monthStr) {
       if (!monthStr) return 0;
       let m = monthStr.toUpperCase();
-      if (m.includes("APR")) return 1;
-      if (m.includes("MAY")) return 2;
-      if (m.includes("JUN")) return 3;
-      if (m.includes("JUL")) return 4;
-      if (m.includes("AUG")) return 5;
-      if (m.includes("SEP")) return 6;
-      if (m.includes("OCT")) return 7;
-      if (m.includes("NOV")) return 8;
-      if (m.includes("DEC")) return 9;
-      if (m.includes("JAN")) return 10;
-      if (m.includes("FEB")) return 11;
-      if (m.includes("MAR")) return 12;
-      return 0;
+      
+      let monthsMap = {
+        "JAN": 1, "FEB": 2, "MAR": 3, "APR": 4, "MAY": 5, "JUN": 6,
+        "JUL": 7, "AUG": 8, "SEP": 9, "OCT": 10, "NOV": 11, "DEC": 12
+      };
+
+      let foundMonth = 0;
+      for (let key in monthsMap) {
+        if (m.includes(key)) {
+          foundMonth = monthsMap[key];
+          break;
+        }
+      }
+
+      // Extract Year (e.g. 23, 24, 2023, 2024)
+      let yearMatch = m.match(/(20\d{2}|\b\d{2}\b)/g);
+      let yearVal = 2023;
+      if (yearMatch) {
+        let rawYear = yearMatch[yearMatch.length - 1];
+        yearVal = rawYear.length === 2 ? parseInt("20" + rawYear) : parseInt(rawYear);
+      }
+
+      // Adjust Financial/Chronological weighting so April comes first in FY or absolute chronological order
+      // Absolute chronological sorting: Year * 12 + Month
+      return (yearVal * 12) + foundMonth;
     }
 
     function getFinancialYear(monthStr) {
@@ -519,12 +532,12 @@
             let finalTonnage = explicitTonnage > 0 ? explicitTonnage : (totalWtKg / 1000);
 
             let fy = getFinancialYear(monthCol);
-            let order = getMonthOrder(monthCol);
+            let seqOrder = parseMonthYearSequence(monthCol);
 
             monthlyData.push({
               month: monthCol,
               fy: fy,
-              order: order,
+              seqOrder: seqOrder,
               sqf1: { p: parseVal(r[1]), w: parseVal(r[2]) },
               sqf2: { p: parseVal(r[3]), w: parseVal(r[4]) },
               sqf3: { p: parseVal(r[5]), w: parseVal(r[6]) },
@@ -534,7 +547,9 @@
           }
         }
 
-        monthlyData.sort((a, b) => a.order - b.order);
+        // Strictly sort all rows chronologically by sequence order (April 2023 onwards)
+        monthlyData.sort((a, b) => a.seqOrder - b.seqOrder);
+        
         populateMonthDropdowns();
         document.getElementById('syncStatus').innerText = "● Live Synced";
         document.getElementById('syncStatus').style.color = "#34d399";
@@ -552,6 +567,7 @@
       fromSelect.innerHTML = '<option value="">-- Start --</option>';
       toSelect.innerHTML = '<option value="">-- End --</option>';
 
+      // Dropdown will now populate strictly in chronological sequence from Google Sheet data
       monthlyData.forEach((row, index) => {
         fromSelect.innerHTML += `<option value="${index}">${row.month}</option>`;
         toSelect.innerHTML += `<option value="${index}">${row.month}</option>`;
