@@ -173,7 +173,7 @@
     .kpi-card span { font-size: 10px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
     .kpi-card h3 { margin: 2px 0 0 0; font-size: 18px; font-weight: 700; color: #f8fafc; }
 
-    /* FY 2026-27 Exclusive Graph Section */
+    /* Financial Year Graph Section */
     .graph-card {
       background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       border: 1px solid #334155;
@@ -300,20 +300,17 @@
       <a href="breakdown.html" class="nav-main-btn">⚠️ Breakdown & Loss</a>
     </div>
 
-    <!-- Filter Panel with Trend Button -->
+    <!-- Filter Panel with Financial Year Dropdown & Trend Button -->
     <div class="filter-panel">
       <div class="filter-row">
+        <!-- Financial Year Dropdown -->
         <div class="filter-group">
-          <span>From Month:</span>
-          <select id="fromMonthSelect" onchange="renderMonthlyTable()">
-            <option value="">-- Start --</option>
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <span>To Month:</span>
-          <select id="toMonthSelect" onchange="renderMonthlyTable()">
-            <option value="">-- End --</option>
+          <span>Financial Year:</span>
+          <select id="fySelect" onchange="renderMonthlyTable()">
+            <option value="2026-2027" selected>FY 2026-2027 (Apr 26 - Mar 27)</option>
+            <option value="2025-2026">FY 2025-2026 (Apr 25 - Mar 26)</option>
+            <option value="2024-2025">FY 2024-2025 (Apr 24 - Mar 25)</option>
+            <option value="2023-2024">FY 2023-2024 (Apr 23 - Mar 24)</option>
           </select>
         </div>
 
@@ -348,10 +345,10 @@
       </div>
     </div>
 
-    <!-- Financial Year 2026-27 Exclusive Bar Graph Section -->
+    <!-- Financial Year Selected Bar Graph Section -->
     <div class="graph-card">
       <div class="table-title-row">
-        <h3 id="fyGraphTitle">📈 Financial Year 2026-27 Monthly Production & Average</h3>
+        <h3 id="fyGraphTitle">📈 Financial Year Monthly Production & Average</h3>
       </div>
       <div class="graph-container">
         <canvas id="monthlyBarChart"></canvas>
@@ -412,6 +409,60 @@
     let trendChartInstance = null;
     let mainBarChartInstance = null;
 
+    // Helper to map month string to month number (1 to 12) for Financial Year sorting (April to March)
+    function getMonthOrder(monthStr) {
+      if (!monthStr) return 0;
+      let m = monthStr.toUpperCase();
+      if (m.includes("APR")) return 1;
+      if (m.includes("MAY")) return 2;
+      if (m.includes("JUN")) return 3;
+      if (m.includes("JUL")) return 4;
+      if (m.includes("AUG")) return 5;
+      if (m.includes("SEP")) return 6;
+      if (m.includes("OCT")) return 7;
+      if (m.includes("NOV")) return 8;
+      if (m.includes("DEC")) return 9;
+      if (m.includes("JAN")) return 10;
+      if (m.includes("FEB")) return 11;
+      if (m.includes("MAR")) return 12;
+      return 0;
+    }
+
+    // Helper to assign row into correct Financial Year based on Month and Year text
+    function getFinancialYear(monthStr) {
+      if (!monthStr) return "";
+      let m = monthStr.toUpperCase();
+      let has23 = m.includes("23");
+      let has24 = m.includes("24");
+      let has25 = m.includes("25");
+      let has26 = m.includes("26");
+      let has27 = m.includes("27");
+
+      // Apr-Dec belongs to the starting year, Jan-Mar belongs to the ending year of FY
+      if (m.includes("JAN") || m.includes("FEB") || m.includes("MAR")) {
+        if (has27) return "2026-2027";
+        if (has26) return "2025-2026";
+        if (has25) return "2024-2025";
+        if (has24) return "2023-2024";
+      } else {
+        if (has26 && has27) return "2026-2027";
+        if (has26) return "2026-2027"; // or 2025-2026 depending on month
+        if (has25 && has26) return "2025-2026";
+        if (has25) return "2025-2026";
+        if (has24 && has25) return "2024-2025";
+        if (has24) return "2024-2025";
+        if (has23) return "2023-2024";
+      }
+
+      // Default checks based on explicit text matching
+      if (has26 && (m.includes("APR") || m.includes("MAY") || m.includes("JUN") || m.includes("JUL") || m.includes("AUG") || m.includes("SEP") || m.includes("OCT") || m.includes("NOV") || m.includes("DEC"))) return "2026-2027";
+      if (has25 && (m.includes("APR") || m.includes("MAY") || m.includes("JUN") || m.includes("JUL") || m.includes("AUG") || m.includes("SEP") || m.includes("OCT") || m.includes("NOV") || m.includes("DEC"))) return "2025-2026";
+      if (has24 && (m.includes("APR") || m.includes("MAY") || m.includes("JUN") || m.includes("JUL") || m.includes("AUG") || m.includes("SEP") || m.includes("OCT") || m.includes("NOV") || m.includes("DEC"))) return "2024-2025";
+      if (has23) return "2023-2024";
+
+      return "2026-2027"; // fallback
+    }
+
     async function fetchMonthlyLive() {
       try {
         const response = await fetch(MONTHLY_CSV_URL);
@@ -434,7 +485,7 @@
           let r = rows[i];
           let monthCol = r[0] ? r[0].replace(/["']/g, "").trim() : "";
           
-          if (monthCol && (monthCol.includes("202") || monthCol.includes("-23") || monthCol.includes("-24") || monthCol.includes("-25") || monthCol.includes("-26") || monthCol.includes("May") || monthCol.includes("Apr") || monthCol.includes("Jun") || monthCol.includes("Jul") || monthCol.includes("Aug") || monthCol.includes("Sep") || monthCol.includes("Oct") || monthCol.includes("Nov") || monthCol.includes("Dec") || monthCol.includes("Jan") || monthCol.includes("Feb") || monthCol.includes("Mar"))) {
+          if (monthCol && (monthCol.includes("202") || monthCol.includes("203") || monthCol.includes("May") || monthCol.includes("Apr") || monthCol.includes("Jun") || monthCol.includes("Jul") || monthCol.includes("Aug") || monthCol.includes("Sep") || monthCol.includes("Oct") || monthCol.includes("Nov") || monthCol.includes("Dec") || monthCol.includes("Jan") || monthCol.includes("Feb") || monthCol.includes("Mar"))) {
             
             let parseVal = (val) => {
               if (!val) return 0;
@@ -455,8 +506,13 @@
             let totalWtKg = parseVal(r[2]) + parseVal(r[4]) + parseVal(r[6]) + parseVal(r[8]);
             let finalTonnage = explicitTonnage > 0 ? explicitTonnage : (totalWtKg / 1000);
 
+            let fy = getFinancialYear(monthCol);
+            let order = getMonthOrder(monthCol);
+
             monthlyData.push({
               month: monthCol,
+              fy: fy,
+              order: order,
               sqf1: { p: parseVal(r[1]), w: parseVal(r[2]) },
               sqf2: { p: parseVal(r[3]), w: parseVal(r[4]) },
               sqf3: { p: parseVal(r[5]), w: parseVal(r[6]) },
@@ -466,7 +522,10 @@
           }
         }
 
-        populateMonthDropdowns();
+        // Sort data chronologically from April to March within each FY
+        monthlyData.sort((a, b) => a.order - b.order);
+
+        renderMonthlyTable();
         document.getElementById('syncStatus').innerText = "● Live Synced";
         document.getElementById('syncStatus').style.color = "#34d399";
       } catch (err) {
@@ -476,29 +535,8 @@
       }
     }
 
-    function populateMonthDropdowns() {
-      const fromSelect = document.getElementById('fromMonthSelect');
-      const toSelect = document.getElementById('toMonthSelect');
-      
-      fromSelect.innerHTML = '<option value="">-- Start --</option>';
-      toSelect.innerHTML = '<option value="">-- End --</option>';
-
-      monthlyData.forEach((row, index) => {
-        fromSelect.innerHTML += `<option value="${index}">${row.month}</option>`;
-        toSelect.innerHTML += `<option value="${index}">${row.month}</option>`;
-      });
-
-      if(monthlyData.length > 0) {
-        fromSelect.value = 0;
-        toSelect.value = monthlyData.length - 1;
-      }
-
-      renderMonthlyTable();
-    }
-
     function renderMonthlyTable() {
-      const fromIdx = document.getElementById('fromMonthSelect').value;
-      const toIdx = document.getElementById('toMonthSelect').value;
+      const selectedFY = document.getElementById('fySelect').value;
       
       const showSqf1 = document.querySelector('.sqf-filter[value="SQF-1"]').checked;
       const showSqf2 = document.querySelector('.sqf-filter[value="SQF-2"]').checked;
@@ -511,16 +549,11 @@
       let gTotalQty = 0;
       let gTotalWeight = 0;
 
-      let startIndex = fromIdx !== "" ? parseInt(fromIdx) : 0;
-      let endIndex = toIdx !== "" ? parseInt(toIdx) : monthlyData.length - 1;
+      // Filter rows strictly matching selected Financial Year
+      const filteredRows = monthlyData.filter(row => row.fy === selectedFY);
 
-      if (startIndex > endIndex) {
-        let temp = startIndex;
-        startIndex = endIndex;
-        endIndex = temp;
-      }
-
-      const filteredRows = monthlyData.slice(startIndex, endIndex + 1);
+      let chartLabels = [];
+      let chartValues = [];
 
       filteredRows.forEach(row => {
         let s1p = showSqf1 ? row.sqf1.p : 0;
@@ -539,6 +572,9 @@
         gTotalQty += rowTotalQty;
         gTotalWeight += rowTotalWeight;
 
+        chartLabels.push(row.month);
+        chartValues.push(parseFloat(rowTonnage.toFixed(2)));
+
         html += `
           <tr>
             <td style="font-weight:700; color:#38bdf8;">${row.month}</td>
@@ -554,7 +590,7 @@
       });
 
       if (!html) {
-        html = `<tr><td colspan="12" style="padding: 20px; color: #94a3b8;">No records found for the selected range.</td></tr>`;
+        html = `<tr><td colspan="12" style="padding: 20px; color: #94a3b8;">No records found for Financial Year ${selectedFY}.</td></tr>`;
       }
 
       tbody.innerHTML = html;
@@ -563,28 +599,18 @@
       document.getElementById('kpiTotalWeight').innerText = `${gTotalWeight.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})} Kg`;
       document.getElementById('kpiTotalTonnage').innerText = `${(gTotalWeight / 1000).toFixed(2)} Ton`;
 
-      // Render Dedicated Financial Year 2026-27 Bar Chart on Main Screen
-      renderFY2026_27BarChart();
+      // Calculate Average and Render Main Bar Chart for Selected Financial Year
+      let totalTonSum = chartValues.reduce((a, b) => a + b, 0);
+      let avgTonnage = chartValues.length > 0 ? (totalTonSum / chartValues.length).toFixed(2) : 0;
+      
+      document.getElementById('fyGraphTitle').innerText = `📈 Financial Year ${selectedFY} Monthly Production | Avg: ${avgTonnage} T`;
+      renderMainBarChart(chartLabels, chartValues, avgTonnage);
     }
 
-    // Exclusive Financial Year 2026-27 Bar Chart with Average Line
-    function renderFY2026_27BarChart() {
+    // Main Bar Chart with Average Line for Selected FY
+    function renderMainBarChart(labels, dataValues, avgValue) {
       const ctx = document.getElementById('monthlyBarChart').getContext('2d');
-
-      // Filter specifically for Financial Year 2026-27 months (April 2026 onwards or matching '2026')
-      let fyData = monthlyData.filter(d => d.month.includes("2026") || d.month.includes("2027") || d.month.toUpperCase().includes("APR") || d.month.toUpperCase().includes("MAY") || d.month.toUpperCase().includes("JUN") || d.month.toUpperCase().includes("JUL") || d.month.toUpperCase().includes("AUG"));
-      
-      // Fallback if matching string differs, take all loaded rows or recent rows
-      if (fyData.length === 0) fyData = monthlyData;
-
-      let labels = fyData.map(d => d.month);
-      let values = fyData.map(d => parseFloat(d.tonnage.toFixed(2)));
-
-      let sum = values.reduce((a, b) => a + b, 0);
-      let avg = values.length > 0 ? (sum / values.length) : 0;
-      let avgLineData = Array(labels.length).fill(parseFloat(avg.toFixed(2)));
-
-      document.getElementById('fyGraphTitle').innerText = `📈 Financial Year 2026-27 Monthly Production | Avg: ${avg.toFixed(2)} T`;
+      const avgLineData = Array(labels.length).fill(parseFloat(avgValue));
 
       if (mainBarChartInstance) {
         mainBarChartInstance.destroy();
@@ -597,13 +623,13 @@
           datasets: [
             {
               label: 'Monthly Production (Ton)',
-              data: values,
+              data: dataValues,
               backgroundColor: '#3b82f6',
               borderRadius: 6,
               order: 2
             },
             {
-              label: `Average (${avg.toFixed(2)} T)`,
+              label: `Average (${avgValue} T)`,
               data: avgLineData,
               type: 'line',
               borderColor: '#f59e0b',
@@ -642,7 +668,7 @@
       });
     }
 
-    /* Trend Chart Modal Logic for Trend Button */
+    /* Trend Modal Logic */
     function openTrendModal() {
       document.getElementById('trendModal').style.display = 'flex';
       renderDynamicTrendChart();
@@ -654,20 +680,9 @@
 
     function renderDynamicTrendChart() {
       const ctx = document.getElementById('trendChart').getContext('2d');
+      const selectedFY = document.getElementById('fySelect').value;
 
-      const fromIdx = document.getElementById('fromMonthSelect').value;
-      const toIdx = document.getElementById('toMonthSelect').value;
-
-      let startIndex = fromIdx !== "" ? parseInt(fromIdx) : 0;
-      let endIndex = toIdx !== "" ? parseInt(toIdx) : monthlyData.length - 1;
-
-      if (startIndex > endIndex) {
-        let temp = startIndex;
-        startIndex = endIndex;
-        endIndex = temp;
-      }
-
-      const rangeData = monthlyData.slice(startIndex, endIndex + 1);
+      const rangeData = monthlyData.filter(row => row.fy === selectedFY);
 
       let labels = rangeData.map(d => d.month);
       let values = rangeData.map(d => parseFloat(d.tonnage.toFixed(2)));
@@ -679,9 +694,8 @@
       values.push(parseFloat(avg.toFixed(2)));
 
       let bgColors = values.map((val, idx) => idx === values.length - 1 ? '#10b981' : '#ec4899');
-      let rangeText = rangeData.length > 0 ? `${rangeData[0].month} to ${rangeData[rangeData.length - 1].month}` : "Selected Range";
       
-      document.getElementById('modalTitle').innerText = `📈 PRODUCTION TREND IN TONNAGE (${rangeText}) | Avg: ${avg.toFixed(2)} T`;
+      document.getElementById('modalTitle').innerText = `📈 PRODUCTION TREND IN TONNAGE (FY ${selectedFY}) | Avg: ${avg.toFixed(2)} T`;
 
       if (trendChartInstance) {
         trendChartInstance.destroy();
