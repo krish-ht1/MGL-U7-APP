@@ -6,8 +6,6 @@
   <title>Yearly Production - Milestone Gear Unit 7</title>
   <!-- Chart.js Library -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Chart.js DataLabels Plugin -->
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -42,6 +40,7 @@
     .header-right { display: flex; align-items: center; gap: 8px; }
     .home-btn {
       background: #1e293b;
+      border: 1px solid #334155;
       color: #38bdf8;
       padding: 6px 12px;
       border-radius: 6px;
@@ -53,9 +52,9 @@
       align-items: center;
       gap: 5px;
     }
-    .ewm-badge { background: rgba(59, 130, 246, 0.15); color: #3b82f6; padding: 3px 8px; border-radius: 6px; font-size: 10.5px; font-weight: 600; }
+    .ewm-badge { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-size: 10.5px; font-weight: 600; }
 
-    .ewm-container { max-width: 1600px; width: 100%; margin: 0 auto; padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
+    .ewm-container { max-width: 1600px; width: 100%; margin: 0 auto; padding: 14px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
 
     /* Navigation Bar */
     .nav-buttons-bar {
@@ -63,12 +62,13 @@
       grid-template-columns: repeat(4, 1fr);
       gap: 8px;
       background: #0f172a;
-      padding: 8px;
+      border: 1px solid #1e293b;
+      padding: 10px;
       border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
     .nav-main-btn {
       background: #1e293b;
+      border: 1px solid #334155;
       color: #94a3b8;
       padding: 8px 6px;
       border-radius: 8px;
@@ -80,22 +80,22 @@
       display: block;
       transition: 0.2s;
     }
-    .nav-main-btn.active { background: #3b82f6; color: #fff; }
+    .nav-main-btn.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
 
-    /* KPI Summary Cards - 3 in One Single Line */
-    .kpi-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    @media (max-width: 768px) { .kpi-grid-3 { grid-template-columns: 1fr; } }
+    /* KPI Summary Cards */
+    .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    @media (max-width: 768px) { .kpi-grid { grid-template-columns: 1fr; } }
 
     .kpi-card {
       background: #0f172a;
+      border: 1px solid #1e293b;
       border-radius: 10px;
-      padding: 12px 16px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
       gap: 4px;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
     .kpi-card::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: #3b82f6; }
     .kpi-card.green::after { background: #34d399; }
@@ -104,25 +104,14 @@
     .kpi-card span { font-size: 10px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
     .kpi-card h3 { margin: 2px 0 0 0; font-size: 18px; font-weight: 700; color: #f8fafc; }
 
-    /* Yearly Production Table (Upar) */
+    /* Table Section */
     .table-section {
       background: #0f172a;
+      border: 1px solid #1e293b;
       border-radius: 10px;
       padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
-    .table-title-row h3 { font-size: 12px; font-weight: 700; color: #f8fafc; margin: 0; }
-    
-    .fixed-table-scroll {
-      max-height: 280px;
-      overflow-y: auto;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      border-radius: 6px;
-    }
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     table.yearly-table {
       width: 100%;
       border-collapse: collapse;
@@ -131,12 +120,11 @@
       white-space: nowrap;
     }
     table.yearly-table th, table.yearly-table td {
-      border: none;
-      padding: 8px 10px;
-      border-bottom: 1px solid #1e293b;
+      border: 1px solid #334155;
+      padding: 8px 6px;
     }
     table.yearly-table th {
-      background: #162032;
+      background: #1e293b;
       color: #94a3b8;
       font-weight: 600;
       position: sticky;
@@ -144,26 +132,17 @@
       z-index: 5;
     }
     table.yearly-table td { background: #0f172a; color: #f1f5f9; }
-    table.yearly-table tr:hover td { background: #162032; }
 
-    /* 3D Professional Yearly Graph Section (Neeche) */
+    /* Graph Card */
     .graph-card {
-      background: linear-gradient(135deg, #0b1120 0%, #0f172a 100%);
-      border-radius: 12px;
-      padding: 16px;
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
     }
-    .graph-title-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .graph-title-row h3 { font-size: 13px; font-weight: 700; color: #f8fafc; margin: 0; }
     .graph-container { position: relative; width: 100%; height: 300px; }
   </style>
 </head>
@@ -190,8 +169,8 @@
       <a href="breakdown.html" class="nav-main-btn">⚠️ Breakdown & Loss</a>
     </div>
 
-    <!-- KPI Summary Cards - 3 in One Single Line -->
-    <div class="kpi-grid-3">
+    <!-- KPI Summary Cards -->
+    <div class="kpi-grid">
       <div class="kpi-card">
         <span>Total Quantity (Pcs)</span>
         <h3 id="kpiTotalQty">0 Pcs</h3>
@@ -206,12 +185,9 @@
       </div>
     </div>
 
-    <!-- 1. Yearly Production Table (Google Sheet Live Data) -->
+    <!-- Yearly Production Table -->
     <div class="table-section">
-      <div class="table-title-row">
-        <h3>📋 Yearly Production Data Record</h3>
-      </div>
-      <div class="fixed-table-scroll">
+      <div class="table-scroll">
         <table class="yearly-table">
           <thead>
             <tr>
@@ -238,26 +214,23 @@
       </div>
     </div>
 
-    <!-- 2. 3D Colorful Yearly Bar Graph Section -->
+    <!-- Yearly Trend Graph Section -->
     <div class="graph-card">
-      <div class="graph-title-row">
-        <h3>📈 Yearly Production Trend (Tonnage)</h3>
-      </div>
+      <h3 style="margin: 0; font-size: 13px; color: #f8fafc;">📈 Yearly Production Trend (Tonnage)</h3>
       <div class="graph-container">
-        <canvas id="yearlyBarChart"></canvas>
+        <canvas id="yearlyChart"></canvas>
       </div>
     </div>
 
   </div>
 
   <script>
-    // Yahan apni Google Sheet ka Yearly CSV link dal lena agar alag gid ho
     const YEARLY_CSV_URL = "https://docs.google.com/spreadsheets/d/1ZKl4Nzxfwrt5MO11Iy-S-Yjiq0t9MHoQrryAE1paqXw/export?format=csv&gid=0";
 
+    let yearlyData = [];
     let yearlyChartInstance = null;
-    let yearlyDataRecords = [];
 
-    async function fetchYearlyLiveData() {
+    async function fetchYearlyLive() {
       try {
         const response = await fetch(YEARLY_CSV_URL);
         const csvText = await response.text();
@@ -274,12 +247,11 @@
           return row;
         });
 
-        yearlyDataRecords = [];
+        yearlyData = [];
         for (let i = 0; i < rows.length; i++) {
           let r = rows[i];
           let yearCol = r[0] ? r[0].replace(/["']/g, "").trim() : "";
-
-          // Check if row contains a financial year pattern like '2023' or '2024' or 'FY'
+          
           if (yearCol && (yearCol.includes("202") || yearCol.includes("203") || yearCol.toUpperCase().includes("FY") || yearCol.includes("-"))) {
             
             let parseVal = (val) => {
@@ -293,7 +265,7 @@
             let totalWtKg = parseVal(r[2]) + parseVal(r[4]) + parseVal(r[6]) + parseVal(r[8]);
             let finalTonnage = explicitTonnage > 0 ? explicitTonnage : (totalWtKg / 1000);
 
-            yearlyDataRecords.push({
+            yearlyData.push({
               year: yearCol,
               sqf1: { p: parseVal(r[1]), w: parseVal(r[2]) },
               sqf2: { p: parseVal(r[3]), w: parseVal(r[4]) },
@@ -304,71 +276,70 @@
           }
         }
 
-        renderYearlyDashboard();
+        renderYearlyTable();
         document.getElementById('syncStatus').innerText = "● Live Synced";
         document.getElementById('syncStatus').style.color = "#34d399";
       } catch (err) {
-        console.log("Error loading yearly sheet:", err);
+        console.log("Error loading CSV:", err);
         document.getElementById('syncStatus').innerText = "● Sync Error";
         document.getElementById('syncStatus').style.color = "#ef4444";
       }
     }
 
-    function renderYearlyDashboard() {
-      let tbodyHtml = "";
-      let labels = [];
-      let values = [];
+    function renderYearlyTable() {
+      const tbody = document.getElementById('yearlyTableBody');
+      let html = "";
 
       let gQty = 0;
       let gWeight = 0;
+      let labels = [];
+      let values = [];
 
-      yearlyDataRecords.forEach(rec => {
-        let s1p = rec.sqf1.p, s1w = rec.sqf1.w;
-        let s2p = rec.sqf2.p, s2w = rec.sqf2.w;
-        let s3p = rec.sqf3.p, s3w = rec.sqf3.w;
-        let s4p = rec.sqf4.p, s4w = rec.sqf4.w;
+      yearlyData.forEach(row => {
+        let s1p = row.sqf1.p, s1w = row.sqf1.w;
+        let s2p = row.sqf2.p, s2w = row.sqf2.w;
+        let s3p = row.sqf3.p, s3w = row.sqf3.w;
+        let s4p = row.sqf4.p, s4w = row.sqf4.w;
 
-        let totalPcs = s1p + s2p + s3p + s4p;
-        let totalKg = s1w + s2w + s3w + s4w;
-        let totalTon = rec.tonnage > 0 ? rec.tonnage : (totalKg / 1000);
+        let rowTotalQty = s1p + s2p + s3p + s4p;
+        let rowTotalWeight = s1w + s2w + s3w + s4w;
+        let rowTonnage = row.tonnage > 0 ? row.tonnage : (rowTotalWeight / 1000);
 
-        gQty += totalPcs;
-        gWeight += totalKg;
+        gQty += rowTotalQty;
+        gWeight += rowTotalWeight;
 
-        labels.push(`${rec.year}`);
-        values.push(parseFloat(totalTon.toFixed(2)));
+        labels.push(row.year);
+        values.push(parseFloat(rowTonnage.toFixed(2)));
 
-        tbodyHtml += `
+        html += `
           <tr>
-            <td style="font-weight:700; color:#38bdf8;">${rec.year}</td>
+            <td style="font-weight:700; color:#38bdf8;">${row.year}</td>
             <td>${s1p.toLocaleString('en-IN')}</td><td>${s1w.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
             <td>${s2p.toLocaleString('en-IN')}</td><td>${s2w.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
             <td>${s3p.toLocaleString('en-IN')}</td><td>${s3w.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
             <td>${s4p.toLocaleString('en-IN')}</td><td>${s4w.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-            <td style="font-weight:700; color:#fde047;">${totalPcs.toLocaleString('en-IN')}</td>
-            <td style="font-weight:700; color:#fde047;">${totalKg.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-            <td style="font-weight:700; color:#34d399;">${totalTon.toFixed(2)} Ton</td>
+            <td style="font-weight:700; color:#fde047;">${rowTotalQty.toLocaleString('en-IN')}</td>
+            <td style="font-weight:700; color:#fde047;">${rowTotalWeight.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td style="font-weight:700; color:#34d399;">${rowTonnage.toFixed(2)} Ton</td>
           </tr>
         `;
       });
 
-      if (!tbodyHtml) {
-        tbodyHtml = `<tr><td colspan="12" style="padding: 20px; color: #94a3b8;">No yearly data found in Google Sheet.</td></tr>`;
+      if (!html) {
+        html = `<tr><td colspan="12" style="padding: 20px; color: #94a3b8;">No yearly records found.</td></tr>`;
       }
 
-      document.getElementById('yearlyTableBody').innerHTML = tbodyHtml;
+      tbody.innerHTML = html;
 
       document.getElementById('kpiTotalQty').innerText = `${gQty.toLocaleString('en-IN')} Pcs`;
       document.getElementById('kpiTotalWeight').innerText = `${gWeight.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})} Kg`;
       document.getElementById('kpiTotalTonnage').innerText = `${(gWeight / 1000).toFixed(2)} Ton`;
 
-      renderYearly3DChart(labels, values);
+      renderYearlyChart(labels, values);
     }
 
-    function renderYearly3DChart(labels, values) {
-      const ctx = document.getElementById('yearlyBarChart').getContext('2d');
-
-      let bgColors = values.map((_, idx) => idx % 2 === 0 ? '#ec4899' : '#3b82f6');
+    function renderYearlyChart(labels, values) {
+      const ctx = document.getElementById('yearlyChart').getContext('2d');
 
       if (yearlyChartInstance) {
         yearlyChartInstance.destroy();
@@ -378,45 +349,29 @@
         type: 'bar',
         data: {
           labels: labels,
-          datasets: [
-            {
-              label: 'Yearly Tonnage',
-              data: values,
-              backgroundColor: bgColors,
-              borderRadius: 8,
-              borderWidth: 0
-            }
-          ]
+          datasets: [{
+            label: 'Tonnage',
+            data: values,
+            backgroundColor: '#3b82f6',
+            borderRadius: 6
+          }]
         },
-        plugins: [ChartDataLabels],
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
             legend: { display: false },
-            datalabels: {
-              anchor: 'end',
-              align: 'top',
-              color: '#f8fafc',
-              font: { family: 'Inter', size: 11.5, weight: '700' },
-              formatter: (value) => value > 0 ? value + ' T' : ''
-            }
+            tooltip: { backgroundColor: '#1e293b', titleColor: '#38bdf8', bodyColor: '#f8fafc', borderColor: '#334155', borderWidth: 1 }
           },
           scales: {
-            x: {
-              ticks: { color: '#cbd5e1', font: { size: 11, weight: '600' } },
-              grid: { display: false }
-            },
-            y: {
-              ticks: { color: '#94a3b8', font: { size: 10 } },
-              grid: { color: 'rgba(51, 65, 85, 0.15)' }
-            }
+            x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+            y: { grid: { color: 'rgba(51, 65, 85, 0.2)' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
           }
         }
       });
     }
 
-    window.addEventListener('DOMContentLoaded', fetchYearlyLiveData);
+    window.addEventListener('DOMContentLoaded', fetchYearlyLive);
   </script>
 </body>
 </html>
