@@ -219,7 +219,7 @@
             </tr>
           </thead>
           <tbody id="yearlyTableBody">
-            <tr><td colspan="5" style="padding: 16px; color: #94a3b8;">Loading...</td></tr>
+            <tr><td colspan="5" style="padding: 16px; color: #94a3b8;">Loading live data...</td></tr>
           </tbody>
         </table>
       </div>
@@ -282,7 +282,7 @@
             let percentage = target > 0 ? ((prod / target) * 100).toFixed(1) : 0;
 
             yearlyData.push({
-              year: yearCol.replace('FY-', ''),
+              year: yearCol,
               production: prod,
               target: target,
               avgMonth: avgM,
@@ -298,6 +298,7 @@
         console.log("Error loading CSV:", err);
         document.getElementById('syncStatus').innerText = "● Error";
         document.getElementById('syncStatus').style.color = "#ef4444";
+        document.getElementById('yearlyTableBody').innerHTML = `<tr><td colspan="5" style="padding: 16px; color: #ef4444;">Error loading live data. Check connection.</td></tr>`;
       }
     }
 
@@ -400,17 +401,12 @@
           plugins: {
             legend: { display: false },
             datalabels: {
-              anchor: function(context) {
-                return context.dataset.type === 'line' ? 'end' : 'end';
-              },
-              align: function(context) {
-                return context.dataset.type === 'line' ? 'top' : 'top';
-              },
+              anchor: 'end',
+              align: 'top',
               color: function(context) {
                 return context.dataset.type === 'line' ? '#fb923c' : '#f8fafc';
               },
               font: { family: 'Inter', size: isMobile ? 8.5 : 10, weight: '700' },
-              // Target aur baaki sabhi values ko bilkul seedha rakha hai taaki phone par bhi saaf dikhe
               rotation: 0,
               formatter: function(value) {
                 return value > 0 ? value : '';
@@ -440,7 +436,7 @@
               type: 'linear',
               position: 'right',
               grid: { display: false },
-              ticks: { color: '#ec4899', font: { size: 8.5 : 10 } }
+              ticks: { color: '#ec4899', font: { size: isMobile ? 8.5 : 10 } }
             }
           }
         }
