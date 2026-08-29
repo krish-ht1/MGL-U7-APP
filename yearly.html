@@ -82,26 +82,6 @@
     }
     .nav-main-btn.active { background: #3b82f6; color: #fff; }
 
-    /* 3D Professional Yearly Graph Section */
-    .graph-card {
-      background: linear-gradient(135deg, #0b1120 0%, #0f172a 100%);
-      border-radius: 12px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-    }
-    .graph-title-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .graph-title-row h3 { font-size: 13px; font-weight: 700; color: #f8fafc; margin: 0; }
-    .graph-container { position: relative; width: 100%; height: 320px; }
-
     /* KPI Summary Cards - 3 in One Single Line */
     .kpi-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
     @media (max-width: 768px) { .kpi-grid-3 { grid-template-columns: 1fr; } }
@@ -124,7 +104,7 @@
     .kpi-card span { font-size: 10px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
     .kpi-card h3 { margin: 2px 0 0 0; font-size: 18px; font-weight: 700; color: #f8fafc; }
 
-    /* Clean Borderless Table Section */
+    /* Yearly Production Table (Ab upar raheगी) */
     .table-section {
       background: #0f172a;
       border-radius: 10px;
@@ -137,7 +117,7 @@
     .table-title-row h3 { font-size: 12px; font-weight: 700; color: #f8fafc; margin: 0; }
     
     .fixed-table-scroll {
-      max-height: 300px;
+      max-height: 280px;
       overflow-y: auto;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
@@ -146,13 +126,13 @@
     table.yearly-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 11.5px;
+      font-size: 11px;
       text-align: center;
       white-space: nowrap;
     }
     table.yearly-table th, table.yearly-table td {
       border: none;
-      padding: 10px 12px;
+      padding: 8px 10px;
       border-bottom: 1px solid #1e293b;
     }
     table.yearly-table th {
@@ -165,6 +145,26 @@
     }
     table.yearly-table td { background: #0f172a; color: #f1f5f9; }
     table.yearly-table tr:hover td { background: #162032; }
+
+    /* 3D Professional Yearly Graph Section (Ab neeche rahega) */
+    .graph-card {
+      background: linear-gradient(135deg, #0b1120 0%, #0f172a 100%);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+    .graph-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .graph-title-row h3 { font-size: 13px; font-weight: 700; color: #f8fafc; margin: 0; }
+    .graph-container { position: relative; width: 100%; height: 300px; }
   </style>
 </head>
 <body>
@@ -190,17 +190,7 @@
       <a href="breakdown.html" class="nav-main-btn">⚠️ Breakdown & Loss</a>
     </div>
 
-    <!-- 1. 3D Professional Yearly Bar Graph Section (Top) -->
-    <div class="graph-card">
-      <div class="graph-title-row">
-        <h3>📈 Yearly Production Trend (Tonnage)</h3>
-      </div>
-      <div class="graph-container">
-        <canvas id="yearlyBarChart"></canvas>
-      </div>
-    </div>
-
-    <!-- 2. KPI Summary Cards - 3 in One Single Line -->
+    <!-- KPI Summary Cards - 3 in One Single Line -->
     <div class="kpi-grid-3">
       <div class="kpi-card">
         <span>Total Quantity (Pcs)</span>
@@ -216,7 +206,7 @@
       </div>
     </div>
 
-    <!-- 3. Yearly Production Table -->
+    <!-- 1. Yearly Production Table (Ab upar set hai) -->
     <div class="table-section">
       <div class="table-title-row">
         <h3>📋 Yearly Production Data Record</h3>
@@ -248,15 +238,23 @@
       </div>
     </div>
 
+    <!-- 2. 3D Colorful Yearly Bar Graph Section (Ab neeche set hai) -->
+    <div class="graph-card">
+      <div class="graph-title-row">
+        <h3>📈 Yearly Production Trend (Tonnage)</h3>
+      </div>
+      <div class="graph-container">
+        <canvas id="yearlyBarChart"></canvas>
+      </div>
+    </div>
+
   </div>
 
   <script>
-    // Yearly data source (You can link your specific yearly sheet CSV URL here if available)
     const YEARLY_CSV_URL = "https://docs.google.com/spreadsheets/d/1ZKl4Nzxfwrt5MO11Iy-S-Yjiq0t9MHoQrryAE1paqXw/export?format=csv&gid=0";
 
     let yearlyChartInstance = null;
 
-    // Sample/Default Structured Yearly Records based on your multi-year data structure
     const yearlyRecords = [
       { year: "2023-2024", sqf1: {p: 4500, w: 812000}, sqf2: {p: 4400, w: 798000}, sqf3: {p: 4600, w: 830000}, sqf4: {p: 4550, w: 820000} },
       { year: "2024-2025", sqf1: {p: 5100, w: 920000}, sqf2: {p: 5000, w: 905000}, sqf3: {p: 5200, w: 940000}, sqf4: {p: 5150, w: 930000} },
@@ -314,7 +312,6 @@
     function renderYearly3DChart(labels, values) {
       const ctx = document.getElementById('yearlyBarChart').getContext('2d');
 
-      // Vibrant 3D-like Color Gradients for Yearly bars
       let bgColors = values.map((_, idx) => idx % 2 === 0 ? '#ec4899' : '#3b82f6');
 
       if (yearlyChartInstance) {
