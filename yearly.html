@@ -24,12 +24,12 @@
       flex-direction: column;
     }
 
-    /* Header with Symbol & Title */
+    /* Header */
     .ewm-header {
       background: rgba(15, 23, 42, 0.9);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid rgba(56, 189, 248, 0.2);
-      padding: 12px 16px;
+      padding: 14px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -38,53 +38,53 @@
       z-index: 1000;
       box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
-    .ewm-brand { display: flex; align-items: center; gap: 8px; }
-    .ewm-brand h1 { font-size: 13px; font-weight: 800; margin: 0; color: #f8fafc; letter-spacing: 0.3px; }
+    .ewm-brand { display: flex; align-items: center; gap: 10px; }
+    .ewm-brand h1 { font-size: 15px; font-weight: 800; margin: 0; color: #f8fafc; letter-spacing: 0.3px; }
     
-    .header-right { display: flex; align-items: center; gap: 8px; }
+    .header-right { display: flex; align-items: center; gap: 10px; }
     .home-btn {
       background: #1e293b;
       border: 1px solid rgba(56, 189, 248, 0.3);
       color: #38bdf8;
-      padding: 5px 10px;
-      border-radius: 6px;
-      font-size: 11px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11.5px;
       font-weight: 700;
       cursor: pointer;
       text-decoration: none;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
     }
     .ewm-badge { 
       background: rgba(52, 211, 153, 0.15); 
       color: #34d399; 
       border: 1px solid rgba(52, 211, 153, 0.4); 
-      padding: 3px 8px; 
-      border-radius: 6px; 
-      font-size: 10px; 
+      padding: 4px 10px; 
+      border-radius: 8px; 
+      font-size: 11px; 
       font-weight: 700; 
     }
 
-    .ewm-container { max-width: 1600px; width: 100%; margin: 0 auto; padding: 12px; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+    .ewm-container { max-width: 1600px; width: 100%; margin: 0 auto; padding: 18px; flex: 1; display: flex; flex-direction: column; gap: 16px; }
 
     /* Navigation Bar with Icons */
     .nav-buttons-bar {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
+      gap: 10px;
       background: rgba(15, 23, 42, 0.8);
       border: 1px solid rgba(255, 255, 255, 0.05);
-      padding: 8px;
-      border-radius: 10px;
+      padding: 10px;
+      border-radius: 12px;
     }
     .nav-main-btn {
       background: #1e293b;
       border: 1px solid rgba(255, 255, 255, 0.08);
       color: #94a3b8;
-      padding: 6px 4px;
-      border-radius: 6px;
-      font-size: 10px;
+      padding: 8px 6px;
+      border-radius: 8px;
+      font-size: 11.5px;
       font-weight: 700;
       cursor: pointer;
       text-align: center;
@@ -92,10 +92,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      gap: 6px;
     }
     .nav-main-btn.active { 
       background: #3b82f6; 
@@ -103,21 +100,21 @@
       color: #fff; 
     }
 
-    /* Table Section */
+    /* Table Section (Web View Best Layout) */
     .table-section {
       background: rgba(15, 23, 42, 0.75);
       backdrop-filter: blur(12px);
       border: 1px solid rgba(56, 189, 248, 0.2);
-      border-radius: 12px;
-      padding: 12px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.5);
     }
-    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px; }
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; }
     table.yearly-table {
       width: 100%;
       border-collapse: separate;
-      border-spacing: 0 4px;
-      font-size: 11px;
+      border-spacing: 0 6px;
+      font-size: 12px;
       text-align: center;
       white-space: nowrap;
     }
@@ -126,56 +123,58 @@
       color: #38bdf8;
       font-weight: 700;
       text-transform: uppercase;
-      font-size: 10px;
+      font-size: 11px;
       letter-spacing: 0.5px;
-      padding: 10px 8px;
+      padding: 12px 14px;
       border: none;
     }
-    table.yearly-table th:first-child { border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
-    table.yearly-table th:last-child { border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
+    table.yearly-table th:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+    table.yearly-table th:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
 
     table.yearly-table td {
       background: rgba(30, 41, 59, 0.4);
-      padding: 10px 8px;
+      padding: 12px 14px;
       border: none;
       font-weight: 600;
     }
-    table.yearly-table tr td:first-child { border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
-    table.yearly-table tr td:last-child { border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
+    table.yearly-table tr td:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+    table.yearly-table tr td:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
 
     /* Graph Card */
     .graph-card {
       background: linear-gradient(145deg, #0b1120 0%, #0f172a 100%);
       border: 1px solid rgba(56, 189, 248, 0.25);
-      border-radius: 12px;
-      padding: 14px;
+      border-radius: 16px;
+      padding: 22px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+      gap: 14px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
     }
     .graph-legend {
       display: flex;
       justify-content: center;
       align-items: center;
       flex-wrap: wrap;
-      gap: 10px;
-      font-size: 10px;
-      font-weight: 700;
+      gap: 20px;
+      font-size: 11.5px;
+      font-weight: 800;
       background: rgba(15, 23, 42, 0.9);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 8px;
-      border-radius: 8px;
+      padding: 10px 16px;
+      border-radius: 12px;
     }
-    .legend-item { display: flex; align-items: center; gap: 5px; }
-    .graph-container { position: relative; width: 100%; height: 280px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; }
+    .graph-container { position: relative; width: 100%; height: 400px; }
 
-    @media (max-width: 480px) {
-      .ewm-container { padding: 8px; gap: 10px; }
-      .ewm-brand h1 { font-size: 11px; }
-      .graph-container { height: 260px; }
+    /* Mobile Responsive Optimizations */
+    @media (max-width: 768px) {
+      .ewm-container { padding: 10px; gap: 10px; }
+      .ewm-brand h1 { font-size: 11.5px; }
+      .nav-main-btn { font-size: 10px; padding: 6px 2px; }
+      .graph-container { height: 300px; }
       table.yearly-table { font-size: 10.5px; }
-      .nav-main-btn { font-size: 9.5px; padding: 6px 2px; }
+      table.yearly-table th, table.yearly-table td { padding: 8px 6px; }
     }
   </style>
 </head>
@@ -183,7 +182,7 @@
 
   <header class="ewm-header">
     <div class="ewm-brand">
-      <span style="font-size: 16px;">📈</span>
+      <span style="font-size: 18px;">📈</span>
       <h1>Milestone Gear Unit 7 - Yearly Production</h1>
     </div>
     <div class="header-right">
@@ -204,32 +203,32 @@
 
     <!-- Table Section -->
     <div class="table-section">
-      <div style="margin-bottom: 8px; font-weight: 700; font-size: 12px; color: #38bdf8;">📊 Performance Summary</div>
+      <div style="margin-bottom: 10px; font-weight: 800; font-size: 13px; color: #38bdf8;">📊 Yearly Performance Master Record</div>
       <div class="table-scroll">
         <table class="yearly-table">
           <thead>
             <tr>
               <th>Year</th>
-              <th>Prod (MT)</th>
-              <th>Target</th>
-              <th>Avg/Mon</th>
-              <th>Achv%</th>
+              <th>PROD. IN TONNAGE</th>
+              <th>TOTAL CAPACITY / Target</th>
+              <th>Avg Prod / Month</th>
+              <th>Achievement (%)</th>
             </tr>
           </thead>
           <tbody id="yearlyTableBody">
-            <tr><td colspan="5" style="padding: 16px; color: #94a3b8;">Loading...</td></tr>
+            <tr><td colspan="5" style="padding: 20px; color: #94a3b8;">Loading live data...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- Graph Section with Non-Overlapping Bar Values -->
+    <!-- Graph Section -->
     <div class="graph-card">
-      <h3 style="margin: 0; font-size: 12.5px; font-weight: 700; color: #f8fafc;">✨ Performance Matrix</h3>
+      <h3 style="margin: 0; font-size: 14px; font-weight: 800; color: #f8fafc;">✨ Advanced High-Definition Performance & Target Matrix</h3>
       <div class="graph-legend">
-        <div class="legend-item" style="color: #38bdf8;"><span style="width: 10px; height: 10px; background: #38bdf8; display: inline-block; border-radius: 2px;"></span> Prod</div>
-        <div class="legend-item" style="color: #fb923c;"><span style="width: 10px; height: 10px; background: #fb923c; display: inline-block; border-radius: 50%;"></span> Target</div>
-        <div class="legend-item" style="color: #ec4899;"><span style="width: 10px; height: 10px; background: #ec4899; display: inline-block; border-radius: 2px;"></span> Avg/M</div>
+        <div class="legend-item" style="color: #38bdf8;"><span style="width: 12px; height: 12px; background: #38bdf8; display: inline-block; border-radius: 3px;"></span> PRODUCTION (MT)</div>
+        <div class="legend-item" style="color: #fb923c;"><span style="width: 12px; height: 12px; background: #fb923c; display: inline-block; border-radius: 50%;"></span> TOTAL CAPACITY / TARGET (MT)</div>
+        <div class="legend-item" style="color: #ec4899;"><span style="width: 12px; height: 12px; background: #ec4899; display: inline-block; border-radius: 3px;"></span> AVG PRODUCTION / MONTH (MT)</div>
       </div>
       <div class="graph-container">
         <canvas id="yearlyChart"></canvas>
@@ -280,7 +279,7 @@
             let percentage = target > 0 ? ((prod / target) * 100).toFixed(1) : 0;
 
             yearlyData.push({
-              year: yearCol.replace('FY-', ''),
+              year: yearCol,
               production: prod,
               target: target,
               avgMonth: avgM,
@@ -290,11 +289,11 @@
         }
 
         renderYearlyTable();
-        document.getElementById('syncStatus').innerText = "● Live";
+        document.getElementById('syncStatus').innerText = "● Live Synced";
         document.getElementById('syncStatus').style.color = "#34d399";
       } catch (err) {
         console.log("Error loading CSV:", err);
-        document.getElementById('syncStatus').innerText = "● Error";
+        document.getElementById('syncStatus').innerText = "● Sync Error";
         document.getElementById('syncStatus').style.color = "#ef4444";
       }
     }
@@ -321,14 +320,14 @@
             <td style="font-weight:800; color:#38bdf8;">${row.year}</td>
             <td style="color:#60a5fa;">${row.production.toLocaleString('en-IN')}</td>
             <td style="color:#fb923c;">${row.target.toLocaleString('en-IN')}</td>
-            <td style="color:#ec4899;">${row.avgMonth.toLocaleString('en-IN', {minimumFractionDigits: 1, maximumFractionDigits: 1})}</td>
-            <td><span style="background: rgba(52, 211, 153, 0.15); color: ${badgeColor}; padding: 3px 6px; border-radius: 4px; font-weight: 700;">${row.percentage}%</span></td>
+            <td style="color:#ec4899;">${row.avgMonth.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td><span style="background: rgba(52, 211, 153, 0.15); color: ${badgeColor}; padding: 4px 10px; border-radius: 6px; font-weight: 700;">${row.percentage}%</span></td>
           </tr>
         `;
       });
 
       if (!html) {
-        html = `<tr><td colspan="5" style="padding: 16px; color: #94a3b8;">No records found.</td></tr>`;
+        html = `<tr><td colspan="5" style="padding: 20px; color: #94a3b8;">No records found.</td></tr>`;
       }
 
       tbody.innerHTML = html;
@@ -337,12 +336,13 @@
 
     function renderYearly3DChart(labels, production, targets, avgs) {
       const ctx = document.getElementById('yearlyChart').getContext('2d');
+      const isMobile = window.innerWidth <= 768;
 
-      let gradProd = ctx.createLinearGradient(0, 0, 0, 300);
+      let gradProd = ctx.createLinearGradient(0, 0, 0, 400);
       gradProd.addColorStop(0, '#38bdf8');
       gradProd.addColorStop(1, '#1e40af');
 
-      let gradPink = ctx.createLinearGradient(0, 0, 0, 300);
+      let gradPink = ctx.createLinearGradient(0, 0, 0, 400);
       gradPink.addColorStop(0, '#f472b6');
       gradPink.addColorStop(1, '#be185d');
 
@@ -356,31 +356,31 @@
           labels: labels,
           datasets: [
             {
-              label: 'Production',
+              label: 'PRODUCTION (MT)',
               data: production,
               backgroundColor: gradProd,
-              borderRadius: 4,
+              borderRadius: 6,
               borderWidth: 0,
               yAxisID: 'y',
               order: 2
             },
             {
-              label: 'Avg/Mon',
+              label: 'AVG PRODUCTION / MONTH (MT)',
               data: avgs,
               backgroundColor: gradPink,
-              borderRadius: 4,
+              borderRadius: 6,
               borderWidth: 0,
               yAxisID: 'y1',
               order: 3
             },
             {
-              label: 'Target',
+              label: 'TOTAL CAPACITY / TARGET (MT)',
               data: targets,
               type: 'line',
               borderColor: '#fb923c',
               backgroundColor: '#fb923c',
-              borderWidth: 2.5,
-              pointRadius: 3,
+              borderWidth: isMobile ? 2.5 : 4,
+              pointRadius: isMobile ? 4 : 6,
               pointBackgroundColor: '#0f172a',
               pointBorderColor: '#fb923c',
               pointBorderWidth: 2,
@@ -397,14 +397,27 @@
           plugins: {
             legend: { display: false },
             datalabels: {
-              // Values ko bar ke andar vertically center/top set kiya hai taaki overlap na ho
-              anchor: 'center',
-              align: 'center',
-              color: '#ffffff',
-              font: { family: 'Inter', size: 8.5, weight: '700' },
-              rotation: -90, // Vertical orientation for phone screen clarity
-              formatter: function(value) {
-                return value > 150 ? value : ''; // Chhoti values ko hide kar dega taaki clutter na ho
+              anchor: function(context) {
+                return context.dataset.type === 'line' ? 'end' : 'end';
+              },
+              align: function(context) {
+                return context.dataset.type === 'line' ? 'top' : 'top';
+              },
+              color: function(context) {
+                return context.dataset.type === 'line' ? '#fb923c' : '#f8fafc';
+              },
+              font: { 
+                family: 'Inter', 
+                size: isMobile ? 9 : 11, 
+                weight: '700' 
+              },
+              // Target aur baaki values ko bilkul seedha (0 degree rotation) rakha hai taaki saaf dikhe
+              rotation: 0,
+              formatter: function(value, context) {
+                if (isMobile && context.dataset.type === 'bar') {
+                  return value > 1500 ? value : ''; // Phone par clutter hatane ke liye choti values skip hongi
+                }
+                return value > 0 ? value : '';
               }
             },
             tooltip: { 
@@ -413,25 +426,25 @@
               bodyColor: '#f8fafc', 
               borderColor: 'rgba(56,189,248,0.4)', 
               borderWidth: 1,
-              padding: 8
+              padding: 10
             }
           },
           scales: {
             x: { 
               grid: { display: false }, 
-              ticks: { color: '#94a3b8', font: { size: 9.5, weight: '700' } } 
+              ticks: { color: '#94a3b8', font: { size: isMobile ? 10 : 11.5, weight: '700' } } 
             },
             y: {
               type: 'linear',
               position: 'left',
               grid: { display: false },
-              ticks: { color: '#38bdf8', font: { size: 8.5 } }
+              ticks: { color: '#38bdf8', font: { size: isMobile ? 9 : 10.5 } }
             },
             y1: {
               type: 'linear',
               position: 'right',
               grid: { display: false },
-              ticks: { color: '#ec4899', font: { size: 8.5 } }
+              ticks: { color: '#ec4899', font: { size: isMobile ? 9 : 10.5 } }
             }
           }
         }
