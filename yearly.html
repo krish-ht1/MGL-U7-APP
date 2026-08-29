@@ -402,8 +402,8 @@
             legend: { display: false },
             datalabels: {
               anchor: function(context) {
-                // Target ke liye value upar (top) rahegi, baaki bars ke liye mobile par center aur web par top rahegi
                 if (context.dataset.type === 'line') return 'end';
+                // फोन पर बार के अंदर (center) और वेब पर बार के ऊपर (end) रहेंगी वैल्यूज़
                 return isMobile ? 'center' : 'end';
               },
               align: function(context) {
@@ -411,10 +411,14 @@
                 return isMobile ? 'center' : 'top';
               },
               color: function(context) {
-                return context.dataset.type === 'line' ? '#fb923c' : '#f8fafc';
+                return context.dataset.type === 'line' ? '#fb923c' : '#ffffff';
               },
-              font: { family: 'Inter', size: isMobile ? 8.5 : 10, weight: '700' },
-              rotation: 0,
+              font: { family: 'Inter', size: isMobile ? 8 : 10, weight: '700' },
+              // फोन पर बार के अंदर वैल्यूज़ कॉलम/रो (Vertical Stacked) फॉर्मेट में रहेंगी ताकि लंबी/सीधी फिट आएं
+              rotation: function(context) {
+                if (isMobile && context.dataset.type !== 'line') return 90; 
+                return 0;
+              },
               formatter: function(value) {
                 return value > 0 ? value : '';
               }
@@ -443,7 +447,7 @@
               type: 'linear',
               position: 'right',
               grid: { display: false },
-              ticks: { color: '#ec4899', font: { size: isMobile ? 8.5 : 10 } }
+              ticks: { color: '#ec4899', font: { size: 8.5 : 10 } }
             }
           }
         }
