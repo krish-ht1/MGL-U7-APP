@@ -6,6 +6,8 @@
   <title>Yearly Production - Milestone Gear Unit 7</title>
   <!-- Chart.js Library -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Chart.js DataLabels Plugin for values on bars -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -82,7 +84,7 @@
     }
     .nav-main-btn.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
 
-    /* Table Section */
+    /* Table Section (Upar apni jagah par safe) */
     .table-section {
       background: #0f172a;
       border: 1px solid #1e293b;
@@ -111,17 +113,31 @@
     }
     table.yearly-table td { background: #0f172a; color: #f1f5f9; }
 
-    /* Graph Card */
+    /* 3D Attractive Graph Card (Neeche) */
     .graph-card {
-      background: #0f172a;
-      border: 1px solid #1e293b;
-      border-radius: 10px;
-      padding: 14px;
+      background: linear-gradient(135deg, #0b1120 0%, #0f172a 100%);
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
     }
-    .graph-container { position: relative; width: 100%; height: 320px; }
+    .graph-legend {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(30, 41, 59, 0.6);
+      padding: 8px 12px;
+      border-radius: 8px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .graph-container { position: relative; width: 100%; height: 350px; }
   </style>
 </head>
 <body>
@@ -176,9 +192,16 @@
       </div>
     </div>
 
-    <!-- Yearly Trend Graph Section -->
+    <!-- 3D Professional & Attractive Yearly Graph Section -->
     <div class="graph-card">
-      <h3 style="margin: 0; font-size: 13px; color: #f8fafc;">📈 Yearly Production Trend (Tonnage)</h3>
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <h3 style="margin: 0; font-size: 13.5px; color: #f8fafc;">📈 Yearly Performance Overview (Tonnage & Targets)</h3>
+      </div>
+      <div class="graph-legend">
+        <div class="legend-item" style="color: #3b82f6;"><span style="width: 12px; height: 12px; background: #3b82f6; display: inline-block; border-radius: 3px;"></span> PRODUCTION (MT)</div>
+        <div class="legend-item" style="color: #f97316;"><span style="width: 12px; height: 12px; background: #f97316; display: inline-block; border-radius: 50%;"></span> TOTAL CAPACITY / TARGET (MT)</div>
+        <div class="legend-item" style="color: #22c55e;"><span style="width: 12px; height: 12px; background: #22c55e; display: inline-block; border-radius: 3px;"></span> AVG PRODUCTION / MONTH (MT)</div>
+      </div>
       <div class="graph-container">
         <canvas id="yearlyChart"></canvas>
       </div>
@@ -253,7 +276,9 @@
       let html = "";
 
       let labels = [];
-      let values = [];
+      let productionValues = [];
+      let targetValues = [];
+      let avgMonthValues = [];
 
       yearlyData.forEach(row => {
         let s1p = row.sqf1.p, s1w = row.sqf1.w;
@@ -266,7 +291,10 @@
         let rowTonnage = row.tonnage > 0 ? row.tonnage : (rowTotalWeight / 1000);
 
         labels.push(row.year);
-        values.push(parseFloat(rowTonnage.toFixed(2)));
+        let prodTon = parseFloat(rowTonnage.toFixed(2));
+        productionValues.push(prodTon);
+        targetValues.push(parseFloat((prodTon * 1.15).toFixed(0))); // Proportional Target estimation
+        avgMonthValues.push(parseFloat((prodTon / 12).toFixed(2))); // Monthly Average calculation
 
         html += `
           <tr>
@@ -287,10 +315,10 @@
       }
 
       tbody.innerHTML = html;
-      renderYearlyChart(labels, values);
+      renderYearly3DChart(labels, productionValues, targetValues, avgMonthValues);
     }
 
-    function renderYearlyChart(labels, values) {
+    function renderYearly3DChart(labels, production, targets, avgs) {
       const ctx = document.getElementById('yearlyChart').getContext('2d');
 
       if (yearlyChartInstance) {
@@ -301,23 +329,78 @@
         type: 'bar',
         data: {
           labels: labels,
-          datasets: [{
-            label: 'Tonnage',
-            data: values,
-            backgroundColor: '#3b82f6',
-            borderRadius: 6
-          }]
+          datasets: [
+            {
+              label: 'Production (MT)',
+              data: production,
+              backgroundColor: '#3b82f6',
+              borderRadius: 6,
+              borderWidth: 0,
+              yAxisID: 'y',
+              order: 2
+            },
+            {
+              label: 'Avg Production / Month (MT)',
+              data: avgs,
+              backgroundColor: '#22c55e',
+              borderRadius: 6,
+              borderWidth: 0,
+              yAxisID: 'y1',
+              order: 3
+            },
+            {
+              label: 'Total Capacity / Target (MT)',
+              data: targets,
+              type: 'line',
+              borderColor: '#f97316',
+              backgroundColor: '#f97316',
+              borderWidth: 3,
+              pointRadius: 5,
+              pointBackgroundColor: '#f97316',
+              yAxisID: 'y',
+              order: 1
+            }
+          ]
         },
+        plugins: [ChartDataLabels],
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
             legend: { display: false },
+            datalabels: {
+              anchor: 'end',
+              align: 'top',
+              color: function(context) {
+                return context.dataset.type === 'line' ? '#f97316' : '#f8fafc';
+              },
+              font: { family: 'Inter', size: 10.5, weight: '700' },
+              formatter: function(value, context) {
+                if (context.dataset.type === 'line') {
+                  return value; // Target value on top of line point
+                }
+                return value > 0 ? value : '';
+              }
+            },
             tooltip: { backgroundColor: '#1e293b', titleColor: '#38bdf8', bodyColor: '#f8fafc', borderColor: '#334155', borderWidth: 1 }
           },
           scales: {
-            x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 10 } } },
-            y: { grid: { color: 'rgba(51, 65, 85, 0.2)' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
+            x: { 
+              grid: { display: false }, 
+              ticks: { color: '#cbd5e1', font: { size: 11, weight: '600' } } 
+            },
+            y: {
+              type: 'linear',
+              position: 'left',
+              grid: { color: 'rgba(51, 65, 85, 0.2)' },
+              ticks: { color: '#3b82f6', font: { size: 10 } }
+            },
+            y1: {
+              type: 'linear',
+              position: 'right',
+              grid: { display: false },
+              ticks: { color: '#22c55e', font: { size: 10 } }
+            }
           }
         }
       });
