@@ -402,18 +402,16 @@
             legend: { display: false },
             datalabels: {
               anchor: function(context) {
-                // Target ke liye value upar (top) rahegi, baaki bars ke liye mobile par center aur web par top rahegi
+                // Target line ki value upar (top) rahegi, baaki bars ki values andar (center) rahengi
                 if (context.dataset.type === 'line') return 'end';
-                return isMobile ? 'center' : 'end';
+                return 'center';
               },
               align: function(context) {
                 if (context.dataset.type === 'line') return 'top';
-                return isMobile ? 'center' : 'top';
+                return 'center';
               },
-              color: function(context) {
-                return context.dataset.type === 'line' ? '#fb923c' : '#f8fafc';
-              },
-              font: { family: 'Inter', size: isMobile ? 8.5 : 10, weight: '700' },
+              color: '#ffffff',
+              font: { family: 'Inter', size: isMobile ? 8 : 10, weight: '700' },
               rotation: 0,
               formatter: function(value) {
                 return value > 0 ? value : '';
