@@ -84,7 +84,7 @@
     }
     .nav-main-btn.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
 
-    /* Filter Panel */
+    /* Filter Panel (Restored Month Dropdowns & Trend Button) */
     .filter-panel {
       background: #0f172a;
       border: 1px solid #1e293b;
@@ -173,17 +173,36 @@
     .kpi-card span { font-size: 10px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
     .kpi-card h3 { margin: 2px 0 0 0; font-size: 18px; font-weight: 700; color: #f8fafc; }
 
-    /* Financial Year Graph Section */
+    /* Graph Section with FY Dropdown inside title row */
     .graph-card {
       background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       border: 1px solid #334155;
       border-radius: 10px;
-      padding: 12px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
+      gap: 10px;
+    }
+    .graph-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
       gap: 8px;
     }
-    .graph-container { position: relative; width: 100%; height: 260px; }
+    .graph-title-row h3 { font-size: 12.5px; font-weight: 700; color: #f8fafc; margin: 0; }
+    .fy-dropdown {
+      background: #1e293b;
+      border: 1px solid #475569;
+      color: #38bdf8;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+    }
+    .graph-container { position: relative; width: 100%; height: 280px; }
 
     /* Fixed Table Section with Inner Scroll */
     .table-section {
@@ -300,17 +319,20 @@
       <a href="breakdown.html" class="nav-main-btn">⚠️ Breakdown & Loss</a>
     </div>
 
-    <!-- Filter Panel with Financial Year Dropdown & Trend Button -->
+    <!-- Filter Panel with Month Filters & Trend Button -->
     <div class="filter-panel">
       <div class="filter-row">
-        <!-- Financial Year Dropdown -->
         <div class="filter-group">
-          <span>Financial Year:</span>
-          <select id="fySelect" onchange="renderMonthlyTable()">
-            <option value="2026-2027" selected>FY 2026-2027 (Apr 26 - Mar 27)</option>
-            <option value="2025-2026">FY 2025-2026 (Apr 25 - Mar 26)</option>
-            <option value="2024-2025">FY 2024-2025 (Apr 24 - Mar 25)</option>
-            <option value="2023-2024">FY 2023-2024 (Apr 23 - Mar 24)</option>
+          <span>From Month:</span>
+          <select id="fromMonthSelect" onchange="renderMonthlyTable()">
+            <option value="">-- Start --</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <span>To Month:</span>
+          <select id="toMonthSelect" onchange="renderMonthlyTable()">
+            <option value="">-- End --</option>
           </select>
         </div>
 
@@ -345,10 +367,17 @@
       </div>
     </div>
 
-    <!-- Financial Year Selected Bar Graph Section -->
+    <!-- Financial Year Bar Graph Section with FY Dropdown inside -->
     <div class="graph-card">
-      <div class="table-title-row">
+      <div class="graph-title-row">
         <h3 id="fyGraphTitle">📈 Financial Year Monthly Production & Average</h3>
+        <!-- Financial Year Dropdown placed right beside the graph -->
+        <select id="fySelect" class="fy-dropdown" onchange="renderMonthlyTable()">
+          <option value="2026-2027" selected>FY 2026-2027 (Apr 26 - Mar 27)</option>
+          <option value="2025-2026">FY 2025-2026 (Apr 25 - Mar 26)</option>
+          <option value="2024-2025">FY 2024-2025 (Apr 24 - Mar 25)</option>
+          <option value="2023-2024">FY 2023-2024 (Apr 23 - Mar 24)</option>
+        </select>
       </div>
       <div class="graph-container">
         <canvas id="monthlyBarChart"></canvas>
@@ -409,7 +438,6 @@
     let trendChartInstance = null;
     let mainBarChartInstance = null;
 
-    // Helper to map month string to month number (1 to 12) for Financial Year sorting (April to March)
     function getMonthOrder(monthStr) {
       if (!monthStr) return 0;
       let m = monthStr.toUpperCase();
@@ -428,7 +456,6 @@
       return 0;
     }
 
-    // Helper to assign row into correct Financial Year based on Month and Year text
     function getFinancialYear(monthStr) {
       if (!monthStr) return "";
       let m = monthStr.toUpperCase();
@@ -438,29 +465,18 @@
       let has26 = m.includes("26");
       let has27 = m.includes("27");
 
-      // Apr-Dec belongs to the starting year, Jan-Mar belongs to the ending year of FY
       if (m.includes("JAN") || m.includes("FEB") || m.includes("MAR")) {
         if (has27) return "2026-2027";
         if (has26) return "2025-2026";
         if (has25) return "2024-2025";
         if (has24) return "2023-2024";
       } else {
-        if (has26 && has27) return "2026-2027";
-        if (has26) return "2026-2027"; // or 2025-2026 depending on month
-        if (has25 && has26) return "2025-2026";
+        if (has26) return "2026-2027";
         if (has25) return "2025-2026";
-        if (has24 && has25) return "2024-2025";
         if (has24) return "2024-2025";
         if (has23) return "2023-2024";
       }
-
-      // Default checks based on explicit text matching
-      if (has26 && (m.includes("APR") || m.includes("MAY") || m.includes("JUN") || m.includes("JUL") || m.includes("AUG") || m.includes("SEP") || m.includes("OCT") || m.includes("NOV") || m.includes("DEC"))) return "2026-2027";
-      if (has25 && (m.includes("APR") || m.includes("MAY") || m.includes("JUN") || m.includes("JUL") || m.includes("AUG") || m.includes("SEP") || m.includes("OCT") || m.includes("NOV") || m.includes("DEC"))) return "2025-2026";
-      if (has24 && (m.includes("APR") || m.includes("MAY") || m.includes("JUN") || m.includes("JUL") || m.includes("AUG") || m.includes("SEP") || m.includes("OCT") || m.includes("NOV") || m.includes("DEC"))) return "2024-2025";
-      if (has23) return "2023-2024";
-
-      return "2026-2027"; // fallback
+      return "2026-2027";
     }
 
     async function fetchMonthlyLive() {
@@ -522,10 +538,8 @@
           }
         }
 
-        // Sort data chronologically from April to March within each FY
         monthlyData.sort((a, b) => a.order - b.order);
-
-        renderMonthlyTable();
+        populateMonthDropdowns();
         document.getElementById('syncStatus').innerText = "● Live Synced";
         document.getElementById('syncStatus').style.color = "#34d399";
       } catch (err) {
@@ -535,7 +549,29 @@
       }
     }
 
+    function populateMonthDropdowns() {
+      const fromSelect = document.getElementById('fromMonthSelect');
+      const toSelect = document.getElementById('toMonthSelect');
+      
+      fromSelect.innerHTML = '<option value="">-- Start --</option>';
+      toSelect.innerHTML = '<option value="">-- End --</option>';
+
+      monthlyData.forEach((row, index) => {
+        fromSelect.innerHTML += `<option value="${index}">${row.month}</option>`;
+        toSelect.innerHTML += `<option value="${index}">${row.month}</option>`;
+      });
+
+      if(monthlyData.length > 0) {
+        fromSelect.value = 0;
+        toSelect.value = monthlyData.length - 1;
+      }
+
+      renderMonthlyTable();
+    }
+
     function renderMonthlyTable() {
+      const fromIdx = document.getElementById('fromMonthSelect').value;
+      const toIdx = document.getElementById('toMonthSelect').value;
       const selectedFY = document.getElementById('fySelect').value;
       
       const showSqf1 = document.querySelector('.sqf-filter[value="SQF-1"]').checked;
@@ -549,11 +585,17 @@
       let gTotalQty = 0;
       let gTotalWeight = 0;
 
-      // Filter rows strictly matching selected Financial Year
-      const filteredRows = monthlyData.filter(row => row.fy === selectedFY);
+      let startIndex = fromIdx !== "" ? parseInt(fromIdx) : 0;
+      let endIndex = toIdx !== "" ? parseInt(toIdx) : monthlyData.length - 1;
 
-      let chartLabels = [];
-      let chartValues = [];
+      if (startIndex > endIndex) {
+        let temp = startIndex;
+        startIndex = endIndex;
+        endIndex = temp;
+      }
+
+      // Filter based on From-To month selection for table
+      const filteredRows = monthlyData.slice(startIndex, endIndex + 1);
 
       filteredRows.forEach(row => {
         let s1p = showSqf1 ? row.sqf1.p : 0;
@@ -572,9 +614,6 @@
         gTotalQty += rowTotalQty;
         gTotalWeight += rowTotalWeight;
 
-        chartLabels.push(row.month);
-        chartValues.push(parseFloat(rowTonnage.toFixed(2)));
-
         html += `
           <tr>
             <td style="font-weight:700; color:#38bdf8;">${row.month}</td>
@@ -590,7 +629,7 @@
       });
 
       if (!html) {
-        html = `<tr><td colspan="12" style="padding: 20px; color: #94a3b8;">No records found for Financial Year ${selectedFY}.</td></tr>`;
+        html = `<tr><td colspan="12" style="padding: 20px; color: #94a3b8;">No records found for the selected range.</td></tr>`;
       }
 
       tbody.innerHTML = html;
@@ -599,18 +638,24 @@
       document.getElementById('kpiTotalWeight').innerText = `${gTotalWeight.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})} Kg`;
       document.getElementById('kpiTotalTonnage').innerText = `${(gTotalWeight / 1000).toFixed(2)} Ton`;
 
-      // Calculate Average and Render Main Bar Chart for Selected Financial Year
-      let totalTonSum = chartValues.reduce((a, b) => a + b, 0);
-      let avgTonnage = chartValues.length > 0 ? (totalTonSum / chartValues.length).toFixed(2) : 0;
-      
-      document.getElementById('fyGraphTitle').innerText = `📈 Financial Year ${selectedFY} Monthly Production | Avg: ${avgTonnage} T`;
-      renderMainBarChart(chartLabels, chartValues, avgTonnage);
+      // Render Main Clean Bar Chart for Selected Financial Year
+      renderFYBarChart(selectedFY);
     }
 
-    // Main Bar Chart with Average Line for Selected FY
-    function renderMainBarChart(labels, dataValues, avgValue) {
+    // Clean, Colorful, Bold FY Bar Chart with Average Line
+    function renderFYBarChart(selectedFY) {
       const ctx = document.getElementById('monthlyBarChart').getContext('2d');
-      const avgLineData = Array(labels.length).fill(parseFloat(avgValue));
+
+      const fyRows = monthlyData.filter(row => row.fy === selectedFY);
+
+      let labels = fyRows.map(d => d.month);
+      let values = fyRows.map(d => parseFloat(d.tonnage.toFixed(2)));
+
+      let sum = values.reduce((a, b) => a + b, 0);
+      let avg = values.length > 0 ? (sum / values.length) : 0;
+      let avgLineData = Array(labels.length).filter((_, i) => i < labels.length).fill(parseFloat(avg.toFixed(2)));
+
+      document.getElementById('fyGraphTitle').innerText = `📈 FY ${selectedFY} Monthly Production | Avg: ${avg.toFixed(2)} T`;
 
       if (mainBarChartInstance) {
         mainBarChartInstance.destroy();
@@ -622,19 +667,21 @@
           labels: labels,
           datasets: [
             {
-              label: 'Monthly Production (Ton)',
-              data: dataValues,
-              backgroundColor: '#3b82f6',
+              label: 'Production (Ton)',
+              data: values,
+              backgroundColor: 'rgba(59, 130, 246, 0.85)',
+              borderColor: '#60a5fa',
+              borderWidth: 1.5,
               borderRadius: 6,
               order: 2
             },
             {
-              label: `Average (${avgValue} T)`,
+              label: `Average (${avg.toFixed(2)} T)`,
               data: avgLineData,
               type: 'line',
               borderColor: '#f59e0b',
-              borderWidth: 2,
-              borderDash: [5, 5],
+              borderWidth: 2.5,
+              borderDash: [6, 6],
               pointRadius: 0,
               order: 1
             }
@@ -645,30 +692,30 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { display: true, position: 'top', labels: { color: '#94a3b8', font: { size: 10 } } },
+            legend: { display: true, position: 'top', labels: { color: '#cbd5e1', font: { size: 11, weight: 'bold' } } },
             datalabels: {
               anchor: 'end',
               align: 'top',
-              color: '#38bdf8',
-              font: { family: 'Inter', size: 10, weight: 'bold' },
+              color: '#f8fafc',
+              font: { family: 'Inter', size: 10.5, weight: '700' },
               formatter: (value, ctx) => ctx.dataset.type === 'line' ? '' : (value > 0 ? value + ' T' : '')
             }
           },
           scales: {
             x: {
-              ticks: { color: '#94a3b8', font: { size: 10 } },
+              ticks: { color: '#94a3b8', font: { size: 10.5, weight: '600' } },
               grid: { display: false }
             },
             y: {
               ticks: { color: '#94a3b8', font: { size: 10 } },
-              grid: { color: 'rgba(51, 65, 85, 0.3)' }
+              grid: { color: 'rgba(51, 65, 85, 0.2)' }
             }
           }
         }
       });
     }
 
-    /* Trend Modal Logic */
+    /* Trend Modal Logic for Trend Button */
     function openTrendModal() {
       document.getElementById('trendModal').style.display = 'flex';
       renderDynamicTrendChart();
@@ -680,9 +727,20 @@
 
     function renderDynamicTrendChart() {
       const ctx = document.getElementById('trendChart').getContext('2d');
-      const selectedFY = document.getElementById('fySelect').value;
 
-      const rangeData = monthlyData.filter(row => row.fy === selectedFY);
+      const fromIdx = document.getElementById('fromMonthSelect').value;
+      const toIdx = document.getElementById('toMonthSelect').value;
+
+      let startIndex = fromIdx !== "" ? parseInt(fromIdx) : 0;
+      let endIndex = toIdx !== "" ? parseInt(toIdx) : monthlyData.length - 1;
+
+      if (startIndex > endIndex) {
+        let temp = startIndex;
+        startIndex = endIndex;
+        endIndex = temp;
+      }
+
+      const rangeData = monthlyData.slice(startIndex, endIndex + 1);
 
       let labels = rangeData.map(d => d.month);
       let values = rangeData.map(d => parseFloat(d.tonnage.toFixed(2)));
@@ -694,8 +752,9 @@
       values.push(parseFloat(avg.toFixed(2)));
 
       let bgColors = values.map((val, idx) => idx === values.length - 1 ? '#10b981' : '#ec4899');
+      let rangeText = rangeData.length > 0 ? `${rangeData[0].month} to ${rangeData[rangeData.length - 1].month}` : "Selected Range";
       
-      document.getElementById('modalTitle').innerText = `📈 PRODUCTION TREND IN TONNAGE (FY ${selectedFY}) | Avg: ${avg.toFixed(2)} T`;
+      document.getElementById('modalTitle').innerText = `📈 PRODUCTION TREND IN TONNAGE (${rangeText}) | Avg: ${avg.toFixed(2)} T`;
 
       if (trendChartInstance) {
         trendChartInstance.destroy();
