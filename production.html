@@ -314,6 +314,9 @@
         const csvText = await response.text();
         const rows = parseCSV(csvText);
 
+        let dynamicTotalTargetMTD = 0;
+        let dynamicMonthTarget = 0;
+
         rows.forEach(r => {
           let rowStr = r.join(" ").toUpperCase();
           let fcName = "";
@@ -323,14 +326,16 @@
           else if (rowStr.includes("SQF-4")) fcName = "SQF-4";
 
           if (fcName && liveAugustData.furnaces[fcName]) {
-            if (r[1] && !isNaN(parseFloat(r[1]))) liveAugustData.furnaces[fcName].capacity = parseFloat(r[1]);
-            if (r[2] && !isNaN(parseFloat(r[2]))) {
-              liveAugustData.furnaces[fcName].monthTarget = parseFloat(r[2]);
-            }
-            if (r[3] && !isNaN(parseFloat(r[3]))) {
-              liveAugustData.furnaces[fcName].targetMTD = parseFloat(r[3]);
+            // Sheet ke har row se dynamically numeric values extract karna
+            let nums = r.map(cell => parseFloat(cell)).filter(n => !isNaN(n));
+            
+            if (nums.length >= 3) {
+              liveAugustData.furnaces[fcName].capacity = nums[0] || 69.75;
+              liveAugustData.furnaces[fcName].monthTarget = nums[1] || 69.75;
+              liveAugustData.furnaces[fcName].targetMTD = nums[2] || 0;
             }
 
+            // Din ka data (Col 6 ya uske baad ke numbers)
             let dayValues = [];
             for (let j = 6; j < r.length; j++) {
               let val = parseFloat(r[j]);
@@ -344,15 +349,20 @@
             }
           }
 
-          if (rowStr.includes("TOTAL IN TON") || rowStr.includes("TOTAL")) {
-            if (r[2] && !isNaN(parseFloat(r[2]))) {
-              liveAugustData.monthTarget = parseFloat(r[2]);
-            }
-            if (r[3] && !isNaN(parseFloat(r[3]))) {
-              liveAugustData.totalTargetMTD = parseFloat(r[3]);
+          // Total row ko pakadna aur sheet se seedha target uthana
+          if (rowStr.includes("TOTAL") || rowStr.includes("CUMULATIVE")) {
+            let nums = r.map(cell => parseFloat(cell)).filter(n => !isNaN(n));
+            if (nums.length >= 2 && !rowStr.includes("CUMULATIVE")) {
+              if (nums[0] > 10) dynamicMonthTarget = nums[0];
+              if (nums[1] > 10) dynamicTotalTargetMTD = nums[1];
             }
           }
         });
+
+        // Agar sheet se direct total target mil jaye toh theek, nahi toh furnaces ke target ka sum kar lo
+        let calculatedSumTarget = Object.values(liveAugustData.furnaces).reduce((acc, f) => acc + (f.targetMTD || 0), 0);
+        liveAugustData.totalTargetMTD = dynamicTotalTargetMTD > 0 ? dynamicTotalTargetMTD : calculatedSumTarget;
+        liveAugustData.monthTarget = dynamicMonthTarget > 0 ? dynamicMonthTarget : 279.0;
 
         renderDWMData();
       } catch (err) {
