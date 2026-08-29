@@ -282,7 +282,6 @@
         }
 
         if (yearlyData.length === 0) {
-          // Fallback static data in case CSV fetch fails or format varies
           yearlyData = [
             { year: "FY-2021~22", production: 1479, target: 1920, avgMonth: 123.25, percentage: 77.0 },
             { year: "FY-2022~23", production: 2080, target: 2340, avgMonth: 173.34, percentage: 88.9 },
@@ -409,17 +408,21 @@
             datalabels: {
               anchor: function(context) {
                 if (context.dataset.type === 'line') return 'end';
-                return 'end';
+                return isMobile ? 'center' : 'end';
               },
               align: function(context) {
                 if (context.dataset.type === 'line') return 'top';
-                return 'top';
+                return isMobile ? 'center' : 'top';
               },
               color: function(context) {
-                return context.dataset.type === 'line' ? '#fb923c' : '#f8fafc';
+                return context.dataset.type === 'line' ? '#fb923c' : '#ffffff';
               },
-              font: { family: 'Inter', size: isMobile ? 8.5 : 10, weight: '700' },
-              rotation: 0,
+              font: { family: 'Inter', size: isMobile ? 8 : 10, weight: '700' },
+              // फोन पर बार के अंदर वैल्यूज़ वर्टिकल (90 डिग्री) रहेंगी ताकि कॉलम के अंदर फिट आएं, वेब पर बिल्कुल सीधी रहेंगी
+              rotation: function(context) {
+                if (isMobile && context.dataset.type !== 'line') return 90;
+                return 0;
+              },
               formatter: function(value) {
                 return value > 0 ? value : '';
               }
