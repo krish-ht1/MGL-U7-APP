@@ -82,28 +82,6 @@
     }
     .nav-main-btn.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
 
-    /* KPI Summary Cards */
-    .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    @media (max-width: 768px) { .kpi-grid { grid-template-columns: 1fr; } }
-
-    .kpi-card {
-      background: #0f172a;
-      border: 1px solid #1e293b;
-      border-radius: 10px;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      position: relative;
-      overflow: hidden;
-    }
-    .kpi-card::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: #3b82f6; }
-    .kpi-card.green::after { background: #34d399; }
-    .kpi-card.orange::after { background: #f59e0b; }
-
-    .kpi-card span { font-size: 10px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
-    .kpi-card h3 { margin: 2px 0 0 0; font-size: 18px; font-weight: 700; color: #f8fafc; }
-
     /* Table Section */
     .table-section {
       background: #0f172a;
@@ -143,7 +121,7 @@
       flex-direction: column;
       gap: 10px;
     }
-    .graph-container { position: relative; width: 100%; height: 300px; }
+    .graph-container { position: relative; width: 100%; height: 320px; }
   </style>
 </head>
 <body>
@@ -169,23 +147,7 @@
       <a href="breakdown.html" class="nav-main-btn">⚠️ Breakdown & Loss</a>
     </div>
 
-    <!-- KPI Summary Cards -->
-    <div class="kpi-grid">
-      <div class="kpi-card">
-        <span>Total Quantity (Pcs)</span>
-        <h3 id="kpiTotalQty">0 Pcs</h3>
-      </div>
-      <div class="kpi-card green">
-        <span>Total Weight (Kg)</span>
-        <h3 id="kpiTotalWeight">0.00 Kg</h3>
-      </div>
-      <div class="kpi-card orange">
-        <span>Weight in Tonnage</span>
-        <h3 id="kpiTotalTonnage">0.00 Ton</h3>
-      </div>
-    </div>
-
-    <!-- Yearly Production Table -->
+    <!-- Yearly Production Table (No KPIs, Clean Layout) -->
     <div class="table-section">
       <div class="table-scroll">
         <table class="yearly-table">
@@ -290,8 +252,6 @@
       const tbody = document.getElementById('yearlyTableBody');
       let html = "";
 
-      let gQty = 0;
-      let gWeight = 0;
       let labels = [];
       let values = [];
 
@@ -304,9 +264,6 @@
         let rowTotalQty = s1p + s2p + s3p + s4p;
         let rowTotalWeight = s1w + s2w + s3w + s4w;
         let rowTonnage = row.tonnage > 0 ? row.tonnage : (rowTotalWeight / 1000);
-
-        gQty += rowTotalQty;
-        gWeight += rowTotalWeight;
 
         labels.push(row.year);
         values.push(parseFloat(rowTonnage.toFixed(2)));
@@ -330,11 +287,6 @@
       }
 
       tbody.innerHTML = html;
-
-      document.getElementById('kpiTotalQty').innerText = `${gQty.toLocaleString('en-IN')} Pcs`;
-      document.getElementById('kpiTotalWeight').innerText = `${gWeight.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})} Kg`;
-      document.getElementById('kpiTotalTonnage').innerText = `${(gWeight / 1000).toFixed(2)} Ton`;
-
       renderYearlyChart(labels, values);
     }
 
