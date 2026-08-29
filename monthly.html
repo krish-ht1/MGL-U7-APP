@@ -151,9 +151,9 @@
       gap: 4px;
     }
 
-    /* KPI Summary Cards */
-    .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    @media (max-width: 768px) { .kpi-grid { grid-template-columns: 1fr; } }
+    /* KPI Summary Cards - 3 in One Single Line */
+    .kpi-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    @media (max-width: 768px) { .kpi-grid-3 { grid-template-columns: 1fr; } }
 
     .kpi-card {
       background: #0f172a;
@@ -173,14 +173,38 @@
     .kpi-card span { font-size: 10px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
     .kpi-card h3 { margin: 2px 0 0 0; font-size: 18px; font-weight: 700; color: #f8fafc; }
 
-    /* Table Section */
+    /* Inline Main Graph Section */
+    .graph-card {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .graph-container { position: relative; width: 100%; height: 260px; }
+
+    /* Fixed Table Section with Inner Scroll */
     .table-section {
       background: #0f172a;
       border: 1px solid #1e293b;
       border-radius: 10px;
       padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
-    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .table-title-row h3 { font-size: 12px; font-weight: 700; color: #f8fafc; margin: 0; }
+    
+    .fixed-table-scroll {
+      max-height: 280px;
+      overflow-y: auto;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border: 1px solid #334155;
+      border-radius: 6px;
+    }
     table.monthly-table {
       width: 100%;
       border-collapse: collapse;
@@ -308,8 +332,8 @@
       </div>
     </div>
 
-    <!-- KPI Summary Cards -->
-    <div class="kpi-grid">
+    <!-- KPI Summary Cards - 3 in One Single Line -->
+    <div class="kpi-grid-3">
       <div class="kpi-card">
         <span>Total Quantity (Pcs)</span>
         <h3 id="kpiTotalQty">0 Pcs</h3>
@@ -324,9 +348,22 @@
       </div>
     </div>
 
-    <!-- Monthly Production Table -->
+    <!-- Financial Year Bar Graph Section -->
+    <div class="graph-card">
+      <div class="table-title-row">
+        <h3>📈 Financial Year Monthly Production & Average Trend</h3>
+      </div>
+      <div class="graph-container">
+        <canvas id="monthlyBarChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Monthly Production Table with Fixed Scrollable Container -->
     <div class="table-section">
-      <div class="table-scroll">
+      <div class="table-title-row">
+        <h3>📋 Monthly Production Data Record</h3>
+      </div>
+      <div class="fixed-table-scroll">
         <table class="monthly-table">
           <thead>
             <tr>
@@ -373,6 +410,7 @@
 
     let monthlyData = [];
     let trendChartInstance = null;
+    let mainBarChartInstance = null;
 
     async function fetchMonthlyLive() {
       try {
@@ -405,11 +443,8 @@
               return isNaN(num) ? 0 : num;
             };
 
-            // Column L (index 11) ya aakhri column se सीधे "Weight in Tonnage" (Column L) uthana
-            // Col 0: Month, 1-2: SQF1, 3-4: SQF2, 5-6: SQF3, 7-8: SQF4, 9-10: Month Total, 11: Weight in Tonnage (Column L)
             let explicitTonnage = r.length > 11 ? parseVal(r[11]) : (r.length > 10 ? parseVal(r[10]) : 0);
             
-            // Fallback agar column index me thoda upar-niche ho toh last index utha lo ya calculate karo
             if (explicitTonnage === 0 && r.length > 9) {
               for (let c = r.length - 1; c >= 9; c--) {
                 let v = parseVal(r[c]);
@@ -487,6 +522,9 @@
 
       const filteredRows = monthlyData.slice(startIndex, endIndex + 1);
 
+      let chartLabels = [];
+      let chartValues = [];
+
       filteredRows.forEach(row => {
         let s1p = showSqf1 ? row.sqf1.p : 0;
         let s1w = showSqf1 ? row.sqf1.w : 0;
@@ -503,6 +541,9 @@
 
         gTotalQty += rowTotalQty;
         gTotalWeight += rowTotalWeight;
+
+        chartLabels.push(row.month);
+        chartValues.push(parseFloat(rowTonnage.toFixed(2)));
 
         html += `
           <tr>
@@ -527,9 +568,75 @@
       document.getElementById('kpiTotalQty').innerText = `${gTotalQty.toLocaleString('en-IN')} Pcs`;
       document.getElementById('kpiTotalWeight').innerText = `${gTotalWeight.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})} Kg`;
       document.getElementById('kpiTotalTonnage').innerText = `${(gTotalWeight / 1000).toFixed(2)} Ton`;
+
+      // Calculate Average and Render Main Inline Bar Chart with Average Line
+      let totalTonSum = chartValues.reduce((a, b) => a + b, 0);
+      let avgTonnage = chartValues.length > 0 ? (totalTonSum / chartValues.length).toFixed(2) : 0;
+      renderMainBarChart(chartLabels, chartValues, avgTonnage);
     }
 
-    /* Fully Dynamic Trend Chart Modal Logic with Column L (Tonnage) */
+    // Main Inline Bar Chart with Average Line
+    function renderMainBarChart(labels, dataValues, avgValue) {
+      const ctx = document.getElementById('monthlyBarChart').getContext('2d');
+      const avgLineData = Array(labels.length).fill(parseFloat(avgValue));
+
+      if (mainBarChartInstance) {
+        mainBarChartInstance.destroy();
+      }
+
+      mainBarChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Monthly Production (Ton)',
+              data: dataValues,
+              backgroundColor: '#3b82f6',
+              borderRadius: 6,
+              order: 2
+            },
+            {
+              label: `Average (${avgValue} T)`,
+              data: avgLineData,
+              type: 'line',
+              borderColor: '#f59e0b',
+              borderWidth: 2,
+              borderDash: [5, 5],
+              pointRadius: 0,
+              order: 1
+            }
+          ]
+        },
+        plugins: [ChartDataLabels],
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: true, position: 'top', labels: { color: '#94a3b8', font: { size: 10 } } },
+            datalabels: {
+              anchor: 'end',
+              align: 'top',
+              color: '#38bdf8',
+              font: { family: 'Inter', size: 10, weight: 'bold' },
+              formatter: (value, ctx) => ctx.dataset.type === 'line' ? '' : (value > 0 ? value + ' T' : '')
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#94a3b8', font: { size: 10 } },
+              grid: { display: false }
+            },
+            y: {
+              ticks: { color: '#94a3b8', font: { size: 10 } },
+              grid: { color: 'rgba(51, 65, 85, 0.3)' }
+            }
+          }
+        }
+      });
+    }
+
+    /* Fully Dynamic Trend Chart Modal Logic */
     function openTrendModal() {
       document.getElementById('trendModal').style.display = 'flex';
       renderDynamicTrendChart();
@@ -554,23 +661,20 @@
         endIndex = temp;
       }
 
-      // Filtered range data based on table dropdown selection
       const rangeData = monthlyData.slice(startIndex, endIndex + 1);
 
       let labels = rangeData.map(d => d.month);
       let values = rangeData.map(d => parseFloat(d.tonnage.toFixed(2)));
 
-      // Calculate Average of selected range
       let sum = values.reduce((a, b) => a + b, 0);
       let avg = values.length > 0 ? (sum / values.length) : 0;
 
-      // Append Average label and value at the end
       labels.push("AVERAGE");
       values.push(parseFloat(avg.toFixed(2)));
 
       let bgColors = values.map((val, idx) => idx === values.length - 1 ? '#10b981' : '#ec4899');
-
       let rangeText = rangeData.length > 0 ? `${rangeData[0].month} to ${rangeData[rangeData.length - 1].month}` : "Selected Range";
+      
       document.getElementById('modalTitle').innerText = `📈 PRODUCTION TREND IN TONNAGE (${rangeText}) | Avg: ${avg.toFixed(2)} T`;
 
       if (trendChartInstance) {
