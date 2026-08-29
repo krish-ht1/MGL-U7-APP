@@ -101,7 +101,7 @@
     }
     table.yearly-table th, table.yearly-table td {
       border: 1px solid #334155;
-      padding: 8px 6px;
+      padding: 10px 12px;
     }
     table.yearly-table th {
       background: #1e293b;
@@ -137,7 +137,7 @@
       border-radius: 8px;
     }
     .legend-item { display: flex; align-items: center; gap: 6px; }
-    .graph-container { position: relative; width: 100%; height: 350px; }
+    .graph-container { position: relative; width: 100%; height: 360px; }
   </style>
 </head>
 <body>
@@ -163,30 +163,20 @@
       <a href="breakdown.html" class="nav-main-btn">⚠️ Breakdown & Loss</a>
     </div>
 
-    <!-- Correct Yearly Production Table -->
+    <!-- Correct Yearly Production Table matching the CSV layout -->
     <div class="table-section">
       <div class="table-scroll">
         <table class="yearly-table">
           <thead>
             <tr>
-              <th rowspan="2" style="vertical-align: middle;">Financial Year</th>
-              <th colspan="2">SQF-1</th>
-              <th colspan="2">SQF-2</th>
-              <th colspan="2">SQF-3</th>
-              <th colspan="2">SQF-4</th>
-              <th colspan="2">YEAR TOTAL</th>
-              <th rowspan="2" style="vertical-align: middle;">WEIGHT IN TONNAGE</th>
-            </tr>
-            <tr>
-              <th>Qty (pcs)</th><th>Weight (kg)</th>
-              <th>Qty (pcs)</th><th>Weight (kg)</th>
-              <th>Qty (pcs)</th><th>Weight (kg)</th>
-              <th>Qty (pcs)</th><th>Weight (kg)</th>
-              <th>Qty (pcs)</th><th>Weight (kg)</th>
+              <th>Financial Year</th>
+              <th>Production (MT)</th>
+              <th>Total Capacity / Target (MT)</th>
+              <th>Avg Production / Month (MT)</th>
             </tr>
           </thead>
           <tbody id="yearlyTableBody">
-            <tr><td colspan="12" style="padding: 20px; color: #94a3b8;">Loading data from Google Sheet...</td></tr>
+            <tr><td colspan="4" style="padding: 20px; color: #94a3b8;">Loading data from Google Sheet...</td></tr>
           </tbody>
         </table>
       </div>
@@ -195,7 +185,7 @@
     <!-- 3D Professional & Attractive Yearly Graph Section -->
     <div class="graph-card">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-        <h3 style="margin: 0; font-size: 13.5px; color: #f8fafc;">📈 Yearly Performance Overview (Tonnage & Targets)</h3>
+        <h3 style="margin: 0; font-size: 13.5px; color: #f8fafc;">📈 Yearly Production, Target & Average Performance</h3>
       </div>
       <div class="graph-legend">
         <div class="legend-item" style="color: #3b82f6;"><span style="width: 12px; height: 12px; background: #3b82f6; display: inline-block; border-radius: 3px;"></span> PRODUCTION (MT)</div>
@@ -210,7 +200,7 @@
   </div>
 
   <script>
-    const YEARLY_CSV_URL = "https://docs.google.com/spreadsheets/d/1ZKl4Nzxfwrt5MO11Iy-S-Yjiq0t9MHoQrryAE1paqXw/export?format=csv&gid=1784889536";
+    const YEARLY_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_55_JgWvZY0QyC87pldI3sKILOrXLYsE8xiuB99-K2ll9jWI5HHYIU6aoxEF1hegbDDmRybDQsW2/pub?gid=1784889536&single=true&output=csv";
 
     let yearlyData = [];
     let yearlyChartInstance = null;
@@ -233,12 +223,12 @@
         });
 
         yearlyData = [];
-        for (let i = 0; i < rows.length; i++) {
+        // Skipping header row (i = 1) assuming row 0 is headers
+        for (let i = 1; i < rows.length; i++) {
           let r = rows[i];
           let yearCol = r[0] ? r[0].replace(/["']/g, "").trim() : "";
           
-          if (yearCol && (yearCol.includes("202") || yearCol.includes("203") || yearCol.toUpperCase().includes("FY") || yearCol.includes("-"))) {
-            
+          if (yearCol && (yearCol.includes("FY") || yearCol.includes("202") || yearCol.includes("203"))) {
             let parseVal = (val) => {
               if (!val) return 0;
               let clean = String(val).replace(/["']/g, "").replace(/,/g, "").trim();
@@ -246,17 +236,11 @@
               return isNaN(num) ? 0 : num;
             };
 
-            let explicitTonnage = r.length > 11 ? parseVal(r[11]) : (r.length > 10 ? parseVal(r[10]) : 0);
-            let totalWtKg = parseVal(r[2]) + parseVal(r[4]) + parseVal(r[6]) + parseVal(r[8]);
-            let finalTonnage = explicitTonnage > 0 ? explicitTonnage : (totalWtKg / 1000);
-
             yearlyData.push({
               year: yearCol,
-              sqf1: { p: parseVal(r[1]), w: parseVal(r[2]) },
-              sqf2: { p: parseVal(r[3]), w: parseVal(r[4]) },
-              sqf3: { p: parseVal(r[5]), w: parseVal(r[6]) },
-              sqf4: { p: parseVal(r[7]), w: parseVal(r[8]) },
-              tonnage: finalTonnage
+              production: parseVal(r[1]),
+              target: parseVal(r[2]),
+              avgMonth: parseVal(r[3])
             });
           }
         }
@@ -281,37 +265,23 @@
       let avgMonthValues = [];
 
       yearlyData.forEach(row => {
-        let s1p = row.sqf1.p, s1w = row.sqf1.w;
-        let s2p = row.sqf2.p, s2w = row.sqf2.w;
-        let s3p = row.sqf3.p, s3w = row.sqf3.w;
-        let s4p = row.sqf4.p, s4w = row.sqf4.w;
-
-        let rowTotalQty = s1p + s2p + s3p + s4p;
-        let rowTotalWeight = s1w + s2w + s3w + s4w;
-        let rowTonnage = row.tonnage > 0 ? row.tonnage : (rowTotalWeight / 1000);
-
         labels.push(row.year);
-        let prodTon = parseFloat(rowTonnage.toFixed(2));
-        productionValues.push(prodTon);
-        targetValues.push(parseFloat((prodTon * 1.15).toFixed(0))); 
-        avgMonthValues.push(parseFloat((prodTon / 12).toFixed(2))); 
+        productionValues.push(row.production);
+        targetValues.push(row.target);
+        avgMonthValues.push(row.avgMonth);
 
         html += `
           <tr>
             <td style="font-weight:700; color:#38bdf8;">${row.year}</td>
-            <td>${s1p.toLocaleString('en-IN')}</td><td>${s1w.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-            <td>${s2p.toLocaleString('en-IN')}</td><td>${s2w.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-            <td>${s3p.toLocaleString('en-IN')}</td><td>${s3w.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-            <td>${s4p.toLocaleString('en-IN')}</td><td>${s4w.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-            <td style="font-weight:700; color:#fde047;">${rowTotalQty.toLocaleString('en-IN')}</td>
-            <td style="font-weight:700; color:#fde047;">${rowTotalWeight.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-            <td style="font-weight:700; color:#34d399;">${rowTonnage.toFixed(2)} Ton</td>
+            <td style="font-weight:700; color:#3b82f6;">${row.production.toLocaleString('en-IN')}</td>
+            <td style="font-weight:700; color:#f97316;">${row.target.toLocaleString('en-IN')}</td>
+            <td style="font-weight:700; color:#22c55e;">${row.avgMonth.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
           </tr>
         `;
       });
 
       if (!html) {
-        html = `<tr><td colspan="12" style="padding: 20px; color: #94a3b8;">No yearly records found.</td></tr>`;
+        html = `<tr><td colspan="4" style="padding: 20px; color: #94a3b8;">No yearly records found.</td></tr>`;
       }
 
       tbody.innerHTML = html;
@@ -331,7 +301,7 @@
           labels: labels,
           datasets: [
             {
-              label: 'Production (MT)',
+              label: 'PRODUCTION (MT)',
               data: production,
               backgroundColor: '#3b82f6',
               borderRadius: 6,
@@ -340,7 +310,7 @@
               order: 2
             },
             {
-              label: 'Avg Production / Month (MT)',
+              label: 'AVG PRODUCTION / MONTH (MT)',
               data: avgs,
               backgroundColor: '#22c55e',
               borderRadius: 6,
@@ -349,7 +319,7 @@
               order: 3
             },
             {
-              label: 'Total Capacity / Target (MT)',
+              label: 'TOTAL CAPACITY / TARGET (MT)',
               data: targets,
               type: 'line',
               borderColor: '#f97316',
@@ -376,9 +346,6 @@
               },
               font: { family: 'Inter', size: 10.5, weight: '700' },
               formatter: function(value, context) {
-                if (context.dataset.type === 'line') {
-                  return value;
-                }
                 return value > 0 ? value : '';
               }
             },
