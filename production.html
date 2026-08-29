@@ -568,6 +568,7 @@
       if (elapsedDays < 1) elapsedDays = 1;
       if (elapsedDays > dataDaysCount) elapsedDays = dataDaysCount;
 
+      let targetMTD = (4 * 2.25 * elapsedDays).toFixed(2);
 
       let headerHtml = `<th style="min-width: 90px;">FURNACE</th><th>Capacity</th><th>Month Target</th><th>Target MTD</th><th>Actual MTD</th><th>Cap. Utilized</th>`;
       for(let d = 1; d <= dataDaysCount; d++) { headerHtml += `<th>${d}</th>`; }
@@ -619,7 +620,7 @@
 
       tbodyHtml += `<tr class="total-row" style="background:#111827 !important;">
         <td>CUMULATIVE TOTAL</td>
-        <td colspan="5"></td>`;
+        <td colspan="5">LOT MTD</td>`;
       cumu.forEach(c => { tbodyHtml += `<td>${c > 0 ? c : '-'}</td>`; });
       tbodyHtml += `</tr>`;
 
