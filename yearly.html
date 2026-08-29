@@ -9,13 +9,13 @@
   <!-- Chart.js DataLabels Plugin -->
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     body {
-      background: #070d1b;
-      color: #e2e8f0;
+      background: radial-gradient(circle at top, #0f172a 0%, #070d1b 100%);
+      color: #f1f5f9;
       font-family: 'Inter', sans-serif;
       margin: 0;
       padding: 0;
@@ -26,136 +26,169 @@
 
     /* Header */
     .ewm-header {
-      background: #0f172a;
-      border-bottom: 1px solid #1e293b;
-      padding: 12px 20px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+      padding: 14px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       position: sticky;
       top: 0;
       z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
-    .ewm-brand { display: flex; align-items: center; gap: 10px; }
-    .ewm-brand h1 { font-size: 14px; font-weight: 700; margin: 0; color: #f8fafc; }
+    .ewm-brand { display: flex; align-items: center; gap: 12px; }
+    .ewm-brand h1 { font-size: 15px; font-weight: 800; margin: 0; color: #f8fafc; letter-spacing: 0.5px; }
     
-    .header-right { display: flex; align-items: center; gap: 8px; }
+    .header-right { display: flex; align-items: center; gap: 10px; }
     .home-btn {
-      background: #1e293b;
-      border: 1px solid #334155;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border: 1px solid rgba(56, 189, 248, 0.3);
       color: #38bdf8;
-      padding: 6px 12px;
-      border-radius: 6px;
+      padding: 6px 14px;
+      border-radius: 8px;
       font-size: 11.5px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       text-decoration: none;
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
+      transition: all 0.3s ease;
     }
-    .ewm-badge { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-size: 10.5px; font-weight: 600; }
+    .home-btn:hover { background: #38bdf8; color: #0f172a; box-shadow: 0 0 15px rgba(56, 189, 248, 0.5); }
+    
+    .ewm-badge { 
+      background: rgba(52, 211, 153, 0.15); 
+      color: #34d399; 
+      border: 1px solid rgba(52, 211, 153, 0.4); 
+      padding: 4px 10px; 
+      border-radius: 8px; 
+      font-size: 11px; 
+      font-weight: 700; 
+      box-shadow: 0 0 10px rgba(52, 211, 153, 0.2);
+    }
 
-    .ewm-container { max-width: 1600px; width: 100%; margin: 0 auto; padding: 14px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
+    .ewm-container { max-width: 1600px; width: 100%; margin: 0 auto; padding: 18px; flex: 1; display: flex; flex-direction: column; gap: 18px; }
 
     /* Navigation Bar */
     .nav-buttons-bar {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      background: #0f172a;
-      border: 1px solid #1e293b;
+      gap: 10px;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
       padding: 10px;
-      border-radius: 10px;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
     }
     .nav-main-btn {
       background: #1e293b;
-      border: 1px solid #334155;
+      border: 1px solid rgba(255, 255, 255, 0.08);
       color: #94a3b8;
-      padding: 8px 6px;
+      padding: 9px 8px;
       border-radius: 8px;
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 700;
       cursor: pointer;
       text-align: center;
       text-decoration: none;
       display: block;
-      transition: 0.2s;
+      transition: all 0.3s ease;
     }
-    .nav-main-btn.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+    .nav-main-btn:hover { color: #f8fafc; border-color: #38bdf8; }
+    .nav-main-btn.active { 
+      background: linear-gradient(135deg, #3b82f6, #2563eb); 
+      border-color: #60a5fa; 
+      color: #fff; 
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); 
+    }
 
-    /* Fancy Premium Borderless Table Section */
+    /* Ultra Fancy Glassmorphism Table Section */
     .table-section {
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      border: 1px solid #334155;
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.5);
     }
-    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px; }
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; }
     table.yearly-table {
       width: 100%;
-      border-collapse: collapse;
-      font-size: 11.5px;
+      border-collapse: separate;
+      border-spacing: 0 6px;
+      font-size: 12px;
       text-align: center;
       white-space: nowrap;
     }
-    table.yearly-table th, table.yearly-table td {
-      border: none;
-      padding: 12px 14px;
-      border-bottom: 1px solid #334155;
-    }
     table.yearly-table th {
-      background: #162032;
+      background: rgba(30, 41, 59, 0.9);
       color: #38bdf8;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      position: sticky;
-      top: 0;
-      z-index: 5;
+      letter-spacing: 0.8px;
+      padding: 12px 14px;
+      border: none;
     }
-    table.yearly-table td { background: #0f172a; color: #f1f5f9; font-weight: 500; }
-    table.yearly-table tr:hover td { background: #162238; }
+    table.yearly-table th:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+    table.yearly-table th:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
 
-    /* Ultra-Attractive 3D/4D Graph Card */
+    table.yearly-table td {
+      background: rgba(30, 41, 59, 0.4);
+      padding: 12px 14px;
+      border: none;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    table.yearly-table tr td:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+    table.yearly-table tr td:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+    table.yearly-table tr:hover td { 
+      background: rgba(56, 189, 248, 0.12); 
+      box-shadow: inset 0 0 10px rgba(56, 189, 248, 0.1);
+    }
+
+    /* 4D/8D High-End Glowing Graph Card */
     .graph-card {
-      background: linear-gradient(135deg, #0b1120 0%, #0f172a 100%);
-      border: 1px solid #334155;
-      border-radius: 14px;
-      padding: 20px;
+      background: linear-gradient(145deg, #0b1120 0%, #0f172a 100%);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 16px;
+      padding: 22px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+      gap: 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255,255,255,0.1);
     }
     .graph-legend {
       display: flex;
       justify-content: center;
       align-items: center;
       flex-wrap: wrap;
-      gap: 20px;
+      gap: 24px;
       font-size: 11.5px;
-      font-weight: 700;
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid #334155;
-      padding: 10px 14px;
-      border-radius: 10px;
+      font-weight: 800;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 12px 16px;
+      border-radius: 12px;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
     }
-    .legend-item { display: flex; align-items: center; gap: 6px; }
-    .graph-container { position: relative; width: 100%; height: 380px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px; }
+    .graph-container { position: relative; width: 100%; height: 400px; }
   </style>
 </head>
 <body>
 
   <header class="ewm-header">
     <div class="ewm-brand">
-      <span style="font-size: 16px;">📈</span>
-      <h1>Milestone Gear Unit 7 - Yearly Production</h1>
+      <span style="font-size: 18px;">🚀</span>
+      <h1>Milestone Gear Unit 7 - Yearly Production Analytics</h1>
     </div>
     <div class="header-right">
       <a href="index.html" class="home-btn">🏠 Home</a>
-      <div class="ewm-badge" id="syncStatus">● Live Sync</div>
+      <div class="ewm-badge" id="syncStatus">● Live Synced</div>
     </div>
   </header>
 
@@ -163,15 +196,17 @@
 
     <!-- Sub-Module Navigation -->
     <div class="nav-buttons-bar">
-      <a href="production.html" class="nav-main-btn">📅 Daily Production (DWM)</a>
-      <a href="monthly.html" class="nav-main-btn">📊 Monthly Production</a>
+      <a href="production.html" class="nav-main-btn">📅 Daily (DWM)</a>
+      <a href="monthly.html" class="nav-main-btn">📊 Monthly</a>
       <a href="yearly.html" class="nav-main-btn active">📈 Yearly Production</a>
-      <a href="breakdown.html" class="nav-main-btn">⚠️ Breakdown & Loss</a>
+      <a href="breakdown.html" class="nav-main-btn">⚠️ Breakdown</a>
     </div>
 
-    <!-- Fancy Premium Table with Percentage Column -->
+    <!-- Fancy Glassmorphism Table Section -->
     <div class="table-section">
-      <div style="margin-bottom: 10px; font-weight: 700; font-size: 13px; color: #f8fafc;">📋 Yearly Performance Data Record</div>
+      <div style="margin-bottom: 12px; font-weight: 800; font-size: 13.5px; color: #38bdf8; display: flex; align-items: center; gap: 8px;">
+        <span>📊</span> Yearly Performance Master Record
+      </div>
       <div class="table-scroll">
         <table class="yearly-table">
           <thead>
@@ -184,21 +219,21 @@
             </tr>
           </thead>
           <tbody id="yearlyTableBody">
-            <tr><td colspan="5" style="padding: 20px; color: #94a3b8;">Loading live data from Google Sheet...</td></tr>
+            <tr><td colspan="5" style="padding: 24px; color: #94a3b8; font-weight: 600;">Connecting with live Google Sheets...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- Ultra-Attractive 3D/4D Graph Section -->
+    <!-- Ultra-Attractive 4D Glowing Graph Section -->
     <div class="graph-card">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-        <h3 style="margin: 0; font-size: 14px; color: #f8fafc;">🚀 Advanced 3D Performance Analytics & Trends</h3>
+        <h3 style="margin: 0; font-size: 15px; font-weight: 800; color: #f8fafc; letter-spacing: 0.5px;">✨ Advanced High-Definition Performance & Target Matrix</h3>
       </div>
       <div class="graph-legend">
-        <div class="legend-item" style="color: #38bdf8;"><span style="width: 12px; height: 12px; background: linear-gradient(135deg, #38bdf8, #2563eb); display: inline-block; border-radius: 4px;"></span> PRODUCTION (MT)</div>
-        <div class="legend-item" style="color: #fb923c;"><span style="width: 12px; height: 12px; background: #fb923c; display: inline-block; border-radius: 50%; box-shadow: 0 0 8px #fb923c;"></span> TOTAL CAPACITY / TARGET (MT)</div>
-        <div class="legend-item" style="color: #34d399;"><span style="width: 12px; height: 12px; background: linear-gradient(135deg, #34d399, #059669); display: inline-block; border-radius: 4px;"></span> AVG PRODUCTION / MONTH (MT)</div>
+        <div class="legend-item" style="color: #38bdf8;"><span style="width: 14px; height: 14px; background: linear-gradient(135deg, #38bdf8, #1d4ed8); display: inline-block; border-radius: 4px; box-shadow: 0 0 10px #38bdf8;"></span> PRODUCTION (MT)</div>
+        <div class="legend-item" style="color: #fb923c;"><span style="width: 14px; height: 14px; background: #fb923c; display: inline-block; border-radius: 50%; box-shadow: 0 0 12px #fb923c;"></span> TOTAL CAPACITY / TARGET (MT)</div>
+        <div class="legend-item" style="color: #34d399;"><span style="width: 14px; height: 14px; background: linear-gradient(135deg, #34d399, #059669); display: inline-block; border-radius: 4px; box-shadow: 0 0 10px #34d399;"></span> AVG PRODUCTION / MONTH (MT)</div>
       </div>
       <div class="graph-container">
         <canvas id="yearlyChart"></canvas>
@@ -283,22 +318,21 @@
         targetValues.push(row.target);
         avgMonthValues.push(row.avgMonth);
 
-        // Badge color based on percentage achievement
-        let badgeColor = row.percentage >= 100 ? '#34d399' : '#f59e0b';
+        let badgeColor = row.percentage >= 100 ? '#34d399' : '#fb923c';
 
         html += `
           <tr>
-            <td style="font-weight:700; color:#38bdf8;">${row.year}</td>
-            <td style="font-weight:700; color:#3b82f6;">${row.production.toLocaleString('en-IN')}</td>
+            <td style="font-weight:800; color:#38bdf8; text-shadow: 0 0 10px rgba(56,189,248,0.3);">${row.year}</td>
+            <td style="font-weight:700; color:#60a5fa;">${row.production.toLocaleString('en-IN')}</td>
             <td style="font-weight:700; color:#fb923c;">${row.target.toLocaleString('en-IN')}</td>
             <td style="font-weight:700; color:#34d399;">${row.avgMonth.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-            <td><span style="background: rgba(52, 211, 153, 0.15); color: ${badgeColor}; padding: 4px 10px; border-radius: 6px; font-weight: 700; border: 1px solid rgba(52, 211, 153, 0.3);">${row.percentage}%</span></td>
+            <td><span style="background: rgba(52, 211, 153, 0.15); color: ${badgeColor}; padding: 5px 12px; border-radius: 8px; font-weight: 800; border: 1px solid rgba(52, 211, 153, 0.4); box-shadow: 0 0 10px rgba(52,211,153,0.2);">${row.percentage}%</span></td>
           </tr>
         `;
       });
 
       if (!html) {
-        html = `<tr><td colspan="5" style="padding: 20px; color: #94a3b8;">No yearly records found.</td></tr>`;
+        html = `<tr><td colspan="5" style="padding: 24px; color: #94a3b8;">No yearly records found.</td></tr>`;
       }
 
       tbody.innerHTML = html;
@@ -308,14 +342,14 @@
     function renderYearly3DChart(labels, production, targets, avgs) {
       const ctx = document.getElementById('yearlyChart').getContext('2d');
 
-      // Creating 3D Gradient Fills for Bars
-      let gradProd = ctx.createLinearGradient(0, 0, 0, 350);
+      // Stunning Ultra-Glow Gradients
+      let gradProd = ctx.createLinearGradient(0, 0, 0, 400);
       gradProd.addColorStop(0, '#38bdf8');
-      gradProd.addColorStop(1, '#1d4ed8');
+      gradProd.addColorStop(1, '#1e40af');
 
-      let gradAvg = ctx.createLinearGradient(0, 0, 0, 350);
+      let gradAvg = ctx.createLinearGradient(0, 0, 0, 400);
       gradAvg.addColorStop(0, '#34d399');
-      gradAvg.addColorStop(1, '#047857');
+      gradAvg.addColorStop(1, '#065f46');
 
       if (yearlyChartInstance) {
         yearlyChartInstance.destroy();
@@ -350,12 +384,12 @@
               type: 'line',
               borderColor: '#fb923c',
               backgroundColor: '#fb923c',
-              borderWidth: 3.5,
+              borderWidth: 4,
               pointRadius: 6,
-              pointBackgroundColor: '#fff',
+              pointBackgroundColor: '#0f172a',
               pointBorderColor: '#fb923c',
-              pointBorderWidth: 2,
-              tension: 0.2,
+              pointBorderWidth: 3,
+              tension: 0.25,
               yAxisID: 'y',
               order: 1
             }
@@ -371,31 +405,39 @@
               anchor: 'end',
               align: 'top',
               color: function(context) {
-                return context.dataset.type === 'line' ? '#fb923c' : '#f8fafc';
+                return context.dataset.type === 'line' ? '#fdba74' : '#f8fafc';
               },
-              font: { family: 'Inter', size: 11, weight: '700' },
-              formatter: function(value, context) {
+              font: { family: 'Inter', size: 11, weight: '800' },
+              formatter: function(value) {
                 return value > 0 ? value : '';
               }
             },
-            tooltip: { backgroundColor: '#0f172a', titleColor: '#38bdf8', bodyColor: '#f8fafc', borderColor: '#334155', borderWidth: 1 }
+            tooltip: { 
+              backgroundColor: 'rgba(15, 23, 42, 0.95)', 
+              titleColor: '#38bdf8', 
+              bodyColor: '#f8fafc', 
+              borderColor: 'rgba(56,189,248,0.4)', 
+              borderWidth: 1,
+              padding: 12,
+              boxPadding: 6
+            }
           },
           scales: {
             x: { 
               grid: { display: false }, 
-              ticks: { color: '#cbd5e1', font: { size: 11, weight: '600' } } 
+              ticks: { color: '#94a3b8', font: { size: 11.5, weight: '700' } } 
             },
             y: {
               type: 'linear',
               position: 'left',
-              grid: { color: 'rgba(51, 65, 85, 0.15)' },
-              ticks: { color: '#38bdf8', font: { size: 10 } }
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#38bdf8', font: { size: 10.5, weight: '600' } }
             },
             y1: {
               type: 'linear',
               position: 'right',
               grid: { display: false },
-              ticks: { color: '#34d399', font: { size: 10 } }
+              ticks: { color: '#34d399', font: { size: 10.5, weight: '600' } }
             }
           }
         }
