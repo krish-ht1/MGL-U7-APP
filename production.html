@@ -107,34 +107,42 @@
       cursor: pointer;
     }
 
-    /* KPI Cards Ribbon Styling for Mobile & Desktop */
-    .kpi-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 10px;
-      margin-bottom: 14px;
+    /* Mobile-Friendly & Attractive KPI Ribbon */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* फोन में 2-2 के जोड़े में दिखेगा, जो बहुत शानदार लगेगा */
+    gap: 8px;
+  }
+  
+  @media (min-width: 768px) {
+    .kpi-row {
+      grid-template-columns: repeat(5, 1fr); /* लैपटॉप/डेस्कटॉप पर एक लाइन में 5 कार्ड्स */
     }
-    .kpi-card {
-      background: #0f172a;
-      border: 1px solid #1e293b;
-      border-radius: 10px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      text-align: left;
-    }
-    .kpi-card span:first-child {
-      font-size: 10.5px;
-      font-weight: 600;
-      color: #94a3b8;
-      text-transform: uppercase;
-    }
-    .kpi-card span:last-child {
-      font-size: 16px;
-      font-weight: 700;
-      color: #f8fafc;
-    }
+  }
+
+  .kpi-card {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .kpi-title {
+    font-size: 10px;
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+
+  .kpi-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: #f8fafc;
+  }
 
     /* DWM Matrix Section */
     .dwm-section {
