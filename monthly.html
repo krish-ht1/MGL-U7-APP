@@ -641,7 +641,7 @@
       render3DFYBarChart(selectedFY);
     }
 
-    // 3D Style Colorful Bar Chart with First & Last Average Bars
+    // 3D Style Colorful Bar Chart with Months and Final Average Bar at the End
     function render3DFYBarChart(selectedFY) {
       const ctx = document.getElementById('monthlyBarChart').getContext('2d');
 
@@ -654,15 +654,14 @@
       let avg = monthValues.length > 0 ? (sum / monthValues.length) : 0;
       let formattedAvg = parseFloat(avg.toFixed(2));
 
-      // Requirement: First bar is Average, then months, then Last bar is also Average
-      let labels = ["AVG (START)", ...monthLabels, "AVG (END)"];
-      let values = [formattedAvg, ...monthValues, formattedAvg];
+      // Requirement: Only months in middle, and 'AVERAGE' at the very end. No start average.
+      let labels = [...monthLabels, "AVERAGE"];
+      let values = [...monthValues, formattedAvg];
 
-      // Beautiful Vibrant 3D-like Color Gradients (Pink/Purple/Blue theme similar to trend popup + green for avg)
+      // Vibrant 3D-like Color Gradients (Pink/Purple/Blue theme with Emerald Green for Average)
       let bgColors = values.map((val, idx) => {
-        if (idx === 0 || idx === values.length - 1) return '#10b981'; // Emerald Green for Average
-        // Vibrant Pink-Purple-Blue gradient feel for months
-        return idx % 2 === 0 ? '#ec4899' : '#3b82f6';
+        if (idx === values.length - 1) return '#10b981'; // Emerald Green for Average at the end
+        return idx % 2 === 0 ? '#ec4899' : '#3b82f6'; // Vibrant pink & blue combination
       });
 
       document.getElementById('fyGraphTitle').innerText = `📈 FY ${selectedFY} Monthly Production & Average (Avg: ${formattedAvg} T)`;
