@@ -394,108 +394,177 @@
       </form>
     </div>
   </div>
-
-  <script>
-    // Live CSV URL from Google Sheet ('dwm' tab)
+<script>
     const LIVE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_55_JgWvZY0QyC87pldI3sKILOrXLYsE8xiuB99-K2ll9jWI5HHYIU6aoxEF1hegbDDmRybDQsW2/pub?gid=0&single=true&output=csv";
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbynvsWeWWBSvCpxTHJaPT7bLkvmMwowRNzA1DFlBHYrr6v8LaMPIAUcC4na6O5U2XZ1dA/exec";
     const ADMIN_PIN = "7890";
 
-    // Database with exact Sheet values (No custom formulas)
+    // 1. April se July tak ka Purana Fixed Data (Yeh bilkul safe rahega, khatam nahi hoga)
     const fixedDatabase = {
-      "AUGUST-2026": {
-        daysCount: 31,
-        monthTarget: 279.0,
-        totalTargetMTD: 243.0,
-        furnaces: {
-          "SQF-1": { capacity: 69.75, monthTarget: 69.75, targetMTD: 60.75, days: [1.74, 3.06, 2.23, 2.23, 1.97, 2.53, 2.53, 2.79, 2.53, 1.87, 1.87, 2.53, 2.87, 1.87, 1.99, 0.79, 2.62, 2.53, 2.87, 1.75, 2.53, 1.84, 2.35, 2.38, 2.53, 0.85, 2.53, 0, 0, 0, 0] },
-          "SQF-2": { capacity: 69.75, monthTarget: 69.75, targetMTD: 60.75, days: [2.89, 2.03, 2.53, 1.69, 1.75, 2.97, 1.89, 2.09, 1.74, 1.85, 2.68, 2.64, 1.74, 2.68, 1.87, 1.98, 2.84, 1.66, 2.68, 2.60, 0.87, 2.68, 2.53, 2.45, 1.83, 1.97, 1.79, 0, 0, 0, 0] },
-          "SQF-3": { capacity: 69.75, monthTarget: 69.75, targetMTD: 60.75, days: [2.20, 2.05, 3.25, 2.05, 2.20, 2.20, 2.09, 2.12, 2.13, 2.21, 2.13, 3.14, 2.04, 2.20, 2.04, 2.06, 2.09, 2.04, 2.80, 1.97, 2.07, 2.16, 2.06, 1.96, 2.08, 2.11, 2.18, 0, 0, 0, 0] },
-          "SQF-4": { capacity: 69.75, monthTarget: 69.75, targetMTD: 60.75, days: [3.17, 1.93, 2.09, 2.50, 2.11, 2.30, 1.98, 2.89, 2.07, 3.07, 2.25, 2.50, 2.60, 2.00, 3.19, 1.55, 2.35, 1.13, 2.45, 1.52, 3.00, 1.99, 2.65, 2.43, 1.90, 1.94, 3.81, 0, 0, 0, 0] }
-        }
-      },
       "JULY-2026": {
-        daysCount: 31,
-        monthTarget: 279.0,
-        totalTargetMTD: 279.0,
+        daysCount: 31, monthTarget: 279.0,
         furnaces: {
-          "SQF-1": { capacity: 69.75, monthTarget: 69.75, targetMTD: 69.75, days: [3.32, 2.53, 2.77, 1.58, 0.79, 2.61, 2.06, 1.83, 1.74, 2.93, 2.78, 1.83, 2.44, 1.53, 1.83, 2.37, 2.65, 1.28, 0.95, 2.53, 2.60, 2.23, 2.62, 1.89, 2.10, 2.68, 2.44, 2.61, 2.53, 2.68, 1.83] },
-          "SQF-2": { capacity: 69.75, monthTarget: 69.75, targetMTD: 69.75, days: [2.37, 2.00, 2.58, 1.79, 1.00, 2.58, 2.53, 2.74, 1.79, 2.26, 2.00, 2.68, 1.47, 2.68, 2.78, 2.88, 1.79, 1.74, 2.73, 1.00, 1.79, 2.04, 1.91, 2.58, 2.37, 2.10, 2.68, 2.53, 2.08, 2.68, 2.53] },
-          "SQF-3": { capacity: 69.75, monthTarget: 69.75, targetMTD: 69.75, days: [2.15, 3.01, 1.97, 2.38, 1.94, 1.92, 1.94, 2.80, 2.20, 2.10, 2.10, 2.96, 2.00, 3.20, 1.57, 1.96, 2.02, 2.13, 2.15, 2.17, 2.12, 2.18, 1.98, 2.57, 2.10, 2.20, 2.05, 3.00, 2.09, 2.10, 2.22] },
-          "SQF-4": { capacity: 69.75, monthTarget: 69.75, targetMTD: 69.75, days: [1.76, 2.14, 2.15, 2.64, 1.59, 2.17, 2.06, 1.71, 2.05, 3.25, 2.02, 2.89, 1.79, 1.67, 2.02, 3.12, 1.91, 2.83, 1.79, 2.05, 2.10, 1.69, 2.84, 2.04, 2.88, 2.12, 2.06, 2.71, 1.58, 3.17, 1.93] }
+          "SQF-1": [3.32, 2.53, 2.77, 1.58, 0.79, 2.61, 2.06, 1.83, 1.74, 2.93, 2.78, 1.83, 2.44, 1.53, 1.83, 2.37, 2.65, 1.28, 0.95, 2.53, 2.60, 2.23, 2.62, 1.89, 2.10, 2.68, 2.44, 2.61, 2.53, 2.68, 1.83],
+          "SQF-2": [2.37, 2.00, 2.58, 1.79, 1.00, 2.58, 2.53, 2.74, 1.79, 2.26, 2.00, 2.68, 1.47, 2.68, 2.78, 2.88, 1.79, 1.74, 2.73, 1.00, 1.79, 2.04, 1.91, 2.58, 2.37, 2.10, 2.68, 2.53, 2.08, 2.68, 2.53],
+          "SQF-3": [2.15, 3.01, 1.97, 2.38, 1.94, 1.92, 1.94, 2.80, 2.20, 2.10, 2.10, 2.96, 2.00, 3.20, 1.57, 1.96, 2.02, 2.13, 2.15, 2.17, 2.12, 2.18, 1.98, 2.57, 2.10, 2.20, 2.05, 3.00, 2.09, 2.10, 2.22],
+          "SQF-4": [1.76, 2.14, 2.15, 2.64, 1.59, 2.17, 2.06, 1.71, 2.05, 3.25, 2.02, 2.89, 1.79, 1.67, 2.02, 3.12, 1.91, 2.83, 1.79, 2.05, 2.10, 1.69, 2.84, 2.04, 2.88, 2.12, 2.06, 2.71, 1.58, 3.17, 1.93]
         }
       },
       "JUNE-2026": {
-        daysCount: 30,
-        monthTarget: 270.0,
-        totalTargetMTD: 270.0,
+        daysCount: 30, monthTarget: 270.0,
         furnaces: {
-          "SQF-1": { capacity: 67.50, monthTarget: 67.50, targetMTD: 67.50, days: [2.01, 2.53, 2.78, 1.79, 1.67, 2.53, 2.37, 2.68, 2.74, 1.74, 2.74, 2.37, 0,0,0,0,0, 1.79, 2.01, 1.83, 2.08, 1.95, 2.53, 2.97, 1.83, 2.37, 1.85, 1.95, 2.68, 2.53] },
-          "SQF-2": { capacity: 67.50, monthTarget: 67.50, targetMTD: 67.50, days: [1.79, 2.58, 1.37, 1.04, 2.82, 1.67, 2.02, 1.51, 2.09, 2.16, 2.06, 1.95, 2.68, 1.79, 2.68, 2.78, 2.78, 2.68, 2.53, 2.00, 1.94, 2.66, 1.85, 1.95, 1.58, 2.81, 1.95, 2.62, 1.49, 2.37] },
-          "SQF-3": { capacity: 67.50, monthTarget: 67.50, targetMTD: 67.50, days: [1.10, 3.05, 1.96, 2.09, 2.13, 2.04, 2.16, 1.99, 2.07, 1.67, 1.05, 3.20, 2.08, 2.13, 2.62, 1.44, 2.04, 2.22, 3.33, 2.23, 2.17, 2.14, 3.11, 1.60, 2.22, 2.73, 2.04, 2.12, 2.01, 3.19] },
-          "SQF-4": { capacity: 67.50, monthTarget: 67.50, targetMTD: 67.50, days: [2.41, 1.81, 2.48, 1.97, 2.84, 1.93, 2.85, 2.54, 1.98, 2.15, 2.86, 1.73, 2.79, 2.97, 1.62, 3.04, 2.13, 2.07, 3.04, 1.88, 2.49, 2.41, 2.51, 2.54, 2.61, 1.83, 1.83, 2.62, 1.45, 1.60] }
+          "SQF-1": [2.01, 2.53, 2.78, 1.79, 1.67, 2.53, 2.37, 2.68, 2.74, 1.74, 2.74, 2.37, 0,0,0,0,0, 1.79, 2.01, 1.83, 2.08, 1.95, 2.53, 2.97, 1.83, 2.37, 1.85, 1.95, 2.68, 2.53],
+          "SQF-2": [1.79, 2.58, 1.37, 1.04, 2.82, 1.67, 2.02, 1.51, 2.09, 2.16, 2.06, 1.95, 2.68, 1.79, 2.68, 2.78, 2.78, 2.68, 2.53, 2.00, 1.94, 2.66, 1.85, 1.95, 1.58, 2.81, 1.95, 2.62, 1.49, 2.37],
+          "SQF-3": [1.10, 3.05, 1.96, 2.09, 2.13, 2.04, 2.16, 1.99, 2.07, 1.67, 1.05, 3.20, 2.08, 2.13, 2.62, 1.44, 2.04, 2.22, 3.33, 2.23, 2.17, 2.14, 3.11, 1.60, 2.22, 2.73, 2.04, 2.12, 2.01, 3.19],
+          "SQF-4": [2.41, 1.81, 2.48, 1.97, 2.84, 1.93, 2.85, 2.54, 1.98, 2.15, 2.86, 1.73, 2.79, 2.97, 1.62, 3.04, 2.13, 2.07, 3.04, 1.88, 2.49, 2.41, 2.51, 2.54, 2.61, 1.83, 1.83, 2.62, 1.45, 1.60]
         }
       },
       "MAY-2026": {
-        daysCount: 31,
-        monthTarget: 279.0,
-        totalTargetMTD: 279.0,
+        daysCount: 31, monthTarget: 279.0,
         furnaces: {
-          "SQF-1": { capacity: 69.75, monthTarget: 69.75, targetMTD: 69.75, days: [2.02, 2.49, 0.95, 2.37, 2.52, 3.47, 2.81, 1.89, 2.53, 2.68, 2.37, 2.37, 2.50, 0,0,0,0,0, 2.68, 2.04, 2.53, 2.62, 2.04, 2.83, 1.74, 2.68, 2.64, 1.87, 3.02, 1.92, 2.01] },
-          "SQF-2": { capacity: 69.75, monthTarget: 69.75, targetMTD: 69.75, days: [2.53, 2.94, 1.74, 1.69, 1.03, 2.63, 1.79, 2.58, 1.74, 2.37, 0.95, 1.94, 1.99, 1.58, 2.68, 2.68, 2.54, 2.55, 2.68, 2.79, 1.03, 1.82, 2.37, 2.37, 1.82, 1.74, 2.00, 2.73, 1.91, 1.86, 2.53] },
-          "SQF-3": { capacity: 69.75, monthTarget: 69.75, targetMTD: 69.75, days: [1.51, 3.14, 2.24, 1.99, 2.14, 2.01, 2.24, 1.91, 2.14, 1.98, 2.71, 1.74, 2.15, 2.17, 1.99, 2.13, 2.06, 2.13, 2.05, 2.46, 1.93, 2.61, 2.09, 2.73, 0,0,0,0,0,0,0] },
-          "SQF-4": { capacity: 69.75, monthTarget: 69.75, targetMTD: 69.75, days: [2.10, 2.80, 2.48, 1.51, 2.18, 1.67, 2.67, 2.12, 1.85, 3.09, 2.45, 1.42, 1.98, 1.45, 2.70, 2.99, 2.02, 2.12, 2.74, 1.13, 0,0,0,0,0, 2.70, 1.95, 2.12, 2.08, 1.66, 1.96] }
+          "SQF-1": [2.02, 2.49, 0.95, 2.37, 2.52, 3.47, 2.81, 1.89, 2.53, 2.68, 2.37, 2.37, 2.50, 0,0,0,0,0, 2.68, 2.04, 2.53, 2.62, 2.04, 2.83, 1.74, 2.68, 2.64, 1.87, 3.02, 1.92, 2.01],
+          "SQF-2": [2.53, 2.94, 1.74, 1.69, 1.03, 2.63, 1.79, 2.58, 1.74, 2.37, 0.95, 1.94, 1.99, 1.58, 2.68, 2.68, 2.54, 2.55, 2.68, 2.79, 1.03, 1.82, 2.37, 2.37, 1.82, 1.74, 2.00, 2.73, 1.91, 1.86, 2.53],
+          "SQF-3": [1.51, 3.14, 2.24, 1.99, 2.14, 2.01, 2.24, 1.91, 2.14, 1.98, 2.71, 1.74, 2.15, 2.17, 1.99, 2.13, 2.06, 2.13, 2.05, 2.46, 1.93, 2.61, 2.09, 2.73, 0,0,0,0,0,0,0],
+          "SQF-4": [2.10, 2.80, 2.48, 1.51, 2.18, 1.67, 2.67, 2.12, 1.85, 3.09, 2.45, 1.42, 1.98, 1.45, 2.70, 2.99, 2.02, 2.12, 2.74, 1.13, 0,0,0,0,0, 2.70, 1.95, 2.12, 2.08, 1.66, 1.96]
         }
       },
       "APRIL-2026": {
-        daysCount: 30,
-        monthTarget: 270.0,
-        totalTargetMTD: 270.0,
+        daysCount: 30, monthTarget: 270.0,
         furnaces: {
-          "SQF-1": { capacity: 67.50, monthTarget: 67.50, targetMTD: 67.50, days: [1.66, 1.58, 3.16, 2.53, 2.37, 3.16, 2.37, 2.53, 3.18, 2.02, 2.53, 2.53, 2.37, 0.79, 3.47, 2.53, 2.53, 2.53, 2.53, 1.67, 2.53, 2.15, 2.02, 2.97, 2.14, 1.74, 2.53, 1.74, 1.46, 2.37] },
-          "SQF-2": { capacity: 67.50, monthTarget: 67.50, targetMTD: 67.50, days: [2.18, 2.74, 1.95, 1.81, 2.24, 2.89, 1.87, 1.00, 2.02, 0.72, 2.83, 1.67, 2.00, 1.74, 1.51, 0.88, 2.66, 1.67, 1.00, 2.38, 1.82, 2.53, 1.77, 0.60, 2.06, 1.74, 3.32, 1.84, 2.29, 2.02] },
-          "SQF-3": { capacity: 67.50, monthTarget: 67.50, targetMTD: 67.50, days: [2.17, 3.30, 2.13, 1.44, 3.28, 1.59, 3.00, 1.74, 2.01, 2.17, 3.18, 1.58, 1.90, 1.85, 2.12, 3.07, 1.85, 1.93, 2.01, 2.53, 1.85, 1.04, 1.78, 0,0,0,0,0,0,0] },
-          "SQF-4": { capacity: 67.50, monthTarget: 67.50, targetMTD: 67.50, days: [2.07, 2.93, 1.64, 2.55, 2.21, 2.55, 2.05, 3.26, 2.10, 2.34, 2.88, 1.72, 2.66, 2.19, 2.35, 2.09, 1.61, 1.96, 1.61, 2.65, 2.88, 1.51, 2.22, 1.92, 2.85, 1.91, 1.98, 2.30, 2.17, 1.08] }
+          "SQF-1": [1.66, 1.58, 3.16, 2.53, 2.37, 3.16, 2.37, 2.53, 3.18, 2.02, 2.53, 2.53, 2.37, 0.79, 3.47, 2.53, 2.53, 2.53, 2.53, 1.67, 2.53, 2.15, 2.02, 2.97, 2.14, 1.74, 2.53, 1.74, 1.46, 2.37],
+          "SQF-2": [2.18, 2.74, 1.95, 1.81, 2.24, 2.89, 1.87, 1.00, 2.02, 0.72, 2.83, 1.67, 2.00, 1.74, 1.51, 0.88, 2.66, 1.67, 1.00, 2.38, 1.82, 2.53, 1.77, 0.60, 2.06, 1.74, 3.32, 1.84, 2.29, 2.02],
+          "SQF-3": [2.17, 3.30, 2.13, 1.44, 3.28, 1.59, 3.00, 1.74, 2.01, 2.17, 3.18, 1.58, 1.90, 1.85, 2.12, 3.07, 1.85, 1.93, 2.01, 2.53, 1.85, 1.04, 1.78, 0,0,0,0,0,0,0],
+          "SQF-4": [2.07, 2.93, 1.64, 2.55, 2.21, 2.55, 2.05, 3.26, 2.10, 2.34, 2.88, 1.72, 2.66, 2.19, 2.35, 2.09, 1.61, 1.96, 1.61, 2.65, 2.88, 1.51, 2.22, 1.92, 2.85, 1.91, 1.98, 2.30, 2.17, 1.08]
         }
       }
     };
 
-    function setDefaultMonthInForm() {
-      const now = new Date();
-      const months = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
-      const currentMonthName = months[now.getMonth()];
-      const currentYear = now.getFullYear();
-      const formattedVal = `${currentMonthName}-${currentYear}`;
+    function parseCSV(text) {
+      return text.split('\n').map(r => {
+        let row = [];
+        let insideQuote = false;
+        let entry = '';
+        for (let char of r) {
+          if (char === '"') { insideQuote = !insideQuote; }
+          else if (char === ',' && !insideQuote) { row.push(entry.trim()); entry = ''; }
+          else { entry += char; }
+        }
+        row.push(entry.trim());
+        return row;
+      });
+    }
+
+    // 2. August ke liye Direct Live Sheet Data render karne ka function (Bina kisi formula ke)
+    async function fetchAugustLiveSheet() {
+      const selectedMonth = document.getElementById('dwmMonthDropdown').value;
+      const syncStatus = document.getElementById('syncStatus');
       
-      const inputMonthSelect = document.getElementById('inputMonth');
-      if (inputMonthSelect) {
-        let exists = false;
-        for(let opt of inputMonthSelect.options) {
-          if(opt.value === formattedVal) {
-            exists = true;
-            break;
+      // Agar mahina April se July ke beech ka hai, toh fixed database dikhao
+      if (selectedMonth !== "AUGUST-2026") {
+        renderFixedDWM(selectedMonth);
+        return;
+      }
+
+      // Agar AUGUST-2026 hai, toh seedha Google Sheet ka live CSV uthao
+      try {
+        const timestamp = new Date().getTime();
+        const response = await fetch(`${LIVE_CSV_URL}&_t=${timestamp}`);
+        const csvText = await response.text();
+        const rows = parseCSV(csvText);
+
+        const thead = document.getElementById('dwmHeaderRow');
+        const tbody = document.getElementById('dwmTableBody');
+
+        if (rows && rows.length > 0) {
+          let headerRow = rows[0];
+          let thHtml = `<tr style="background: #1e293b;">`;
+          headerRow.forEach((col, idx) => {
+            let colName = col.replace(/["']/g, "");
+            thHtml += `<th style="padding: 8px 10px; border-right: 1px solid #334155; white-space: nowrap;">${colName || 'Col ' + (idx+1)}</th>`;
+          });
+          thHtml += `</tr>`;
+          thead.innerHTML = thHtml;
+
+          let dataRows = rows.slice(1);
+          let dHtml = "";
+          dataRows.forEach((row, index) => {
+            if (row.length > 1 && row.some(cell => cell.trim() !== "")) {
+              let bgStyle = (index % 2 === 0) ? "background: #1e293b;" : "background: #0f172a;";
+              dHtml += `<tr style="${bgStyle} border-bottom: 1px solid #334155;">`;
+              row.forEach(cell => {
+                let cellVal = cell.replace(/["']/g, "");
+                dHtml += `<td style="padding: 6px 8px; border-right: 1px solid #334155; color: #cbd5e1; white-space: nowrap;">${cellVal || '-'}</td>`;
+              });
+              dHtml += `</tr>`;
+            }
+          });
+          tbody.innerHTML = dHtml || "<tr><td style='padding:15px; color:#94a3b8;'>No rows found.</td></tr>";
+
+          if(syncStatus) {
+            syncStatus.innerText = "● August Live Synced From Sheet";
+            syncStatus.style.color = "#34d399";
           }
         }
-        if(!exists) {
-          let newOpt = document.createElement('option');
-          newOpt.value = formattedVal;
-          newOpt.text = `${currentMonthName} - ${currentYear} (Auto)`;
-          inputMonthSelect.add(newOpt, inputMonthSelect.firstChild);
+      } catch (err) {
+        console.error("Live fetch error:", err);
+        if(syncStatus) {
+          syncStatus.innerText = "● Offline Mode";
+          syncStatus.style.color = "#f59e0b";
         }
-        inputMonthSelect.value = formattedVal;
       }
     }
 
-    function openAddModal() { 
-      document.getElementById('addModal').style.display = 'flex'; 
-      setDefaultMonthInForm(); 
+    // Purane fixed months (April-July) ke liye render function
+    function renderFixedDWM(selectedMonth) {
+      const syncStatus = document.getElementById('syncStatus');
+      if(syncStatus) {
+        syncStatus.innerText = `● Fixed Data (${selectedMonth})`;
+        syncStatus.style.color = "#38bdf8";
+      }
+      let fData = fixedDatabase[selectedMonth];
+      let dataDaysCount = fData.daysCount;
+      let furnacesMap = fData.furnaces;
+
+      let headerHtml = `<th style="min-width: 90px;">FURNACE</th><th>Capacity</th><th>Month Target</th><th>Target MTD</th><th>Actual MTD</th><th>Cap. Utilized</th>`;
+      for(let d = 1; d <= dataDaysCount; d++) { headerHtml += `<th>${d}</th>`; }
+      document.getElementById('dwmHeaderRow').innerHTML = headerHtml;
+
+      let actualMTD = 0;
+      let totals = Array(dataDaysCount).fill(0);
+      let tbodyHtml = "";
+
+      Object.keys(furnacesMap).forEach(fcName => {
+        let daysArr = furnacesMap[fcName];
+        let fActual = daysArr.slice(0, dataDaysCount).reduce((a, b) => a + (b || 0), 0);
+        actualMTD += fActual;
+
+        tbodyHtml += `<tr>
+          <td style="font-weight:700; color:#38bdf8;">${fcName}</td>
+          <td>69.75</td><td>69.75</td><td>60.75</td>
+          <td style="font-weight:700;">${fActual.toFixed(2)}</td><td>-</td>`;
+
+        for(let i = 0; i < dataDaysCount; i++) {
+          let val = daysArr[i] || 0;
+          totals[i] += val;
+          tbodyHtml += `<td>${val > 0 ? val.toFixed(2) : '-'}</td>`;
+        }
+        tbodyHtml += `</tr>`;
+      });
+
+      document.getElementById('dwmTableBody').innerHTML = tbodyHtml;
+      document.getElementById('dwmTableTitle').innerText = `📋 Daily Work Management (DWM) Matrix - ${selectedMonth}`;
     }
 
-    function closeAddModal() { 
-      document.getElementById('addModal').style.display = 'none';
-      document.getElementById('securityPin').value = '';
+    function setDefaultMonthInForm() {
+      const now = new Date();
+      const months = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+      const formattedVal = `${months[now.getMonth()]}-${now.getFullYear()}`;
+      const inputMonthSelect = document.getElementById('inputMonth');
+      if (inputMonthSelect) inputMonthSelect.value = formattedVal;
     }
 
+    function openAddModal() { document.getElementById('addModal').style.display = 'flex'; setDefaultMonthInForm(); }
+    function closeAddModal() { document.getElementById('addModal').style.display = 'none'; document.getElementById('securityPin').value = ''; }
     function switchMainTab(tabId, btn) {
       document.querySelectorAll('.module-view').forEach(v => v.classList.remove('active'));
       document.querySelectorAll('.nav-main-btn').forEach(b => b.classList.remove('active'));
@@ -503,157 +572,10 @@
       btn.classList.add('active');
     }
 
-    // Direct Google Sheet Sync (Target MTD aur Data direct sheet se uthane ke liye)
-    async function fetchLiveAugustData() {
-      const syncStatus = document.getElementById('syncStatus');
-      try {
-        const timestamp = new Date().getTime();
-        const response = await fetch(`${LIVE_CSV_URL}&_t=${timestamp}`);
-        const csvText = await response.text();
-        const rows = csvText.split('\n').map(r => r.split(',').map(v => v.trim().replace(/["']/g, "")));
-
-        for (let i = 0; i < rows.length; i++) {
-          let r = rows[i];
-          let rowStr = r.join(" ").toUpperCase();
-          
-          let fcName = "";
-          if (rowStr.includes("SQF-1")) fcName = "SQF-1";
-          else if (rowStr.includes("SQF-2")) fcName = "SQF-2";
-          else if (rowStr.includes("SQF-3")) fcName = "SQF-3";
-          else if (rowStr.includes("SQF-4")) fcName = "SQF-4";
-
-          if (fcName && fixedDatabase["AUGUST-2026"].furnaces[fcName]) {
-            // Capacity (col 1), Month Target (col 2), Target MTD (col 3)
-            if (r[1] && !isNaN(parseFloat(r[1]))) fixedDatabase["AUGUST-2026"].furnaces[fcName].capacity = parseFloat(r[1]);
-            if (r[2] && !isNaN(parseFloat(r[2]))) fixedDatabase["AUGUST-2026"].furnaces[fcName].monthTarget = parseFloat(r[2]);
-            if (r[3] && !isNaN(parseFloat(r[3]))) fixedDatabase["AUGUST-2026"].furnaces[fcName].targetMTD = parseFloat(r[3]);
-
-            // Days values (Column 6 se 36 tak)
-            let dayValues = [];
-            for (let j = 6; j < r.length; j++) {
-              let val = parseFloat(r[j]);
-              if (!isNaN(val) && r[j] !== "") dayValues.push(val);
-            }
-            if (dayValues.length > 0) {
-              for (let d = 0; d < Math.min(dayValues.length, 31); d++) {
-                fixedDatabase["AUGUST-2026"].furnaces[fcName].days[d] = dayValues[d];
-              }
-            }
-          }
-
-          if (rowStr.includes("TOTAL IN TON") || rowStr.includes("TOTAL")) {
-            if (r[3] && !isNaN(parseFloat(r[3]))) {
-              fixedDatabase["AUGUST-2026"].totalTargetMTD = parseFloat(r[3]);
-            }
-          }
-        }
-
-        if(syncStatus) {
-          syncStatus.innerText = "● Live Synced From Sheet";
-          syncStatus.style.color = "#34d399";
-        }
-        renderDWMData();
-      } catch (err) {
-        console.error("Live fetch error:", err);
-        renderDWMData();
-      }
-    }
-
-    function renderDWMData() {
-      const selectedMonth = document.getElementById('dwmMonthDropdown').value;
-      let fData = fixedDatabase[selectedMonth] || fixedDatabase["AUGUST-2026"];
-      let dataDaysCount = fData.daysCount;
-      let monthTarget = fData.monthTarget;
-      let furnacesMap = fData.furnaces;
-
-      let headerHtml = `<th style="min-width: 90px;">FURNACE</th><th>Capacity</th><th>Month Target</th><th>Target MTD</th><th>Actual MTD</th><th>Cap. Utilized</th>`;
-      for(let d = 1; d <= dataDaysCount; d++) { headerHtml += `<th>${d}</th>`; }
-      document.getElementById('dwmHeaderRow').innerHTML = headerHtml;
-
-      let totalCapacity = 0;
-      let totalTargetMTD = 0;
-      let actualMTD = 0;
-      let totals = Array(dataDaysCount).fill(0);
-      let cumu = [];
-      let runningCumu = 0;
-      let tbodyHtml = "";
-
-      Object.keys(furnacesMap).forEach(fcName => {
-        let fc = furnacesMap[fcName];
-        let daysArr = fc.days;
-        let fActual = daysArr.slice(0, dataDaysCount).reduce((a, b) => a + (b || 0), 0);
-        
-        totalCapacity += (fc.capacity || 69.75);
-        totalTargetMTD += (fc.targetMTD || 60.75);
-        actualMTD += fActual;
-        
-        let util = fc.targetMTD > 0 ? ((fActual / fc.targetMTD) * 100).toFixed(1) + "%" : "0.0%";
-
-        tbodyHtml += `<tr>
-          <td style="font-weight:700; color:#38bdf8;">${fcName}</td>
-          <td>${fc.capacity || 69.75}</td>
-          <td>${fc.monthTarget || 69.75}</td>
-          <td style="font-weight:600; color:#fbbf24;">${fc.targetMTD !== undefined ? fc.targetMTD.toFixed(2) : '60.75'}</td>
-          <td style="font-weight:700;">${fActual.toFixed(2)}</td>
-          <td>${util}</td>`;
-
-        for(let i = 0; i < dataDaysCount; i++) {
-          let val = daysArr[i] || 0;
-          totals[i] += val;
-          let cssClass = val >= 2.25 ? "cell-green" : (val > 0 ? "cell-red" : "");
-          tbodyHtml += `<td class="${cssClass}">${val > 0 ? val.toFixed(2) : '-'}</td>`;
-        }
-        tbodyHtml += `</tr>`;
-      });
-
-      totals.forEach(t => {
-        runningCumu += t;
-        cumu.push(runningCumu.toFixed(2));
-      });
-
-      // Agar data object mein direct Total Target MTD ho to wahi use karo
-      let finalTargetMTD = fData.totalTargetMTD || totalTargetMTD;
-
-      tbodyHtml += `<tr class="total-row">
-        <td>TOTAL IN TON</td>
-        <td>${monthTarget}</td>
-        <td>${monthTarget}</td>
-        <td>${finalTargetMTD.toFixed(2)}</td>
-        <td>${actualMTD.toFixed(2)}</td>
-        <td>${finalTargetMTD > 0 ? ((actualMTD/finalTargetMTD)*100).toFixed(1) : 0}%</td>`;
-      totals.forEach(t => { tbodyHtml += `<td>${t > 0 ? t.toFixed(2) : '-'}</td>`; });
-      tbodyHtml += `</tr>`;
-
-      tbodyHtml += `<tr class="total-row" style="background:#111827 !important;">
-        <td>CUMULATIVE TOTAL</td>
-        <td colspan="5">LOT MTD</td>`;
-      cumu.forEach(c => { tbodyHtml += `<td>${c > 0 ? c : '-'}</td>`; });
-      tbodyHtml += `</tr>`;
-
-      document.getElementById('dwmTableBody').innerHTML = tbodyHtml;
-
-      // Updating KPI Cards
-      document.getElementById('kpiMonthTarget').innerText = `${monthTarget} Ton`;
-      document.getElementById('kpiTargetMTD').innerText = `${finalTargetMTD.toFixed(2)} Ton`;
-      document.getElementById('kpiActualMTD').innerText = `${actualMTD.toFixed(2)} Ton`;
-      
-      let daysWithProd = totals.filter(x => x > 0).length || 1;
-      document.getElementById('kpiAvgProd').innerText = `${(actualMTD / daysWithProd).toFixed(2)} Ton/Day`;
-      
-      let variance = (actualMTD - finalTargetMTD).toFixed(2);
-      let varEl = document.getElementById('kpiVariance');
-      varEl.innerText = `${variance} Ton`;
-      varEl.style.color = variance >= 0 ? "#34d399" : "#ef4444";
-      document.getElementById('dwmTableTitle').innerText = `📋 Daily Work Management (DWM) Matrix - ${selectedMonth}`;
-    }
-
     async function submitProductionData(event) {
       event.preventDefault();
       const pin = document.getElementById('securityPin').value;
-      if (pin !== ADMIN_PIN) {
-        alert("❌ Incorrect Security PIN!");
-        return;
-      }
+      if (pin !== ADMIN_PIN) { alert("❌ Incorrect Security PIN!"); return; }
 
       const submitBtn = document.getElementById('submitBtn');
       submitBtn.innerText = "Saving...";
@@ -677,7 +599,7 @@
         alert("✅ Data submitted successfully!");
         closeAddModal();
         document.getElementById('inputTon').value = '';
-        setTimeout(fetchLiveAugustData, 1500);
+        setTimeout(fetchAugustLiveSheet, 2000);
       } catch (err) {
         alert("❌ Error saving data.");
       } finally {
@@ -687,7 +609,7 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      fetchLiveAugustData();
+      fetchAugustLiveSheet();
     });
 </script>
 </body>
