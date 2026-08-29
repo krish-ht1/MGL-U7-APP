@@ -100,7 +100,7 @@
       color: #fff; 
     }
 
-    /* Table Section (Web View Best Layout) */
+    /* Table Section */
     .table-section {
       background: rgba(15, 23, 42, 0.75);
       backdrop-filter: blur(12px);
@@ -167,12 +167,13 @@
     .legend-item { display: flex; align-items: center; gap: 8px; }
     .graph-container { position: relative; width: 100%; height: 400px; }
 
-    /* Mobile Responsive Optimizations */
+    /* Mobile Specific Compact Styling */
     @media (max-width: 768px) {
       .ewm-container { padding: 10px; gap: 10px; }
-      .ewm-brand h1 { font-size: 11.5px; }
+      .ewm-brand h1 { font-size: 11px; }
       .nav-main-btn { font-size: 10px; padding: 6px 2px; }
-      .graph-container { height: 300px; }
+      .graph-container { height: 280px; }
+      .table-section { padding: 12px; }
       table.yearly-table { font-size: 10.5px; }
       table.yearly-table th, table.yearly-table td { padding: 8px 6px; }
     }
@@ -279,7 +280,7 @@
             let percentage = target > 0 ? ((prod / target) * 100).toFixed(1) : 0;
 
             yearlyData.push({
-              year: yearCol,
+              year: yearCol.replace('FY-', ''),
               production: prod,
               target: target,
               avgMonth: avgM,
@@ -397,26 +398,19 @@
           plugins: {
             legend: { display: false },
             datalabels: {
-              anchor: function(context) {
-                return context.dataset.type === 'line' ? 'end' : 'end';
-              },
-              align: function(context) {
-                return context.dataset.type === 'line' ? 'top' : 'top';
-              },
+              anchor: 'end',
+              align: 'top',
               color: function(context) {
                 return context.dataset.type === 'line' ? '#fb923c' : '#f8fafc';
               },
               font: { 
                 family: 'Inter', 
-                size: isMobile ? 9 : 11, 
+                size: isMobile ? 8.5 : 11, 
                 weight: '700' 
               },
-              // Target aur baaki values ko bilkul seedha (0 degree rotation) rakha hai taaki saaf dikhe
+              // Target aur baaki sabki values bilkul seedhi (Horizontal) rakhi hain
               rotation: 0,
-              formatter: function(value, context) {
-                if (isMobile && context.dataset.type === 'bar') {
-                  return value > 1500 ? value : ''; // Phone par clutter hatane ke liye choti values skip hongi
-                }
+              formatter: function(value) {
                 return value > 0 ? value : '';
               }
             },
