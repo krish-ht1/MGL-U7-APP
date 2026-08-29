@@ -173,7 +173,7 @@
     .kpi-card span { font-size: 10px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
     .kpi-card h3 { margin: 2px 0 0 0; font-size: 18px; font-weight: 700; color: #f8fafc; }
 
-    /* Inline Main Graph Section */
+    /* FY 2026-27 Exclusive Graph Section */
     .graph-card {
       background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       border: 1px solid #334155;
@@ -348,10 +348,10 @@
       </div>
     </div>
 
-    <!-- Financial Year Bar Graph Section -->
+    <!-- Financial Year 2026-27 Exclusive Bar Graph Section -->
     <div class="graph-card">
       <div class="table-title-row">
-        <h3>📈 Financial Year Monthly Production & Average Trend</h3>
+        <h3 id="fyGraphTitle">📈 Financial Year 2026-27 Monthly Production & Average</h3>
       </div>
       <div class="graph-container">
         <canvas id="monthlyBarChart"></canvas>
@@ -522,9 +522,6 @@
 
       const filteredRows = monthlyData.slice(startIndex, endIndex + 1);
 
-      let chartLabels = [];
-      let chartValues = [];
-
       filteredRows.forEach(row => {
         let s1p = showSqf1 ? row.sqf1.p : 0;
         let s1w = showSqf1 ? row.sqf1.w : 0;
@@ -541,9 +538,6 @@
 
         gTotalQty += rowTotalQty;
         gTotalWeight += rowTotalWeight;
-
-        chartLabels.push(row.month);
-        chartValues.push(parseFloat(rowTonnage.toFixed(2)));
 
         html += `
           <tr>
@@ -569,16 +563,28 @@
       document.getElementById('kpiTotalWeight').innerText = `${gTotalWeight.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})} Kg`;
       document.getElementById('kpiTotalTonnage').innerText = `${(gTotalWeight / 1000).toFixed(2)} Ton`;
 
-      // Calculate Average and Render Main Inline Bar Chart with Average Line
-      let totalTonSum = chartValues.reduce((a, b) => a + b, 0);
-      let avgTonnage = chartValues.length > 0 ? (totalTonSum / chartValues.length).toFixed(2) : 0;
-      renderMainBarChart(chartLabels, chartValues, avgTonnage);
+      // Render Dedicated Financial Year 2026-27 Bar Chart on Main Screen
+      renderFY2026_27BarChart();
     }
 
-    // Main Inline Bar Chart with Average Line
-    function renderMainBarChart(labels, dataValues, avgValue) {
+    // Exclusive Financial Year 2026-27 Bar Chart with Average Line
+    function renderFY2026_27BarChart() {
       const ctx = document.getElementById('monthlyBarChart').getContext('2d');
-      const avgLineData = Array(labels.length).fill(parseFloat(avgValue));
+
+      // Filter specifically for Financial Year 2026-27 months (April 2026 onwards or matching '2026')
+      let fyData = monthlyData.filter(d => d.month.includes("2026") || d.month.includes("2027") || d.month.toUpperCase().includes("APR") || d.month.toUpperCase().includes("MAY") || d.month.toUpperCase().includes("JUN") || d.month.toUpperCase().includes("JUL") || d.month.toUpperCase().includes("AUG"));
+      
+      // Fallback if matching string differs, take all loaded rows or recent rows
+      if (fyData.length === 0) fyData = monthlyData;
+
+      let labels = fyData.map(d => d.month);
+      let values = fyData.map(d => parseFloat(d.tonnage.toFixed(2)));
+
+      let sum = values.reduce((a, b) => a + b, 0);
+      let avg = values.length > 0 ? (sum / values.length) : 0;
+      let avgLineData = Array(labels.length).fill(parseFloat(avg.toFixed(2)));
+
+      document.getElementById('fyGraphTitle').innerText = `📈 Financial Year 2026-27 Monthly Production | Avg: ${avg.toFixed(2)} T`;
 
       if (mainBarChartInstance) {
         mainBarChartInstance.destroy();
@@ -591,13 +597,13 @@
           datasets: [
             {
               label: 'Monthly Production (Ton)',
-              data: dataValues,
+              data: values,
               backgroundColor: '#3b82f6',
               borderRadius: 6,
               order: 2
             },
             {
-              label: `Average (${avgValue} T)`,
+              label: `Average (${avg.toFixed(2)} T)`,
               data: avgLineData,
               type: 'line',
               borderColor: '#f59e0b',
@@ -636,7 +642,7 @@
       });
     }
 
-    /* Fully Dynamic Trend Chart Modal Logic */
+    /* Trend Chart Modal Logic for Trend Button */
     function openTrendModal() {
       document.getElementById('trendModal').style.display = 'flex';
       renderDynamicTrendChart();
