@@ -104,7 +104,7 @@
     .kpi-card span { font-size: 10px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
     .kpi-card h3 { margin: 2px 0 0 0; font-size: 18px; font-weight: 700; color: #f8fafc; }
 
-    /* Yearly Production Table (Ab upar raheगी) */
+    /* Yearly Production Table (Upar) */
     .table-section {
       background: #0f172a;
       border-radius: 10px;
@@ -146,7 +146,7 @@
     table.yearly-table td { background: #0f172a; color: #f1f5f9; }
     table.yearly-table tr:hover td { background: #162032; }
 
-    /* 3D Professional Yearly Graph Section (Ab neeche rahega) */
+    /* 3D Professional Yearly Graph Section (Neeche) */
     .graph-card {
       background: linear-gradient(135deg, #0b1120 0%, #0f172a 100%);
       border-radius: 12px;
@@ -206,7 +206,7 @@
       </div>
     </div>
 
-    <!-- 1. Yearly Production Table (Ab upar set hai) -->
+    <!-- 1. Yearly Production Table (Google Sheet Live Data) -->
     <div class="table-section">
       <div class="table-title-row">
         <h3>📋 Yearly Production Data Record</h3>
@@ -232,13 +232,13 @@
             </tr>
           </thead>
           <tbody id="yearlyTableBody">
-            <tr><td colspan="12" style="padding: 20px; color: #94a3b8;">Loading yearly data...</td></tr>
+            <tr><td colspan="12" style="padding: 20px; color: #94a3b8;">Loading data from Google Sheet...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- 2. 3D Colorful Yearly Bar Graph Section (Ab neeche set hai) -->
+    <!-- 2. 3D Colorful Yearly Bar Graph Section -->
     <div class="graph-card">
       <div class="graph-title-row">
         <h3>📈 Yearly Production Trend (Tonnage)</h3>
@@ -251,16 +251,68 @@
   </div>
 
   <script>
+    // Yahan apni Google Sheet ka Yearly CSV link dal lena agar alag gid ho
     const YEARLY_CSV_URL = "https://docs.google.com/spreadsheets/d/1ZKl4Nzxfwrt5MO11Iy-S-Yjiq0t9MHoQrryAE1paqXw/export?format=csv&gid=0";
 
     let yearlyChartInstance = null;
+    let yearlyDataRecords = [];
 
-    const yearlyRecords = [
-      { year: "2023-2024", sqf1: {p: 4500, w: 812000}, sqf2: {p: 4400, w: 798000}, sqf3: {p: 4600, w: 830000}, sqf4: {p: 4550, w: 820000} },
-      { year: "2024-2025", sqf1: {p: 5100, w: 920000}, sqf2: {p: 5000, w: 905000}, sqf3: {p: 5200, w: 940000}, sqf4: {p: 5150, w: 930000} },
-      { year: "2025-2026", sqf1: {p: 5800, w: 1050000}, sqf2: {p: 5700, w: 1030000}, sqf3: {p: 5900, w: 1070000}, sqf4: {p: 5850, w: 1060000} },
-      { year: "2026-2027", sqf1: {p: 2400, w: 450000}, sqf2: {p: 2350, w: 440000}, sqf3: {p: 2450, w: 460000}, sqf4: {p: 2400, w: 450000} }
-    ];
+    async function fetchYearlyLiveData() {
+      try {
+        const response = await fetch(YEARLY_CSV_URL);
+        const csvText = await response.text();
+        const rows = csvText.split('\n').map(r => {
+          let row = [];
+          let insideQuote = false;
+          let entry = '';
+          for (let char of r) {
+            if (char === '"') { insideQuote = !insideQuote; }
+            else if (char === ',' && !insideQuote) { row.push(entry.trim()); entry = ''; }
+            else { entry += char; }
+          }
+          row.push(entry.trim());
+          return row;
+        });
+
+        yearlyDataRecords = [];
+        for (let i = 0; i < rows.length; i++) {
+          let r = rows[i];
+          let yearCol = r[0] ? r[0].replace(/["']/g, "").trim() : "";
+
+          // Check if row contains a financial year pattern like '2023' or '2024' or 'FY'
+          if (yearCol && (yearCol.includes("202") || yearCol.includes("203") || yearCol.toUpperCase().includes("FY") || yearCol.includes("-"))) {
+            
+            let parseVal = (val) => {
+              if (!val) return 0;
+              let clean = String(val).replace(/["']/g, "").replace(/,/g, "").trim();
+              let num = parseFloat(clean);
+              return isNaN(num) ? 0 : num;
+            };
+
+            let explicitTonnage = r.length > 11 ? parseVal(r[11]) : (r.length > 10 ? parseVal(r[10]) : 0);
+            let totalWtKg = parseVal(r[2]) + parseVal(r[4]) + parseVal(r[6]) + parseVal(r[8]);
+            let finalTonnage = explicitTonnage > 0 ? explicitTonnage : (totalWtKg / 1000);
+
+            yearlyDataRecords.push({
+              year: yearCol,
+              sqf1: { p: parseVal(r[1]), w: parseVal(r[2]) },
+              sqf2: { p: parseVal(r[3]), w: parseVal(r[4]) },
+              sqf3: { p: parseVal(r[5]), w: parseVal(r[6]) },
+              sqf4: { p: parseVal(r[7]), w: parseVal(r[8]) },
+              tonnage: finalTonnage
+            });
+          }
+        }
+
+        renderYearlyDashboard();
+        document.getElementById('syncStatus').innerText = "● Live Synced";
+        document.getElementById('syncStatus').style.color = "#34d399";
+      } catch (err) {
+        console.log("Error loading yearly sheet:", err);
+        document.getElementById('syncStatus').innerText = "● Sync Error";
+        document.getElementById('syncStatus').style.color = "#ef4444";
+      }
+    }
 
     function renderYearlyDashboard() {
       let tbodyHtml = "";
@@ -270,7 +322,7 @@
       let gQty = 0;
       let gWeight = 0;
 
-      yearlyRecords.forEach(rec => {
+      yearlyDataRecords.forEach(rec => {
         let s1p = rec.sqf1.p, s1w = rec.sqf1.w;
         let s2p = rec.sqf2.p, s2w = rec.sqf2.w;
         let s3p = rec.sqf3.p, s3w = rec.sqf3.w;
@@ -278,17 +330,17 @@
 
         let totalPcs = s1p + s2p + s3p + s4p;
         let totalKg = s1w + s2w + s3w + s4w;
-        let totalTon = totalKg / 1000;
+        let totalTon = rec.tonnage > 0 ? rec.tonnage : (totalKg / 1000);
 
         gQty += totalPcs;
         gWeight += totalKg;
 
-        labels.push(`FY ${rec.year}`);
+        labels.push(`${rec.year}`);
         values.push(parseFloat(totalTon.toFixed(2)));
 
         tbodyHtml += `
           <tr>
-            <td style="font-weight:700; color:#38bdf8;">FY ${rec.year}</td>
+            <td style="font-weight:700; color:#38bdf8;">${rec.year}</td>
             <td>${s1p.toLocaleString('en-IN')}</td><td>${s1w.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
             <td>${s2p.toLocaleString('en-IN')}</td><td>${s2w.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
             <td>${s3p.toLocaleString('en-IN')}</td><td>${s3w.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
@@ -299,6 +351,10 @@
           </tr>
         `;
       });
+
+      if (!tbodyHtml) {
+        tbodyHtml = `<tr><td colspan="12" style="padding: 20px; color: #94a3b8;">No yearly data found in Google Sheet.</td></tr>`;
+      }
 
       document.getElementById('yearlyTableBody').innerHTML = tbodyHtml;
 
@@ -360,7 +416,7 @@
       });
     }
 
-    window.addEventListener('DOMContentLoaded', renderYearlyDashboard);
+    window.addEventListener('DOMContentLoaded', fetchYearlyLiveData);
   </script>
 </body>
 </html>
