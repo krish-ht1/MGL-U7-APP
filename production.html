@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Milestone Gear Unit 7 - Production Review Dashboard</title>
-  <!-- Chart.js for Graph -->
+  <!-- Chart.js for Gorgeous Gradient Graph -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -44,13 +44,14 @@
       background: #0f172a; border: 1px solid #1e293b; border-radius: 8px;
       padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
     }
+    .filters-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .month-select-wrap { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: #94a3b8; }
     .month-select-wrap select {
       background: #1e293b; border: 1px solid #334155; color: #f8fafc;
       padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; outline: none; cursor: pointer;
     }
     
-    /* Enhanced KPI Cards with Color Themes */
+    /* Enhanced Compact KPI Cards with Color Themes */
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -70,32 +71,48 @@
       position: relative;
       overflow: hidden;
     }
-    /* Unique Accent Borders for Visual Range/Color Scheme */
-    .kpi-card-mini:nth-child(1) { border-left: 3px solid #3b82f6; } /* Month Target - Blue */
-    .kpi-card-mini:nth-child(2) { border-left: 3px solid #8b5cf6; } /* Target MTD - Purple */
-    .kpi-card-mini:nth-child(3) { border-left: 3px solid #10b981; } /* Actual MTD - Green */
-    .kpi-card-mini:nth-child(4) { border-left: 3px solid #f59e0b; } /* Avg / Day - Amber */
-    .kpi-card-mini:nth-child(5) { border-left: 3px solid #ef4444; } /* Variance - Red/Dynamic */
+    .kpi-card-mini:nth-child(1) { border-left: 3px solid #3b82f6; }
+    .kpi-card-mini:nth-child(2) { border-left: 3px solid #8b5cf6; }
+    .kpi-card-mini:nth-child(3) { border-left: 3px solid #10b981; }
+    .kpi-card-mini:nth-child(4) { border-left: 3px solid #f59e0b; }
+    .kpi-card-mini:nth-child(5) { border-left: 3px solid #ef4444; }
 
     .kpi-title-mini {
-      font-size: 9.5px;
-      font-weight: 600;
-      color: #94a3b8;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
+      font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.3px;
     }
     .kpi-val-mini {
-      font-size: 13px;
-      font-weight: 700;
-      color: #f8fafc;
-      margin-top: 2px;
+      font-size: 13px; font-weight: 700; color: #f8fafc; margin-top: 2px;
     }
-    /* Graph Section Container */
+
+    .dwm-section {
+      background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;
+    }
+    .dwm-title-row { display: flex; justify-content: space-between; align-items: center; }
+    .dwm-title-row h3 { font-size: 11.5px; font-weight: 700; color: #f8fafc; margin: 0; }
+    
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; max-height: 350px; }
+    table.dwm-table { width: 100%; border-collapse: collapse; font-size: 10px; text-align: center; white-space: nowrap; }
+    table.dwm-table th, table.dwm-table td { border: 1px solid #334155; padding: 4px 6px; }
+    table.dwm-table th { background: #1e293b; color: #94a3b8; font-weight: 600; position: sticky; top: 0; z-index: 5; }
+    table.dwm-table td { background: #0f172a; color: #f1f5f9; }
+    
+    .cell-green { background: rgba(16, 185, 129, 0.2) !important; color: #34d399 !important; font-weight: 600; }
+    .cell-red { background: rgba(239, 68, 68, 0.2) !important; color: #f87171 !important; font-weight: 600; }
+    .total-row { background: #1e293b !important; font-weight: 700; color: #38bdf8 !important; }
+
+    /* Stunning Graph Section */
     .graph-section {
-      background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 6px;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
     }
     .graph-container {
-      position: relative; width: 100%; height: 220px;
+      position: relative; width: 100%; height: 240px;
     }
   </style>
 </head>
@@ -123,15 +140,25 @@
     <!-- MODULE 1: DAILY PRODUCTION (DWM) -->
     <div id="view-dwm" class="module-view active">
       <div class="control-bar">
-        <div class="month-select-wrap">
-          <span>Month:</span>
-          <select id="dwmMonthDropdown" onchange="renderDWMData()">
-            <option value="AUGUST-2026" selected>August - 2026</option>
-            <option value="JULY-2026">July - 2026</option>
-            <option value="JUNE-2026">June - 2026</option>
-            <option value="MAY-2026">May - 2026</option>
-            <option value="APRIL-2026">April - 2026</option>
-          </select>
+        <div class="filters-group">
+          <!-- Month Dropdown -->
+          <div class="month-select-wrap">
+            <span>Month:</span>
+            <select id="dwmMonthDropdown" onchange="onMonthChange()">
+              <option value="AUGUST-2026" selected>August - 2026</option>
+              <option value="JULY-2026">July - 2026</option>
+              <option value="JUNE-2026">June - 2026</option>
+              <option value="MAY-2026">May - 2026</option>
+              <option value="APRIL-2026">April - 2026</option>
+            </select>
+          </div>
+          <!-- Date Dropdown (Added next to Month) -->
+          <div class="month-select-wrap">
+            <span>Date:</span>
+            <select id="dwmDateDropdown" onchange="renderDWMData()">
+              <option value="ALL" selected>All Days (Full Month)</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -139,23 +166,23 @@
       <div class="kpi-grid">
         <div class="kpi-card-mini">
           <span class="kpi-title-mini">Month Target</span>
-          <span class="kpi-val-mini" id="kpiMonthTarget">279 Ton</span>
+          <span class="kpi-val-mini" id="kpiMonthTarget">279 T</span>
         </div>
         <div class="kpi-card-mini">
           <span class="kpi-title-mini">Target MTD</span>
-          <span class="kpi-val-mini" id="kpiTargetMTD">243 Ton</span>
+          <span class="kpi-val-mini" id="kpiTargetMTD">243 T</span>
         </div>
         <div class="kpi-card-mini">
           <span class="kpi-title-mini">Actual MTD</span>
-          <span class="kpi-val-mini" id="kpiActualMTD">0 Ton</span>
+          <span class="kpi-val-mini" id="kpiActualMTD">0 T</span>
         </div>
         <div class="kpi-card-mini">
           <span class="kpi-title-mini">Avg / Day</span>
-          <span class="kpi-val-mini" id="kpiAvgProd">0 Ton</span>
+          <span class="kpi-val-mini" id="kpiAvgProd">0 T</span>
         </div>
-        <div class="kpi-card-mini" style="grid-column: span 2; @media(min-width: 768px){grid-column: span 1;}">
+        <div class="kpi-card-mini" style="grid-column: span 2; grid-column: span 1;">
           <span class="kpi-title-mini">Variance</span>
-          <span class="kpi-val-mini" id="kpiVariance">0 Ton</span>
+          <span class="kpi-val-mini" id="kpiVariance">0 T</span>
         </div>
       </div>
 
@@ -172,10 +199,10 @@
         </div>
       </div>
 
-      <!-- PRODUCTION TREND GRAPH (Added in Free Space) -->
+      <!-- STUNNING GRAPH SECTION -->
       <div class="graph-section">
         <div class="dwm-title-row">
-          <h3>📈 Daily Production Trend (Total Ton)</h3>
+          <h3>📈 Daily Production Trend (Colorful & Attractive)</h3>
         </div>
         <div class="graph-container">
           <canvas id="productionTrendChart"></canvas>
@@ -257,6 +284,23 @@
       });
     }
 
+    // Month change hone par Date dropdown ko update karo
+    function onMonthChange() {
+      const selectedMonth = document.getElementById('dwmMonthDropdown').value;
+      let daysCount = 31;
+      if (selectedMonth === "AUGUST-2026") daysCount = liveAugustData.daysCount;
+      else if (fixedDatabase[selectedMonth]) daysCount = fixedDatabase[selectedMonth].daysCount;
+
+      const dateDropdown = document.getElementById('dwmDateDropdown');
+      let optionsHtml = `<option value="ALL" selected>All Days (Full Month)</option>`;
+      for (let d = 1; d <= daysCount; d++) {
+        optionsHtml += `<option value="${d}">Date ${d}</option>`;
+      }
+      dateDropdown.innerHTML = optionsHtml;
+
+      fetchAugustLiveSheet();
+    }
+
     async function fetchAugustLiveSheet() {
       const selectedMonth = document.getElementById('dwmMonthDropdown').value;
       const syncStatus = document.getElementById('syncStatus');
@@ -292,6 +336,7 @@
               if (!isNaN(val) && r[j] !== "") dayValues.push(val);
             }
             if (dayValues.length > 0) {
+              liveAugustData.daysCount = dayValues.length;
               for (let d = 0; d < Math.min(dayValues.length, 31); d++) {
                 liveAugustData.furnaces[fcName].days[d] = dayValues[d];
               }
@@ -316,6 +361,8 @@
 
     function renderDWMData() {
       const selectedMonth = document.getElementById('dwmMonthDropdown').value;
+      const selectedDate = document.getElementById('dwmDateDropdown').value;
+
       let dataDaysCount = 31;
       let monthTarget = 279.0;
       let totalTargetMTD = 243.0;
@@ -340,8 +387,13 @@
         };
       }
 
+      // Table Headers (Agar specific date select hai toh sirf wahi date dikhegi, nahi toh saari)
       let headerHtml = `<th style="min-width: 80px;">FURNACE</th><th>Cap</th><th>Month Target</th><th>Target MTD</th><th>Actual MTD</th><th>Util %</th>`;
-      for(let d = 1; d <= dataDaysCount; d++) { headerHtml += `<th>${d}</th>`; }
+      if (selectedDate === "ALL") {
+        for(let d = 1; d <= dataDaysCount; d++) { headerHtml += `<th>${d}</th>`; }
+      } else {
+        headerHtml += `<th>Date ${selectedDate}</th>`;
+      }
       document.getElementById('dwmHeaderRow').innerHTML = headerHtml;
 
       let actualMTD = 0;
@@ -351,10 +403,17 @@
       Object.keys(furnacesMap).forEach(fcName => {
         let fc = furnacesMap[fcName];
         let daysArr = fc.days;
-        let fActual = daysArr.slice(0, dataDaysCount).reduce((a, b) => a + (b || 0), 0);
+        
+        let fActual = 0;
+        if (selectedDate === "ALL") {
+          fActual = daysArr.slice(0, dataDaysCount).reduce((a, b) => a + (b || 0), 0);
+        } else {
+          let dIdx = parseInt(selectedDate) - 1;
+          fActual = daysArr[dIdx] || 0;
+        }
         actualMTD += fActual;
 
-        let util = fc.targetMTD > 0 ? ((fActual / fc.targetMTD) * 100).toFixed(1) + "%" : "0.0%";
+        let util = fc.targetMTD > 0 ? ((fActual / (fc.targetMTD / (selectedDate === "ALL" ? 1 : dataDaysCount))) * 100).toFixed(1) + "%" : "0.0%";
 
         tbodyHtml += `<tr>
           <td style="font-weight:700; color:#38bdf8;">${fcName}</td>
@@ -364,77 +423,130 @@
           <td style="font-weight:700;">${fActual.toFixed(2)}</td>
           <td>${util}</td>`;
 
-        for(let i = 0; i < dataDaysCount; i++) {
-          let val = daysArr[i] || 0;
-          totals[i] += val;
+        if (selectedDate === "ALL") {
+          for(let i = 0; i < dataDaysCount; i++) {
+            let val = daysArr[i] || 0;
+            totals[i] += val;
+            let cssClass = val >= 2.25 ? "cell-green" : (val > 0 ? "cell-red" : "");
+            tbodyHtml += `<td class="${cssClass}">${val > 0 ? val.toFixed(2) : '-'}</td>`;
+          }
+        } else {
+          let dIdx = parseInt(selectedDate) - 1;
+          let val = daysArr[dIdx] || 0;
+          totals[dIdx] += val;
           let cssClass = val >= 2.25 ? "cell-green" : (val > 0 ? "cell-red" : "");
           tbodyHtml += `<td class="${cssClass}">${val > 0 ? val.toFixed(2) : '-'}</td>`;
         }
         tbodyHtml += `</tr>`;
       });
 
+      let totalValForDisplay = actualMTD;
+      let colTotalSum = totals.reduce((a, b) => a + b, 0);
+
       tbodyHtml += `<tr class="total-row">
         <td>TOTAL TON</td>
         <td>${monthTarget}</td>
         <td>${monthTarget}</td>
         <td>${totalTargetMTD.toFixed(2)}</td>
-        <td>${actualMTD.toFixed(2)}</td>
-        <td>${totalTargetMTD > 0 ? ((actualMTD/totalTargetMTD)*100).toFixed(1) : 0}%</td>`;
-      totals.forEach(t => { tbodyHtml += `<td>${t > 0 ? t.toFixed(2) : '-'}</td>`; });
+        <td>${totalValForDisplay.toFixed(2)}</td>
+        <td>${totalTargetMTD > 0 ? ((totalValForDisplay/totalTargetMTD)*100).toFixed(1) : 0}%</td>`;
+      
+      if (selectedDate === "ALL") {
+        totals.forEach(t => { tbodyHtml += `<td>${t > 0 ? t.toFixed(2) : '-'}</td>`; });
+      } else {
+        let dIdx = parseInt(selectedDate) - 1;
+        let t = totals[dIdx] || 0;
+        tbodyHtml += `<td>${t > 0 ? t.toFixed(2) : '-'}</td>`;
+      }
       tbodyHtml += `</tr>`;
 
       document.getElementById('dwmTableBody').innerHTML = tbodyHtml;
 
-      // Update KPI Mini Cards
+      // Update KPI Cards based on selection
       document.getElementById('kpiMonthTarget').innerText = `${monthTarget} T`;
       document.getElementById('kpiTargetMTD').innerText = `${totalTargetMTD.toFixed(2)} T`;
-      document.getElementById('kpiActualMTD').innerText = `${actualMTD.toFixed(2)} T`;
+      document.getElementById('kpiActualMTD').innerText = `${totalValForDisplay.toFixed(2)} T`;
       
-      let daysWithProd = totals.filter(x => x > 0).length || 1;
-      document.getElementById('kpiAvgProd').innerText = `${(actualMTD / daysWithProd).toFixed(2)} T/Day`;
+      let activeDaysCount = selectedDate === "ALL" ? (totals.filter(x => x > 0).length || 1) : 1;
+      document.getElementById('kpiAvgProd').innerText = `${(totalValForDisplay / activeDaysCount).toFixed(2)} T/Day`;
       
-      let variance = (actualMTD - totalTargetMTD).toFixed(2);
+      let variance = (totalValForDisplay - (selectedDate === "ALL" ? totalTargetMTD : (totalTargetMTD/dataDaysCount))).toFixed(2);
       let varEl = document.getElementById('kpiVariance');
       varEl.innerText = `${variance} T`;
       varEl.style.color = variance >= 0 ? "#34d399" : "#f87171";
-      document.getElementById('dwmTitleTitle').innerText = `📋 Daily Work Management (DWM) - ${selectedMonth}`;
+      document.getElementById('dwmTableTitle').innerText = `📋 DWM Matrix - ${selectedMonth} ${selectedDate !== 'ALL' ? '(Date: ' + selectedDate + ')' : ''}`;
 
-      // Update Chart
-      updateProductionChart(Array.from({length: dataDaysCount}, (_, i) => i + 1), totals);
+      // Update Stunning Color-Filled Graph
+      if (selectedDate === "ALL") {
+        updateProductionChart(Array.from({length: dataDaysCount}, (_, i) => i + 1), totals);
+      } else {
+        let dIdx = parseInt(selectedDate) - 1;
+        updateProductionChart([`Date ${selectedDate}`], [totals[dIdx] || 0]);
+      }
     }
 
     function updateProductionChart(labels, dataValues) {
-      const ctx = document.getElementById('productionTrendChart').getContext('2d');
+      const canvasEl = document.getElementById('productionTrendChart');
+      if (!canvasEl) return;
+      const ctx = canvasEl.getContext('2d');
       if (prodChart) { prodChart.destroy(); }
+
+      let gradient = ctx.createLinearGradient(0, 0, 0, 240);
+      gradient.addColorStop(0, 'rgba(56, 189, 248, 0.5)');
+      gradient.addColorStop(0.5, 'rgba(59, 130, 246, 0.2)');
+      gradient.addColorStop(1, 'rgba(15, 23, 42, 0.0)');
 
       prodChart = new Chart(ctx, {
         type: 'line',
         data: {
           labels: labels,
           datasets: [{
-            label: 'Daily Production (Ton)',
+            label: 'Production (Ton)',
             data: dataValues,
             borderColor: '#38bdf8',
-            backgroundColor: 'rgba(56, 189, 248, 0.1)',
-            borderWidth: 2,
-            pointRadius: 2,
+            backgroundColor: gradient,
+            borderWidth: 3,
+            pointBackgroundColor: '#38bdf8',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 1.5,
+            pointRadius: 4,
+            pointHoverRadius: 6,
             fill: true,
-            tension: 0.3
+            tension: 0.4
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#1e293b',
+              titleColor: '#38bdf8',
+              bodyColor: '#f8fafc',
+              borderColor: '#334155',
+              borderWidth: 1,
+              padding: 10,
+              displayColors: false
+            }
+          },
           scales: {
-            x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: { size: 9 } } },
-            y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: { size: 9 } } }
+            x: {
+              grid: { color: 'rgba(51, 65, 85, 0.4)', drawBorder: false },
+              ticks: { color: '#94a3b8', font: { size: 10, weight: '500' } }
+            },
+            y: {
+              grid: { color: 'rgba(51, 65, 85, 0.4)', drawBorder: false },
+              ticks: { color: '#94a3b8', font: { size: 10, weight: '500' } }
+            }
           }
         }
       });
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      fetchAugustLiveSheet();
+      onMonthChange();
     });
   </script>
+</body>
+</html>
