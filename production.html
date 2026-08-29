@@ -150,11 +150,11 @@
       <div class="kpi-grid">
         <div class="kpi-card-mini">
           <span class="kpi-title-mini">Month Target</span>
-          <span class="kpi-val-mini" id="kpiMonthTarget">279 T</span>
+          <span class="kpi-val-mini" id="kpiMonthTarget">0 T</span>
         </div>
         <div class="kpi-card-mini">
           <span class="kpi-title-mini">Target MTD</span>
-          <span class="kpi-val-mini" id="kpiTargetMTD">243 T</span>
+          <span class="kpi-val-mini" id="kpiTargetMTD">0 T</span>
         </div>
         <div class="kpi-card-mini">
           <span class="kpi-title-mini">Actual MTD</span>
@@ -185,7 +185,6 @@
 
       <!-- DUAL VISUALIZATION GRAPHS SECTION -->
       <div class="graphs-grid">
-        <!-- Graph 1: Simple Daily Trend -->
         <div class="graph-card">
           <div class="dwm-title-row">
             <h3 id="trendGraphTitle">📈 Daily Production Trend</h3>
@@ -195,7 +194,6 @@
           </div>
         </div>
 
-        <!-- Graph 2: Furnace Breakdown & Total Bar with Safe Headroom -->
         <div class="graph-card">
           <div class="dwm-title-row">
             <h3 id="furnaceGraphTitle">🏆 Furnace-wise Output & Total</h3>
@@ -252,13 +250,13 @@
 
     let liveAugustData = {
       daysCount: 31,
-      monthTarget: 279.0,
-      totalTargetMTD: 243.0,
+      monthTarget: 0,
+      totalTargetMTD: 0,
       furnaces: {
-        "SQF-1": { capacity: 69.75, monthTarget: 69.75, targetMTD: 60.75, days: Array(31).fill(0) },
-        "SQF-2": { capacity: 69.75, monthTarget: 69.75, targetMTD: 60.75, days: Array(31).fill(0) },
-        "SQF-3": { capacity: 69.75, monthTarget: 69.75, targetMTD: 60.75, days: Array(31).fill(0) },
-        "SQF-4": { capacity: 69.75, monthTarget: 69.75, targetMTD: 60.75, days: Array(31).fill(0) }
+        "SQF-1": { capacity: 0, monthTarget: 0, targetMTD: 0, days: Array(31).fill(0) },
+        "SQF-2": { capacity: 0, monthTarget: 0, targetMTD: 0, days: Array(31).fill(0) },
+        "SQF-3": { capacity: 0, monthTarget: 0, targetMTD: 0, days: Array(31).fill(0) },
+        "SQF-4": { capacity: 0, monthTarget: 0, targetMTD: 0, days: Array(31).fill(0) }
       }
     };
 
@@ -300,7 +298,6 @@
       const selectedMonth = document.getElementById('dwmMonthDropdown').value;
       const syncStatus = document.getElementById('syncStatus');
 
-      // Status turant Blue set hoga taaki koi confusion na ho
       if(syncStatus) {
         syncStatus.innerText = "● Live Synced";
         syncStatus.style.color = "#38bdf8";
@@ -327,8 +324,12 @@
 
           if (fcName && liveAugustData.furnaces[fcName]) {
             if (r[1] && !isNaN(parseFloat(r[1]))) liveAugustData.furnaces[fcName].capacity = parseFloat(r[1]);
-            if (r[2] && !isNaN(parseFloat(r[2]))) liveAugustData.furnaces[fcName].monthTarget = parseFloat(r[2]);
-            if (r[3] && !isNaN(parseFloat(r[3]))) liveAugustData.furnaces[fcName].targetMTD = parseFloat(r[3]);
+            if (r[2] && !isNaN(parseFloat(r[2]))) {
+              liveAugustData.furnaces[fcName].monthTarget = parseFloat(r[2]);
+            }
+            if (r[3] && !isNaN(parseFloat(r[3]))) {
+              liveAugustData.furnaces[fcName].targetMTD = parseFloat(r[3]);
+            }
 
             let dayValues = [];
             for (let j = 6; j < r.length; j++) {
@@ -344,6 +345,9 @@
           }
 
           if (rowStr.includes("TOTAL IN TON") || rowStr.includes("TOTAL")) {
+            if (r[2] && !isNaN(parseFloat(r[2]))) {
+              liveAugustData.monthTarget = parseFloat(r[2]);
+            }
             if (r[3] && !isNaN(parseFloat(r[3]))) {
               liveAugustData.totalTargetMTD = parseFloat(r[3]);
             }
@@ -353,10 +357,6 @@
         renderDWMData();
       } catch (err) {
         console.error("Live fetch error:", err);
-        if(syncStatus) {
-          syncStatus.innerText = "● Live Synced";
-          syncStatus.style.color = "#38bdf8";
-        }
         renderDWMData();
       }
     }
@@ -366,8 +366,8 @@
       const selectedDate = document.getElementById('dwmDateDropdown').value;
 
       let dataDaysCount = 31;
-      let monthTarget = 279.0;
-      let totalTargetMTD = 243.0;
+      let monthTarget = 0;
+      let totalTargetMTD = 0;
       let furnacesMap = {};
 
       if (selectedMonth === "AUGUST-2026") {
@@ -389,7 +389,6 @@
         };
       }
 
-      // Table Header Rendering
       let headerHtml = `<th style="min-width: 80px;">FURNACE</th><th>Cap</th><th>Month Target</th><th>Target MTD</th><th>Actual MTD</th><th>Util %</th>`;
       if (selectedDate === "ALL") {
         for(let d = 1; d <= dataDaysCount; d++) { headerHtml += `<th>${d}</th>`; }
@@ -426,8 +425,8 @@
 
         tbodyHtml += `<tr>
           <td style="font-weight:700; color:#38bdf8;">${fcName}</td>
-          <td>${fc.capacity || 69.75}</td>
-          <td>${fc.monthTarget || 69.75}</td>
+          <td>${fc.capacity || 0}</td>
+          <td>${fc.monthTarget || 0}</td>
           <td style="font-weight:600; color:#fbbf24;">${fc.targetMTD !== undefined ? Number(fc.targetMTD).toFixed(2) : '-'}</td>
           <td style="font-weight:700;">${fActual.toFixed(2)}</td>
           <td>${util}</td>`;
@@ -472,7 +471,6 @@
 
       document.getElementById('dwmTableBody').innerHTML = tbodyHtml;
 
-      // Update KPI Cards with exact sheet Target MTD
       document.getElementById('kpiMonthTarget').innerText = `${monthTarget} T`;
       document.getElementById('kpiTargetMTD').innerText = `${Number(totalTargetMTD).toFixed(2)} T`;
       document.getElementById('kpiActualMTD').innerText = `${totalValForDisplay.toFixed(2)} T`;
@@ -546,7 +544,6 @@
       const ctx = canvasEl.getContext('2d');
       if (furnaceChartInstance) { furnaceChartInstance.destroy(); }
 
-      // Safe Padding taaki top values kabhi na katein
       let maxDataVal = Math.max(...dataValues, 10);
       let suggestedTop = maxDataVal * 1.25;
 
