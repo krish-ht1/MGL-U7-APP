@@ -4,8 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Milestone Gear Unit 7 - Production Review Dashboard</title>
-  <!-- Chart.js Library -->
+  <!-- Chart.js and Chartjs Plugin for Data Labels -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -85,7 +86,7 @@
     .cell-red { background: rgba(239, 68, 68, 0.25) !important; color: #f87171 !important; font-weight: 600; }
     .total-row { background: #1e293b !important; font-weight: 700; color: #38bdf8 !important; }
 
-    /* Dual Graphs Layout (Side by Side on Desktop, Stacked on Mobile) */
+    /* Dual Graphs Layout */
     .graphs-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -98,7 +99,7 @@
       background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       border: 1px solid #334155; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;
     }
-    .graph-container { position: relative; width: 100%; height: 240px; }
+    .graph-container { position: relative; width: 100%; height: 260px; }
   </style>
 </head>
 <body>
@@ -184,20 +185,20 @@
 
       <!-- DUAL VISUALIZATION GRAPHS SECTION -->
       <div class="graphs-grid">
-        <!-- Graph 1: Daily Production Trend -->
+        <!-- Graph 1: Simplified & Clear Daily Trend -->
         <div class="graph-card">
           <div class="dwm-title-row">
-            <h3 id="trendGraphTitle">📈 Daily Trend (Total Ton)</h3>
+            <h3 id="trendGraphTitle">📈 Daily Production Trend</h3>
           </div>
           <div class="graph-container">
             <canvas id="dailyTrendChart"></canvas>
           </div>
         </div>
 
-        <!-- Graph 2: Furnace / SKU-wise Comparison & Ranking -->
+        <!-- Graph 2: Furnace Breakdown with Values & Total Bar -->
         <div class="graph-card">
           <div class="dwm-title-row">
-            <h3 id="furnaceGraphTitle">🏆 Furnace-wise Breakdown (SQF 1-4)</h3>
+            <h3 id="furnaceGraphTitle">🏆 Furnace-wise Output & Total</h3>
           </div>
           <div class="graph-container">
             <canvas id="furnaceComparisonChart"></canvas>
@@ -394,8 +395,9 @@
       let totals = Array(dataDaysCount).fill(0);
       let tbodyHtml = "";
       
-      let furnaceLabels = [];
-      let furnaceValues = [];
+      let furnaceLabels = ["SQF-1", "SQF-2", "SQF-3", "SQF-4"];
+      let furnaceValues = [0, 0, 0, 0];
+      let fIndex = 0;
 
       Object.keys(furnacesMap).forEach(fcName => {
         let fc = furnacesMap[fcName];
@@ -410,8 +412,8 @@
         }
         actualMTD += fActual;
 
-        furnaceLabels.push(fcName);
-        furnaceValues.push(fActual);
+        furnaceValues[fIndex] = parseFloat(fActual.toFixed(2));
+        fIndex++;
 
         let util = fc.targetMTD > 0 ? ((fActual / (fc.targetMTD / (selectedDate === "ALL" ? 1 : dataDaysCount))) * 100).toFixed(1) + "%" : "0.0%";
 
@@ -441,6 +443,10 @@
       });
 
       let totalValForDisplay = actualMTD;
+
+      // Push Total also into Furnace Chart Data for comparison
+      furnaceLabels.push("TOTAL");
+      furnaceValues.push(parseFloat(totalValForDisplay.toFixed(2)));
 
       tbodyHtml += `<tr class="total-row">
         <td>TOTAL TON</td>
@@ -475,11 +481,10 @@
       varEl.style.color = variance >= 0 ? "#34d399" : "#f87171";
       document.getElementById('dwmTableTitle').innerText = `📋 DWM Matrix - ${selectedMonth} ${selectedDate !== 'ALL' ? '(Date: ' + selectedDate + ')' : ''}`;
 
-      // Update Titles for Graphs
       document.getElementById('trendGraphTitle').innerText = `📈 Daily Trend - ${selectedMonth} ${selectedDate !== 'ALL' ? '(Date: ' + selectedDate + ')' : ''}`;
-      document.getElementById('furnaceGraphTitle').innerText = `🏆 Furnace-wise Output - ${selectedMonth} ${selectedDate !== 'ALL' ? '(Date: ' + selectedDate + ')' : '(MTD)'}`;
+      document.getElementById('furnaceGraphTitle').innerText = `🏆 Furnace-wise Output & Total - ${selectedMonth} ${selectedDate !== 'ALL' ? '(Date: ' + selectedDate + ')' : '(MTD)'}`;
 
-      // Render Both Gorgeous Charts
+      // Render Charts
       if (selectedDate === "ALL") {
         updateTrendChart(Array.from({length: dataDaysCount}, (_, i) => i + 1), totals);
       } else {
@@ -490,7 +495,7 @@
       updateFurnaceChart(furnaceLabels, furnaceValues);
     }
 
-    // Chart 1: Daily Trend Line Chart with Neon Gradient
+    // Simplified & Clear Daily Trend Line Chart
     function updateTrendChart(labels, dataValues) {
       const canvasEl = document.getElementById('dailyTrendChart');
       if (!canvasEl) return;
@@ -498,8 +503,7 @@
       if (trendChartInstance) { trendChartInstance.destroy(); }
 
       let gradient = ctx.createLinearGradient(0, 0, 0, 240);
-      gradient.addColorStop(0, 'rgba(56, 189, 248, 0.6)');
-      gradient.addColorStop(0.5, 'rgba(59, 130, 246, 0.2)');
+      gradient.addColorStop(0, 'rgba(56, 189, 248, 0.5)');
       gradient.addColorStop(1, 'rgba(15, 23, 42, 0.0)');
 
       trendChartInstance = new Chart(ctx, {
@@ -507,17 +511,15 @@
         data: {
           labels: labels,
           datasets: [{
-            label: 'Production (Ton)',
+            label: 'Ton',
             data: dataValues,
             borderColor: '#38bdf8',
             backgroundColor: gradient,
-            borderWidth: 3,
+            borderWidth: 2.5,
             pointBackgroundColor: '#38bdf8',
-            pointBorderColor: '#ffffff',
-            pointBorderWidth: 1.5,
-            pointRadius: 4,
+            pointRadius: 3,
             fill: true,
-            tension: 0.4
+            tension: 0.2
           }]
         },
         options: {
@@ -528,14 +530,14 @@
             tooltip: { backgroundColor: '#1e293b', titleColor: '#38bdf8', bodyColor: '#f8fafc', borderColor: '#334155', borderWidth: 1 }
           },
           scales: {
-            x: { grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
-            y: { grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
+            x: { grid: { color: 'rgba(51, 65, 85, 0.2)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+            y: { grid: { color: 'rgba(51, 65, 85, 0.2)' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
           }
         }
       });
     }
 
-    // Chart 2: Furnace Comparison Bar Chart (SQF-1 to SQF-4)
+    // Furnace & Total Bar Chart with Direct Values on Top
     function updateFurnaceChart(labels, dataValues) {
       const canvasEl = document.getElementById('furnaceComparisonChart');
       if (!canvasEl) return;
@@ -545,13 +547,11 @@
       furnaceChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: labels, // SQF-1, SQF-2, SQF-3, SQF-4
+          labels: labels, // SQF-1, SQF-2, SQF-3, SQF-4, TOTAL
           datasets: [{
             label: 'Output (Ton)',
             data: dataValues,
-            backgroundColor: ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b'],
-            borderColor: ['#60a5fa', '#a78bfa', '#34d399', '#fbbf24'],
-            borderWidth: 1.5,
+            backgroundColor: ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#38bdf8'], // Total gets sky blue
             borderRadius: 6
           }]
         },
@@ -560,13 +560,22 @@
           maintainAspectRatio: false,
           plugins: {
             legend: { display: false },
+            // Plugin to show exact values on top of each bar
+            datalabels: {
+              anchor: 'end',
+              align: 'top',
+              color: '#f8fafc',
+              font: { size: 11, weight: '700' },
+              formatter: (value) => value > 0 ? value + ' T' : ''
+            },
             tooltip: { backgroundColor: '#1e293b', titleColor: '#38bdf8', bodyColor: '#f8fafc', borderColor: '#334155', borderWidth: 1 }
           },
           scales: {
             x: { grid: { display: false }, ticks: { color: '#f8fafc', font: { size: 11, weight: '700' } } },
             y: { grid: { color: 'rgba(51, 65, 85, 0.3)' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
           }
-        }
+        },
+        plugins: [ChartDataLabels]
       });
     }
 
