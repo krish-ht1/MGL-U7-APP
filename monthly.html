@@ -84,7 +84,7 @@
     }
     .nav-main-btn.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
 
-    /* Filter Panel (Restored Month Dropdowns & Trend Button) */
+    /* Filter Panel */
     .filter-panel {
       background: #0f172a;
       border: 1px solid #1e293b;
@@ -173,15 +173,16 @@
     .kpi-card span { font-size: 10px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
     .kpi-card h3 { margin: 2px 0 0 0; font-size: 18px; font-weight: 700; color: #f8fafc; }
 
-    /* Graph Section with FY Dropdown inside title row */
+    /* 3D Professional Graph Section */
     .graph-card {
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      background: linear-gradient(135deg, #0b1120 0%, #0f172a 100%);
       border: 1px solid #334155;
-      border-radius: 10px;
-      padding: 14px;
+      border-radius: 12px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
       gap: 10px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
     }
     .graph-title-row {
       display: flex;
@@ -190,19 +191,19 @@
       flex-wrap: wrap;
       gap: 8px;
     }
-    .graph-title-row h3 { font-size: 12.5px; font-weight: 700; color: #f8fafc; margin: 0; }
+    .graph-title-row h3 { font-size: 13px; font-weight: 700; color: #f8fafc; margin: 0; }
     .fy-dropdown {
       background: #1e293b;
       border: 1px solid #475569;
       color: #38bdf8;
-      padding: 4px 10px;
+      padding: 6px 12px;
       border-radius: 6px;
-      font-size: 11.5px;
+      font-size: 12px;
       font-weight: 700;
       outline: none;
       cursor: pointer;
     }
-    .graph-container { position: relative; width: 100%; height: 280px; }
+    .graph-container { position: relative; width: 100%; height: 290px; }
 
     /* Fixed Table Section with Inner Scroll */
     .table-section {
@@ -367,11 +368,10 @@
       </div>
     </div>
 
-    <!-- Financial Year Bar Graph Section with FY Dropdown inside -->
+    <!-- 3D Professional FY Bar Graph Section with FY Dropdown inside -->
     <div class="graph-card">
       <div class="graph-title-row">
         <h3 id="fyGraphTitle">📈 Financial Year Monthly Production & Average</h3>
-        <!-- Financial Year Dropdown placed right beside the graph -->
         <select id="fySelect" class="fy-dropdown" onchange="renderMonthlyTable()">
           <option value="2026-2027" selected>FY 2026-2027 (Apr 26 - Mar 27)</option>
           <option value="2025-2026">FY 2025-2026 (Apr 25 - Mar 26)</option>
@@ -594,7 +594,6 @@
         endIndex = temp;
       }
 
-      // Filter based on From-To month selection for table
       const filteredRows = monthlyData.slice(startIndex, endIndex + 1);
 
       filteredRows.forEach(row => {
@@ -638,24 +637,35 @@
       document.getElementById('kpiTotalWeight').innerText = `${gTotalWeight.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})} Kg`;
       document.getElementById('kpiTotalTonnage').innerText = `${(gTotalWeight / 1000).toFixed(2)} Ton`;
 
-      // Render Main Clean Bar Chart for Selected Financial Year
-      renderFYBarChart(selectedFY);
+      // Render 3D Professional Bar Chart for Selected Financial Year
+      render3DFYBarChart(selectedFY);
     }
 
-    // Clean, Colorful, Bold FY Bar Chart with Average Line
-    function renderFYBarChart(selectedFY) {
+    // 3D Style Colorful Bar Chart with First & Last Average Bars
+    function render3DFYBarChart(selectedFY) {
       const ctx = document.getElementById('monthlyBarChart').getContext('2d');
 
       const fyRows = monthlyData.filter(row => row.fy === selectedFY);
 
-      let labels = fyRows.map(d => d.month);
-      let values = fyRows.map(d => parseFloat(d.tonnage.toFixed(2)));
+      let monthLabels = fyRows.map(d => d.month);
+      let monthValues = fyRows.map(d => parseFloat(d.tonnage.toFixed(2)));
 
-      let sum = values.reduce((a, b) => a + b, 0);
-      let avg = values.length > 0 ? (sum / values.length) : 0;
-      let avgLineData = Array(labels.length).filter((_, i) => i < labels.length).fill(parseFloat(avg.toFixed(2)));
+      let sum = monthValues.reduce((a, b) => a + b, 0);
+      let avg = monthValues.length > 0 ? (sum / monthValues.length) : 0;
+      let formattedAvg = parseFloat(avg.toFixed(2));
 
-      document.getElementById('fyGraphTitle').innerText = `📈 FY ${selectedFY} Monthly Production | Avg: ${avg.toFixed(2)} T`;
+      // Requirement: First bar is Average, then months, then Last bar is also Average
+      let labels = ["AVG (START)", ...monthLabels, "AVG (END)"];
+      let values = [formattedAvg, ...monthValues, formattedAvg];
+
+      // Beautiful Vibrant 3D-like Color Gradients (Pink/Purple/Blue theme similar to trend popup + green for avg)
+      let bgColors = values.map((val, idx) => {
+        if (idx === 0 || idx === values.length - 1) return '#10b981'; // Emerald Green for Average
+        // Vibrant Pink-Purple-Blue gradient feel for months
+        return idx % 2 === 0 ? '#ec4899' : '#3b82f6';
+      });
+
+      document.getElementById('fyGraphTitle').innerText = `📈 FY ${selectedFY} Monthly Production & Average (Avg: ${formattedAvg} T)`;
 
       if (mainBarChartInstance) {
         mainBarChartInstance.destroy();
@@ -669,21 +679,10 @@
             {
               label: 'Production (Ton)',
               data: values,
-              backgroundColor: 'rgba(59, 130, 246, 0.85)',
-              borderColor: '#60a5fa',
+              backgroundColor: bgColors,
+              borderRadius: 8,
               borderWidth: 1.5,
-              borderRadius: 6,
-              order: 2
-            },
-            {
-              label: `Average (${avg.toFixed(2)} T)`,
-              data: avgLineData,
-              type: 'line',
-              borderColor: '#f59e0b',
-              borderWidth: 2.5,
-              borderDash: [6, 6],
-              pointRadius: 0,
-              order: 1
+              borderColor: 'rgba(255, 255, 255, 0.15)'
             }
           ]
         },
@@ -692,23 +691,23 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { display: true, position: 'top', labels: { color: '#cbd5e1', font: { size: 11, weight: 'bold' } } },
+            legend: { display: false },
             datalabels: {
               anchor: 'end',
               align: 'top',
               color: '#f8fafc',
-              font: { family: 'Inter', size: 10.5, weight: '700' },
-              formatter: (value, ctx) => ctx.dataset.type === 'line' ? '' : (value > 0 ? value + ' T' : '')
+              font: { family: 'Inter', size: 11, weight: '700' },
+              formatter: (value) => value > 0 ? value + ' T' : ''
             }
           },
           scales: {
             x: {
-              ticks: { color: '#94a3b8', font: { size: 10.5, weight: '600' } },
+              ticks: { color: '#cbd5e1', font: { size: 10.5, weight: '600' } },
               grid: { display: false }
             },
             y: {
               ticks: { color: '#94a3b8', font: { size: 10 } },
-              grid: { color: 'rgba(51, 65, 85, 0.2)' }
+              grid: { color: 'rgba(51, 65, 85, 0.25)' }
             }
           }
         }
