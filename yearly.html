@@ -84,7 +84,7 @@
     }
     .nav-main-btn.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
 
-    /* Table Section (Upar apni jagah par safe) */
+    /* Yearly Table Section */
     .table-section {
       background: #0f172a;
       border: 1px solid #1e293b;
@@ -113,7 +113,7 @@
     }
     table.yearly-table td { background: #0f172a; color: #f1f5f9; }
 
-    /* 3D Attractive Graph Card (Neeche) */
+    /* 3D Attractive Graph Card */
     .graph-card {
       background: linear-gradient(135deg, #0b1120 0%, #0f172a 100%);
       border: 1px solid #334155;
@@ -163,7 +163,7 @@
       <a href="breakdown.html" class="nav-main-btn">⚠️ Breakdown & Loss</a>
     </div>
 
-    <!-- Yearly Production Table -->
+    <!-- Correct Yearly Production Table -->
     <div class="table-section">
       <div class="table-scroll">
         <table class="yearly-table">
@@ -293,8 +293,8 @@
         labels.push(row.year);
         let prodTon = parseFloat(rowTonnage.toFixed(2));
         productionValues.push(prodTon);
-        targetValues.push(parseFloat((prodTon * 1.15).toFixed(0))); // Proportional Target estimation
-        avgMonthValues.push(parseFloat((prodTon / 12).toFixed(2))); // Monthly Average calculation
+        targetValues.push(parseFloat((prodTon * 1.15).toFixed(0))); 
+        avgMonthValues.push(parseFloat((prodTon / 12).toFixed(2))); 
 
         html += `
           <tr>
@@ -377,7 +377,7 @@
               font: { family: 'Inter', size: 10.5, weight: '700' },
               formatter: function(value, context) {
                 if (context.dataset.type === 'line') {
-                  return value; // Target value on top of line point
+                  return value;
                 }
                 return value > 0 ? value : '';
               }
