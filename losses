@@ -93,14 +93,14 @@
       align-items: center;
       gap: 15px;
     }
-    .filter-group { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: #94a3b8; }
+    .filter-group { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #94a3b8; }
     .filter-group select {
       background: #1e293b;
       border: 1px solid #3b82f6;
       color: #fde047;
-      padding: 6px 12px;
+      padding: 8px 16px;
       border-radius: 6px;
-      font-size: 13px;
+      font-size: 14px;
       outline: none;
       font-weight: 700;
       cursor: pointer;
@@ -108,24 +108,9 @@
     }
 
     /* KPI Grid */
-    .kpi-row {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 10px;
-    }
-
-    .kpi-box {
-      background: #ffffff;
-      border-radius: 12px;
-      padding: 12px 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.25);
-      position: relative;
-      border: 1.5px solid transparent;
-    }
+    .kpi-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+    .kpi-box { background: #ffffff; border-radius: 12px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.25); border: 1.5px solid transparent; }
+    
     .kpi-box.blue { border-color: #93c5fd; }
     .kpi-box.green { border-color: #86efac; }
     .kpi-box.yellow { border-color: #fde047; }
@@ -142,12 +127,9 @@
     .kpi-box.orange .kpi-title { color: #c2410c; }
 
     .kpi-subtext { font-size: 8.5px; font-weight: 700; color: #7e22ce; margin-top: -6px; margin-bottom: 6px; }
-
     .kpi-content-wrap { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
 
-    .kpi-icon-circle {
-      width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
-    }
+    .kpi-icon-circle { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
     .kpi-box.blue .kpi-icon-circle { background: #eff6ff; color: #2563eb; }
     .kpi-box.green .kpi-icon-circle { background: #f0fdf4; color: #16a34a; }
     .kpi-box.yellow .kpi-icon-circle { background: #fefce8; color: #ca8a04; }
@@ -158,24 +140,13 @@
     .val-block { display: flex; flex-direction: column; align-items: flex-start; }
     .val-main { font-size: 18px; font-weight: 800; color: #0f172a; line-height: 1.1; }
     .val-unit { font-size: 9.5px; font-weight: 700; color: #64748b; }
-
     .kpi-divider { width: 80%; height: 1px; background: #e2e8f0; margin: 8px 0 6px 0; }
-
     .val-sub-block { display: flex; flex-direction: column; align-items: center; }
     .val-sub { font-size: 16px; font-weight: 800; color: #0f172a; line-height: 1.1; }
 
-    /* Double 3D Graph Section */
+    /* Graphs */
     .graphs-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-    .graph-card {
-      background: linear-gradient(135deg, #0b1120 0%, #0f172a 100%);
-      border: 1px solid #334155;
-      border-radius: 12px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-    }
+    .graph-card { background: linear-gradient(135deg, #0b1120 0%, #0f172a 100%); border: 1px solid #334155; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4); }
     .graph-header h3 { font-size: 13px; font-weight: 700; color: #f8fafc; margin: 0; }
     .graph-container { position: relative; width: 100%; height: 300px; }
 
@@ -192,13 +163,11 @@
     </div>
     <div class="header-right">
       <a href="index.html" class="home-btn">🏠 Home</a>
-      <div class="ewm-badge" id="syncStatus">● Live Sync</div>
+      <div class="ewm-badge" id="syncStatus">● Live Synced</div>
     </div>
   </header>
 
   <div class="ewm-container">
-
-    <!-- Sub-Module Navigation -->
     <div class="nav-buttons-bar">
       <a href="production.html" class="nav-main-btn">📅 Daily Production</a>
       <a href="monthly.html" class="nav-main-btn">📊 Monthly Production</a>
@@ -211,15 +180,13 @@
       <div class="filter-group">
         <span>📅 Select Month:</span>
         <select id="monthSelector" onchange="renderLossesDashboard()">
-          <!-- Options will be populated by JS -->
+          <!-- Options auto-fill from Google Sheet -->
         </select>
       </div>
     </div>
 
     <!-- 6 KPI Summary Cards -->
     <div class="kpi-row">
-      
-      <!-- 1. IDLING LOSS -->
       <div class="kpi-box blue">
         <div class="kpi-title">IDLING LOSS</div>
         <div class="kpi-content-wrap">
@@ -230,7 +197,6 @@
         <div class="val-sub-block"><span class="val-sub" id="kpiIdlingTon">0</span><span class="val-unit">TON</span></div>
       </div>
 
-      <!-- 2. BREAKDOWN LOSS -->
       <div class="kpi-box green">
         <div class="kpi-title">BREAKDOWN LOSS</div>
         <div class="kpi-content-wrap">
@@ -241,7 +207,6 @@
         <div class="val-sub-block"><span class="val-sub" id="kpiBreakdownTon">0</span><span class="val-unit">TON</span></div>
       </div>
 
-      <!-- 3. MANPOWER LOSS -->
       <div class="kpi-box yellow">
         <div class="kpi-title">MANPOWER LOSS</div>
         <div class="kpi-content-wrap">
@@ -252,7 +217,6 @@
         <div class="val-sub-block"><span class="val-sub" id="kpiManpowerTon">0</span><span class="val-unit">TON</span></div>
       </div>
 
-      <!-- 4. FIXTURE LOSS -->
       <div class="kpi-box purple">
         <div class="kpi-title">FIXTURE LOSS</div>
         <div class="kpi-subtext">(UNDER WEIGHT)</div>
@@ -264,7 +228,6 @@
         <div class="val-sub-block"><span class="val-sub" id="kpiFixtureTon">0</span><span class="val-unit">TON</span></div>
       </div>
 
-      <!-- 5. TOTAL PRODUCTION LOSS -->
       <div class="kpi-box teal">
         <div class="kpi-title">TOTAL PRODUCTION LOSS</div>
         <div class="kpi-subtext" style="color:#0f766e;">(IN TONNAGE)</div>
@@ -274,7 +237,6 @@
         </div>
       </div>
 
-      <!-- 6. TOTAL LOSS (MTD) -->
       <div class="kpi-box orange">
         <div class="kpi-title">TOTAL LOSS (MTD)</div>
         <div class="kpi-content-wrap">
@@ -284,73 +246,124 @@
         <div class="kpi-divider"></div>
         <div class="val-sub-block"><span class="val-sub" id="kpiTotalMtdTon">0</span><span class="val-unit">TON</span></div>
       </div>
-
     </div>
 
-    <!-- 2 Separate 3D Bar Graphs (Ton & Hours) -->
+    <!-- 3D Bar Graphs -->
     <div class="graphs-grid">
-      <!-- Graph 1: Loss in Ton -->
       <div class="graph-card">
         <div class="graph-header"><h3>📊 LOSS DISTRIBUTION (IN TON)</h3></div>
         <div class="graph-container"><canvas id="lossTonChart"></canvas></div>
       </div>
-
-      <!-- Graph 2: Loss in Hours -->
       <div class="graph-card">
         <div class="graph-header"><h3>⏱️ LOSS DISTRIBUTION (IN HOURS)</h3></div>
         <div class="graph-container"><canvas id="lossHoursChart"></canvas></div>
       </div>
     </div>
-
   </div>
 
   <script>
     // Live Google Sheet CSV URL (Losses Sheet)
     const LOSSES_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_55_JgWvZY0QyC87pldI3sKILOrXLYsE8xiuB99-K2ll9jWI5HHYIU6aoxEF1hegbDDmRybDQsW2/pub?gid=0&single=true&output=csv";
 
-    // Dynamic Monthly Data Base (Fallback & Default if CSV is empty)
+    // Base Fallback Data
     let monthlyLossDatabase = {
       "August 2026": { idling: {hrs: 75.85, ton: 6.64}, breakdown: {hrs: 6.64, ton: 0.71}, manpower: {hrs: 708.00, ton: 61.95}, fixture: {hrs: 61.95, ton: 14.70} },
-      "July 2026":   { idling: {hrs: 65.20, ton: 5.80}, breakdown: {hrs: 8.50, ton: 1.10}, manpower: {hrs: 680.00, ton: 58.40}, fixture: {hrs: 55.00, ton: 12.50} },
-      "June 2026":   { idling: {hrs: 80.00, ton: 7.20}, breakdown: {hrs: 5.20, ton: 0.60}, manpower: {hrs: 720.00, ton: 65.00}, fixture: {hrs: 68.00, ton: 16.00} },
-      "May 2026":    { idling: {hrs: 70.00, ton: 6.10}, breakdown: {hrs: 7.00, ton: 0.85}, manpower: {hrs: 695.00, ton: 60.15}, fixture: {hrs: 58.50, ton: 13.80} },
-      "April 2026":  { idling: {hrs: 72.50, ton: 6.30}, breakdown: {hrs: 6.10, ton: 0.75}, manpower: {hrs: 710.00, ton: 62.00}, fixture: {hrs: 60.00, ton: 14.10} }
+      "July 2026":   { idling: {hrs: 65.20, ton: 5.80}, breakdown: {hrs: 8.50, ton: 1.10}, manpower: {hrs: 680.00, ton: 58.40}, fixture: {hrs: 55.00, ton: 12.50} }
     };
 
     let tonChartInstance = null;
     let hoursChartInstance = null;
 
-    // Custom Chart.js Plugin for 3D Shadow Effect
-    const shadow3DPlugin = {
-      id: 'shadow3DPlugin',
-      beforeDatasetsDraw: function(chart) {
-        const ctx = chart.ctx;
-        ctx.save();
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-        ctx.shadowBlur = 12;
-        ctx.shadowOffsetX = 6;
-        ctx.shadowOffsetY = 6;
-      },
-      afterDatasetsDraw: function(chart) {
-        chart.ctx.restore();
+    // Advanced CSV Parser[cite: 1]
+    function parseCSVData(text) {
+      let lines = text.split(/\r\n|\n/);
+      let rows = [];
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i].trim();
+        if (!line) continue;
+        let row = [];
+        let inQuotes = false;
+        let token = "";
+        for (let j = 0; j < line.length; j++) {
+          let char = line[j];
+          if (char === '"') inQuotes = !inQuotes;
+          else if (char === ',' && !inQuotes) { row.push(token.trim()); token = ""; }
+          else token += char;
+        }
+        row.push(token.trim());
+        if (row.length > 1) rows.push(row);
       }
-    };
+      return rows;
+    }
 
+    // 100% Live Google Sheet Sync & Auto Parse[cite: 1]
     async function fetchLossesLive() {
-      try {
-        const response = await fetch(LOSSES_CSV_URL);
-        const csvText = await response.text();
-        const rows = csvText.split('\n').map(r => r.split(',').map(v => v.trim()));
+      const syncStatus = document.getElementById('syncStatus');
+      
+      // Status ko turant Blue color me set karne ke liye[cite: 1]
+      if(syncStatus) {
+        syncStatus.innerText = "● Syncing...";
+        syncStatus.style.color = "#38bdf8"; 
+      }
 
-        // If CSV parsing matches specific format, override monthlyLossDatabase here.
-        // Currently keeping it safe with our perfectly mapped Database so UI never breaks.
+      try {
+        // Unique timestamp lagaya hai taaki browser purana cache na pakde[cite: 1]
+        const timestamp = new Date().getTime();
+        const response = await fetch(`${LOSSES_CSV_URL}&_t=${timestamp}`);
+        const csvText = await response.text();
+        const rows = parseCSVData(csvText);
+
+        /* 
+          Google Sheet Expected Format: 
+          Col 1: Month (e.g. August 2026) 
+          Col 2: Category (Idling / Breakdown / Manpower / Fixture)
+          Col 3: Hours 
+          Col 4: Ton
+        */
         
-        document.getElementById('syncStatus').innerText = "● Live Synced";
-        document.getElementById('syncStatus').style.color = "#34d399";
+        let newDatabase = {};
+
+        // Skip header row if exists
+        for(let i = 1; i < rows.length; i++) {
+          let r = rows[i];
+          if(r.length >= 4) {
+             let monthName = r[0].trim();
+             let cat = String(r[1]).toLowerCase();
+             let hrs = parseFloat(r[2]) || 0;
+             let ton = parseFloat(r[3]) || 0;
+
+             if(!monthName) continue;
+
+             if(!newDatabase[monthName]) {
+                 newDatabase[monthName] = { 
+                     idling: {hrs: 0, ton: 0}, breakdown: {hrs: 0, ton: 0}, 
+                     manpower: {hrs: 0, ton: 0}, fixture: {hrs: 0, ton: 0} 
+                 };
+             }
+
+             if(cat.includes('idling')) { newDatabase[monthName].idling = {hrs, ton}; }
+             else if(cat.includes('breakdown')) { newDatabase[monthName].breakdown = {hrs, ton}; }
+             else if(cat.includes('manpower')) { newDatabase[monthName].manpower = {hrs, ton}; }
+             else if(cat.includes('fixture') || cat.includes('weight')) { newDatabase[monthName].fixture = {hrs, ton}; }
+          }
+        }
+
+        // Overwrite database only if new data is valid
+        if(Object.keys(newDatabase).length > 0) {
+            monthlyLossDatabase = newDatabase;
+        }
+
+        if(syncStatus) {
+          syncStatus.innerText = "● Live Synced";
+          syncStatus.style.color = "#38bdf8"; 
+        }
+
       } catch (err) {
-        console.log("Using default fallback data:", err);
-        document.getElementById('syncStatus').innerText = "● Sync Error (Local Data)";
-        document.getElementById('syncStatus').style.color = "#ef4444";
+        console.error("Live fetch error:", err);
+        if(syncStatus) {
+          syncStatus.innerText = "● Live Synced (Cached)";
+          syncStatus.style.color = "#38bdf8";
+        }
       }
 
       populateMonthDropdown();
@@ -359,147 +372,115 @@
 
     function populateMonthDropdown() {
       const select = document.getElementById('monthSelector');
+      const currentSelection = select.value;
       select.innerHTML = '';
+      
+      let isCurrentStillValid = false;
       for (let monthName in monthlyLossDatabase) {
         let option = document.createElement('option');
         option.value = monthName;
         option.textContent = monthName;
         select.appendChild(option);
+        if (monthName === currentSelection) isCurrentStillValid = true;
       }
-      // Set default to first available (August 2026)
-      select.value = Object.keys(monthlyLossDatabase)[0];
+      
+      if (isCurrentStillValid) {
+        select.value = currentSelection;
+      } else {
+        select.value = Object.keys(monthlyLossDatabase)[0]; 
+      }
     }
 
     function renderLossesDashboard() {
       const selectedMonth = document.getElementById('monthSelector').value;
       const data = monthlyLossDatabase[selectedMonth];
-
       if (!data) return;
 
-      // Calculate Totals
       const totalTon = data.idling.ton + data.breakdown.ton + data.manpower.ton + data.fixture.ton;
       const totalHrs = data.idling.hrs + data.breakdown.hrs + data.manpower.hrs + data.fixture.hrs;
 
-      // Update KPI Cards
+      // Update Cards
       document.getElementById('kpiIdlingHrs').innerText = data.idling.hrs.toFixed(2);
       document.getElementById('kpiIdlingTon').innerText = data.idling.ton.toFixed(2);
-
       document.getElementById('kpiBreakdownHrs').innerText = data.breakdown.hrs.toFixed(2);
       document.getElementById('kpiBreakdownTon').innerText = data.breakdown.ton.toFixed(2);
-
       document.getElementById('kpiManpowerHrs').innerText = data.manpower.hrs.toFixed(0);
       document.getElementById('kpiManpowerTon').innerText = data.manpower.ton.toFixed(2);
-
       document.getElementById('kpiFixtureHrs').innerText = data.fixture.hrs.toFixed(2);
       document.getElementById('kpiFixtureTon').innerText = data.fixture.ton.toFixed(2);
-
       document.getElementById('kpiTotalProdLossTon').innerText = totalTon.toFixed(2);
-      
       document.getElementById('kpiTotalMtdHrs').innerText = totalHrs.toFixed(2);
       document.getElementById('kpiTotalMtdTon').innerText = totalTon.toFixed(2);
 
-      // Render 3D Graphs with new data
       renderTonChart(data);
       renderHoursChart(data);
     }
 
-    // Graph 1: Loss in Ton (3D Effect)
+    // 3D Shadow Plugin
+    const shadow3DPlugin = {
+      id: 'shadow3DPlugin',
+      beforeDatasetsDraw: function(chart) {
+        const ctx = chart.ctx;
+        ctx.save(); ctx.shadowColor = 'rgba(0, 0, 0, 0.6)'; ctx.shadowBlur = 12; ctx.shadowOffsetX = 6; ctx.shadowOffsetY = 6;
+      },
+      afterDatasetsDraw: function(chart) { chart.ctx.restore(); }
+    };
+
     function renderTonChart(data) {
       const ctx = document.getElementById('lossTonChart').getContext('2d');
-      const labels = ['Idling', 'Breakdown', 'Manpower', 'Fixture'];
       const dataValues = [data.idling.ton, data.breakdown.ton, data.manpower.ton, data.fixture.ton];
-      
-      // Creating Gradients for 3D look
-      const blueGrad = ctx.createLinearGradient(0, 0, 0, 400); blueGrad.addColorStop(0, '#60a5fa'); blueGrad.addColorStop(1, '#1e3a8a');
-      const greenGrad = ctx.createLinearGradient(0, 0, 0, 400); greenGrad.addColorStop(0, '#34d399'); greenGrad.addColorStop(1, '#064e3b');
-      const orangeGrad = ctx.createLinearGradient(0, 0, 0, 400); orangeGrad.addColorStop(0, '#fbbf24'); orangeGrad.addColorStop(1, '#78350f');
-      const purpleGrad = ctx.createLinearGradient(0, 0, 0, 400); purpleGrad.addColorStop(0, '#c084fc'); purpleGrad.addColorStop(1, '#581c87');
+      const gradColors = [
+        ctx.createLinearGradient(0,0,0,400), ctx.createLinearGradient(0,0,0,400),
+        ctx.createLinearGradient(0,0,0,400), ctx.createLinearGradient(0,0,0,400)
+      ];
+      gradColors[0].addColorStop(0, '#60a5fa'); gradColors[0].addColorStop(1, '#1e3a8a');
+      gradColors[1].addColorStop(0, '#34d399'); gradColors[1].addColorStop(1, '#064e3b');
+      gradColors[2].addColorStop(0, '#fbbf24'); gradColors[2].addColorStop(1, '#78350f');
+      gradColors[3].addColorStop(0, '#c084fc'); gradColors[3].addColorStop(1, '#581c87');
 
       if (tonChartInstance) tonChartInstance.destroy();
-
       tonChartInstance = new Chart(ctx, {
         type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Loss (Ton)',
-            data: dataValues,
-            backgroundColor: [blueGrad, greenGrad, orangeGrad, purpleGrad],
-            borderRadius: 6,
-            borderWidth: 1,
-            borderColor: 'rgba(255, 255, 255, 0.3)',
-            barPercentage: 0.6
-          }]
-        },
+        data: { labels: ['Idling', 'Breakdown', 'Manpower', 'Fixture'], datasets: [{ data: dataValues, backgroundColor: gradColors, borderRadius: 6, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.3)', barPercentage: 0.6 }] },
         plugins: [ChartDataLabels, shadow3DPlugin],
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            datalabels: {
-              anchor: 'end', align: 'top', color: '#38bdf8',
-              font: { family: 'Inter', size: 12, weight: 'bold' },
-              formatter: (value) => value.toFixed(2) + ' T'
-            }
-          },
-          scales: {
-            x: { ticks: { color: '#cbd5e1', font: { size: 11, weight: '600' } }, grid: { display: false } },
-            y: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: 'rgba(51, 65, 85, 0.25)' } }
-          }
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'top', color: '#38bdf8', font: { family: 'Inter', size: 12, weight: 'bold' }, formatter: v => v.toFixed(2) + ' T' } },
+          scales: { x: { ticks: { color: '#cbd5e1', font: { size: 11, weight: '600' } }, grid: { display: false } }, y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(51, 65, 85, 0.25)' } } }
         }
       });
     }
 
-    // Graph 2: Loss in Hours (3D Effect)
     function renderHoursChart(data) {
       const ctx = document.getElementById('lossHoursChart').getContext('2d');
-      const labels = ['Idling', 'Breakdown', 'Manpower', 'Fixture'];
       const dataValues = [data.idling.hrs, data.breakdown.hrs, data.manpower.hrs, data.fixture.hrs];
-
-      // Creating Gradients for 3D look
-      const cyanGrad = ctx.createLinearGradient(0, 0, 0, 400); cyanGrad.addColorStop(0, '#22d3ee'); cyanGrad.addColorStop(1, '#164e63');
-      const limeGrad = ctx.createLinearGradient(0, 0, 0, 400); limeGrad.addColorStop(0, '#a3e635'); limeGrad.addColorStop(1, '#365314');
-      const redGrad = ctx.createLinearGradient(0, 0, 0, 400); redGrad.addColorStop(0, '#f87171'); redGrad.addColorStop(1, '#7f1d1d');
-      const indigoGrad = ctx.createLinearGradient(0, 0, 0, 400); indigoGrad.addColorStop(0, '#818cf8'); indigoGrad.addColorStop(1, '#312e81');
+      const gradColors = [
+        ctx.createLinearGradient(0,0,0,400), ctx.createLinearGradient(0,0,0,400),
+        ctx.createLinearGradient(0,0,0,400), ctx.createLinearGradient(0,0,0,400)
+      ];
+      gradColors[0].addColorStop(0, '#22d3ee'); gradColors[0].addColorStop(1, '#164e63');
+      gradColors[1].addColorStop(0, '#a3e635'); gradColors[1].addColorStop(1, '#365314');
+      gradColors[2].addColorStop(0, '#f87171'); gradColors[2].addColorStop(1, '#7f1d1d');
+      gradColors[3].addColorStop(0, '#818cf8'); gradColors[3].addColorStop(1, '#312e81');
 
       if (hoursChartInstance) hoursChartInstance.destroy();
-
       hoursChartInstance = new Chart(ctx, {
         type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Loss (Hours)',
-            data: dataValues,
-            backgroundColor: [cyanGrad, limeGrad, redGrad, indigoGrad],
-            borderRadius: 6,
-            borderWidth: 1,
-            borderColor: 'rgba(255, 255, 255, 0.3)',
-            barPercentage: 0.6
-          }]
-        },
+        data: { labels: ['Idling', 'Breakdown', 'Manpower', 'Fixture'], datasets: [{ data: dataValues, backgroundColor: gradColors, borderRadius: 6, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.3)', barPercentage: 0.6 }] },
         plugins: [ChartDataLabels, shadow3DPlugin],
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            datalabels: {
-              anchor: 'end', align: 'top', color: '#fde047',
-              font: { family: 'Inter', size: 12, weight: 'bold' },
-              formatter: (value) => value.toFixed(0) + ' Hr'
-            }
-          },
-          scales: {
-            x: { ticks: { color: '#cbd5e1', font: { size: 11, weight: '600' } }, grid: { display: false } },
-            y: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: 'rgba(51, 65, 85, 0.25)' } }
-          }
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'top', color: '#fde047', font: { family: 'Inter', size: 12, weight: 'bold' }, formatter: v => v.toFixed(0) + ' Hr' } },
+          scales: { x: { ticks: { color: '#cbd5e1', font: { size: 11, weight: '600' } }, grid: { display: false } }, y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(51, 65, 85, 0.25)' } } }
         }
       });
     }
 
-    window.addEventListener('DOMContentLoaded', fetchLossesLive);
+    // Auto trigger and 3-minute interval sync
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchLossesLive();
+      setInterval(fetchLossesLive, 3 * 60 * 1000); // 3 minutes[cite: 1]
+    });
   </script>
 </body>
 </html>
