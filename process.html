@@ -1338,23 +1338,51 @@
       applyAllFilters();
     }
 
-    // Auto-Construct Drive URL without needing manual links in sheet
     function openSipPdfDirect() {
       if (!currentActivePart || currentActivePart === "-") {
         alert("Please search or select a component first.");
         return;
       }
 
-      let targetUrl = "";
-      if (currentActivePdfLink && currentActivePdfLink.trim() !== "") {
-        targetUrl = normalizeDriveLink(currentActivePdfLink);
-      } else {
-        // Auto-construct search query or direct view link pattern based on part/MS number
-        const cleanPart = encodeURIComponent(currentActivePart.trim());
-        targetUrl = `https://drive.google.com/drive/search?q=${cleanPart}`;
+      // 1. Check current active link or fallback to default Drive preview
+      let targetUrl = currentActivePdfLink;
+      if (!targetUrl || targetUrl.trim() === "") {
+        targetUrl = "https://drive.google.com/file/d/1CNZujlalyUkB0gv96UgYbHXKkDfErmdD/view?usp=drivesdk";
       }
 
-      window.open(bustCache(targetUrl), '_blank', 'width=1000,height=700');
+      // 2. Convert Google Drive /view link to /preview so it opens inside the popup smoothly
+      let embedPreviewUrl = targetUrl;
+      const match = targetUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (match && match[1]) {
+        embedPreviewUrl = `https://drive.google.com/file/d/${match[1]}/preview`;
+      } else if (targetUrl.includes('/view')) {
+        embedPreviewUrl = targetUrl.replace('/view', '/preview');
+      }
+
+      // 3. Update Modal Header & Title
+      const partNameElem = document.getElementById('modalPartName');
+      if (partNameElem) partNameElem.innerText = `Part No: ${currentActivePart}`;
+      
+      const titleElem = document.getElementById('modalSipTitle');
+      if (titleElem) titleElem.innerText = `📑 Standard Inspection Plan - Part ${currentActivePart}`;
+
+      // 4. Load the preview URL directly into the popup iframe
+      const frame = document.getElementById('sipPdfFrame');
+      if (frame) {
+        frame.src = embedPreviewUrl;
+      }
+
+      // 5. Set fallback link for "Open in Full Tab" button
+      const extLink = document.getElementById('modalOpenExternal');
+      if (extLink) {
+        extLink.href = targetUrl;
+      }
+
+      // 6. Display the Modal Popup on screen
+      const modal = document.getElementById('sipModal');
+      if (modal) {
+        modal.style.display = 'flex';
+      }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
