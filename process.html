@@ -1344,7 +1344,7 @@
         return;
       }
 
-      // 1. Check current active link or fallback to default Drive preview
+      // 1. Get the current active PDF link or fallback to default
       let targetUrl = currentActivePdfLink;
       if (!targetUrl || targetUrl.trim() === "") {
         targetUrl = "https://drive.google.com/file/d/1CNZujlalyUkB0gv96UgYbHXKkDfErmdD/view?usp=drivesdk";
@@ -1359,7 +1359,7 @@
         embedPreviewUrl = targetUrl.replace('/view', '/preview');
       }
 
-      // 3. Update Modal Header & Title
+      // 3. Update Modal Title & Part Name
       const partNameElem = document.getElementById('modalPartName');
       if (partNameElem) partNameElem.innerText = `Part No: ${currentActivePart}`;
       
@@ -1372,23 +1372,18 @@
         frame.src = embedPreviewUrl;
       }
 
-      // 5. Set fallback link for "Open in Full Tab" button
+      // 5. Set fallback link for "Open in Full Tab" button inside modal
       const extLink = document.getElementById('modalOpenExternal');
       if (extLink) {
         extLink.href = targetUrl;
       }
 
-      // 6. Display the Modal Popup on screen
+      // 6. Display the In-App Modal Popup on screen
       const modal = document.getElementById('sipModal');
       if (modal) {
         modal.style.display = 'flex';
       }
     }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      loadAllLiveSheets(false);
-      setInterval(() => loadAllLiveSheets(false), AUTO_REFRESH_MS);
-    });
   </script>
 </body>
 </html>
