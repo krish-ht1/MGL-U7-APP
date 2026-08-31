@@ -1384,6 +1384,11 @@
         modal.style.display = 'flex';
       }
     }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadAllLiveSheets(false);
+      setInterval(() => loadAllLiveSheets(false), AUTO_REFRESH_MS);
+    });
   </script>
 </body>
 </html>
