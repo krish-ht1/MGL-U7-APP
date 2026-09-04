@@ -242,12 +242,12 @@
       <div class="search-row">
         <div class="search-input-wrap">
           <span class="search-icon">🔍</span>
-          <input type="text" id="docSearch" placeholder="Search by Doc No (e.g. WI-ST-01, 1234), Title, Category..." oninput="filterDocuments()">
+          <input type="text" id="docSearch" placeholder="Search by Doc No (e.g. TPG-HT-01, WI-ST-01), Title, Category..." oninput="filterDocuments()">
         </div>
         <button class="btn-reset" onclick="resetFilters()">🔄 Reset</button>
       </div>
 
-      <!-- Category Filter Tabs (Matching your original tabs) -->
+      <!-- Category Filter Tabs -->
       <div class="category-tabs" id="categoryTabs">
         <button class="cat-tab active" onclick="selectCategory('ALL', this)">All Documents</button>
         <button class="cat-tab" onclick="selectCategory('WIST', this)">WIST</button>
@@ -279,7 +279,7 @@
         <strong id="metricFMT" style="color: #34d399;">0</strong>
       </div>
       <div class="metric-box">
-        <span>QSP, TPG & FR</span>
+        <span>TPG, QSP & FR</span>
         <strong id="metricOthers" style="color: #fde047;">0</strong>
       </div>
     </div>
@@ -297,6 +297,7 @@
               <th>SR</th>
               <th>TITLE / DESCRIPTION</th>
               <th>DOC NO</th>
+              <th>TAB / CATEGORY</th>
               <th>REVISION</th>
               <th>LAST UPDATED</th>
               <th>ACTION / REMARK'S</th>
@@ -312,7 +313,7 @@
   </div>
 
   <script>
-    // Master CSV Link for Central Document Hub (gid=2013659920 or active master GID)
+    // Master CSV Link for Central Document Hub
     const DOCUMENT_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=2013659920&single=true&output=csv";
 
     let centralDocumentsData = [];
@@ -355,6 +356,7 @@
       return null;
     }
 
+    // Convert Google Drive links into direct View and Download links
     function getDriveLinks(rawLink) {
       if (!rawLink || !rawLink.startsWith('http')) {
         return { view: '#', download: '#' };
@@ -384,14 +386,14 @@
           rows.shift(); // Remove header row
           centralDocumentsData = [];
           rows.forEach((r, index) => {
-            // Correct mapping based on your layout:
+            // Column Mapping:
             // r[0] = SR (Col A)
             // r[1] = TITLE / DESCRIPTION (Col B)
-            // r[2] = DOC NO (Col C - e.g. WI-ST-01, 1234)
+            // r[2] = DOC NO (Col C - e.g. TPG-HT-01, WI-ST-01)
             // r[3] = TAB / CATEGORY (Col D)
             // r[4] = REVISION (Col E)
             // r[5] = LAST UPDATED (Col F)
-            // r[6] = ACTION / LINK (Col G)
+            // r[6] = FILE LINK (Col G)
 
             let title = r[1] || 'Untitled Document';
             let docId = r[2] || `DOC-${index + 1}`;
@@ -400,6 +402,7 @@
             let date = r[5] || '2026-01-01';
             let rawLink = r[6] || 'https://drive.google.com/';
 
+            // Determine category tab based on doc number prefix or category column
             let category = 'WIST';
             if (catRaw.includes('WI-HT') || docId.includes('WI-HT')) category = 'WI-HT';
             else if (catRaw.includes('WI-LAB') || docId.includes('WI-LAB')) category = 'WI-LAB';
@@ -412,6 +415,7 @@
             else if (catRaw.includes('TPG-HT') || docId.includes('TPG-HT')) category = 'TPG-HT';
             else if (catRaw.includes('FR-HT') || docId.includes('FR-HT')) category = 'FR-HT';
             else if (catRaw.includes('WIST') || docId.includes('WIST')) category = 'WIST';
+            else if (catRaw) category = catRaw;
 
             const links = getDriveLinks(rawLink);
 
