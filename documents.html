@@ -215,7 +215,7 @@
       <a href="index.html" class="back-btn">⬅ Home</a>
       <h1>📂 Central Document Hub (QMS & SOPs)</h1>
     </div>
-    <span style="font-size: 11px; color: #34d399; font-weight: 600;">🟢 Live Hub Active</span>
+    <span id="syncBadge" style="font-size: 11px; color: #34d399; font-weight: 600;">🟢 Live Sync Active</span>
   </header>
 
   <div class="hub-container">
@@ -231,11 +231,11 @@
       </div>
 
       <div class="category-tabs" id="categoryTabs">
-        <button class="cat-tab active" onclick="selectCategory('ALL')">All Documents</button>
-        <button class="cat-tab" onclick="selectCategory('FORMAT')">Formats (150+)</button>
-        <button class="cat-tab" onclick="selectCategory('CHECK_SHEET')">Check Sheets (150+)</button>
-        <button class="cat-tab" onclick="selectCategory('WORK_INSTRUCTION')">Work Instructions (200+)</button>
-        <button class="cat-tab" onclick="selectCategory('PROCEDURE')">Procedures / SOPs</button>
+        <button class="cat-tab active" onclick="selectCategory('ALL', this)">All Documents</button>
+        <button class="cat-tab" onclick="selectCategory('FORMAT', this)">Formats (FMT)</button>
+        <button class="cat-tab" onclick="selectCategory('CHECK_SHEET', this)">Check Sheets</button>
+        <button class="cat-tab" onclick="selectCategory('WORK_INSTRUCTION', this)">Work Instructions (WI)</button>
+        <button class="cat-tab" onclick="selectCategory('PROCEDURE', this)">Procedures / SOPs</button>
       </div>
     </div>
 
@@ -263,7 +263,7 @@
     <div class="table-card">
       <div class="table-header-meta">
         <span id="tableRecordCount">Showing 0 documents</span>
-        <span style="font-size: 11px; color: #9ca3af;">Cloud Synchronized Repository</span>
+        <span style="font-size: 11px; color: #9ca3af;">Google Sheets Synchronized Master</span>
       </div>
       <div class="table-scroll">
         <table>
@@ -279,7 +279,7 @@
             </tr>
           </thead>
           <tbody id="documentTableBody">
-            <tr><td colspan="7" class="no-data">Loading document repository...</td></tr>
+            <tr><td colspan="7" class="no-data">Loading master documents from Google Sheets...</td></tr>
           </tbody>
         </table>
       </div>
@@ -288,17 +288,69 @@
   </div>
 
   <script>
-    // Master Central Document Hub dataset sample (Ready for your 400-500 files integration)
-    const centralDocumentsData = [
-      { id: "FMT-MNT-01", title: "Furnace Preventive Maintenance Checklist", category: "CHECK_SHEET", rev: "Rev-02", date: "2026-04-12", link: "https://drive.google.com/drive/folders/1rWWfcpXPSKSUpXToDCvKPPjSPQMPj6CR" },
-      { id: "FMT-MNT-02", title: "SQF Daily Log and Temperature Monitoring Sheet", category: "FORMAT", rev: "Rev-01", date: "2026-05-15", link: "https://drive.google.com/drive/folders/1rWWfcpXPSKSUpXToDCvKPPjSPQMPj6CR" },
-      { id: "WI-HT-001", title: "Standard Operating Procedure for Seal Quench Furnace Operation", category: "WORK_INSTRUCTION", rev: "Rev-03", date: "2026-06-01", link: "https://drive.google.com/drive/folders/1rWWfcpXPSKSUpXToDCvKPPjSPQMPj6CR" },
-      { id: "SOP-QMS-05", title: "Quality Management Control & Non-Conformance Procedure", category: "PROCEDURE", rev: "Rev-00", date: "2026-01-10", link: "https://drive.google.com/drive/folders/1rWWfcpXPSKSUpXToDCvKPPjSPQMPj6CR" },
-      { id: "FMT-LAB-12", title: "Microstructure & Core Hardness Test Report Format", category: "FORMAT", rev: "Rev-01", date: "2026-03-20", link: "https://drive.google.com/drive/folders/1rWWfcpXPSKSUpXToDCvKPPjSPQMPj6CR" },
-      { id: "WI-HT-002", title: "Methanol Dosing Pump Setup and Safety Instruction", category: "WORK_INSTRUCTION", rev: "Rev-02", date: "2026-07-05", link: "https://drive.google.com/drive/folders/1rWWfcpXPSKSUpXToDCvKPPjSPQMPj6CR" }
-    ];
+    // Tera naya master index CSV link
+    const DOCUMENT_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_55_JgWvZY0QyC87pldI3sKILOrXLYsE8xiuB99-K2ll9jWI5HHYIU6aoxEF1hegbDDmRybDQsW2/pub?gid=539352874&single=true&output=csv";
 
+    let centralDocumentsData = [];
     let activeCategory = "ALL";
+
+    function parseCSV(text) {
+      let r = [], row = [''], q = false;
+      for (let i = 0; i < text.length; i++) {
+        let c = text[i], next = text[i + 1];
+        if (c === '"') {
+          if (q && next === '"') { row[row.length - 1] += '"'; i++; } else { q = !q; }
+        } else if (c === ',' && !q) {
+          row.push('');
+        } else if ((c === '\r' || c === '\n') && !q) {
+          if (c === '\r' && next === '\n') { i++; }
+          if (row.length > 1 || (row.length === 1 && row[0] !== '')) r.push(row);
+          row = [''];
+        } else { row[row.length - 1] += c; }
+      }
+      if (row.length > 1 || (row.length === 1 && row[0] !== '')) r.push(row);
+      return r.map(cols => cols.map(col => (col || '').trim()));
+    }
+
+    async function loadMasterDocuments() {
+      try {
+        const resp = await fetch(DOCUMENT_CSV_URL);
+        const csvText = await resp.text();
+        const rows = parseCSV(csvText);
+
+        if (rows.length > 1) {
+          rows.shift(); // Remove header row
+          centralDocumentsData = rows.map((r, index) => {
+            let docId = r[0] || `DOC-${index + 1}`;
+            let title = r[1] || 'Untitled Document';
+            let catRaw = (r[2] || 'FORMAT').toUpperCase();
+            let rev = r[3] || 'Rev-00';
+            let date = r[4] || '2026-01-01';
+            let link = r[5] || 'https://drive.google.com/';
+
+            // Standardize categories
+            let category = 'FORMAT';
+            if (catRaw.includes('CHECK') || catRaw.includes('CHKSHT')) category = 'CHECK_SHEET';
+            else if (catRaw.includes('WORK') || catRaw.includes('WI')) category = 'WORK_INSTRUCTION';
+            else if (catRaw.includes('PROC') || catRaw.includes('SOP')) category = 'PROCEDURE';
+
+            return { id: docId, title: title, category: category, rev: rev, date: date, link: link };
+          });
+
+          document.getElementById('syncBadge').innerText = "🟢 Live (Synced)";
+          document.getElementById('syncBadge').style.color = "#34d399";
+        }
+      } catch (err) {
+        console.log("Error loading live docs, using fallback", err);
+        document.getElementById('syncBadge').innerText = "🟠 Ready Mode";
+        // Fallback sample data
+        centralDocumentsData = [
+          { id: "FMT-MNT-01", title: "Furnace Preventive Maintenance Checklist", category: "CHECK_SHEET", rev: "Rev-02", date: "2026-04-12", link: "https://drive.google.com/" },
+          { id: "WI-HT-001", title: "Standard Operating Procedure for Seal Quench Furnace", category: "WORK_INSTRUCTION", rev: "Rev-03", date: "2026-06-01", link: "https://drive.google.com/" }
+        ];
+      }
+      filterDocuments();
+    }
 
     function renderDocumentTable(data) {
       const tbody = document.getElementById('documentTableBody');
@@ -335,10 +387,10 @@
       tbody.innerHTML = html;
     }
 
-    function selectCategory(cat) {
+    function selectCategory(cat, btnEl) {
       activeCategory = cat;
       document.querySelectorAll('.cat-tab').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
+      btnEl.classList.add('active');
       filterDocuments();
     }
 
@@ -358,12 +410,11 @@
 
     function resetFilters() {
       document.getElementById('docSearch').value = '';
-      selectCategory('ALL');
+      const allBtn = document.querySelector('.cat-tab');
+      if (allBtn) selectCategory('ALL', allBtn);
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      renderDocumentTable(centralDocumentsData);
-    });
+    window.addEventListener('DOMContentLoaded', loadMasterDocuments);
   </script>
 </body>
 </html>
