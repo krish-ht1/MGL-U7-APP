@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Central Document Hub - Milestone Gears Unit 7</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+      background: #090d16;
+      color: #e2e8f0;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header Bar */
+    .top-bar {
+      position: sticky;
+      top: 0;
+      background: #111827;
+      border-bottom: 1px solid #1f2937;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+      z-index: 1000;
+    }
+    .nav-left { display: flex; align-items: center; gap: 12px; }
+    .back-btn {
+      background: #1f2937;
+      border: 1px solid #374151;
+      color: #38bdf8;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 12px;
+      transition: 0.2s;
+    }
+    .back-btn:hover { background: #38bdf8; color: #090d16; }
+    .nav-left h1 { font-size: 15px; margin: 0; color: #f9fafb; font-weight: 600; letter-spacing: -0.2px; }
+
+    .hub-container {
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Search & Filter Panel */
+    .filter-panel {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    
+    .search-row { display: flex; gap: 10px; align-items: center; }
+    .search-input-wrap { flex: 1; position: relative; }
+    .search-input-wrap input {
+      width: 100%;
+      background: #090d16;
+      border: 1px solid #374151;
+      color: #f9fafb;
+      padding: 10px 14px 10px 38px;
+      border-radius: 6px;
+      font-size: 13px;
+      outline: none;
+      font-family: inherit;
+    }
+    .search-input-wrap input:focus { border-color: #38bdf8; }
+    .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 14px; color: #9ca3af; }
+
+    .btn-reset {
+      background: #1f2937;
+      color: #9ca3af;
+      border: 1px solid #374151;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-reset:hover { background: #ef4444; color: white; border-color: #ef4444; }
+
+    /* Category Filter Tabs */
+    .category-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .cat-tab {
+      background: #090d16;
+      border: 1px solid #374151;
+      color: #9ca3af;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .cat-tab.active, .cat-tab:hover {
+      background: #38bdf8;
+      color: #090d16;
+      border-color: #38bdf8;
+    }
+
+    /* Summary Metric Ribbons */
+    .metrics-ribbon {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .metric-box {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 8px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .metric-box span { font-size: 10px; color: #9ca3af; text-transform: uppercase; font-weight: 600; }
+    .metric-box strong { font-size: 18px; color: #f9fafb; font-weight: 700; }
+
+    /* Documents Table Card */
+    .table-card {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    .table-header-meta {
+      padding: 10px 14px;
+      background: #090d16;
+      border-bottom: 1px solid #1f2937;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #9ca3af;
+    }
+    .table-scroll { overflow-x: auto; max-height: 550px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; white-space: nowrap; text-align: left; }
+    th {
+      background: #090d16;
+      color: #9ca3af;
+      padding: 10px 14px;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      border-bottom: 1px solid #1f2937;
+      z-index: 10;
+    }
+    td { padding: 10px 14px; border-bottom: 1px solid #1f2937; color: #cbd5e1; }
+    tr:hover td { background: rgba(56, 189, 248, 0.04); }
+
+    .badge-category {
+      background: rgba(56, 189, 248, 0.1);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 11px;
+    }
+
+    .btn-view-doc {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-weight: 600;
+      font-size: 11px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: 0.2s;
+    }
+    .btn-view-doc:hover { background: #dc2626; }
+
+    .no-data { padding: 40px; text-align: center; color: #9ca3af; font-size: 13px; }
+
+    @media (max-width: 900px) {
+      .metrics-ribbon { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="top-bar">
+    <div class="nav-left">
+      <a href="index.html" class="back-btn">⬅ Home</a>
+      <h1>📂 Central Document Hub (QMS & SOPs)</h1>
+    </div>
+    <span style="font-size: 11px; color: #34d399; font-weight: 600;">🟢 Live Hub Active</span>
+  </header>
+
+  <div class="hub-container">
+    
+    <!-- Search & Filters -->
+    <div class="filter-panel">
+      <div class="search-row">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="docSearch" placeholder="Search by Doc No, Title, Category or Keywords..." oninput="filterDocuments()">
+        </div>
+        <button class="btn-reset" onclick="resetFilters()">🔄 Reset</button>
+      </div>
+
+      <div class="category-tabs" id="categoryTabs">
+        <button class="cat-tab active" onclick="selectCategory('ALL')">All Documents</button>
+        <button class="cat-tab" onclick="selectCategory('FORMAT')">Formats (150+)</button>
+        <button class="cat-tab" onclick="selectCategory('CHECK_SHEET')">Check Sheets (150+)</button>
+        <button class="cat-tab" onclick="selectCategory('WORK_INSTRUCTION')">Work Instructions (200+)</button>
+        <button class="cat-tab" onclick="selectCategory('PROCEDURE')">Procedures / SOPs</button>
+      </div>
+    </div>
+
+    <!-- Summary Metrics -->
+    <div class="metrics-ribbon">
+      <div class="metric-box">
+        <span>Total Master Files</span>
+        <strong id="metricTotal">0</strong>
+      </div>
+      <div class="metric-box">
+        <span>Active Formats</span>
+        <strong id="metricFormats" style="color: #38bdf8;">0</strong>
+      </div>
+      <div class="metric-box">
+        <span>Work Instructions</span>
+        <strong id="metricWI" style="color: #34d399;">0</strong>
+      </div>
+      <div class="metric-box">
+        <span>Procedures & Check Sheets</span>
+        <strong id="metricOthers" style="color: #fde047;">0</strong>
+      </div>
+    </div>
+
+    <!-- Documents Table -->
+    <div class="table-card">
+      <div class="table-header-meta">
+        <span id="tableRecordCount">Showing 0 documents</span>
+        <span style="font-size: 11px; color: #9ca3af;">Cloud Synchronized Repository</span>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>SR</th>
+              <th>DOCUMENT NUMBER</th>
+              <th>TITLE / DESCRIPTION</th>
+              <th>CATEGORY</th>
+              <th>REVISION</th>
+              <th>LAST UPDATED</th>
+              <th style="text-align: center;">ACTION</th>
+            </tr>
+          </thead>
+          <tbody id="documentTableBody">
+            <tr><td colspan="7" class="no-data">Loading document repository...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Master Central Document Hub dataset sample (Ready for your 400-500 files integration)
+    const centralDocumentsData = [
+      { id: "FMT-MNT-01", title: "Furnace Preventive Maintenance Checklist", category: "CHECK_SHEET", rev: "Rev-02", date: "2026-04-12", link: "https://drive.google.com/drive/folders/1rWWfcpXPSKSUpXToDCvKPPjSPQMPj6CR" },
+      { id: "FMT-MNT-02", title: "SQF Daily Log and Temperature Monitoring Sheet", category: "FORMAT", rev: "Rev-01", date: "2026-05-15", link: "https://drive.google.com/drive/folders/1rWWfcpXPSKSUpXToDCvKPPjSPQMPj6CR" },
+      { id: "WI-HT-001", title: "Standard Operating Procedure for Seal Quench Furnace Operation", category: "WORK_INSTRUCTION", rev: "Rev-03", date: "2026-06-01", link: "https://drive.google.com/drive/folders/1rWWfcpXPSKSUpXToDCvKPPjSPQMPj6CR" },
+      { id: "SOP-QMS-05", title: "Quality Management Control & Non-Conformance Procedure", category: "PROCEDURE", rev: "Rev-00", date: "2026-01-10", link: "https://drive.google.com/drive/folders/1rWWfcpXPSKSUpXToDCvKPPjSPQMPj6CR" },
+      { id: "FMT-LAB-12", title: "Microstructure & Core Hardness Test Report Format", category: "FORMAT", rev: "Rev-01", date: "2026-03-20", link: "https://drive.google.com/drive/folders/1rWWfcpXPSKSUpXToDCvKPPjSPQMPj6CR" },
+      { id: "WI-HT-002", title: "Methanol Dosing Pump Setup and Safety Instruction", category: "WORK_INSTRUCTION", rev: "Rev-02", date: "2026-07-05", link: "https://drive.google.com/drive/folders/1rWWfcpXPSKSUpXToDCvKPPjSPQMPj6CR" }
+    ];
+
+    let activeCategory = "ALL";
+
+    function renderDocumentTable(data) {
+      const tbody = document.getElementById('documentTableBody');
+      document.getElementById('tableRecordCount').innerText = `Showing ${data.length} document${data.length === 1 ? '' : 's'}`;
+
+      // Update Metrics
+      document.getElementById('metricTotal').innerText = centralDocumentsData.length;
+      document.getElementById('metricFormats').innerText = centralDocumentsData.filter(d => d.category === 'FORMAT').length;
+      document.getElementById('metricWI').innerText = centralDocumentsData.filter(d => d.category === 'WORK_INSTRUCTION').length;
+      document.getElementById('metricOthers').innerText = centralDocumentsData.filter(d => d.category === 'CHECK_SHEET' || d.category === 'PROCEDURE').length;
+
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="no-data">🔍 No matching documents found in repository.</td></tr>`;
+        return;
+      }
+
+      let html = "";
+      data.forEach((doc, idx) => {
+        let catBadgeText = doc.category.replace('_', ' ');
+        html += `
+          <tr>
+            <td style="color: #9ca3af; font-weight: 500;">${idx + 1}</td>
+            <td style="font-weight: 700; color: #38bdf8;">${doc.id}</td>
+            <td style="font-weight: 600; color: #f9fafb;">${doc.title}</td>
+            <td><span class="badge-category">${catBadgeText}</span></td>
+            <td><span style="color: #34d399; font-weight: 600;">${doc.rev}</span></td>
+            <td style="color: #9ca3af;">${doc.date}</td>
+            <td style="text-align: center;">
+              <a href="${doc.link}" target="_blank" class="btn-view-doc">📄 Open File</a>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    function selectCategory(cat) {
+      activeCategory = cat;
+      document.querySelectorAll('.cat-tab').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      filterDocuments();
+    }
+
+    function filterDocuments() {
+      const query = document.getElementById('docSearch').value.toLowerCase().trim();
+
+      const filtered = centralDocumentsData.filter(doc => {
+        const matchesCat = (activeCategory === 'ALL' || doc.category === activeCategory);
+        const matchesQuery = doc.id.toLowerCase().includes(query) || 
+                             doc.title.toLowerCase().includes(query) || 
+                             doc.category.toLowerCase().includes(query);
+        return matchesCat && matchesQuery;
+      });
+
+      renderDocumentTable(filtered);
+    }
+
+    function resetFilters() {
+      document.getElementById('docSearch').value = '';
+      selectCategory('ALL');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderDocumentTable(centralDocumentsData);
+    });
+  </script>
+</body>
+</html>
