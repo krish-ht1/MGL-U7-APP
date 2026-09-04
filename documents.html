@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Central Document Hub - Milestone Gears Unit 7</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
     body {
-      background: #0b1120;
+      background: #090d16;
       color: #e2e8f0;
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Inter', sans-serif;
       margin: 0;
       padding: 0;
       min-height: 100vh;
@@ -24,91 +24,92 @@
     .top-bar {
       position: sticky;
       top: 0;
-      background: #1e293b;
-      border-bottom: 2px solid #f97316;
+      background: #111827;
+      border-bottom: 1px solid #1f2937;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+      padding: 12px 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
       z-index: 1000;
     }
     .nav-left { display: flex; align-items: center; gap: 12px; }
     .back-btn {
-      background: #0f172a;
-      border: 1px solid #334155;
-      color: #f97316;
+      background: #1f2937;
+      border: 1px solid #374151;
+      color: #38bdf8;
       padding: 6px 12px;
       border-radius: 6px;
       font-weight: 600;
       text-decoration: none;
       font-size: 12px;
+      transition: 0.2s;
     }
-    .back-btn:hover { background: #f97316; color: white; }
-    .nav-left h1 { font-size: 15px; margin: 0; color: #f8fafc; font-weight: 600; }
+    .back-btn:hover { background: #38bdf8; color: #090d16; }
+    .nav-left h1 { font-size: 15px; margin: 0; color: #f9fafb; font-weight: 600; }
 
     .hub-container {
-      max-width: 1600px;
+      max-width: 1500px;
       width: 100%;
       margin: 0 auto;
-      padding: 14px 16px;
+      padding: 16px;
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
     }
 
     /* Search & Filter Panel */
     .filter-panel {
-      background: #1e293b;
-      border: 1px solid #334155;
+      background: #111827;
+      border: 1px solid #1f2937;
       border-radius: 10px;
-      padding: 12px 14px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      padding: 14px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
     }
     
     .search-row { display: flex; gap: 10px; align-items: center; }
     .search-input-wrap { flex: 1; position: relative; }
     .search-input-wrap input {
       width: 100%;
-      background: #0f172a;
-      border: 1px solid #475569;
-      color: #f8fafc;
-      padding: 9px 14px 9px 36px;
+      background: #090d16;
+      border: 1px solid #374151;
+      color: #f9fafb;
+      padding: 10px 14px 10px 38px;
       border-radius: 6px;
       font-size: 13px;
       outline: none;
       font-family: inherit;
     }
-    .search-input-wrap input:focus { border-color: #f97316; }
-    .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 14px; color: #94a3b8; }
+    .search-input-wrap input:focus { border-color: #38bdf8; }
+    .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 14px; color: #9ca3af; }
 
     .btn-reset {
-      background: #334155;
-      color: #cbd5e1;
-      border: none;
-      padding: 9px 14px;
+      background: #1f2937;
+      color: #9ca3af;
+      border: 1px solid #374151;
+      padding: 10px 14px;
       border-radius: 6px;
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
       white-space: nowrap;
     }
-    .btn-reset:hover { background: #ef4444; color: white; }
+    .btn-reset:hover { background: #ef4444; color: white; border-color: #ef4444; }
 
-    /* Category Filter Tabs */
+    /* Category & Tab Filters (All 10 Tabs Restored) */
     .category-tabs {
       display: flex;
       gap: 6px;
       flex-wrap: wrap;
     }
     .cat-tab {
-      background: #0f172a;
-      border: 1px solid #475569;
-      color: #94a3b8;
+      background: #090d16;
+      border: 1px solid #374151;
+      color: #9ca3af;
       padding: 6px 12px;
       border-radius: 6px;
       font-size: 11px;
@@ -117,72 +118,70 @@
       transition: 0.2s;
     }
     .cat-tab.active, .cat-tab:hover {
-      background: #f97316;
-      color: #fff;
-      border-color: #f97316;
+      background: #38bdf8;
+      color: #090d16;
+      border-color: #38bdf8;
     }
 
-    /* Summary Metric Ribbons */
+    /* Summary Metrics Ribbon */
     .metrics-ribbon {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
     }
     .metric-box {
-      background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%);
-      border: 1px solid #334155;
+      background: #111827;
+      border: 1px solid #1f2937;
       border-radius: 8px;
-      padding: 10px 14px;
+      padding: 12px 14px;
       display: flex;
       flex-direction: column;
-      gap: 3px;
+      gap: 4px;
     }
-    .metric-box span { font-size: 10px; color: #94a3b8; text-transform: uppercase; font-weight: 600; }
-    .metric-box strong { font-size: 16px; color: #38bdf8; font-weight: 700; }
+    .metric-box span { font-size: 10px; color: #9ca3af; text-transform: uppercase; font-weight: 600; }
+    .metric-box strong { font-size: 18px; color: #f9fafb; font-weight: 700; }
 
     /* Documents Table Card */
     .table-card {
-      background: #1e293b;
-      border: 1px solid #334155;
+      background: #111827;
+      border: 1px solid #1f2937;
       border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
     }
     .table-header-meta {
-      padding: 8px 14px;
-      background: #111827;
-      border-bottom: 1px solid #334155;
+      padding: 10px 14px;
+      background: #090d16;
+      border-bottom: 1px solid #1f2937;
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-size: 12px;
-      color: #94a3b8;
+      color: #9ca3af;
     }
     .table-scroll { overflow-x: auto; max-height: 550px; }
-    table { width: 100%; border-collapse: collapse; font-size: 11.5px; white-space: nowrap; text-align: left; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; white-space: nowrap; text-align: left; }
     th {
-      background: #0284c7;
-      color: #ffffff;
-      padding: 9px 12px;
+      background: #090d16;
+      color: #9ca3af;
+      padding: 10px 14px;
       font-weight: 600;
       position: sticky;
       top: 0;
-      border-bottom: 1px solid #0369a1;
+      border-bottom: 1px solid #1f2937;
       z-index: 10;
     }
-    td { padding: 8px 12px; border-bottom: 1px solid #334155; color: #cbd5e1; }
-    tr:nth-child(even) td { background: #1e293b; }
-    tr:nth-child(odd) td { background: #0f172a; }
-    tr:hover td { background: rgba(249, 115, 22, 0.1); color: #fff; }
+    td { padding: 10px 14px; border-bottom: 1px solid #1f2937; color: #cbd5e1; }
+    tr:hover td { background: rgba(56, 189, 248, 0.04); }
 
     .badge-category {
-      background: rgba(56, 189, 248, 0.15);
+      background: rgba(56, 189, 248, 0.1);
       color: #38bdf8;
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      padding: 2px 7px;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      padding: 2px 8px;
       border-radius: 4px;
       font-weight: 600;
-      font-size: 10.5px;
+      font-size: 11px;
     }
 
     .btn-view-doc {
@@ -201,7 +200,11 @@
       transition: 0.2s;
     }
     .btn-view-doc:hover { background: #dc2626; }
-    .no-data { padding: 40px; text-align: center; color: #94a3b8; font-size: 13px; }
+    .no-data { padding: 40px; text-align: center; color: #9ca3af; font-size: 13px; }
+
+    @media (max-width: 900px) {
+      .metrics-ribbon { grid-template-columns: repeat(2, 1fr); }
+    }
   </style>
 </head>
 <body>
@@ -226,12 +229,19 @@
         <button class="btn-reset" onclick="resetFilters()">🔄 Reset</button>
       </div>
 
+      <!-- Master Sheet Tabs / Categories Restored -->
       <div class="category-tabs" id="categoryTabs">
         <button class="cat-tab active" onclick="selectCategory('ALL', this)">All Documents</button>
-        <button class="cat-tab" onclick="selectCategory('FORMAT', this)">Formats (FMT)</button>
-        <button class="cat-tab" onclick="selectCategory('CHECK_SHEET', this)">Check Sheets</button>
-        <button class="cat-tab" onclick="selectCategory('WORK_INSTRUCTION', this)">Work Instructions (WI)</button>
-        <button class="cat-tab" onclick="selectCategory('PROCEDURE', this)">Procedures / SOPs</button>
+        <button class="cat-tab" onclick="selectCategory('WI-HT', this)">WI-HT</button>
+        <button class="cat-tab" onclick="selectCategory('WI-LAB', this)">WI-LAB</button>
+        <button class="cat-tab" onclick="selectCategory('QSP', this)">QSP</button>
+        <button class="cat-tab" onclick="selectCategory('FMT-HT', this)">FMT-HT</button>
+        <button class="cat-tab" onclick="selectCategory('FMT-MNT', this)">FMT-MNT</button>
+        <button class="cat-tab" onclick="selectCategory('FMT-ENGG', this)">FMT-ENGG</button>
+        <button class="cat-tab" onclick="selectCategory('FMT-MR', this)">FMT-MR</button>
+        <button class="cat-tab" onclick="selectCategory('FMT-HR', this)">FMT-HR</button>
+        <button class="cat-tab" onclick="selectCategory('TPG-HT', this)">TPG-HT</button>
+        <button class="cat-tab" onclick="selectCategory('FR-HT', this)">FR-HT</button>
       </div>
     </div>
 
@@ -242,15 +252,15 @@
         <strong id="metricTotal">0</strong>
       </div>
       <div class="metric-box">
-        <span>Active Formats</span>
-        <strong id="metricFormats" style="color: #38bdf8;">0</strong>
+        <span>Work Instructions (WI)</span>
+        <strong id="metricWI" style="color: #38bdf8;">0</strong>
       </div>
       <div class="metric-box">
-        <span>Work Instructions</span>
-        <strong id="metricWI" style="color: #34d399;">0</strong>
+        <span>Formats (FMT)</span>
+        <strong id="metricFMT" style="color: #34d399;">0</strong>
       </div>
       <div class="metric-box">
-        <span>Check Sheets & Procedures</span>
+        <span>QSP, TPG & Reports</span>
         <strong id="metricOthers" style="color: #fde047;">0</strong>
       </div>
     </div>
@@ -259,7 +269,7 @@
     <div class="table-card">
       <div class="table-header-meta">
         <span id="tableRecordCount">Showing 0 documents</span>
-        <span style="font-size: 11px; color: #94a3b8;">Google Sheets Master Document Tab</span>
+        <span style="font-size: 11px; color: #9ca3af;">Google Sheets Synchronized Repository</span>
       </div>
       <div class="table-scroll">
         <table>
@@ -268,7 +278,7 @@
               <th>SR</th>
               <th>DOCUMENT NUMBER</th>
               <th>TITLE / DESCRIPTION</th>
-              <th>CATEGORY</th>
+              <th>TAB / CATEGORY</th>
               <th>REVISION</th>
               <th>LAST UPDATED</th>
               <th style="text-align: center;">ACTION</th>
@@ -284,8 +294,19 @@
   </div>
 
   <script>
-    // Tera Master Document Hub CSV Link (gid=539352874)
-    const DOCUMENT_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_55_JgWvZY0QyC87pldI3sKILOrXLYsE8xiuB99-K2ll9jWI5HHYIU6aoxEF1hegbDDmRybDQsW2/pub?gid=539352874&single=true&output=csv";
+    // All 10 Master Document Sources provided by user
+    const DOCUMENT_SOURCES = [
+      { category: "WI-HT", url: "https://docs.google.com/spreadsheets/d/1kp3AlRlBtzCLH0bWzbtkBr8ExfaaCmnN/export?format=csv&gid=1160669701" },
+      { category: "WI-LAB", url: "https://docs.google.com/spreadsheets/d/1kp3AlRlBtzCLH0bWzbtkBr8ExfaaCmnN/export?format=csv&gid=142985474" },
+      { category: "QSP", url: "https://docs.google.com/spreadsheets/d/1kp3AlRlBtzCLH0bWzbtkBr8ExfaaCmnN/export?format=csv&gid=1307148560" },
+      { category: "FMT-HT", url: "https://docs.google.com/spreadsheets/d/1kp3AlRlBtzCLH0bWzbtkBr8ExfaaCmnN/export?format=csv&gid=84180881" },
+      { category: "FMT-MNT", url: "https://docs.google.com/spreadsheets/d/1kp3AlRlBtzCLH0bWzbtkBr8ExfaaCmnN/export?format=csv&gid=1548473240" },
+      { category: "FMT-ENGG", url: "https://docs.google.com/spreadsheets/d/1kp3AlRlBtzCLH0bWzbtkBr8ExfaaCmnN/export?format=csv&gid=2042605475" },
+      { category: "FMT-MR", url: "https://docs.google.com/spreadsheets/d/1kp3AlRlBtzCLH0bWzbtkBr8ExfaaCmnN/export?format=csv&gid=1057767220" },
+      { category: "FMT-HR", url: "https://docs.google.com/spreadsheets/d/1kp3AlRlBtzCLH0bWzbtkBr8ExfaaCmnN/export?format=csv&gid=1992686343" },
+      { category: "TPG-HT", url: "https://docs.google.com/spreadsheets/d/1kp3AlRlBtzCLH0bWzbtkBr8ExfaaCmnN/export?format=csv&gid=1625072539" },
+      { category: "FR-HT", url: "https://docs.google.com/spreadsheets/d/1kp3AlRlBtzCLH0bWzbtkBr8ExfaaCmnN/export?format=csv&gid=1762883165" }
+    ];
 
     let centralDocumentsData = [];
     let activeCategory = "ALL";
@@ -312,8 +333,7 @@
       const endpoints = [
         rawUrl,
         "https://api.allorigins.win/raw?url=" + encodeURIComponent(rawUrl),
-        "https://corsproxy.io/?" + encodeURIComponent(rawUrl),
-        "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(rawUrl)
+        "https://corsproxy.io/?" + encodeURIComponent(rawUrl)
       ];
       for (const ep of endpoints) {
         try {
@@ -327,30 +347,40 @@
       return null;
     }
 
-    async function loadMasterDocuments() {
-      const csvText = await fetchCSVWithProxy(DOCUMENT_CSV_URL);
-      if (csvText) {
-        const rows = parseCSV(csvText);
-        if (rows.length > 1) {
-          rows.shift(); // Remove header
-          centralDocumentsData = rows.map((r, index) => {
-            let docId = r[0] || `DOC-${index + 1}`;
-            let title = r[1] || 'Untitled Document';
-            let catRaw = (r[2] || 'FORMAT').toUpperCase();
-            let rev = r[3] || 'Rev-00';
-            let date = r[4] || '2026-01-01';
-            let link = r[5] || 'https://drive.google.com/';
+    async function loadAllMasterDocuments() {
+      centralDocumentsData = [];
+      let loadedCount = 0;
 
-            let category = 'FORMAT';
-            if (catRaw.includes('CHECK') || catRaw.includes('CHKSHT') || catRaw.includes('FRST')) category = 'CHECK_SHEET';
-            else if (catRaw.includes('WORK') || catRaw.includes('WI')) category = 'WORK_INSTRUCTION';
-            else if (catRaw.includes('PROC') || catRaw.includes('QSP') || catRaw.includes('SOP')) category = 'PROCEDURE';
-            else if (catRaw.includes('FMT')) category = 'FORMAT';
+      for (const src of DOCUMENT_SOURCES) {
+        const csvText = await fetchCSVWithProxy(src.url);
+        if (csvText) {
+          const rows = parseCSV(csvText);
+          if (rows.length > 1) {
+            rows.shift(); // Remove header
+            rows.forEach((r, idx) => {
+              if (r.length > 0 && (r[0] || r[1])) {
+                let docId = r[0] || `${src.category}-${idx + 1}`;
+                let title = r[1] || r[2] || 'Untitled Document';
+                let rev = r[3] || r[2] || 'Rev-00';
+                let date = r[4] || '2026-01-01';
+                let link = r[5] || r[4] || 'https://drive.google.com/';
 
-            return { id: docId, title: title, category: category, rev: rev, date: date, link: link };
-          });
+                centralDocumentsData.push({
+                  id: docId,
+                  title: title,
+                  category: src.category,
+                  rev: rev,
+                  date: date,
+                  link: link.startsWith('http') ? link : 'https://drive.google.com/'
+                });
+              }
+            });
+            loadedCount++;
+          }
         }
       }
+
+      document.getElementById('syncBadge').innerText = `🟢 Live (${loadedCount}/10 Tabs)`;
       filterDocuments();
     }
 
@@ -358,10 +388,11 @@
       const tbody = document.getElementById('documentTableBody');
       document.getElementById('tableRecordCount').innerText = `Showing ${data.length} document${data.length === 1 ? '' : 's'}`;
 
+      // Update Metrics
       document.getElementById('metricTotal').innerText = centralDocumentsData.length;
-      document.getElementById('metricFormats').innerText = centralDocumentsData.filter(d => d.category === 'FORMAT').length;
-      document.getElementById('metricWI').innerText = centralDocumentsData.filter(d => d.category === 'WORK_INSTRUCTION').length;
-      document.getElementById('metricOthers').innerText = centralDocumentsData.filter(d => d.category === 'CHECK_SHEET' || d.category === 'PROCEDURE').length;
+      document.getElementById('metricWI').innerText = centralDocumentsData.filter(d => d.category.includes('WI')).length;
+      document.getElementById('metricFMT').innerText = centralDocumentsData.filter(d => d.category.includes('FMT')).length;
+      document.getElementById('metricOthers').innerText = centralDocumentsData.filter(d => !d.category.includes('WI') && !d.category.includes('FMT')).length;
 
       if (data.length === 0) {
         tbody.innerHTML = `<tr><td colspan="7" class="no-data">🔍 No matching documents found in repository.</td></tr>`;
@@ -370,15 +401,14 @@
 
       let html = "";
       data.forEach((doc, idx) => {
-        let catBadgeText = doc.category.replace('_', ' ');
         html += `
           <tr>
-            <td style="color: #94a3b8; font-weight: 500;">${idx + 1}</td>
+            <td style="color: #9ca3af; font-weight: 500;">${idx + 1}</td>
             <td style="font-weight: 700; color: #38bdf8;">${doc.id}</td>
-            <td style="font-weight: 600; color: #f8fafc;">${doc.title}</td>
-            <td><span class="badge-category">${catBadgeText}</span></td>
+            <td style="font-weight: 600; color: #f9fafb;">${doc.title}</td>
+            <td><span class="badge-category">${doc.category}</span></td>
             <td><span style="color: #34d399; font-weight: 600;">${doc.rev}</span></td>
-            <td style="color: #94a3b8;">${doc.date}</td>
+            <td style="color: #9ca3af;">${doc.date}</td>
             <td style="text-align: center;">
               <a href="${doc.link}" target="_blank" class="btn-view-doc">📄 Open File</a>
             </td>
@@ -397,6 +427,7 @@
 
     function filterDocuments() {
       const query = document.getElementById('docSearch').value.toLowerCase().trim();
+
       const filtered = centralDocumentsData.filter(doc => {
         const matchesCat = (activeCategory === 'ALL' || doc.category === activeCategory);
         const matchesQuery = doc.id.toLowerCase().includes(query) || 
@@ -404,6 +435,7 @@
                              doc.category.toLowerCase().includes(query);
         return matchesCat && matchesQuery;
       });
+
       renderDocumentTable(filtered);
     }
 
@@ -413,7 +445,7 @@
       if (allBtn) selectCategory('ALL', allBtn);
     }
 
-    window.addEventListener('DOMContentLoaded', loadMasterDocuments);
+    window.addEventListener('DOMContentLoaded', loadAllMasterDocuments);
   </script>
 </body>
 </html>
