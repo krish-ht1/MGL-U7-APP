@@ -247,7 +247,7 @@
         <button class="btn-reset" onclick="resetFilters()">🔄 Reset</button>
       </div>
 
-      <!-- Category Filter Tabs -->
+      <!-- Category Filter Tabs (Matching your original tabs) -->
       <div class="category-tabs" id="categoryTabs">
         <button class="cat-tab active" onclick="selectCategory('ALL', this)">All Documents</button>
         <button class="cat-tab" onclick="selectCategory('WIST', this)">WIST</button>
@@ -313,7 +313,8 @@
   </div>
 
   <script>
-    const DOCUMENT_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=2013659920&single=true&output=csv";
+    // Master CSV Link for Central Document Hub (gid=2013659920 or active master GID)
+    const DOCUMENT_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_55_JgWvZY0QyC87pldI3sKILOrXLYsE8xiuB99-K2ll9jWI5HHYIU6aoxEF1hegbDDmRybDQsW2/pub?gid=2013659920&single=true&output=csv";
 
     let centralDocumentsData = [];
     let activeCategory = "ALL";
@@ -384,10 +385,10 @@
           rows.shift(); // Remove header row
           centralDocumentsData = [];
           rows.forEach((r, index) => {
-            // Correct mapping according to your table columns:
+            // Correct mapping based on your layout:
             // r[0] = SR (Col A)
             // r[1] = TITLE / DESCRIPTION (Col B)
-            // r[2] = DOC NO (Col C - e.g. WI-ST-01, WI-ST-02, FMT-ST-01, 1234)
+            // r[2] = DOC NO (Col C - e.g. WI-ST-01, 1234)
             // r[3] = TAB / CATEGORY (Col D)
             // r[4] = REVISION (Col E)
             // r[5] = LAST UPDATED (Col F)
@@ -401,12 +402,17 @@
             let rawLink = r[6] || 'https://drive.google.com/';
 
             let category = 'WIST';
-            if (catRaw.includes('WI') || docId.includes('WI')) category = 'WI';
-            else if (catRaw.includes('FMT') || docId.includes('FMT')) category = 'FMT';
-            else if (catRaw.includes('TPG') || docId.includes('TPG')) category = 'TPG';
-            else if (catRaw.includes('FR') || docId.includes('FR')) category = 'FR';
+            if (catRaw.includes('WI-HT') || docId.includes('WI-HT')) category = 'WI-HT';
+            else if (catRaw.includes('WI-LAB') || docId.includes('WI-LAB')) category = 'WI-LAB';
             else if (catRaw.includes('QSP') || docId.includes('QSP')) category = 'QSP';
-            else if (catRaw) category = catRaw;
+            else if (catRaw.includes('FMT-HT') || docId.includes('FMT-HT')) category = 'FMT-HT';
+            else if (catRaw.includes('FMT-MNT') || docId.includes('FMT-MNT')) category = 'FMT-MNT';
+            else if (catRaw.includes('FMT-ENGG') || docId.includes('FMT-ENGG')) category = 'FMT-ENGG';
+            else if (catRaw.includes('FMT-MR') || docId.includes('FMT-MR')) category = 'FMT-MR';
+            else if (catRaw.includes('FMT-HR') || docId.includes('FMT-HR')) category = 'FMT-HR';
+            else if (catRaw.includes('TPG-HT') || docId.includes('TPG-HT')) category = 'TPG-HT';
+            else if (catRaw.includes('FR-HT') || docId.includes('FR-HT')) category = 'FR-HT';
+            else if (catRaw.includes('WIST') || docId.includes('WIST')) category = 'WIST';
 
             const links = getDriveLinks(rawLink);
 
