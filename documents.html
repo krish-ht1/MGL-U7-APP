@@ -101,7 +101,7 @@
     }
     .btn-reset:hover { background: #ef4444; color: white; }
 
-    /* Category Filter Tabs */
+    /* Category Filter Tabs (Restored all original tabs) */
     .category-tabs {
       display: flex;
       gap: 6px;
@@ -111,7 +111,7 @@
       background: #0f172a;
       border: 1px solid #475569;
       color: #94a3b8;
-      padding: 6px 12px;
+      padding: 6px 10px;
       border-radius: 6px;
       font-size: 11px;
       font-weight: 600;
@@ -127,7 +127,7 @@
     /* Summary Metric Ribbons */
     .metrics-ribbon {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: 10px;
     }
     .metric-box {
@@ -188,7 +188,7 @@
     }
 
     .btn-view-doc {
-      background: #ef4444;
+      background: #0284c7;
       color: white;
       border: none;
       padding: 5px 10px;
@@ -202,7 +202,7 @@
       gap: 5px;
       transition: 0.2s;
     }
-    .btn-view-doc:hover { background: #dc2626; }
+    .btn-view-doc:hover { background: #0369a1; }
     .no-data { padding: 40px; text-align: center; color: #94a3b8; font-size: 13px; }
   </style>
 </head>
@@ -211,9 +211,9 @@
   <header class="top-bar">
     <div class="nav-left">
       <a href="index.html" class="back-btn">⬅ Home</a>
-      <h1>📂 Central Document Hub (Master Docs Tab)</h1>
+      <h1>📂 Central Document Hub (Live Master Repository)</h1>
     </div>
-    <span id="syncBadge" style="font-size: 11px; color: #34d399; font-weight: 600;">🟢 Live Master Sync</span>
+    <span id="syncBadge" style="font-size: 11px; color: #34d399; font-weight: 600;">🟢 Live Multi-Tab Sync</span>
   </header>
 
   <div class="hub-container">
@@ -228,13 +228,20 @@
         <button class="btn-reset" onclick="resetFilters()">🔄 Reset</button>
       </div>
 
+      <!-- Original Tabs Restored -->
       <div class="category-tabs" id="categoryTabs">
         <button class="cat-tab active" onclick="selectCategory('ALL', this)">All Documents</button>
-        <button class="cat-tab" onclick="selectCategory('WI', this)">Work Instructions (WI)</button>
-        <button class="cat-tab" onclick="selectCategory('FMT', this)">Formats (FMT)</button>
-        <button class="cat-tab" onclick="selectCategory('TPG', this)">Guidelines (TPG)</button>
-        <button class="cat-tab" onclick="selectCategory('FR', this)">Reports (FR)</button>
-        <button class="cat-tab" onclick="selectCategory('QSP', this)">Procedures (QSP)</button>
+        <button class="cat-tab" onclick="selectCategory('WIST', this)">WIST</button>
+        <button class="cat-tab" onclick="selectCategory('WI-HT', this)">WI-HT</button>
+        <button class="cat-tab" onclick="selectCategory('WI-LAB', this)">WI-LAB</button>
+        <button class="cat-tab" onclick="selectCategory('QSP', this)">QSP</button>
+        <button class="cat-tab" onclick="selectCategory('FMT-HT', this)">FMT-HT</button>
+        <button class="cat-tab" onclick="selectCategory('FMT-MNT', this)">FMT-MNT</button>
+        <button class="cat-tab" onclick="selectCategory('FMT-ENGG', this)">FMT-ENGG</button>
+        <button class="cat-tab" onclick="selectCategory('FMT-MR', this)">FMT-MR</button>
+        <button class="cat-tab" onclick="selectCategory('FMT-HR', this)">FMT-HR</button>
+        <button class="cat-tab" onclick="selectCategory('TPG-HT', this)">TPG-HT</button>
+        <button class="cat-tab" onclick="selectCategory('FR-HT', this)">FR-HT</button>
       </div>
     </div>
 
@@ -253,7 +260,7 @@
         <strong id="metricFMT" style="color: #34d399;">0</strong>
       </div>
       <div class="metric-box">
-        <span>QSP, TPG & FR</span>
+        <span>Procedures, TPG & FR</span>
         <strong id="metricOthers" style="color: #fde047;">0</strong>
       </div>
     </div>
@@ -262,7 +269,7 @@
     <div class="table-card">
       <div class="table-header-meta">
         <span id="tableRecordCount">Showing 0 documents</span>
-        <span style="font-size: 11px; color: #94a3b8;">Google Sheets 'docs' Tab Master Repository</span>
+        <span style="font-size: 11px; color: #94a3b8;">Google Sheets Live Multi-Tab Repository</span>
       </div>
       <div class="table-scroll">
         <table>
@@ -271,14 +278,14 @@
               <th>SR</th>
               <th>DOCUMENT NUMBER</th>
               <th>TITLE / DESCRIPTION</th>
-              <th>CATEGORY</th>
+              <th>TAB / CATEGORY</th>
               <th>REVISION</th>
               <th>LAST UPDATED</th>
               <th style="text-align: center;">ACTION</th>
             </tr>
           </thead>
           <tbody id="documentTableBody">
-            <tr><td colspan="7" class="no-data">Loading master documents from Google Sheets...</td></tr>
+            <tr><td colspan="7" class="no-data">Loading all live document tabs from Google Sheets...</td></tr>
           </tbody>
         </table>
       </div>
@@ -287,8 +294,19 @@
   </div>
 
   <script>
-    // Tera Master Document Tab CSV Link (gid=539352874 - docs tab)
-    const DOCUMENT_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_55_JgWvZY0QyC87pldI3sKILOrXLYsE8xiuB99-K2ll9jWI5HHYIU6aoxEF1hegbDDmRybDQsW2/pub?gid=539352874&single=true&output=csv";
+    // All 10 Master Document Tab Sources (Live GIDs)
+    const DOCUMENT_SOURCES = [
+      { category: "WI-HT", url: "https://docs.google.com/spreadsheets/d/1kp3AlRlBtzCLH0bWzbtkBr8ExfaaCmnN/export?format=csv&gid=1160669701" },
+      { category: "WI-LAB", url: "https://docs.google.com/spreadsheets/d/1kp3AlRlBtzCLH0bWzbtkBr8ExfaaCmnN/export?format=csv&gid=142985474" },
+      { category: "QSP", url: "https://docs.google.com/spreadsheets/d/1kp3AlRlBtzCLH0bWzbtkBr8ExfaaCmnN/export?format=csv&gid=1307148560" },
+      { category: "FMT-HT", url: "https://docs.google.com/spreadsheets/d/1kp3AlRlBtzCLH0bWzbtkBr8ExfaaCmnN/export?format=csv&gid=84180881" },
+      { category: "FMT-MNT", url: "https://docs.google.com/spreadsheets/d/1kp3AlRlBtzCLH0bWzbtkBr8ExfaaCmnN/export?format=csv&gid=1548473240" },
+      { category: "FMT-ENGG", url: "https://docs.google.com/spreadsheets/d/1kp3AlRlBtzCLH0bWzbtkBr8ExfaaCmnN/export?format=csv&gid=2042605475" },
+      { category: "FMT-MR", url: "https://docs.google.com/spreadsheets/d/1kp3AlRlBtzCLH0bWzbtkBr8ExfaaCmnN/export?format=csv&gid=1057767220" },
+      { category: "FMT-HR", url: "https://docs.google.com/spreadsheets/d/1kp3AlRlBtzCLH0bWzbtkBr8ExfaaCmnN/export?format=csv&gid=1992686343" },
+      { category: "TPG-HT", url: "https://docs.google.com/spreadsheets/d/1kp3AlRlBtzCLH0bWzbtkBr8ExfaaCmnN/export?format=csv&gid=1625072539" },
+      { category: "FR-HT", url: "https://docs.google.com/spreadsheets/d/1kp3AlRlBtzCLH0bWzbtkBr8ExfaaCmnN/export?format=csv&gid=1762883165" }
+    ];
 
     let centralDocumentsData = [];
     let activeCategory = "ALL";
@@ -330,40 +348,40 @@
       return null;
     }
 
-    async function loadMasterDocuments() {
-      const csvText = await fetchCSVWithProxy(DOCUMENT_CSV_URL);
-      if (csvText) {
-        const rows = parseCSV(csvText);
-        if (rows.length > 1) {
-          rows.shift(); // Remove header
-          centralDocumentsData = [];
-          rows.forEach((r, index) => {
-            let docId = r[0] || `DOC-${index + 1}`;
-            let title = r[1] || 'Untitled Document';
-            let catRaw = (r[2] || docId).toUpperCase();
-            let rev = r[3] || 'Rev-00';
-            let date = r[4] || '2026-01-01';
-            let link = r[5] || 'https://drive.google.com/';
+    async function loadAllMasterDocuments() {
+      centralDocumentsData = [];
+      let loadedCount = 0;
 
-            // Automatically detect category prefix from Doc No or Column C
-            let category = 'OTHERS';
-            if (catRaw.includes('WI') || docId.includes('WI')) category = 'WI';
-            else if (catRaw.includes('FMT') || docId.includes('FMT')) category = 'FMT';
-            else if (catRaw.includes('TPG') || docId.includes('TPG')) category = 'TPG';
-            else if (catRaw.includes('FR') || docId.includes('FR')) category = 'FR';
-            else if (catRaw.includes('QSP') || docId.includes('QSP')) category = 'QSP';
+      for (const src of DOCUMENT_SOURCES) {
+        const csvText = await fetchCSVWithProxy(src.url);
+        if (csvText) {
+          const rows = parseCSV(csvText);
+          if (rows.length > 1) {
+            rows.shift(); // Remove header
+            rows.forEach((r, idx) => {
+              if (r.length > 0 && (r[0] || r[1])) {
+                let docId = r[0] || `${src.category}-${idx + 1}`;
+                let title = r[1] || r[2] || 'Untitled Document';
+                let rev = r[3] || r[2] || 'Rev-00';
+                let date = r[4] || '2026-01-01';
+                let link = r[5] || r[4] || 'https://drive.google.com/';
 
-            centralDocumentsData.push({ 
-              id: docId, 
-              title: title, 
-              category: category, 
-              rev: rev, 
-              date: date, 
-              link: link.startsWith('http') ? link : 'https://drive.google.com/' 
+                centralDocumentsData.push({
+                  id: docId,
+                  title: title,
+                  category: src.category,
+                  rev: rev,
+                  date: date,
+                  link: link.startsWith('http') ? link : 'https://drive.google.com/'
+                });
+              }
             });
-          });
+            loadedCount++;
+          }
         }
       }
+
+      document.getElementById('syncBadge').innerText = `🟢 Live (${loadedCount}/10 Tabs Loaded)`;
       filterDocuments();
     }
 
@@ -371,13 +389,14 @@
       const tbody = document.getElementById('documentTableBody');
       document.getElementById('tableRecordCount').innerText = `Showing ${data.length} document${data.length === 1 ? '' : 's'}`;
 
+      // Update Metrics
       document.getElementById('metricTotal').innerText = centralDocumentsData.length;
-      document.getElementById('metricWI').innerText = centralDocumentsData.filter(d => d.category === 'WI').length;
-      document.getElementById('metricFMT').innerText = centralDocumentsData.filter(d => d.category === 'FMT').length;
-      document.getElementById('metricOthers').innerText = centralDocumentsData.filter(d => d.category !== 'WI' && d.category !== 'FMT').length;
+      document.getElementById('metricWI').innerText = centralDocumentsData.filter(d => d.category.includes('WI')).length;
+      document.getElementById('metricFMT').innerText = centralDocumentsData.filter(d => d.category.includes('FMT')).length;
+      document.getElementById('metricOthers').innerText = centralDocumentsData.filter(d => !d.category.includes('WI') && !d.category.includes('FMT')).length;
 
       if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="no-data">🔍 No matching documents found in repository. Try searching 'WI-HT' or 'FMT-HT'.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="no-data">🔍 No matching documents found. Try searching 'WI-HT' or 'FMT-HT'.</td></tr>`;
         return;
       }
 
@@ -409,6 +428,7 @@
 
     function filterDocuments() {
       const query = document.getElementById('docSearch').value.toLowerCase().trim();
+
       const filtered = centralDocumentsData.filter(doc => {
         const matchesCat = (activeCategory === 'ALL' || doc.category === activeCategory);
         const matchesQuery = doc.id.toLowerCase().includes(query) || 
@@ -416,6 +436,7 @@
                              doc.category.toLowerCase().includes(query);
         return matchesCat && matchesQuery;
       });
+
       renderDocumentTable(filtered);
     }
 
@@ -425,7 +446,7 @@
       if (allBtn) selectCategory('ALL', allBtn);
     }
 
-    window.addEventListener('DOMContentLoaded', loadMasterDocuments);
+    window.addEventListener('DOMContentLoaded', loadAllMasterDocuments);
   </script>
 </body>
 </html>
