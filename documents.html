@@ -124,24 +124,6 @@
       border-color: #f97316;
     }
 
-    /* Summary Metric Ribbons */
-    .metrics-ribbon {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 10px;
-    }
-    .metric-box {
-      background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%);
-      border: 1px solid #334155;
-      border-radius: 8px;
-      padding: 10px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-    .metric-box span { font-size: 10px; color: #94a3b8; text-transform: uppercase; font-weight: 600; }
-    .metric-box strong { font-size: 16px; color: #38bdf8; font-weight: 700; }
-
     /* Documents Table Card */
     .table-card {
       background: #1e293b;
@@ -177,7 +159,6 @@
     tr:nth-child(odd) td { background: #0f172a; }
     tr:hover td { background: rgba(249, 115, 22, 0.1); color: #fff; }
 
-    .action-btns { display: flex; gap: 6px; justify-content: flex-start; align-items: center; }
     .btn-action-view {
       background: #0284c7;
       color: white;
@@ -213,6 +194,54 @@
     .btn-action-dl:hover { background: #059669; }
 
     .no-data { padding: 40px; text-align: center; color: #94a3b8; font-size: 13px; }
+
+    /* Embedded In-App PDF/File Viewer Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(5px);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+    }
+    .modal-content {
+      background: #1e293b;
+      border: 2px solid #f97316;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 1000px;
+      height: 90vh;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+    }
+    .modal-header {
+      padding: 12px 20px;
+      background: #0f172a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+    }
+    .modal-body {
+      padding: 10px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .pdf-viewer-frame {
+      width: 100%;
+      flex: 1;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      background: #0f172a;
+    }
   </style>
 </head>
 <body>
@@ -222,7 +251,7 @@
       <a href="index.html" class="back-btn">⬅ Home</a>
       <h1>📂 Central Document Hub</h1>
     </div>
-    <span id="syncBadge" style="font-size: 11px; color: #34d399; font-weight: 600;">🟢 Live Master Sync (GID 2013659920)</span>
+    <span id="syncBadge" style="font-size: 11px; color: #34d399; font-weight: 600;">🟢 Live Master Sync</span>
   </header>
 
   <div class="hub-container">
@@ -232,45 +261,14 @@
       <div class="search-row">
         <div class="search-input-wrap">
           <span class="search-icon">🔍</span>
-          <input type="text" id="docSearch" placeholder="Search by Title, Doc No (e.g. WI-HT-00), Category..." oninput="filterDocuments()">
+          <input type="text" id="docSearch" placeholder="Search across sheet data..." oninput="filterDocuments()">
         </div>
         <button class="btn-reset" onclick="resetFilters()">🔄 Reset</button>
       </div>
 
-      <!-- Category Filter Tabs -->
+      <!-- Dynamic Category Tabs -->
       <div class="category-tabs" id="categoryTabs">
         <button class="cat-tab active" onclick="selectCategory('ALL', this)">All Documents</button>
-        <button class="cat-tab" onclick="selectCategory('WIST', this)">WIST</button>
-        <button class="cat-tab" onclick="selectCategory('WI-HT', this)">WI-HT</button>
-        <button class="cat-tab" onclick="selectCategory('WI-LAB', this)">WI-LAB</button>
-        <button class="cat-tab" onclick="selectCategory('QSP', this)">QSP</button>
-        <button class="cat-tab" onclick="selectCategory('FMT-HT', this)">FMT-HT</button>
-        <button class="cat-tab" onclick="selectCategory('FMT-MNT', this)">FMT-MNT</button>
-        <button class="cat-tab" onclick="selectCategory('FMT-ENGG', this)">FMT-ENGG</button>
-        <button class="cat-tab" onclick="selectCategory('FMT-MR', this)">FMT-MR</button>
-        <button class="cat-tab" onclick="selectCategory('FMT-HR', this)">FMT-HR</button>
-        <button class="cat-tab" onclick="selectCategory('TPG-HT', this)">TPG-HT</button>
-        <button class="cat-tab" onclick="selectCategory('FR-HT', this)">FR-HT</button>
-      </div>
-    </div>
-
-    <!-- Summary Metrics -->
-    <div class="metrics-ribbon">
-      <div class="metric-box">
-        <span>Total Master Files</span>
-        <strong id="metricTotal">0</strong>
-      </div>
-      <div class="metric-box">
-        <span>Work Instructions</span>
-        <strong id="metricWI" style="color: #38bdf8;">0</strong>
-      </div>
-      <div class="metric-box">
-        <span>Formats & Checklists</span>
-        <strong id="metricFMT" style="color: #34d399;">0</strong>
-      </div>
-      <div class="metric-box">
-        <span>QSP, TPG & FR</span>
-        <strong id="metricOthers" style="color: #fde047;">0</strong>
       </div>
     </div>
 
@@ -278,18 +276,13 @@
     <div class="table-card">
       <div class="table-header-meta">
         <span id="tableRecordCount">Showing 0 documents</span>
-        <span style="font-size: 11px; color: #94a3b8;">Google Sheets Master Repository</span>
+        <span style="font-size: 11px; color: #94a3b8;">Google Sheets Master Repository (GID: 2013659920)</span>
       </div>
       <div class="table-scroll">
         <table>
           <thead>
-            <tr>
-              <th>SR</th>
-              <th>TITLE / DESCRIPTION</th>
-              <th>DOC NO</th>
-              <th>REVISION</th>
-              <th>LAST UPDATED</th>
-              <th>ACTION / REMARK'S (VIEW & DOWNLOAD)</th>
+            <tr id="tableHeaderRow">
+              <th>Loading Headers...</th>
             </tr>
           </thead>
           <tbody id="documentTableBody">
@@ -301,11 +294,31 @@
 
   </div>
 
+  <!-- In-App Preview Modal Popup -->
+  <div class="modal-overlay" id="docModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <h3 style="margin: 0; color: #f97316; font-size: 15px;" id="modalDocTitle">📑 Document Preview</h3>
+          <span id="modalDocSub" style="font-size: 11px; color: #38bdf8; font-weight: 600;">-</span>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <a id="modalOpenExternal" href="#" target="_blank" style="background: #0284c7; color: white; padding: 5px 10px; border-radius: 5px; font-size: 11px; text-decoration: none; font-weight: 600;">↗ Open Full Tab</a>
+          <button onclick="closeDocModal()" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 12px;">✕ Close</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <iframe id="docPdfFrame" class="pdf-viewer-frame" src=""></iframe>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // Permanently locked GID 2013659920 CSV Link
+    // Locked Master CSV Link with GID 2013659920
     const DOCUMENT_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=2013659920&single=true&output=csv";
 
-    let centralDocumentsData = [];
+    let rawSheetRows = [];
+    let sheetHeaders = [];
     let activeCategory = "ALL";
 
     function parseCSV(text) {
@@ -359,99 +372,109 @@
 
       if (fileId) {
         return {
-          view: `https://drive.google.com/file/d/${fileId}/view?usp=sharing`,
+          view: `https://drive.google.com/file/d/${fileId}/view`,
+          embed: `https://drive.google.com/file/d/${fileId}/preview`,
           download: `https://drive.google.com/uc?export=download&id=${fileId}`
         };
       }
-      return { view: rawLink, download: rawLink };
+      return { view: rawLink, embed: rawLink, download: rawLink };
     }
 
     async function loadMasterDocuments() {
       const csvText = await fetchCSVWithProxy(DOCUMENT_CSV_URL);
       if (csvText) {
         const rows = parseCSV(csvText);
-        if (rows.length > 1) {
-          rows.shift(); // Remove header row
-          centralDocumentsData = [];
-          rows.forEach((r, index) => {
-            // Layout mapping:
-            // r[0] = SR (Col A)
-            // r[1] = TITLE / DESCRIPTION (Col B)
-            // r[2] = DOC NO (Col C)
-            // r[3] = REVISION (Col D)
-            // r[4] = LAST UPDATED (Col E)
-            // r[5] = FILE LINK (Col F)
-
-            let title = r[1] || 'Untitled Document';
-            let docId = r[2] || `DOC-${index + 1}`;
-            let rev = r[3] || 'Rev-00';
-            let date = r[4] || '2026-01-01';
-            let rawLink = r[5] || 'https://drive.google.com/';
-
-            let upperId = docId.toUpperCase();
-            let category = 'WIST';
-            if (upperId.includes('WI-HT')) category = 'WI-HT';
-            else if (upperId.includes('WI-LAB')) category = 'WI-LAB';
-            else if (upperId.includes('QSP')) category = 'QSP';
-            else if (upperId.includes('FMT-HT')) category = 'FMT-HT';
-            else if (upperId.includes('FMT-MNT')) category = 'FMT-MNT';
-            else if (upperId.includes('FMT-ENGG')) category = 'FMT-ENGG';
-            else if (upperId.includes('FMT-MR')) category = 'FMT-MR';
-            else if (upperId.includes('FMT-HR')) category = 'FMT-HR';
-            else if (upperId.includes('TPG-HT')) category = 'TPG-HT';
-            else if (upperId.includes('FR-HT')) category = 'FR-HT';
-            else if (upperId.includes('WIST') || upperId.includes('WI-ST')) category = 'WIST';
-
-            const links = getDriveLinks(rawLink);
-
-            centralDocumentsData.push({ 
-              id: docId, 
-              title: title, 
-              category: category, 
-              rev: rev, 
-              date: date, 
-              viewLink: links.view,
-              downloadLink: links.download
-            });
-          });
+        if (rows.length > 0) {
+          sheetHeaders = rows.shift();
+          rawSheetRows = rows;
+          
+          buildDynamicHeaders();
+          buildCategoryTabs();
         }
       }
       filterDocuments();
+    }
+
+    function buildDynamicHeaders() {
+      const tr = document.getElementById('tableHeaderRow');
+      let html = `<th>SR</th>`;
+      sheetHeaders.forEach(h => {
+        if(h) html += `<th>${h}</th>`;
+      });
+      html += `<th style="text-align: center;">ACTION (VIEW & DOWNLOAD)</th>`;
+      tr.innerHTML = html;
+    }
+
+    function buildCategoryTabs() {
+      const tabsContainer = document.getElementById('categoryTabs');
+      let categories = new Set();
+      
+      rawSheetRows.forEach(r => {
+        let docNo = r[2] || r[1] || '';
+        let prefix = docNo.split('-')[0];
+        if (prefix) categories.add(prefix.toUpperCase());
+      });
+
+      let tabsHtml = `<button class="cat-tab active" onclick="selectCategory('ALL', this)">All Documents</button>`;
+      categories.forEach(cat => {
+        if(cat.length <= 8) {
+          tabsHtml += `<button class="cat-tab" onclick="selectCategory('${cat}', this)">${cat}</button>`;
+        }
+      });
+      tabsContainer.innerHTML = tabsHtml;
     }
 
     function renderDocumentTable(data) {
       const tbody = document.getElementById('documentTableBody');
       document.getElementById('tableRecordCount').innerText = `Showing ${data.length} document${data.length === 1 ? '' : 's'}`;
 
-      document.getElementById('metricTotal').innerText = centralDocumentsData.length;
-      document.getElementById('metricWI').innerText = centralDocumentsData.filter(d => d.category.includes('WI')).length;
-      document.getElementById('metricFMT').innerText = centralDocumentsData.filter(d => d.category.includes('FMT')).length;
-      document.getElementById('metricOthers').innerText = centralDocumentsData.filter(d => !d.category.includes('WI') && !d.category.includes('FMT')).length;
-
       if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="no-data">🔍 No matching documents found in repository.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="${sheetHeaders.length + 2}" class="no-data">🔍 No matching records found in sheet.</td></tr>`;
         return;
       }
 
       let html = "";
-      data.forEach((doc, idx) => {
+      data.forEach((r, idx) => {
+        let rawLink = r[r.length - 1] && r[r.length - 1].startsWith('http') ? r[r.length - 1] : 'https://drive.google.com/';
+        const links = getDriveLinks(rawLink);
+        const docTitle = r[1] || `Document ${idx + 1}`;
+        const docNo = r[2] || 'DOC';
+
+        html += `<tr>`;
+        html += `<td style="color: #94a3b8; font-weight: 500;">${idx + 1}</td>`;
+        
+        sheetHeaders.forEach((h, colIdx) => {
+          let cellVal = r[colIdx] || '-';
+          let style = (colIdx === 1 || colIdx === 2) ? "font-weight: 700; color: #38bdf8;" : "color: #cbd5e1;";
+          html += `<td style="${style}">${cellVal}</td>`;
+        });
+
+        // In-App Popup View Button & Direct Download Button
         html += `
-          <tr>
-            <td style="color: #94a3b8; font-weight: 500;">${idx + 1}</td>
-            <td style="font-weight: 600; color: #f8fafc;">${doc.title}</td>
-            <td style="font-weight: 700; color: #38bdf8;">${doc.id}</td>
-            <td><span style="color: #34d399; font-weight: 600;">${doc.rev}</span></td>
-            <td style="color: #94a3b8;">${doc.date}</td>
-            <td>
-              <div class="action-btns">
-                <a href="${doc.viewLink}" target="_blank" class="btn-action-view">👁️ View</a>
-                <a href="${doc.downloadLink}" class="btn-action-dl">📥 Download</a>
-              </div>
-            </td>
-          </tr>
+          <td style="text-align: center;">
+            <div style="display: flex; gap: 6px; justify-content: center;">
+              <button onclick="openDocModal('${docNo}', '${docTitle}', '${links.embed}', '${links.view}')" class="btn-action-view">👁️ View</button>
+              <a href="${links.download}" class="btn-action-dl">📥 Download</a>
+            </div>
+          </td>
         `;
+        html += `</tr>`;
       });
       tbody.innerHTML = html;
+    }
+
+    // Open In-App Modal Popup for PDF / File Preview
+    function openDocModal(docNo, docTitle, embedUrl, viewUrl) {
+      document.getElementById('modalDocTitle').innerText = `📑 ${docTitle}`;
+      document.getElementById('modalDocSub').innerText = `Doc No: ${docNo}`;
+      document.getElementById('docPdfFrame').src = embedUrl;
+      document.getElementById('modalOpenExternal').href = viewUrl;
+      document.getElementById('docModal').style.display = 'flex';
+    }
+
+    function closeDocModal() {
+      document.getElementById('docPdfFrame').src = "";
+      document.getElementById('docModal').style.display = 'none';
     }
 
     function selectCategory(cat, btnEl) {
@@ -463,12 +486,11 @@
 
     function filterDocuments() {
       const query = document.getElementById('docSearch').value.toLowerCase().trim();
-      const filtered = centralDocumentsData.filter(doc => {
-        const matchesCat = (activeCategory === 'ALL' || doc.category.toUpperCase() === activeCategory.toUpperCase());
-        const matchesQuery = doc.id.toLowerCase().includes(query) || 
-                             doc.title.toLowerCase().includes(query) || 
-                             doc.category.toLowerCase().includes(query);
-        return matchesCat && matchesQuery;
+      const filtered = rawSheetRows.filter(r => {
+        const rowString = r.join(' ').toLowerCase();
+        const matchesQuery = rowString.includes(query);
+        const matchesCat = (activeCategory === 'ALL' || rowString.includes(activeCategory.toLowerCase()));
+        return matchesQuery && matchesCat;
       });
       renderDocumentTable(filtered);
     }
