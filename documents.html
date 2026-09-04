@@ -502,6 +502,13 @@
     }
 
     window.addEventListener('DOMContentLoaded', loadMasterDocuments);
+    function openSipPdfDirect(targetUrl) {
+      // अगर शीट से डायरेक्ट लिंक मिला है तो ठीक, वरना डिफॉल्ट ड्राइव फोल्डर खोलें
+      let urlToOpen = targetUrl && targetUrl.startsWith('http') ? targetUrl : 'https://drive.google.com/drive/folders/16XX5ER6Gi_Ty0Ya2E2G-IOTbGEIduGE9';
+      
+      // नए टैब में ड्राइव या फाइल खोलें
+      window.open(urlToOpen, '_blank');
+    }
   </script>
 </body>
 </html>
