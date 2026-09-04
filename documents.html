@@ -177,16 +177,6 @@
     tr:nth-child(odd) td { background: #0f172a; }
     tr:hover td { background: rgba(249, 115, 22, 0.1); color: #fff; }
 
-    .badge-category {
-      background: rgba(56, 189, 248, 0.15);
-      color: #38bdf8;
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      padding: 2px 7px;
-      border-radius: 4px;
-      font-weight: 600;
-      font-size: 10.5px;
-    }
-
     .action-btns { display: flex; gap: 6px; justify-content: flex-start; align-items: center; }
     .btn-action-view {
       background: #0284c7;
@@ -232,7 +222,7 @@
       <a href="index.html" class="back-btn">⬅ Home</a>
       <h1>📂 Central Document Hub</h1>
     </div>
-    <span id="syncBadge" style="font-size: 11px; color: #34d399; font-weight: 600;">🟢 Live Master Sync</span>
+    <span id="syncBadge" style="font-size: 11px; color: #34d399; font-weight: 600;">🟢 Live Master Sync (GID 2013659920)</span>
   </header>
 
   <div class="hub-container">
@@ -242,7 +232,7 @@
       <div class="search-row">
         <div class="search-input-wrap">
           <span class="search-icon">🔍</span>
-          <input type="text" id="docSearch" placeholder="Search by Doc No (e.g. TPG-HT-01, WI-ST-01), Title, Category..." oninput="filterDocuments()">
+          <input type="text" id="docSearch" placeholder="Search by Title, Doc No (e.g. WI-HT-00), Category..." oninput="filterDocuments()">
         </div>
         <button class="btn-reset" onclick="resetFilters()">🔄 Reset</button>
       </div>
@@ -279,7 +269,7 @@
         <strong id="metricFMT" style="color: #34d399;">0</strong>
       </div>
       <div class="metric-box">
-        <span>TPG, QSP & FR</span>
+        <span>QSP, TPG & FR</span>
         <strong id="metricOthers" style="color: #fde047;">0</strong>
       </div>
     </div>
@@ -297,14 +287,13 @@
               <th>SR</th>
               <th>TITLE / DESCRIPTION</th>
               <th>DOC NO</th>
-              <th>TAB / CATEGORY</th>
               <th>REVISION</th>
               <th>LAST UPDATED</th>
-              <th>ACTION / REMARK'S</th>
+              <th>ACTION / REMARK'S (VIEW & DOWNLOAD)</th>
             </tr>
           </thead>
           <tbody id="documentTableBody">
-            <tr><td colspan="7" class="no-data">Loading master documents from Google Sheets...</td></tr>
+            <tr><td colspan="6" class="no-data">Loading master documents from Google Sheets...</td></tr>
           </tbody>
         </table>
       </div>
@@ -313,7 +302,7 @@
   </div>
 
   <script>
-    // Master CSV Link for Central Document Hub
+    // Permanently locked GID 2013659920 CSV Link
     const DOCUMENT_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=2013659920&single=true&output=csv";
 
     let centralDocumentsData = [];
@@ -356,7 +345,6 @@
       return null;
     }
 
-    // Convert Google Drive links into direct View and Download links
     function getDriveLinks(rawLink) {
       if (!rawLink || !rawLink.startsWith('http')) {
         return { view: '#', download: '#' };
@@ -386,36 +374,33 @@
           rows.shift(); // Remove header row
           centralDocumentsData = [];
           rows.forEach((r, index) => {
-            // Column Mapping:
+            // Layout mapping:
             // r[0] = SR (Col A)
             // r[1] = TITLE / DESCRIPTION (Col B)
-            // r[2] = DOC NO (Col C - e.g. TPG-HT-01, WI-ST-01)
-            // r[3] = TAB / CATEGORY (Col D)
-            // r[4] = REVISION (Col E)
-            // r[5] = LAST UPDATED (Col F)
-            // r[6] = FILE LINK (Col G)
+            // r[2] = DOC NO (Col C)
+            // r[3] = REVISION (Col D)
+            // r[4] = LAST UPDATED (Col E)
+            // r[5] = FILE LINK (Col F)
 
             let title = r[1] || 'Untitled Document';
             let docId = r[2] || `DOC-${index + 1}`;
-            let catRaw = (r[3] || docId).toUpperCase();
-            let rev = r[4] || 'Rev-00';
-            let date = r[5] || '2026-01-01';
-            let rawLink = r[6] || 'https://drive.google.com/';
+            let rev = r[3] || 'Rev-00';
+            let date = r[4] || '2026-01-01';
+            let rawLink = r[5] || 'https://drive.google.com/';
 
-            // Determine category tab based on doc number prefix or category column
+            let upperId = docId.toUpperCase();
             let category = 'WIST';
-            if (catRaw.includes('WI-HT') || docId.includes('WI-HT')) category = 'WI-HT';
-            else if (catRaw.includes('WI-LAB') || docId.includes('WI-LAB')) category = 'WI-LAB';
-            else if (catRaw.includes('QSP') || docId.includes('QSP')) category = 'QSP';
-            else if (catRaw.includes('FMT-HT') || docId.includes('FMT-HT')) category = 'FMT-HT';
-            else if (catRaw.includes('FMT-MNT') || docId.includes('FMT-MNT')) category = 'FMT-MNT';
-            else if (catRaw.includes('FMT-ENGG') || docId.includes('FMT-ENGG')) category = 'FMT-ENGG';
-            else if (catRaw.includes('FMT-MR') || docId.includes('FMT-MR')) category = 'FMT-MR';
-            else if (catRaw.includes('FMT-HR') || docId.includes('FMT-HR')) category = 'FMT-HR';
-            else if (catRaw.includes('TPG-HT') || docId.includes('TPG-HT')) category = 'TPG-HT';
-            else if (catRaw.includes('FR-HT') || docId.includes('FR-HT')) category = 'FR-HT';
-            else if (catRaw.includes('WIST') || docId.includes('WIST')) category = 'WIST';
-            else if (catRaw) category = catRaw;
+            if (upperId.includes('WI-HT')) category = 'WI-HT';
+            else if (upperId.includes('WI-LAB')) category = 'WI-LAB';
+            else if (upperId.includes('QSP')) category = 'QSP';
+            else if (upperId.includes('FMT-HT')) category = 'FMT-HT';
+            else if (upperId.includes('FMT-MNT')) category = 'FMT-MNT';
+            else if (upperId.includes('FMT-ENGG')) category = 'FMT-ENGG';
+            else if (upperId.includes('FMT-MR')) category = 'FMT-MR';
+            else if (upperId.includes('FMT-HR')) category = 'FMT-HR';
+            else if (upperId.includes('TPG-HT')) category = 'TPG-HT';
+            else if (upperId.includes('FR-HT')) category = 'FR-HT';
+            else if (upperId.includes('WIST') || upperId.includes('WI-ST')) category = 'WIST';
 
             const links = getDriveLinks(rawLink);
 
@@ -444,7 +429,7 @@
       document.getElementById('metricOthers').innerText = centralDocumentsData.filter(d => !d.category.includes('WI') && !d.category.includes('FMT')).length;
 
       if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="no-data">🔍 No matching documents found in repository.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="no-data">🔍 No matching documents found in repository.</td></tr>`;
         return;
       }
 
@@ -455,7 +440,6 @@
             <td style="color: #94a3b8; font-weight: 500;">${idx + 1}</td>
             <td style="font-weight: 600; color: #f8fafc;">${doc.title}</td>
             <td style="font-weight: 700; color: #38bdf8;">${doc.id}</td>
-            <td><span class="badge-category">${doc.category}</span></td>
             <td><span style="color: #34d399; font-weight: 600;">${doc.rev}</span></td>
             <td style="color: #94a3b8;">${doc.date}</td>
             <td>
@@ -480,7 +464,7 @@
     function filterDocuments() {
       const query = document.getElementById('docSearch').value.toLowerCase().trim();
       const filtered = centralDocumentsData.filter(doc => {
-        const matchesCat = (activeCategory === 'ALL' || doc.category.toUpperCase().includes(activeCategory.toUpperCase()));
+        const matchesCat = (activeCategory === 'ALL' || doc.category.toUpperCase() === activeCategory.toUpperCase());
         const matchesQuery = doc.id.toLowerCase().includes(query) || 
                              doc.title.toLowerCase().includes(query) || 
                              doc.category.toLowerCase().includes(query);
