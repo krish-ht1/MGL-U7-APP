@@ -218,8 +218,17 @@
 
   <script>
     const LIVE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_55_JgWvZY0QyC87pldI3sKILOrXLYsE8xiuB99-K2ll9jWI5HHYIU6aoxEF1hegbDDmRybDQsW2/pub?gid=0&single=true&output=csv";
-
-    const fixedDatabase = {
+const monthDataStore = {
+      // September 2026 Data (Live)
+      "2026-09": {
+        daysInMonth: 30, lotMtd: 0,
+        furnaces: [
+          { name: "SQF-1", cap: 67.5, tgt: 67.5, tgtMtd: 67.5, actualMtd: 0, capUtil: 0, days: new Array(30).fill(0) },
+          { name: "SQF-2", cap: 67.5, tgt: 67.5, tgtMtd: 67.5, actualMtd: 0, capUtil: 0, days: new Array(30).fill(0) },
+          { name: "SQF-3", cap: 67.5, tgt: 67.5, tgtMtd: 67.5, actualMtd: 0, capUtil: 0, days: new Array(30).fill(0) },
+          { name: "SQF-4", cap: 67.5, tgt: 67.5, tgtMtd: 67.5, actualMtd: 0, capUtil: 0, days: new Array(30).fill(0) }
+        ]
+      },
       "JULY-2026": {
         daysCount: 31, monthTarget: 279.0, totalTargetMTD: 279.0,
         furnaces: {
