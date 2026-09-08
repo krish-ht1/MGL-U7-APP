@@ -211,7 +211,17 @@
   <script>
     const LIVE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_55_JgWvZY0QyC87pldI3sKILOrXLYsE8xiuB99-K2ll9jWI5HHYIU6aoxEF1hegbDDmRybDQsW2/pub?gid=0&single=true&output=csv";
 
+    // 1. फिक्सड डेटाबेस (जुलाई और अगस्त तक का डेटा यहाँ परमानेंट सुरक्षित है)
     const fixedDatabase = {
+      "AUGUST-2026": {
+        daysCount: 31, monthTarget: 279.0, totalTargetMTD: 243.0,
+        furnaces: {
+          "SQF-1": [1.74, 3.06, 2.23, 2.23, 1.97, 2.53, 2.53, 2.79, 2.53, 1.87, 1.87, 2.53, 2.87, 1.87, 1.99, 0.79, 2.62, 2.53, 2.87, 1.75, 2.53, 1.84, 2.35, 2.38, 2.53, 0.85, 2.53, 2.76, 2.53, 2.62, 1.19],
+          "SQF-2": [2.89, 2.03, 2.53, 1.69, 1.75, 2.97, 1.89, 2.09, 1.74, 1.85, 2.68, 2.64, 1.74, 2.68, 1.87, 1.98, 2.84, 1.66, 2.68, 2.60, 0.87, 2.68, 2.53, 2.45, 1.83, 1.97, 1.79, 2.73, 1.82, 1.98, 2.49],
+          "SQF-3": [2.20, 2.05, 3.25, 2.05, 2.20, 2.20, 2.09, 2.12, 2.13, 2.21, 2.13, 3.14, 2.04, 2.20, 2.04, 2.06, 2.09, 2.04, 2.80, 1.97, 2.07, 2.16, 2.06, 1.96, 2.08, 2.11, 2.18, 1.97, 3.24, 1.82, 2.19],
+          "SQF-4": [3.17, 1.93, 2.09, 2.52, 2.11, 2.30, 1.98, 2.89, 2.07, 3.07, 2.25, 2.52, 2.62, 3.19, 1.55, 2.35, 1.13, 2.45, 1.52, 3.19, 1.99, 2.65, 2.43, 1.91, 1.94, 3.81, 1.52, 2.86, 2.07, 2.69, 1.85]
+        }
+      },
       "JULY-2026": {
         daysCount: 31, monthTarget: 279.0, totalTargetMTD: 279.0,
         furnaces: {
@@ -250,6 +260,7 @@
       }
     };
 
+    // 2. सितंबर (या करंट एक्टिव महीना) के लिए लाइव डेटा स्टोरेज जो Google Sheet से उठेगा
     let liveSeptemberData = {
       daysCount: 30,
       monthTarget: 270.0,
@@ -259,18 +270,6 @@
         "SQF-2": Array(30).fill(0),
         "SQF-3": Array(30).fill(0),
         "SQF-4": Array(30).fill(0)
-      }
-    };
-
-    let liveAugustData = {
-      daysCount: 31,
-      monthTarget: 279.0,
-      totalTargetMTD: 243.0,
-      furnaces: {
-        "SQF-1": Array(31).fill(0),
-        "SQF-2": Array(31).fill(0),
-        "SQF-3": Array(31).fill(0),
-        "SQF-4": Array(31).fill(0)
       }
     };
 
@@ -296,7 +295,6 @@
       const selectedMonth = document.getElementById('dwmMonthDropdown').value;
       let daysCount = 31;
       if (selectedMonth === "SEPTEMBER-2026") daysCount = liveSeptemberData.daysCount;
-      else if (selectedMonth === "AUGUST-2026") daysCount = liveAugustData.daysCount;
       else if (fixedDatabase[selectedMonth]) daysCount = fixedDatabase[selectedMonth].daysCount;
 
       const dateDropdown = document.getElementById('dwmDateDropdown');
@@ -313,7 +311,7 @@
       const selectedMonth = document.getElementById('dwmMonthDropdown').value;
       const syncStatus = document.getElementById('syncStatus');
 
-      if (selectedMonth !== "SEPTEMBER-2026" && selectedMonth !== "AUGUST-2026") {
+      if (selectedMonth !== "SEPTEMBER-2026") {
         if(syncStatus) { syncStatus.innerText = `● Fixed (${selectedMonth})`; syncStatus.style.color = "#38bdf8"; }
         renderDWMData();
         return;
@@ -325,41 +323,24 @@
         const csvText = await response.text();
         const rows = parseCSV(csvText);
 
+        // Google Sheet ke horizontal format ke hisaab se parse karna (Jaise aapki image me hai)
         rows.forEach(r => {
           let rowStr = r.join(" ").toUpperCase();
-          if (selectedMonth === "SEPTEMBER-2026" && (rowStr.includes("SEPTEMBER") || rowStr.includes("SEP"))) {
-            let fcName = "";
-            if (rowStr.includes("SQF-1")) fcName = "SQF-1";
-            else if (rowStr.includes("SQF-2")) fcName = "SQF-2";
-            else if (rowStr.includes("SQF-3")) fcName = "SQF-3";
-            else if (rowStr.includes("SQF-4")) fcName = "SQF-4";
+          let fcName = "";
+          if (rowStr.includes("SQF-1")) fcName = "SQF-1";
+          else if (rowStr.includes("SQF-2")) fcName = "SQF-2";
+          else if (rowStr.includes("SQF-3")) fcName = "SQF-3";
+          else if (rowStr.includes("SQF-4")) fcName = "SQF-4";
 
-            if (fcName) {
-              let dayValues = [];
-              for (let j = 4; j < r.length; j++) {
-                let val = parseFloat(r[j]);
-                if (!isNaN(val) && r[j] !== "") dayValues.push(val);
-              }
-              for (let d = 0; d < Math.min(dayValues.length, 30); d++) {
-                liveSeptemberData.furnaces[fcName][d] = dayValues[d];
-              }
+          if (fcName) {
+            let dayValues = [];
+            // Index 6 ya uske baad se 1 se 31 tareekh ke numbers shuru hote hain
+            for (let j = 6; j < r.length; j++) {
+              let val = parseFloat(r[j]);
+              if (!isNaN(val) && r[j] !== "") dayValues.push(val);
             }
-          } else if (selectedMonth === "AUGUST-2026" && (rowStr.includes("AUGUST") || rowStr.includes("AUG"))) {
-            let fcName = "";
-            if (rowStr.includes("SQF-1")) fcName = "SQF-1";
-            else if (rowStr.includes("SQF-2")) fcName = "SQF-2";
-            else if (rowStr.includes("SQF-3")) fcName = "SQF-3";
-            else if (rowStr.includes("SQF-4")) fcName = "SQF-4";
-
-            if (fcName) {
-              let dayValues = [];
-              for (let j = 4; j < r.length; j++) {
-                let val = parseFloat(r[j]);
-                if (!isNaN(val) && r[j] !== "") dayValues.push(val);
-              }
-              for (let d = 0; d < Math.min(dayValues.length, 31); d++) {
-                liveAugustData.furnaces[fcName][d] = dayValues[d];
-              }
+            for (let d = 0; d < Math.min(dayValues.length, 30); d++) {
+              liveSeptemberData.furnaces[fcName][d] = dayValues[d];
             }
           }
         });
@@ -377,9 +358,9 @@
       const selectedMonth = document.getElementById('dwmMonthDropdown').value;
       const selectedDate = document.getElementById('dwmDateDropdown').value;
 
-      let dataDaysCount = 31;
-      let monthTarget = 279.0;
-      let totalTargetMTD = 243.0;
+      let dataDaysCount = 30;
+      let monthTarget = 270.0;
+      let totalTargetMTD = 225.0;
       let furnacesMap = {};
 
       if (selectedMonth === "SEPTEMBER-2026") {
@@ -387,11 +368,6 @@
         monthTarget = liveSeptemberData.monthTarget;
         totalTargetMTD = liveSeptemberData.totalTargetMTD;
         furnacesMap = liveSeptemberData.furnaces;
-      } else if (selectedMonth === "AUGUST-2026") {
-        dataDaysCount = liveAugustData.daysCount;
-        monthTarget = liveAugustData.monthTarget;
-        totalTargetMTD = liveAugustData.totalTargetMTD;
-        furnacesMap = liveAugustData.furnaces;
       } else {
         let fData = fixedDatabase[selectedMonth];
         dataDaysCount = fData.daysCount;
@@ -411,7 +387,6 @@
 
       let actualMTD = 0;
       let totals = Array(dataDaysCount).fill(0);
-      let cumulativeTotals = Array(dataDaysCount).fill(0);
       let runningSum = 0;
       let tbodyHtml = "";
       
@@ -478,7 +453,7 @@
       }
       tbodyHtml += `</tr>`;
 
-      // 2. CUMULATIVE TOTAL Row
+      // 2. CUMULATIVE TOTAL Row (Lot MTD)
       let cumuCells = "";
       if (selectedDate === "ALL") {
         totals.forEach(t => {
@@ -491,7 +466,7 @@
         cumuCells += `<td>${runningSum > 0 ? runningSum.toFixed(2) : '-'}</td>`;
       }
 
-      tbodyHtml += `<tr class="cumulative-row">
+      tbodyHtml += `<tr class="cumulative-row" style="background:#111827 !important; font-weight:700; color:#f8fafc;">
         <td>CUMULATIVE TOTAL</td>
         <td colspan="5">LOT MTD</td>
         ${cumuCells}
@@ -513,11 +488,11 @@
       varEl.style.color = variance >= 0 ? "#34d399" : "#f87171";
       document.getElementById('dwmTableTitle').innerText = `📋 DWM Matrix - ${selectedMonth}`;
 
-      // Render Charts with Total Data
+      // Render Charts
       if (selectedDate === "ALL") {
         updateTrendChart(Array.from({length: dataDaysCount}, (_, i) => i + 1), totals);
       } else {
-        let dIdx = parseInt(selectedDate) - 1;
+        let dIdx = parseInt(selectedDate - 1);
         updateTrendChart([`Date ${selectedDate}`], [totals[dIdx] || 0]);
       }
 
