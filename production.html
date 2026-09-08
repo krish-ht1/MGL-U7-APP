@@ -260,16 +260,15 @@
       }
     };
 
-    // सितंबर के लिए लाइव डेटा स्टोरेज स्ट्रक्चर
     let liveSeptemberData = {
       daysCount: 30,
-      monthTarget: 0,
+      monthTarget: 270.0,
       totalTargetMTD: 0,
       furnaces: {
-        "SQF-1": { capacity: 69.75, monthTarget: 0, targetMTD: 0, days: Array(30).fill(0) },
-        "SQF-2": { capacity: 69.75, monthTarget: 0, targetMTD: 0, days: Array(30).fill(0) },
-        "SQF-3": { capacity: 69.75, monthTarget: 0, targetMTD: 0, days: Array(30).fill(0) },
-        "SQF-4": { capacity: 69.75, monthTarget: 0, targetMTD: 0, days: Array(30).fill(0) }
+        "SQF-1": { capacity: 69.75, monthTarget: 69.75, targetMTD: 0, days: Array(30).fill(0) },
+        "SQF-2": { capacity: 69.75, monthTarget: 69.75, targetMTD: 0, days: Array(30).fill(0) },
+        "SQF-3": { capacity: 69.75, monthTarget: 69.75, targetMTD: 0, days: Array(30).fill(0) },
+        "SQF-4": { capacity: 69.75, monthTarget: 69.75, targetMTD: 0, days: Array(30).fill(0) }
       }
     };
 
@@ -326,9 +325,10 @@
         let dynamicMonthTarget = 0;
         let dynamicTotalTargetMTD = 0;
 
-        // सितंबर के डेटा को रीसेट करना
+        // सितंबर डेटा रीसेट करना
         Object.keys(liveSeptemberData.furnaces).forEach(fc => {
-          liveSeptemberData.furnaces[fc] = Array(30).fill(0);
+          liveSeptemberData.furnaces[fc].days = Array(30).fill(0);
+          liveSeptemberData.furnaces[fc].targetMTD = 0;
         });
 
         rows.forEach(r => {
@@ -340,29 +340,29 @@
           else if (rowStr.includes("SQF-4")) fcName = "SQF-4";
 
           if (fcName) {
+            if (r[1] && !isNaN(parseFloat(r[1]))) liveSeptemberData.furnaces[fcName].capacity = parseFloat(r[1]);
+            if (r[2] && !isNaN(parseFloat(r[2]))) liveSeptemberData.furnaces[fcName].monthTarget = parseFloat(r[2]);
+            if (r[3] && !isNaN(parseFloat(r[3]))) liveSeptemberData.furnaces[fcName].targetMTD = parseFloat(r[3]);
+
             let dayValues = [];
-            // दिन का डेटा Col 7 (यानी index 7) से शुरू होता है
             for (let j = 7; j < r.length; j++) {
               let val = parseFloat(r[j]);
-              if (!isNaN(val) && r[j] !== "") {
-                dayValues.push(val);
-              }
+              if (!isNaN(val) && r[j] !== "") dayValues.push(val);
             }
-            
+            liveSeptemberData.daysCount = Math.max(liveSeptemberData.daysCount, dayValues.length);
             for (let d = 0; d < Math.min(dayValues.length, 30); d++) {
-              liveSeptemberData.furnaces[fcName][d] = dayValues[d];
+              liveSeptemberData.furnaces[fcName].days[d] = dayValues[d];
             }
           }
 
-          // शीट की टोटल या कम्युलेटिव रो से डायरेक्ट टारगेट उठाना
           if (rowStr.includes("TOTAL") || rowStr.includes("CUMULATIVE")) {
             if (r[2] && !isNaN(parseFloat(r[2]))) dynamicMonthTarget = parseFloat(r[2]);
             if (r[3] && !isNaN(parseFloat(r[3]))) dynamicTotalTargetMTD = parseFloat(r[3]);
           }
         });
 
-        if (dynamicMonthTarget > 0) liveSeptemberData.monthTarget = dynamicMonthTarget;
-        if (dynamicTotalTargetMTD > 0) liveSeptemberData.totalTargetMTD = dynamicTotalTargetMTD;
+        liveSeptemberData.monthTarget = dynamicMonthTarget > 0 ? dynamicMonthTarget : 270.0;
+        liveSeptemberData.totalTargetMTD = dynamicTotalTargetMTD > 0 ? dynamicTotalTargetMTD : Object.values(liveSeptemberData.furnaces).reduce((acc, f) => acc + (f.targetMTD || 0), 0);
 
         if(syncStatus) { syncStatus.innerText = "● Live Synced"; syncStatus.style.color = "#34d399"; }
         renderDWMData();
@@ -380,26 +380,36 @@
       let dataDaysCount = 30;
       let monthTarget = 270.0;
       let totalTargetMTD = 0;
-      let furnacesMap = {};
+      let rawFurnacesMap = {};
 
       if (selectedMonth === "SEPTEMBER-2026") {
         dataDaysCount = liveSeptemberData.daysCount;
         monthTarget = liveSeptemberData.monthTarget;
         totalTargetMTD = liveSeptemberData.totalTargetMTD;
-        furnacesMap = liveSeptemberData.furnaces;
+        rawFurnacesMap = liveSeptemberData.furnaces;
       } else {
         let fData = fixedDatabase[selectedMonth];
         dataDaysCount = fData.daysCount;
         monthTarget = fData.monthTarget;
         totalTargetMTD = fData.totalTargetMTD || 270.0;
-        // Fixed database map formatting
-        furnacesMap = {
-          "SQF-1": { capacity: 69.75, monthTarget: 69.75, targetMTD: totalTargetMTD/4, days: fData.furnaces["SQF-1"] },
-          "SQF-2": { capacity: 69.75, monthTarget: 69.75, targetMTD: totalTargetMTD/4, days: fData.furnaces["SQF-2"] },
-          "SQF-3": { capacity: 69.75, monthTarget: 69.75, targetMTD: totalTargetMTD/4, days: fData.furnaces["SQF-3"] },
-          "SQF-4": { capacity: 69.75, monthTarget: 69.75, targetMTD: totalTargetMTD/4, days: fData.furnaces["SQF-4"] }
-        };
+        rawFurnacesMap = fData.furnaces;
       }
+
+      // Unified Normalization (fixed and live format handling)
+      let furnacesMap = {};
+      Object.keys(rawFurnacesMap).forEach(fcName => {
+        let item = rawFurnacesMap[fcName];
+        if (Array.isArray(item)) {
+          furnacesMap[fcName] = {
+            capacity: 69.75,
+            monthTarget: monthTarget / 4,
+            targetMTD: totalTargetMTD / 4,
+            days: item
+          };
+        } else {
+          furnacesMap[fcName] = item;
+        }
+      });
 
       let headerHtml = `<th style="min-width: 80px;">FURNACE</th><th>Cap</th><th>Month Target</th><th>Target MTD</th><th>Actual MTD</th><th>Util %</th>`;
       if (selectedDate === "ALL") {
@@ -438,7 +448,7 @@
         tbodyHtml += `<tr>
           <td style="font-weight:700; color:#38bdf8;">${fcName}</td>
           <td>${fc.capacity || 69.75}</td>
-          <td>${fc.monthTarget || 69.75}</td>
+          <td>${fc.monthTarget || (monthTarget/4).toFixed(2)}</td>
           <td style="font-weight:600; color:#fbbf24;">${targetVal.toFixed(2)}</td>
           <td style="font-weight:700;">${fActual.toFixed(2)}</td>
           <td>${util}</td>`;
@@ -482,7 +492,7 @@
       }
       tbodyHtml += `</tr>`;
 
-      // 2. Cumulative Total Row (Lot MTD)
+      // 2. Cumulative Total Row
       let cumuCells = "";
       if (selectedDate === "ALL") {
         totals.forEach(t => {
@@ -503,16 +513,13 @@
 
       document.getElementById('dwmTableBody').innerHTML = tbodyHtml;
 
-      // KPIs Update (जितने दिन का डेटा शीट में भरा है, उसी के हिसाब से एवरेज निकलेगा)
+      // KPIs Update (जितने दिन का डेटा शीट में भरा है, उसी से डिवाइड करके एवरेज निकलेगा)
       let filledDaysCount = 0;
-      if (selectedMonth === "SEPTEMBER-2026") {
-        // सिर्फ उन दिनों को गिनो जहाँ कम से कम एक फर्नेस में वैल्यू > 0 हो
-        for (let i = 0; i < dataDaysCount; i++) {
-          let daySum = Object.values(furnacesMap).reduce((sum, f) => sum + (f.days[i] || 0), 0);
-          if (daySum > 0) filledDaysCount++;
-        }
+      for (let i = 0; i < dataDaysCount; i++) {
+        let daySum = Object.values(furnacesMap).reduce((sum, f) => sum + (f.days[i] || 0), 0);
+        if (daySum > 0) filledDaysCount++;
       }
-      if (filledDaysCount === 0) filledDaysCount = 1; // Division by zero बचाने के लिए
+      if (filledDaysCount === 0) filledDaysCount = 1;
 
       document.getElementById('kpiMonthTarget').innerText = `${monthTarget} T`;
       document.getElementById('kpiTargetMTD').innerText = `${totalTargetMTD.toFixed(2)} T`;
@@ -604,7 +611,7 @@
               align: 'top',
               color: '#f8fafc',
               font: { size: 11, weight: '700' },
-              formatter: (value) => value > 0 ? value.toFixed(2) + ' T' : '' // वैल्यू पॉइंट के बाद 2 डिजिट में
+              formatter: (value) => value > 0 ? value.toFixed(2) + ' T' : '' // फिक्स 2 डेसिमल डिजिट्स
             },
             tooltip: { backgroundColor: '#1e293b', titleColor: '#38bdf8', bodyColor: '#f8fafc', borderColor: '#334155', borderWidth: 1 }
           },
