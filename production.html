@@ -218,17 +218,9 @@
 
   <script>
     const LIVE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_55_JgWvZY0QyC87pldI3sKILOrXLYsE8xiuB99-K2ll9jWI5HHYIU6aoxEF1hegbDDmRybDQsW2/pub?gid=0&single=true&output=csv";
-const monthDataStore = {
-      // September 2026 Data (Live)
-      "2026-09": {
-        daysInMonth: 30, lotMtd: 0,
-        furnaces: [
-          { name: "SQF-1", cap: 67.5, tgt: 67.5, tgtMtd: 67.5, actualMtd: 0, capUtil: 0, days: new Array(30).fill(0) },
-          { name: "SQF-2", cap: 67.5, tgt: 67.5, tgtMtd: 67.5, actualMtd: 0, capUtil: 0, days: new Array(30).fill(0) },
-          { name: "SQF-3", cap: 67.5, tgt: 67.5, tgtMtd: 67.5, actualMtd: 0, capUtil: 0, days: new Array(30).fill(0) },
-          { name: "SQF-4", cap: 67.5, tgt: 67.5, tgtMtd: 67.5, actualMtd: 0, capUtil: 0, days: new Array(30).fill(0) }
-        ]
-      },
+
+    // अप्रैल से जुलाई तक का फिक्स ऐतिहासिक डेटा (इसे बिल्कुल नहीं छेड़ेंगे)
+    const fixedDatabase = {
       "JULY-2026": {
         daysCount: 31, monthTarget: 279.0, totalTargetMTD: 279.0,
         furnaces: {
@@ -267,15 +259,16 @@ const monthDataStore = {
       }
     };
 
-    let liveAugustData = {
+    // लाइव डेटा स्टोरेज (जो अगस्त, सितंबर या किसी भी एक्टिव महीने के लिए ऑटोमैटिक काम करेगा)
+    let liveDynamicData = {
       daysCount: 31,
-      monthTarget: 0,
-      totalTargetMTD: 0,
+      monthTarget: 279.0,
+      totalTargetMTD: 225.0,
       furnaces: {
-        "SQF-1": { capacity: 0, monthTarget: 0, targetMTD: 0, days: Array(31).fill(0) },
-        "SQF-2": { capacity: 0, monthTarget: 0, targetMTD: 0, days: Array(31).fill(0) },
-        "SQF-3": { capacity: 0, monthTarget: 0, targetMTD: 0, days: Array(31).fill(0) },
-        "SQF-4": { capacity: 0, monthTarget: 0, targetMTD: 0, days: Array(31).fill(0) }
+        "SQF-1": { capacity: 69.75, monthTarget: 69.75, targetMTD: 0, days: Array(31).fill(0) },
+        "SQF-2": { capacity: 69.75, monthTarget: 69.75, targetMTD: 0, days: Array(31).fill(0) },
+        "SQF-3": { capacity: 69.75, monthTarget: 69.75, targetMTD: 0, days: Array(31).fill(0) },
+        "SQF-4": { capacity: 69.75, monthTarget: 69.75, targetMTD: 0, days: Array(31).fill(0) }
       }
     };
 
@@ -297,32 +290,18 @@ const monthDataStore = {
       });
     }
 
-    function onMonthChange() {
-      const selectedMonth = document.getElementById('dwmMonthDropdown').value;
-      let daysCount = 31;
-      if (selectedMonth === "AUGUST-2026") daysCount = liveAugustData.daysCount;
-      else if (fixedDatabase[selectedMonth]) daysCount = fixedDatabase[selectedMonth].daysCount;
-
-      const dateDropdown = document.getElementById('dwmDateDropdown');
-      let optionsHtml = `<option value="ALL" selected>All Days (Full Month)</option>`;
-      for (let d = 1; d <= daysCount; d++) {
-        optionsHtml += `<option value="${d}">Date ${d}</option>`;
-      }
-      dateDropdown.innerHTML = optionsHtml;
-
-      fetchAugustLiveSheet();
-    }
-
-    async function fetchAugustLiveSheet() {
+    // ऑटोमैटिक लाइव शीट फेच करने का स्मार्ट फंक्शन
+    async function fetchLiveSheetData() {
       const selectedMonth = document.getElementById('dwmMonthDropdown').value;
       const syncStatus = document.getElementById('syncStatus');
 
-      if(syncStatus) {
+      if (syncStatus) {
         syncStatus.innerText = "● Live Synced";
         syncStatus.style.color = "#38bdf8";
       }
 
-      if (selectedMonth !== "AUGUST-2026") {
+      // अगर यूजर ने अप्रैल-जुलाई (फिक्स डेटा) चुना है, तो शीट फेच करने की जरूरत नहीं
+      if (fixedDatabase[selectedMonth]) {
         renderDWMData();
         return;
       }
@@ -333,55 +312,47 @@ const monthDataStore = {
         const csvText = await response.text();
         const rows = parseCSV(csvText);
 
+        // रिसेट करें
+        Object.keys(liveDynamicData.furnaces).forEach(fc => {
+          liveDynamicData.furnaces[fc].days = Array(31).fill(0);
+          liveDynamicData.furnaces[fc].targetMTD = 0;
+        });
+
         let dynamicTotalTargetMTD = 0;
         let dynamicMonthTarget = 0;
 
         rows.forEach(r => {
           let rowStr = r.join(" ").toUpperCase();
-          let fcName = "";
-          if (rowStr.includes("SQF-1")) fcName = "SQF-1";
-          else if (rowStr.includes("SQF-2")) fcName = "SQF-2";
-          else if (rowStr.includes("SQF-3")) fcName = "SQF-3";
-          else if (rowStr.includes("SQF-4")) fcName = "SQF-4";
+          // चेक करें कि डेटा सेलेक्टेड महीने का है (जैसे AUGUST-2026 या 2026-09)
+          if (rowStr.includes(selectedMonth) || rowStr.includes(selectedMonth.replace("-", " "))) {
+            let fcName = "";
+            if (rowStr.includes("SQF-1")) fcName = "SQF-1";
+            else if (rowStr.includes("SQF-2")) fcName = "SQF-2";
+            else if (rowStr.includes("SQF-3")) fcName = "SQF-3";
+            else if (rowStr.includes("SQF-4")) fcName = "SQF-4";
 
-          if (fcName && liveAugustData.furnaces[fcName]) {
-            // Sheet ke har row se dynamically numeric values extract karna
-            let nums = r.map(cell => parseFloat(cell)).filter(n => !isNaN(n));
-            
-            if (nums.length >= 3) {
-              liveAugustData.furnaces[fcName].capacity = nums[0] || 69.75;
-              liveAugustData.furnaces[fcName].monthTarget = nums[1] || 69.75;
-              liveAugustData.furnaces[fcName].targetMTD = nums[2] || 0;
-            }
+            if (fcName && liveDynamicData.furnaces[fcName]) {
+              let nums = r.map(cell => parseFloat(cell)).filter(n => !isNaN(n));
+              if (nums.length >= 3) {
+                liveDynamicData.furnaces[fcName].capacity = nums[0] || 69.75;
+                liveDynamicData.furnaces[fcName].monthTarget = nums[1] || 69.75;
+                liveDynamicData.furnaces[fcName].targetMTD = nums[2] || 0;
+              }
 
-            // Din ka data (Col 6 ya uske baad ke numbers)
-            let dayValues = [];
-            for (let j = 6; j < r.length; j++) {
-              let val = parseFloat(r[j]);
-              if (!isNaN(val) && r[j] !== "") dayValues.push(val);
-            }
-            if (dayValues.length > 0) {
-              liveAugustData.daysCount = dayValues.length;
-              for (let d = 0; d < Math.min(dayValues.length, 31); d++) {
-                liveAugustData.furnaces[fcName].days[d] = dayValues[d];
+              let dayValues = [];
+              for (let j = 4; j < r.length; j++) {
+                let val = parseFloat(r[j]);
+                if (!isNaN(val) && r[j] !== "") dayValues.push(val);
+              }
+              if (dayValues.length > 0) {
+                liveDynamicData.daysCount = dayValues.length;
+                for (let d = 0; d < Math.min(dayValues.length, 31); d++) {
+                  liveDynamicData.furnaces[fcName].days[d] = dayValues[d];
+                }
               }
             }
           }
-
-          // Total row ko pakadna aur sheet se seedha target uthana
-          if (rowStr.includes("TOTAL") || rowStr.includes("CUMULATIVE")) {
-            let nums = r.map(cell => parseFloat(cell)).filter(n => !isNaN(n));
-            if (nums.length >= 2 && !rowStr.includes("CUMULATIVE")) {
-              if (nums[0] > 10) dynamicMonthTarget = nums[0];
-              if (nums[1] > 10) dynamicTotalTargetMTD = nums[1];
-            }
-          }
         });
-
-        // Agar sheet se direct total target mil jaye toh theek, nahi toh furnaces ke target ka sum kar lo
-        let calculatedSumTarget = Object.values(liveAugustData.furnaces).reduce((acc, f) => acc + (f.targetMTD || 0), 0);
-        liveAugustData.totalTargetMTD = dynamicTotalTargetMTD > 0 ? dynamicTotalTargetMTD : calculatedSumTarget;
-        liveAugustData.monthTarget = dynamicMonthTarget > 0 ? dynamicMonthTarget : 279.0;
 
         renderDWMData();
       } catch (err) {
@@ -390,21 +361,38 @@ const monthDataStore = {
       }
     }
 
+    function onMonthChange() {
+      const selectedMonth = document.getElementById('dwmMonthDropdown').value;
+      let daysCount = 31;
+      
+      if (fixedDatabase[selectedMonth]) {
+        daysCount = fixedDatabase[selectedMonth].daysCount;
+      } else {
+        daysCount = (selectedMonth.includes("JUNE") || selectedMonth.includes("09") || selectedMonth.includes("APRIL")) ? 30 : 31;
+      }
+
+      const dateDropdown = document.getElementById('dwmDateDropdown');
+      if (dateDropdown) {
+        let optionsHtml = `<option value="ALL" selected>All Days (Full Month)</option>`;
+        for (let d = 1; d <= daysCount; d++) {
+          optionsHtml += `<option value="${d}">Date ${d}</option>`;
+        }
+        dateDropdown.innerHTML = optionsHtml;
+      }
+
+      fetchLiveSheetData();
+    }
+
     function renderDWMData() {
       const selectedMonth = document.getElementById('dwmMonthDropdown').value;
-      const selectedDate = document.getElementById('dwmDateDropdown').value;
+      const selectedDate = document.getElementById('dwmDateDropdown') ? document.getElementById('dwmDateDropdown').value : "ALL";
 
       let dataDaysCount = 31;
-      let monthTarget = 0;
-      let totalTargetMTD = 0;
+      let monthTarget = 279.0;
+      let totalTargetMTD = 225.0;
       let furnacesMap = {};
 
-      if (selectedMonth === "AUGUST-2026") {
-        dataDaysCount = liveAugustData.daysCount;
-        monthTarget = liveAugustData.monthTarget;
-        totalTargetMTD = liveAugustData.totalTargetMTD;
-        furnacesMap = liveAugustData.furnaces;
-      } else {
+      if (fixedDatabase[selectedMonth]) {
         let fData = fixedDatabase[selectedMonth];
         dataDaysCount = fData.daysCount;
         monthTarget = fData.monthTarget;
@@ -416,6 +404,11 @@ const monthDataStore = {
           "SQF-3": { capacity: 69.75, monthTarget: 69.75, targetMTD: totalTargetMTD/4, days: fData.furnaces["SQF-3"] },
           "SQF-4": { capacity: 69.75, monthTarget: 69.75, targetMTD: totalTargetMTD/4, days: fData.furnaces["SQF-4"] }
         };
+      } else {
+        dataDaysCount = liveDynamicData.daysCount;
+        monthTarget = liveDynamicData.monthTarget;
+        totalTargetMTD = liveDynamicData.totalTargetMTD;
+        furnacesMap = liveDynamicData.furnaces;
       }
 
       let headerHtml = `<th style="min-width: 80px;">FURNACE</th><th>Cap</th><th>Month Target</th><th>Target MTD</th><th>Actual MTD</th><th>Util %</th>`;
@@ -424,7 +417,8 @@ const monthDataStore = {
       } else {
         headerHtml += `<th>Date ${selectedDate}</th>`;
       }
-      document.getElementById('dwmHeaderRow').innerHTML = headerHtml;
+      let headerRowEl = document.getElementById('dwmHeaderRow');
+      if (headerRowEl) headerRowEl.innerHTML = headerHtml;
 
       let actualMTD = 0;
       let totals = Array(dataDaysCount).fill(0);
@@ -436,7 +430,7 @@ const monthDataStore = {
 
       Object.keys(furnacesMap).forEach(fcName => {
         let fc = furnacesMap[fcName];
-        let daysArr = fc.days;
+        let daysArr = fc.days || [];
         
         let fActual = 0;
         if (selectedDate === "ALL") {
@@ -454,8 +448,8 @@ const monthDataStore = {
 
         tbodyHtml += `<tr>
           <td style="font-weight:700; color:#38bdf8;">${fcName}</td>
-          <td>${fc.capacity || 0}</td>
-          <td>${fc.monthTarget || 0}</td>
+          <td>${fc.capacity || 69.75}</td>
+          <td>${fc.monthTarget || 69.75}</td>
           <td style="font-weight:600; color:#fbbf24;">${fc.targetMTD !== undefined ? Number(fc.targetMTD).toFixed(2) : '-'}</td>
           <td style="font-weight:700;">${fActual.toFixed(2)}</td>
           <td>${util}</td>`;
@@ -498,120 +492,24 @@ const monthDataStore = {
       }
       tbodyHtml += `</tr>`;
 
-      document.getElementById('dwmTableBody').innerHTML = tbodyHtml;
+      let tbodyEl = document.getElementById('dwmTableBody');
+      if (tbodyEl) tbodyEl.innerHTML = tbodyHtml;
 
-      document.getElementById('kpiMonthTarget').innerText = `${monthTarget} T`;
-      document.getElementById('kpiTargetMTD').innerText = `${Number(totalTargetMTD).toFixed(2)} T`;
-      document.getElementById('kpiActualMTD').innerText = `${totalValForDisplay.toFixed(2)} T`;
+      if(document.getElementById('kpiMonthTarget')) document.getElementById('kpiMonthTarget').innerText = `${monthTarget} Ton`;
+      if(document.getElementById('kpiTargetMTD')) document.getElementById('kpiTargetMTD').innerText = `${Number(totalTargetMTD).toFixed(2)} Ton`;
+      if(document.getElementById('kpiActualMTD')) document.getElementById('kpiActualMTD').innerText = `${totalValForDisplay.toFixed(2)} Ton`;
       
       let activeDaysCount = selectedDate === "ALL" ? (dataDaysCount || 1) : 1;
-      document.getElementById('kpiAvgProd').innerText = `${(totalValForDisplay / activeDaysCount).toFixed(2)} T/Day`;
+      if(document.getElementById('kpiAvgProd')) document.getElementById('kpiAvgProd').innerText = `${(totalValForDisplay / activeDaysCount).toFixed(2)} Ton/Day`;
       
       let variance = (totalValForDisplay - totalTargetMTD).toFixed(2);
       let varEl = document.getElementById('kpiVariance');
-      varEl.innerText = `${variance} T`;
-      varEl.style.color = variance >= 0 ? "#34d399" : "#f87171";
-      
-      document.getElementById('dwmTableTitle').innerText = `📋 DWM Matrix - ${selectedMonth} ${selectedDate !== 'ALL' ? '(Date: ' + selectedDate + ')' : ''}`;
-      document.getElementById('trendGraphTitle').innerText = `📈 Daily Trend - ${selectedMonth} ${selectedDate !== 'ALL' ? '(Date: ' + selectedDate + ')' : ''}`;
-      document.getElementById('furnaceGraphTitle').innerText = `🏆 Furnace-wise Output & Total - ${selectedMonth} ${selectedDate !== 'ALL' ? '(Date: ' + selectedDate + ')' : '(MTD)'}`;
-
-      if (selectedDate === "ALL") {
-        updateTrendChart(Array.from({length: dataDaysCount}, (_, i) => i + 1), totals);
-      } else {
-        let dIdx = parseInt(selectedDate) - 1;
-        updateTrendChart([`Date ${selectedDate}`], [totals[dIdx] || 0]);
+      if(varEl) {
+        varEl.innerText = `${variance} Ton`;
+        varEl.style.color = variance >= 0 ? "#34d399" : "#ef4444";
       }
-
-      updateFurnaceChart(furnaceLabels, furnaceValues);
-    }
-
-    function updateTrendChart(labels, dataValues) {
-      const canvasEl = document.getElementById('dailyTrendChart');
-      if (!canvasEl) return;
-      const ctx = canvasEl.getContext('2d');
-      if (trendChartInstance) { trendChartInstance.destroy(); }
-
-      let gradient = ctx.createLinearGradient(0, 0, 0, 240);
-      gradient.addColorStop(0, 'rgba(56, 189, 248, 0.5)');
-      gradient.addColorStop(1, 'rgba(15, 23, 42, 0.0)');
-
-      trendChartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Ton',
-            data: dataValues,
-            borderColor: '#38bdf8',
-            backgroundColor: gradient,
-            borderWidth: 2.5,
-            pointBackgroundColor: '#38bdf8',
-            pointRadius: 3,
-            fill: true,
-            tension: 0.2
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: { backgroundColor: '#1e293b', titleColor: '#38bdf8', bodyColor: '#f8fafc', borderColor: '#334155', borderWidth: 1 }
-          },
-          scales: {
-            x: { grid: { color: 'rgba(51, 65, 85, 0.2)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
-            y: { grid: { color: 'rgba(51, 65, 85, 0.2)' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
-          }
-        }
-      });
-    }
-
-    function updateFurnaceChart(labels, dataValues) {
-      const canvasEl = document.getElementById('furnaceComparisonChart');
-      if (!canvasEl) return;
-      const ctx = canvasEl.getContext('2d');
-      if (furnaceChartInstance) { furnaceChartInstance.destroy(); }
-
-      let maxDataVal = Math.max(...dataValues, 10);
-      let suggestedTop = maxDataVal * 1.25;
-
-      furnaceChartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Output (Ton)',
-            data: dataValues,
-            backgroundColor: ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#38bdf8'],
-            borderRadius: 6
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            datalabels: {
-              anchor: 'end',
-              align: 'top',
-              color: '#f8fafc',
-              font: { size: 11, weight: '700' },
-              formatter: (value) => value > 0 ? value + ' T' : ''
-            },
-            tooltip: { backgroundColor: '#1e293b', titleColor: '#38bdf8', bodyColor: '#f8fafc', borderColor: '#334155', borderWidth: 1 }
-          },
-          scales: {
-            x: { grid: { display: false }, ticks: { color: '#f8fafc', font: { size: 11, weight: '700' } } },
-            y: { 
-              grid: { color: 'rgba(51, 65, 85, 0.3)' }, 
-              ticks: { color: '#94a3b8', font: { size: 10 } },
-              suggestedMax: suggestedTop
-            }
-          }
-        },
-        plugins: [ChartDataLabels]
-      });
+      
+      if(document.getElementById('dwmTableTitle')) document.getElementById('dwmTableTitle').innerText = `📋 Daily Work Management (DWM) Matrix - ${selectedMonth}`;
     }
 
     window.addEventListener('DOMContentLoaded', () => {
