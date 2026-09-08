@@ -344,7 +344,8 @@
             if (r[2] && !isNaN(parseFloat(r[2]))) liveSeptemberData.furnaces[fcName].monthTarget = parseFloat(r[2]);
             if (r[3] && !isNaN(parseFloat(r[3]))) liveSeptemberData.furnaces[fcName].targetMTD = parseFloat(r[3]);
 
-            let dayValues = [];
+           let dayValues = [];
+            // दिन का डेटा Col 6 (यानी index 6) यानी 1 तारीख से शुरू होना चाहिए
             for (let j = 6; j < r.length; j++) {
               let val = parseFloat(r[j]);
               if (!isNaN(val) && r[j] !== "") dayValues.push(val);
@@ -353,7 +354,6 @@
             for (let d = 0; d < Math.min(dayValues.length, 30); d++) {
               liveSeptemberData.furnaces[fcName].days[d] = dayValues[d];
             }
-          }
 
           if (rowStr.includes("TOTAL") || rowStr.includes("CUMULATIVE")) {
             if (r[2] && !isNaN(parseFloat(r[2]))) dynamicMonthTarget = parseFloat(r[2]);
