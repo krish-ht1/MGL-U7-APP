@@ -242,7 +242,7 @@
       padding: 6px 8px;
       border-radius: 6px;
       text-align: center;
-      min-width: 0; /* Prevents flex/grid blowout */
+      min-width: 0;
     }
     .sip-param-box.comp-box {
       text-align: left;
@@ -264,8 +264,8 @@
       color: #fde047;
       display: block;
       margin-top: 2px;
-      word-break: break-word; /* Breaks long comments/ECD neatly */
-      white-space: normal;     /* Allows multi-line breaking */
+      word-break: break-word;
+      white-space: normal;
       line-height: 1.3;
     }
     .part-sub-badge {
@@ -468,6 +468,44 @@
     }
     .no-data { padding: 30px; color: #94a3b8; font-size: 12.5px; text-align: center; }
 
+    /* SIP Popup Modal Styles */
+    #sipModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+    .sip-modal-content {
+      background: #0f172a;
+      border: 1px solid #334155;
+      padding: 15px;
+      border-radius: 8px;
+      width: 90%;
+      height: 90%;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    }
+    .sip-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 8px;
+    }
+    .sip-modal-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
     @media (max-width: 1200px) {
       .sip-grid { grid-template-columns: repeat(3, 1fr); }
     }
@@ -524,7 +562,7 @@
   <div class="dashboard-container">
 
     <div class="file-warning-banner" id="fileModeWarning">
-      ⚠️ <b>Ye file abhi seedhe C: drive से (file://) खुल रही है।</b> Local server से open करें (e.g. <code>python -m http.server 8000</code>).
+      ⚠️ <b>Ye file abhi seedhe C: drive se (file://) khul rahi hai.</b> Local server se open karein (e.g. <code>python -m http.server 8000</code>).
     </div>
 
     <!-- 1. Search and Filters -->
@@ -717,7 +755,7 @@
               <th>HARDENING<span class="th-sub-box">Temp * Time * CP</span></th>
               <th>QUENCHING<span class="th-sub-box">RPM * Oil Temp</span></th>
               <th>TEMPERING<span class="th-sub-box">Temp * Time</span></th>
-              <th>REMARKS / LOADING / PASTING</th>
+              <th>LOADING / PASTING / OTHERS</th>
             </tr>
           </thead>
           <tbody id="tableBody">
@@ -729,6 +767,23 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- SIP Modal Popup Structure -->
+  <div id="sipModal">
+    <div class="sip-modal-content">
+      <div class="sip-modal-header">
+        <div>
+          <h3 id="modalSipTitle" style="color:#38bdf8; margin:0; font-size:14px;">📑 Standard Inspection Plan</h3>
+          <span id="modalPartName" style="color:#fde047; font-size:11px; font-weight:600;">-</span>
+        </div>
+        <div class="sip-modal-actions">
+          <a id="modalOpenExternal" href="#" target="_blank" style="background:#1e293b; color:#38bdf8; border:1px solid #334155; padding:5px 10px; border-radius:4px; font-size:11px; font-weight:600; text-decoration:none;">🔗 Open Full Tab</a>
+          <button onclick="closeSipModal()" style="background:#ef4444; color:white; border:none; padding:5px 12px; border-radius:4px; font-weight:700; cursor:pointer; font-size:11px;">✕ Close</button>
+        </div>
+      </div>
+      <iframe id="sipPdfFrame" src="" style="width:100%; height:100%; border:none; border-radius:4px; background:#fff;"></iframe>
+    </div>
   </div>
 
   <script>
@@ -789,24 +844,6 @@
       }
       if (row.length > 1 || (row.length === 1 && row[0] !== '')) r.push(row);
       return r.map(cols => cols.map(col => (col || '').trim()));
-    }
-
-    function normalizeDriveLink(raw) {
-      if (!raw) return "";
-      const link = String(raw).trim();
-      if (!link) return "";
-      let fileId = "";
-      let match = link.match(/\/d\/([a-zA-Z0-9_-]{15,})/);
-      if (match) fileId = match[1];
-      if (!fileId) {
-        match = link.match(/[?&]id=([a-zA-Z0-9_-]{15,})/);
-        if (match) fileId = match[1];
-      }
-      if (!fileId && /^[a-zA-Z0-9_-]{20,}$/.test(link)) fileId = link;
-      if (fileId) {
-        return `https://drive.google.com/file/d/${fileId}/preview`;
-      }
-      return link;
     }
 
     function bustCache(url) {
@@ -1338,51 +1375,61 @@
       applyAllFilters();
     }
 
-    function openSipPdfDirect() {
+    // Dynamic SIP PDF Fetch from Google Drive using Apps Script Web App
+    async function openSipPdfDirect() {
       if (!currentActivePart || currentActivePart === "-") {
         alert("Please search or select a component first.");
         return;
       }
 
-      // 1. Get the current active PDF link or fallback to default
-      let targetUrl = currentActivePdfLink;
-      if (!targetUrl || targetUrl.trim() === "") {
-        targetUrl = "https://drive.google.com/file/d/1CNZujlalyUkB0gv96UgYbHXKkDfErmdD/view?usp=drivesdk";
+      // If a direct manual/spreadsheet link exists, use it as fallback or preview directly
+      if (currentActivePdfLink && currentActivePdfLink.trim() !== "" && (currentActivePdfLink.includes("http") || currentActivePdfLink.includes("drive.google.com"))) {
+        let embedPreviewUrl = currentActivePdfLink;
+        const match = currentActivePdfLink.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (match && match[1]) {
+          embedPreviewUrl = `https://drive.google.com/file/d/${match[1]}/preview`;
+        } else if (currentActivePdfLink.includes('/view')) {
+          embedPreviewUrl = currentActivePdfLink.replace('/view', '/preview');
+        }
+
+        document.getElementById('modalPartName').innerText = `Part No / MS No: ${currentActivePart}`;
+        document.getElementById('modalSipTitle').innerText = `📑 Standard Inspection Plan - Part ${currentActivePart}`;
+        document.getElementById('sipPdfFrame').src = embedPreviewUrl;
+        document.getElementById('modalOpenExternal').href = currentActivePdfLink;
+        document.getElementById('sipModal').style.display = 'flex';
+        return;
       }
 
-      // 2. Convert Google Drive /view link to /preview so it opens inside the popup smoothly
-      let embedPreviewUrl = targetUrl;
-      const match = targetUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
-      if (match && match[1]) {
-        embedPreviewUrl = `https://drive.google.com/file/d/${match[1]}/preview`;
-      } else if (targetUrl.includes('/view')) {
-        embedPreviewUrl = targetUrl.replace('/view', '/preview');
-      }
+      // Otherwise dynamically fetch from Google Drive by MS Number name via Apps Script Web App
+      const webAppUrl = "https://script.google.com/macros/s/AKfycbxRwJnL1fIfGYFYn3OwAvOo2wrR7dwfOmu5F2-1tCZSd9NTo8Gp4yEC4pkEva7sWIdl/exec";
+      const searchUrl = `${webAppUrl}?action=getSip&ms=${encodeURIComponent(currentActivePart)}`;
 
-      // 3. Update Modal Title & Part Name
-      const partNameElem = document.getElementById('modalPartName');
-      if (partNameElem) partNameElem.innerText = `Part No: ${currentActivePart}`;
-      
-      const titleElem = document.getElementById('modalSipTitle');
-      if (titleElem) titleElem.innerText = `📑 Standard Inspection Plan - Part ${currentActivePart}`;
+      try {
+        let response = await fetch(searchUrl);
+        let fileId = await response.text();
+        fileId = fileId ? fileId.trim() : "";
 
-      // 4. Load the preview URL directly into the popup iframe
-      const frame = document.getElementById('sipPdfFrame');
-      if (frame) {
-        frame.src = embedPreviewUrl;
+        if (fileId && fileId !== "NOT_FOUND" && !fileId.includes("error")) {
+          const embedPreviewUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+          
+          document.getElementById('modalPartName').innerText = `Part No / MS No: ${currentActivePart}`;
+          document.getElementById('modalSipTitle').innerText = `📑 Standard Inspection Plan - Part ${currentActivePart}`;
+          document.getElementById('sipPdfFrame').src = embedPreviewUrl;
+          document.getElementById('modalOpenExternal').href = `https://drive.google.com/file/d/${fileId}/view`;
+          
+          document.getElementById('sipModal').style.display = 'flex';
+        } else {
+          alert(`❌ Google Drive par '${currentActivePart}' naam se koi PDF file nahi mili! Kripya check karein ki file ka naam MS number se saved hai.`);
+        }
+      } catch (err) {
+        console.error("SIP Fetch Error:", err);
+        alert("❌ File load karne mein error aayi hai. Network connection check karein.");
       }
+    }
 
-      // 5. Set fallback link for "Open in Full Tab" button inside modal
-      const extLink = document.getElementById('modalOpenExternal');
-      if (extLink) {
-        extLink.href = targetUrl;
-      }
-
-      // 6. Display the In-App Modal Popup on screen
-      const modal = document.getElementById('sipModal');
-      if (modal) {
-        modal.style.display = 'flex';
-      }
+    function closeSipModal() {
+      document.getElementById('sipPdfFrame').src = '';
+      document.getElementById('sipModal').style.display = 'none';
     }
 
     window.addEventListener('DOMContentLoaded', () => {
