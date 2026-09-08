@@ -345,7 +345,7 @@
             if (r[3] && !isNaN(parseFloat(r[3]))) liveSeptemberData.furnaces[fcName].targetMTD = parseFloat(r[3]);
 
             let dayValues = [];
-            for (let j = 7; j < r.length; j++) {
+            for (let j = 6; j < r.length; j++) {
               let val = parseFloat(r[j]);
               if (!isNaN(val) && r[j] !== "") dayValues.push(val);
             }
