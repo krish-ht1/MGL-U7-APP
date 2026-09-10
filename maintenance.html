@@ -59,7 +59,7 @@
             gap: 16px;
         }
 
-        /* 3 Master Navigation Buttons (Tabs) */
+        /* Tabs Bar */
         .tabs-bar {
             display: flex;
             gap: 10px;
@@ -87,7 +87,6 @@
             box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
         }
 
-        /* Content Sections */
         .content-section {
             display: none;
             flex-direction: column;
@@ -97,7 +96,6 @@
             display: flex;
         }
 
-        /* Section Card */
         .section-card {
             background: #1e293b;
             border: 1px solid #334155;
@@ -131,7 +129,7 @@
         }
         .search-box:focus { border-color: #f97316; }
 
-        /* Clean Scrollable Table */
+        /* Clean Table Styling with auto-fit width behavior */
         .table-responsive {
             overflow-x: auto;
             max-height: 550px;
@@ -142,104 +140,73 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 11px;
-            white-space: nowrap;
-            text-align: center;
+            font-size: 11.5px;
+            text-align: left;
         }
         th {
             background: #0284c7;
             color: white;
-            padding: 9px 8px;
+            padding: 10px 12px;
             font-weight: 600;
             position: sticky;
             top: 0;
             z-index: 10;
             border: 1px solid #0369a1;
-            text-transform: uppercase;
+            white-space: nowrap;
         }
         td {
-            padding: 7px 8px;
+            padding: 8px 12px;
             border: 1px solid #475569;
             color: #cbd5e1;
             background: #0f172a;
+            white-space: nowrap; /* text ke mutabik width fit rakhne ke liye */
         }
-
-        /* Sticky First Column */
-        th:first-child, td:first-child {
-            position: sticky;
-            left: 0;
-            background: #1e293b;
-            z-index: 5;
-            border-right: 2px solid #38bdf8;
-        }
-        th:first-child { z-index: 12; background: #0284c7; }
-
-        /* Plan (Yellow Fill) & Done/Actual (Green Fill) */
-        .cell-plan-yellow {
-            background-color: #eab308 !important;
-            color: #000000 !important;
-            font-weight: 700;
-        }
-        .cell-done-green {
-            background-color: #22c55e !important;
-            color: #ffffff !important;
-            font-weight: 700;
-        }
+        tr:hover td { background: rgba(249, 115, 22, 0.08); color: #fff; }
 
         .no-data { padding: 30px; text-align: center; color: #94a3b8; font-size: 13px; }
     </style>
 </head>
 <body>
 
-    <!-- Top Bar -->
     <header class="top-bar">
         <div class="nav-left">
             <a href="index.html" class="back-btn">⬅ Home</a>
             <h1>⚙️ HT Maintenance Master Hub</h1>
         </div>
-        <span style="font-size: 11px; color: #34d399; font-weight: 600;">● Live Sheet Synced</span>
+        <span style="font-size: 11px; color: #34d399; font-weight: 600;">● Live Synced</span>
     </header>
 
     <div class="main-container">
         
-        <!-- 3 Master Navigation Buttons (Tabs) -->
+        <!-- Navigation Tabs -->
         <div class="tabs-bar">
             <button class="tab-btn active" onclick="switchMaintenanceTab('pm', this)">📅 PM Schedule</button>
             <button class="tab-btn" onclick="switchMaintenanceTab('spares', this)">🛠️ Critical Spare List</button>
             <button class="tab-btn" onclick="switchMaintenanceTab('calib', this)">📏 Calibration Master List</button>
         </div>
 
-        <!-- 1. PM Schedule Section (Live from Google Sheet) -->
+        <!-- 1. PM Schedule Section -->
         <div id="section-pm" class="content-section active">
             <div class="section-card">
-                <div class="section-title">
-                    <span>📋 प्रिवेंटिव मेंटेनेंस शेड्यूल 2026-2027 (Live)</span>
-                </div>
+                <div class="section-title"><span>📋 Preventive Maintenance Schedule 2026-2027</span></div>
                 <div class="table-responsive">
-                    <table>
-                        <thead id="pmThead">
-                            <tr><th>Loading Headers...</th></tr>
-                        </thead>
-                        <tbody id="pmTableBody">
-                            <tr><td colspan="15" class="no-data">Google Sheet से डेटा लोड हो रहा है...</td></tr>
-                        </tbody>
+                    <table style="text-align: center;">
+                        <thead id="pmThead"><tr><th>Loading...</th></tr></thead>
+                        <tbody id="pmTableBody"><tr><td colspan="15" class="no-data">Loading PM Schedule...</td></tr></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- 2. Critical Spare List Section (Live from Google Sheet GID: 1304634560) -->
+        <!-- 2. Critical Spare List Section with Search Box -->
         <div id="section-spares" class="content-section">
             <div class="section-card">
-                <div class="section-title"><span>🛠️ Critical Spare Parts Stock & List (Live)</span></div>
+                <div class="section-title"><span>🛠️ Critical Spare Parts Stock & List</span></div>
+                <input type="text" id="spareSearch" class="search-box" placeholder="🔍 Search by Description, Part Number or Item Code..." onkeyup="filterSparesTable()">
                 <div class="table-responsive">
                     <table>
-                        <thead id="sparesThead">
-                            <tr><th>Loading Spares Headers...</th></tr>
-                        </thead>
-                        <tbody id="sparesTableBody">
-                            <tr><td colspan="7" class="no-data">Loading Critical Spares from Google Sheet...</td></tr>
-                        </tbody>
+                        <thead id="sparesThead"><tr><th>Loading Headers...</th></tr></thead>
+                        <tbody id="sparesTableBody"><tr><td colspan="7" class="no-data">Loading Critical Spares...</td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -248,16 +215,12 @@
         <!-- 3. Calibration Master List Section -->
         <div id="section-calib" class="content-section">
             <div class="section-card">
-                <div class="section-title"><span>📏 Instrument Calibration Master List & Search</span></div>
-                <input type="text" id="calibrationSearch" class="search-box" placeholder="🔍 Search by Instrument Name, ID, Make or Location..." onkeyup="filterCalibrationTable()">
+                <div class="section-title"><span>📏 Instrument Calibration Master List</span></div>
+                <input type="text" id="calibrationSearch" class="search-box" placeholder="🔍 Search by Instrument Name, Make, ID or Location..." onkeyup="filterCalibrationTable()">
                 <div class="table-responsive">
                     <table>
-                        <thead id="calibThead">
-                            <tr><th>Loading Calibration Headers...</th></tr>
-                        </thead>
-                        <tbody id="calibrationTableBody">
-                            <tr><td colspan="9" class="no-data">Loading Calibration Records...</td></tr>
-                        </tbody>
+                        <thead id="calibThead"><tr><th>Loading Headers...</th></tr></thead>
+                        <tbody id="calibrationTableBody"><tr><td colspan="9" class="no-data">Loading Calibration Records...</td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -266,18 +229,18 @@
     </div>
 
     <script>
-        // Tab Switcher Logic
         function switchMaintenanceTab(tabId, btn) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-
             btn.classList.add('active');
             document.getElementById('section-' + tabId).classList.add('active');
         }
 
-        // CSV URLs
         const PM_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=1943594971&single=true&output=csv";
         const SPARES_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=1304634560&single=true&output=csv";
+
+        let rawSparesData = [];
+        let sparesHeaders = [];
 
         function parseCSV(text) {
             return text.split('\n').map(r => {
@@ -292,137 +255,78 @@
             });
         }
 
-        async function fetchPMScheduleLive() {
+        async function fetchPMSchedule() {
             try {
-                const res = await fetch(`${PM_CSV_URL}&_t=${new Date().getTime()}`);
+                const res = await fetch(`${PM_CSV_URL}&_t=${Date.now()}`);
                 const text = await res.text();
                 const rows = parseCSV(text);
-
-                const thead = document.getElementById('pmThead');
-                const tbody = document.getElementById('pmTableBody');
-
                 if (rows.length > 0) {
-                    let headerRow = rows[0];
                     let thHtml = `<tr>`;
-                    headerRow.forEach(col => { thHtml += `<th>${col || ''}</th>`; });
+                    rows[0].forEach(h => thHtml += `<th>${h || ''}</th>`);
                     thHtml += `</tr>`;
-                    thead.innerHTML = thHtml;
+                    document.getElementById('pmThead').innerHTML = thHtml;
 
-                    let dataRows = rows.slice(1);
                     let html = "";
-
-                    dataRows.forEach(r => {
-                        if (r.length > 1 && r.some(cell => cell !== '')) {
+                    rows.slice(1).forEach(r => {
+                        if (r.length > 1 && r.some(c => c !== '')) {
                             html += `<tr>`;
-                            r.forEach((cell, cIdx) => {
-                                let cellText = cell || '';
-                                let upperText = cellText.toUpperCase();
-                                let customClass = "";
-                                let style = (cIdx === 1) ? "font-weight:700; color:#38bdf8;" : "";
-
-                                if (upperText.includes('PLAN')) {
-                                    customClass = "cell-plan-yellow";
-                                } else if (upperText.includes('DONE') || upperText.includes('ACTUAL')) {
-                                    customClass = "cell-done-green";
-                                }
-
-                                html += `<td class="${customClass}" style="${style}">${cellText}</td>`;
-                            });
+                            r.forEach(cell => html += `<td>${cell || '-'}</td>`);
                             html += `</tr>`;
                         }
                     });
-                    tbody.innerHTML = html;
+                    document.getElementById('pmTableBody').innerHTML = html;
                 }
-            } catch (err) {
-                console.error("Error loading PM schedule:", err);
+            } catch (e) {
+                console.error(e);
             }
         }
 
-        async function fetchCriticalSparesLive() {
+        async function fetchCriticalSpares() {
             try {
-                const res = await fetch(`${SPARES_CSV_URL}&_t=${new Date().getTime()}`);
+                const res = await fetch(`${SPARES_CSV_URL}&_t=${Date.now()}`);
                 const text = await res.text();
                 const rows = parseCSV(text);
-
-                const thead = document.getElementById('sparesThead');
-                const tbody = document.getElementById('sparesTableBody');
-
                 if (rows.length > 0) {
-                    let headerRow = rows[0];
+                    sparesHeaders = rows[0];
                     let thHtml = `<tr>`;
-                    headerRow.forEach(col => { thHtml += `<th>${col || ''}</th>`; });
+                    sparesHeaders.forEach(h => thHtml += `<th>${h || ''}</th>`);
                     thHtml += `</tr>`;
-                    thead.innerHTML = thHtml;
+                    document.getElementById('sparesThead').innerHTML = thHtml;
 
-                    let dataRows = rows.slice(1);
-                    let html = "";
-
-                    dataRows.forEach(r => {
-                        if (r.length > 1 && r.some(cell => cell !== '')) {
-                            html += `<tr>`;
-                            r.forEach(cell => {
-                                html += `<td>${cell || '-'}</td>`;
-                            });
-                            html += `</tr>`;
-                        }
-                    });
-                    tbody.innerHTML = html;
+                    rawSparesData = rows.slice(1).filter(r => r.length > 1 && r.some(c => c !== ''));
+                    renderSparesTable(rawSparesData);
                 }
-            } catch (err) {
-                console.error("Error loading Critical Spares:", err);
-                document.getElementById('sparesTableBody').innerHTML = `<tr><td colspan="7" class="no-data" style="color:#ef4444;">⚠️ क्रिटिकल स्पेयर लिस्ट लोड करने में समस्या।</td></tr>`;
+            } catch (e) {
+                document.getElementById('sparesTableBody').innerHTML = `<tr><td colspan="7" class="no-data" style="color:#ef4444;">Error loading spares list.</td></tr>`;
             }
         }
 
-        function loadCalibrationDemo() {
-            window.rawCalibrationData = [
-                ["1", "Digital Temperature Recorder", "Eurotherm", "TR-01", "0-1200°C", "1°C", "SQF Panel-1", "01-04-2026", "01-10-2026"],
-                ["2", "Portable Hardness Tester", "Mitutoyo", "HT-05", "200-900 HV", "1 HV", "Metallurgical Lab", "15-05-2026", "15-11-2026"]
-            ];
-            
-            const calibThead = document.getElementById('calibThead');
-            calibThead.innerHTML = `<tr>
-                <th>Sr. No</th>
-                <th>Instrument Name</th>
-                <th>Make</th>
-                <th>Inst ID No.</th>
-                <th>Range</th>
-                <th>L.C</th>
-                <th>Location</th>
-                <th>Last Calib. Date</th>
-                <th>Due Date</th>
-            </tr>`;
-            
-            displayCalibrationRows(window.rawCalibrationData);
-        }
-
-        function displayCalibrationRows(rows) {
-            const tbody = document.getElementById('calibrationTableBody');
+        function renderSparesTable(rows) {
+            const tbody = document.getElementById('sparesTableBody');
+            if (rows.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="no-data">No matching spare parts found.</td></tr>`;
+                return;
+            }
             let html = "";
-            rows.forEach((r, idx) => {
-                html += `<tr><td>${idx + 1}</td>`;
-                for (let i = 1; i < r.length; i++) {
-                    html += `<td>${r[i] || '-'}</td>`;
-                }
+            rows.forEach(r => {
+                html += `<tr>`;
+                r.forEach(cell => html += `<td>${cell || '-'}</td>`);
                 html += `</tr>`;
             });
             tbody.innerHTML = html;
         }
 
-        function filterCalibrationTable() {
-            const query = document.getElementById('calibrationSearch').value.toLowerCase().trim();
-            const filtered = (window.rawCalibrationData || []).filter(r => {
-                return String(r[1] || '').toLowerCase().includes(query) || 
-                       String(r[3] || '').toLowerCase().includes(query) ||
-                       String(r[6] || '').toLowerCase().includes(query);
+        function filterSparesTable() {
+            const query = document.getElementById('spareSearch').value.toLowerCase().trim();
+            const filtered = rawSparesData.filter(r => {
+                return r.some(col => String(col).toLowerCase().includes(query));
             });
-            displayCalibrationRows(filtered);
+            renderSparesTable(filtered);
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            fetchPMScheduleLive();
-            fetchCriticalSparesLive();
-            loadCalibrationDemo();
+            fetchPMSchedule();
+            fetchCriticalSpares();
         });
     </script>
 </body>
