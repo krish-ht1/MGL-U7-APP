@@ -2,60 +2,215 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>HT Maintenance Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HT Maintenance Hub - Milestone Gears Unit 7</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #0f172a; color: #fff; margin: 0; padding: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 15px; margin-bottom: 20px; }
-        .back-btn { background: #3b82f6; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; text-decoration: none; }
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { background: #1e293b; color: #cbd5e1; border: 1px solid #475569; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
-        .tab-btn.active { background: #3b82f6; color: white; border-color: #3b82f6; }
-        .content-section { background: #1e293b; padding: 20px; border-radius: 8px; }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        body { font-family: 'Poppins', sans-serif; background: #0f172a; color: #fff; margin: 0; padding: 0; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; background: #1e293b; border-bottom: 2px solid #f97316; padding: 12px 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.8); }
+        .back-btn { background: #0f172a; color: #38bdf8; border: 1px solid #334155; padding: 8px 15px; border-radius: 6px; cursor: pointer; text-decoration: none; font-weight: 600; font-size: 12px; }
+        .back-btn:hover { background: #38bdf8; color: #0f172a; }
+
+        .container { max-width: 1400px; width: calc(100% - 40px); margin: 20px auto; flex: 1; display: flex; flex-direction: column; gap: 20px; }
+        
+        .tabs { display: flex; gap: 10px; flex-wrap: wrap; }
+        .tab-btn { background: #1e293b; color: #cbd5e1; border: 1px solid #475569; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.2s; }
+        .tab-btn.active, .tab-btn:hover { background: #f97316; color: white; border-color: #f97316; }
+
+        .content-section { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .content-section.active { display: block; }
+        
+        .section-title { font-size: 16px; font-weight: 700; color: #f8fafc; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+
+        /* Search Box for Calibration */
+        .search-box { width: 100%; padding: 10px 14px; background: #0f172a; border: 1px solid #475569; color: white; border-radius: 6px; font-size: 13px; outline: none; margin-bottom: 15px; box-sizing: border-box; font-family: inherit; }
+        .search-box:focus { border-color: #f97316; box-shadow: 0 0 0 2px rgba(249,115,22,0.25); }
+
+        /* Table Styling */
+        .table-scroll { overflow-x: auto; max-height: 500px; border-radius: 8px; border: 1px solid #334155; }
+        table { width: 100%; border-collapse: collapse; font-size: 11.5px; white-space: nowrap; text-align: left; }
+        th { background: #0284c7; color: white; padding: 10px 12px; font-weight: 600; position: sticky; top: 0; z-index: 10; }
+        td { padding: 9px 12px; border-bottom: 1px solid #334155; color: #cbd5e1; }
+        tr:nth-child(even) td { background: #1e293b; }
+        tr:nth-child(odd) td { background: #0f172a; }
+        tr:hover td { background: rgba(249, 115, 22, 0.1); color: #fff; }
+        .no-data { padding: 30px; text-align: center; color: #94a3b8; font-size: 13px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>⚙️ HT Maintenance Dashboard</h1>
         <a href="index.html" class="back-btn">⬅️ Back to Main Dashboard</a>
+        <h2 style="color: #f97316; margin: 0; font-size: 16px;">⚙️ HT Maintenance Master Dashboard</h2>
+        <span id="syncStatus" style="font-size: 11px; color: #34d399; font-weight: 600;">🟢 Live Sync Ready</span>
     </div>
 
-    <!-- Sub-Modules Switcher Tabs -->
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('pm')">📅 PM Schedule (SQF)</button>
-        <button class="tab-btn" onclick="switchTab('spares')">🛠️ Critical Spare List</button>
-        <!-- Kal ko yahan aur bhi tabs add kar sakta hai -->
-    </div>
+    <div class="container">
+        
+        <!-- Sub-Modules Switcher Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('pm', this)">📅 PM Schedule (SQF)</button>
+            <button class="tab-btn" onclick="switchTab('spares', this)">🛠️ Critical Spare List</button>
+            <button class="tab-btn" onclick="switchTab('calib', this)">📏 Calibration List & Search</button>
+        </div>
 
-    <!-- Content Area -->
-    <div class="content-section" id="moduleContent">
-        <p>Loading PM Schedule...</p>
+        <!-- 1. PM Schedule Section -->
+        <div class="content-section active" id="pm-section">
+            <div class="section-title"><span>📅 Seal Quench Furnace (SQF) PM Schedule - 2026-2027</span></div>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>SR</th>
+                            <th>EQUIPMENT / MACHINE</th>
+                            <th>MAINTENANCE TASK</th>
+                            <th>FREQUENCY</th>
+                            <th>LAST DONE</th>
+                            <th>NEXT DUE</th>
+                            <th>STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pmTableBody">
+                        <tr><td colspan="7" class="no-data">Loading PM Schedule...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 2. Critical Spares Section -->
+        <div class="content-section" id="spares-section">
+            <div class="section-title"><span>🛠️ Critical Spare Parts List & Stock Tracking</span></div>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>SR</th>
+                            <th>ITEM CODE</th>
+                            <th>SPARE DESCRIPTION</th>
+                            <th>PART NUMBER</th>
+                            <th>MIN STOCK</th>
+                            <th>CURRENT STOCK</th>
+                            <th>RACK LOCATION</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sparesTableBody">
+                        <tr><td colspan="7" class="no-data">Loading Critical Spares...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 3. Calibration List Section with Live Search -->
+        <div class="content-section" id="calib-section">
+            <div class="section-title"><span>📏 Instrument Calibration Master List</span></div>
+            <input type="text" id="calibrationSearch" class="search-box" placeholder="🔍 Search by Instrument Name, ID, Make or Location..." onkeyup="filterCalibrationTable()">
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>SR</th>
+                            <th>INSTRUMENT NAME</th>
+                            <th>MAKE</th>
+                            <th>INST ID NO.</th>
+                            <th>RANGE</th>
+                            <th>L.C</th>
+                            <th>LOCATION</th>
+                            <th>LAST CALIB. DATE</th>
+                            <th>DUE DATE</th>
+                        </tr>
+                    </thead>
+                    <tbody id="calibrationTableBody">
+                        <tr><td colspan="9" class="no-data">Loading Calibration Records...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        const WEB_APP_URL = "YAHAN_APNA_APPS_SCRIPT_URL_DAL_DENA";
+        // Yahan apni Google Sheet ka Publish to Web wala CSV link daal dena ( ya alag GID wala link)
+        const MAINTENANCE_CSV_URL = "YAHAN_APNA_MAINTENANCE_SHEET_CSV_LINK_DAL_DENA";
 
-        function switchTab(tabName) {
-            // Buttons ka active class badalna
+        let rawCalibrationData = [];
+
+        function switchTab(tabName, btnEl) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-
-            const container = document.getElementById('moduleContent');
+            document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
+            
+            if(btnEl) btnEl.classList.add('active');
 
             if (tabName === 'pm') {
-                container.innerHTML = "<h3>📅 Seal Quench Furnace (SQF) PM Schedule - 2026-2027</h3><p>Yahan Google Sheet se fetch karke PM Schedule ka table dikhayenge.</p>";
-                // Yahan fetch('...action=pmSchedule') wala code chalega
+                document.getElementById('pm-section').classList.add('active');
             } else if (tabName === 'spares') {
-                container.innerHTML = "<h3>🛠️ Critical Spare Parts List</h3><p>Yahan Critical Spares ka data load hoga.</p>";
-                // Yahan fetch('...action=criticalSpares') wala code chalega
+                document.getElementById('spares-section').classList.add('active');
+            } else if (tabName === 'calib') {
+                document.getElementById('calib-section').classList.add('active');
             }
         }
 
-        // Page khulte hi default PM Schedule load karega
+        // Dummy Data loader (Jab tak Google sheet link na ho, tab tak testing ke liye)
+        function loadDefaultData() {
+            // PM Schedule Dummy Data
+            document.getElementById('pmTableBody').innerHTML = `
+                <tr><td>1</td><td><b>SQF-01</b></td><td>Burner Nozzle & Thermocouple Check</td><td>Monthly</td><td>10-01-2026</td><td>10-02-2026</td><td style="color:#34d399; font-weight:600;">Completed</td></tr>
+                <tr><td>2</td><td><b>SQF-02</b></td><td>Quench Agitator Motor Greasing</td><td>Weekly</td><td>05-02-2026</td><td>12-02-2026</td><td style="color:#f59e0b; font-weight:600;">Due Soon</td></tr>
+            `;
+
+            // Critical Spares Dummy Data
+            document.getElementById('sparesTableBody').innerHTML = `
+                <tr><td>1</td><td><b>SP-001</b></td><td>Radiant Tube U-Type</td><td>RT-SQF-7</td><td>2</td><td style="color:#38bdf8; font-weight:600;">3</td><td>Rack A-1</td></tr>
+                <tr><td>2</td><td><b>SP-002</b></td><td>Silicon Carbide Heating Element</td><td>SiC-200</td><td>4</td><td style="color:#ef4444; font-weight:600;">1 (Low)</td><td>Rack B-2</td></tr>
+            `;
+
+            // Calibration Dummy Data (Sath me search ke liye array store karenge)
+            rawCalibrationData = [
+                ["1", "Digital Temperature Recorder", "Eurotherm", "TR-01", "0-1200°C", "1°C", "SQF Panel-1", "01-01-2026", "01-07-2026"],
+                ["2", "Portable Hardness Tester", "Mitutoyo", "HT-05", "200-900 HV", "1 HV", "Metallurgical Lab", "15-12-2025", "15-06-2026"],
+                ["3", "Pressure Transmitter", "Wika", "PT-03", "0-10 bar", "0.1 bar", "Gas House", "10-01-2026", "10-07-2026"]
+            ];
+            displayCalibrationRows(rawCalibrationData);
+        }
+
+        function displayCalibrationRows(rows) {
+            const tbody = document.getElementById('calibrationTableBody');
+            if (!rows || rows.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="no-data">🔍 No matching records found.</td></tr>`;
+                return;
+            }
+            
+            let html = "";
+            rows.forEach((r, idx) => {
+                html += `<tr>`;
+                html += `<td style="color: #94a3b8;">${idx + 1}</td>`;
+                for (let i = 1; i < r.length; i++) {
+                    let style = (i === 1 || i === 3) ? "font-weight: 700; color: #38bdf8;" : "color: #cbd5e1;";
+                    html += `<td style="${style}">${r[i] || '-'}</td>`;
+                }
+                html += `</tr>`;
+            });
+            tbody.html = html; // Fixed typo
+            tbody.innerHTML = html;
+        }
+
+        // 🔍 Live Search Filter Logic for Calibration List
+        function filterCalibrationTable() {
+            const query = document.getElementById('calibrationSearch').value.toLowerCase().trim();
+            const filtered = rawCalibrationData.filter(r => {
+                let name = String(r[1] || '').toLowerCase();
+                let make = String(r[2] || '').toLowerCase();
+                let id = String(r[3] || '').toLowerCase();
+                let loc = String(r[6] || '').toLowerCase();
+                return name.includes(query) || make.includes(query) || id.includes(query) || loc.includes(query);
+            });
+            displayCalibrationRows(filtered);
+        }
+
         window.onload = function() {
-            switchTab('pm');
+            loadDefaultData();
         };
     </script>
-
 </body>
 </html>
