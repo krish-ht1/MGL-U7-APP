@@ -59,7 +59,7 @@
             gap: 16px;
         }
 
-        /* 3 Main Navigation Buttons Bar (Tabs) */
+        /* 3 Master Navigation Buttons Bar (Tabs) - Preserved */
         .tabs-bar {
             display: flex;
             gap: 10px;
@@ -165,6 +165,32 @@
         }
         tr:hover td { background: rgba(249, 115, 22, 0.1); color: #fff; }
 
+        /* Sticky First Column (Sr. No) & Machine Name */
+        th:first-child, td:first-child {
+            position: sticky;
+            left: 0;
+            background: #1e293b;
+            z-index: 5;
+            border-right: 2px solid #38bdf8;
+        }
+        th:first-child { z-index: 12; background: #0284c7; }
+
+        /* Yellow and Green Color Combination for Plan vs Actual */
+        .plan-row td { 
+            background: rgba(234, 179, 8, 0.12) !important; 
+            color: #fde047 !important; 
+            font-weight: 600; 
+        }
+        .actual-row td { 
+            background: rgba(34, 197, 94, 0.12) !important; 
+            color: #4ade80 !important; 
+            font-weight: 600; 
+        }
+
+        .cell-plan { background: rgba(234, 179, 8, 0.25) !important; color: #fde047 !important; font-weight: 700; }
+        .cell-actual { background: rgba(34, 197, 94, 0.25) !important; color: #4ade80 !important; font-weight: 700; }
+        .cell-empty { color: #475569; }
+
         .no-data { padding: 30px; text-align: center; color: #94a3b8; font-size: 13px; }
     </style>
 </head>
@@ -188,17 +214,20 @@
             <button class="tab-btn" onclick="switchMaintenanceTab('calib', this)">📏 Calibration Master List</button>
         </div>
 
-        <!-- 1. PM Schedule Section -->
+        <!-- 1. PM Schedule Section (प्रिवेंटिव मेंटेनेंस शेड्यूल 2026-2027) -->
         <div id="section-pm" class="content-section active">
             <div class="section-card">
-                <div class="section-title"><span>📋 प्रिवेंटिव मेंटेनेंस शेड्यूल 2026-2027</span></div>
+                <div class="section-title">
+                    <span>📋 प्रिवेंटिव मेंटेनेंस शेड्यूल 2026-2027</span>
+                    <span style="font-size: 11px; color: #94a3b8; font-weight: 400;">Frequency: Every 6 Months</span>
+                </div>
                 <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
                                 <th>Sr. No</th>
-                                <th>Machine Name</th>
-                                <th>Specification & Make</th>
+                                <th>Instrument & Machine Name</th>
+                                <th>Specification of M/C & Make</th>
                                 <th>Schedule</th>
                                 <th>April 26</th>
                                 <th>May 26</th>
@@ -288,13 +317,73 @@
             document.getElementById('section-' + tabId).classList.add('active');
         }
 
-        // Dummy Data loader for demonstration
+        // PM Schedule Master Data (4 Furnaces Setup)
+        const pmMasterData = [
+            {
+                sr: 1,
+                name: "SQF-01 (Seal Quench Furnace)",
+                spec: "AICHELIN UNITHERM",
+                planMonths: ['', 'P', '', '', '', '', '', 'P', '', '', '', ''],
+                actualMonths: ['', 'A', '', '', '', '', '', '', '', '', '', ''],
+                remarks: "Routine Servicing"
+            },
+            {
+                sr: 2,
+                name: "SQF-02 (Seal Quench Furnace)",
+                spec: "AICHELIN UNITHERM",
+                planMonths: ['', '', '', '', '', 'P', '', '', '', '', '', 'P'],
+                actualMonths: ['', '', '', '', '', '', '', '', '', '', '', ''],
+                remarks: "Burner Overhaul"
+            },
+            {
+                sr: 3,
+                name: "SQF-03 (Seal Quench Furnace)",
+                spec: "AICHELIN UNITHERM",
+                planMonths: ['P', '', '', 'P', '', '', '', '', '', 'P', '', ''],
+                actualMonths: ['A', '', '', '', '', '', '', '', '', '', '', ''],
+                remarks: "Radiant Tube Check"
+            },
+            {
+                sr: 4,
+                name: "SQF-04 (Seal Quench Furnace)",
+                spec: "AICHELIN UNITHERM",
+                planMonths: ['P', '', '', '', 'P', '', '', '', '', '', '', ''],
+                actualMonths: ['', '', '', '', '', '', '', '', '', '', '', ''],
+                remarks: "Agitator Maint."
+            }
+        ];
+
         function loadMaintenanceModuleData() {
-            // PM Schedule
-            document.getElementById('pmTableBody').innerHTML = `
-                <tr><td rowspan="2">1</td><td rowspan="2"><b>SQF-01</b></td><td rowspan="2">AICHELIN UNITHERM</td><td style="color:#fde047;">PLAN</td><td></td><td>✔</td><td></td><td></td><td></td><td></td><td></td><td>✔</td><td></td><td></td><td></td><td></td><td>Routine Check</td></tr>
-                <tr><td style="color:#4ade80;">ACTUAL</td><td></td><td>✔</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>Done On Time</td></tr>
-            `;
+            // Render PM Schedule Table
+            const tbody = document.getElementById('pmTableBody');
+            let html = "";
+
+            pmMasterData.forEach((item) => {
+                // Plan Row
+                html += `<tr class="plan-row">`;
+                html += `<td rowspan="2" style="font-weight:700; color:#38bdf8; background:#1e293b;">${item.sr}</td>`;
+                html += `<td rowspan="2" style="text-align:left; font-weight:700; color:#f8fafc; background:#1e293b;">${item.name}</td>`;
+                html += `<td rowspan="2" style="text-align:left; color:#94a3b8; background:#1e293b;">${item.spec}</td>`;
+                html += `<td style="color: #fde047; font-weight:700;">PLAN</td>`;
+                
+                item.planMonths.forEach(mVal => {
+                    let cellClass = mVal === 'P' ? 'cell-plan' : 'cell-empty';
+                    html += `<td class="${cellClass}">${mVal === 'P' ? 'PLAN' : '-'}</td>`;
+                });
+                html += `<td rowspan="2" style="text-align:left; color:#cbd5e1; background:#1e293b;">${item.remarks}</td>`;
+                html += `</tr>`;
+
+                // Actual Row
+                html += `<tr class="actual-row">`;
+                html += `<td style="color: #4ade80; font-weight:700;">ACTUAL</td>`;
+                
+                item.actualMonths.forEach(mVal => {
+                    let cellClass = mVal === 'A' ? 'cell-actual' : 'cell-empty';
+                    html += `<td class="${cellClass}">${mVal === 'A' ? 'DONE' : '-'}</td>`;
+                });
+                html += `</tr>`;
+            });
+            tbody.innerHTML = html;
 
             // Spares List
             document.getElementById('sparesTableBody').innerHTML = `
