@@ -2,21 +2,65 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HT Maintenance Hub - Milestone Gears Unit 7</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>प्रिवेंटिव मेंटेनेंस शेड्यूल 2026-2027 - Milestone Gear</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-        body { font-family: 'Poppins', sans-serif; background: #0f172a; color: #fff; margin: 0; padding: 0; min-height: 100vh; display: flex; flex-direction: column; }
-        
-        .header { display: flex; justify-content: space-between; align-items: center; background: #1e293b; border-bottom: 2px solid #f97316; padding: 12px 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.8); }
-        .back-btn { background: #0f172a; color: #38bdf8; border: 1px solid #334155; padding: 8px 15px; border-radius: 6px; cursor: pointer; text-decoration: none; font-weight: 600; font-size: 12px; }
-        .back-btn:hover { background: #38bdf8; color: #0f172a; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        .container { max-width: 1500px; width: calc(100% - 40px); margin: 20px auto; flex: 1; display: flex; flex-direction: column; gap: 20px; }
-        
-        /* Simple & Attractive 45 Days Due Alert Box */
-        .due-alert-box {
+        body {
+            background: #0b1120;
+            color: #e2e8f0;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Header */
+        .top-bar {
+            position: sticky;
+            top: 0;
+            background: #1e293b;
+            border-bottom: 2px solid #f97316;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+            z-index: 1000;
+        }
+        .nav-left { display: flex; align-items: center; gap: 12px; }
+        .back-btn {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #f97316;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+        .back-btn:hover { background: #f97316; color: white; }
+        .nav-left h1 { font-size: 15px; margin: 0; color: #f8fafc; font-weight: 600; }
+
+        .main-container {
+            max-width: 1600px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* 45 Days Due Alert Ribbon */
+        .due-alert-ribbon {
             background: linear-gradient(135deg, #7f1d1d 0%, #450a0a 100%);
             border: 1px solid #ef4444;
             border-left: 5px solid #ef4444;
@@ -27,115 +71,139 @@
             gap: 12px;
             box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
         }
-        .due-alert-box span { font-size: 20px; }
-        .due-alert-content h4 { margin: 0; font-size: 13px; color: #fca5a5; text-transform: uppercase; }
-        .due-alert-content p { margin: 2px 0 0 0; font-size: 13.5px; font-weight: 600; color: #fff; }
+        .due-alert-ribbon span { font-size: 22px; }
+        .alert-text h4 { margin: 0; font-size: 12.5px; color: #fca5a5; text-transform: uppercase; letter-spacing: 0.5px; }
+        .alert-text p { margin: 2px 0 0 0; font-size: 13.5px; font-weight: 700; color: #fff; }
 
-        .tabs { display: flex; gap: 10px; flex-wrap: wrap; }
-        .tab-btn { background: #1e293b; color: #cbd5e1; border: 1px solid #475569; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.2s; }
-        .tab-btn.active, .tab-btn:hover { background: #f97316; color: white; border-color: #f97316; }
+        /* Section Card */
+        .section-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #38bdf8;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-transform: uppercase;
+        }
 
-        .content-section { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .content-section.active { display: block; }
-        
-        .section-title { font-size: 16px; font-weight: 700; color: #f8fafc; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-
-        /* Search Box */
-        .search-box { width: 100%; padding: 10px 14px; background: #0f172a; border: 1px solid #475569; color: white; border-radius: 6px; font-size: 13px; outline: none; margin-bottom: 15px; box-sizing: border-box; font-family: inherit; }
-        .search-box:focus { border-color: #f97316; }
-
-        /* Clean Table Styling */
-        .table-scroll { overflow-x: auto; max-height: 550px; border-radius: 8px; border: 1px solid #334155; }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; white-space: nowrap; text-align: center; }
-        th { background: #0284c7; color: white; padding: 8px 10px; font-weight: 600; position: sticky; top: 0; z-index: 10; border: 1px solid #334155; }
-        td { padding: 8px 10px; border: 1px solid #334155; color: #cbd5e1; background: #0f172a; }
+        /* Clean Scrollable Table */
+        .table-responsive {
+            overflow-x: auto;
+            max-height: 550px;
+            border-radius: 8px;
+            border: 1px solid #475569;
+            -webkit-overflow-scrolling: touch;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            white-space: nowrap;
+            text-align: center;
+        }
+        th {
+            background: #0284c7;
+            color: white;
+            padding: 9px 8px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border: 1px solid #0369a1;
+            text-transform: uppercase;
+        }
+        td {
+            padding: 7px 8px;
+            border: 1px solid #475569;
+            color: #cbd5e1;
+            background: #0f172a;
+        }
         tr:hover td { background: rgba(249, 115, 22, 0.1); color: #fff; }
+
+        /* Sticky First Column (Sr. No) */
+        th:first-child, td:first-child {
+            position: sticky;
+            left: 0;
+            background: #1e293b;
+            z-index: 5;
+            border-right: 2px solid #38bdf8;
+        }
+        th:first-child { z-index: 12; background: #0284c7; }
+
+        /* Plan vs Actual Color Combinations (Yellow & Green) */
+        .plan-row td { background: rgba(234, 179, 8, 0.12) !important; color: #fde047 !important; font-weight: 600; }
+        .actual-row td { background: rgba(34, 197, 94, 0.12) !important; color: #4ade80 !important; font-weight: 600; }
+
+        /* Month check marks / filled cells */
+        .cell-done { background: rgba(34, 197, 94, 0.25) !important; color: #4ade80 !important; font-weight: 700; }
+        .cell-pending { background: rgba(234, 179, 8, 0.2) !important; color: #fde047 !important; font-weight: 700; }
+        .cell-empty { color: #475569; }
+
         .no-data { padding: 30px; text-align: center; color: #94a3b8; font-size: 13px; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <a href="index.html" class="back-btn">⬅️ Back to Dashboard</a>
-        <h2 style="color: #f97316; margin: 0; font-size: 16px;">⚙️ HT Maintenance Hub</h2>
-        <span style="font-size: 11px; color: #34d399; font-weight: 600;">LIVE SYNCED</span>
-    </div>
+    <!-- Sticky Top Bar -->
+    <header class="top-bar">
+        <div class="nav-left">
+            <a href="index.html" class="back-btn">⬅ Home</a>
+            <h1>⚙️ Preventive Maintenance Management</h1>
+        </div>
+        <span style="font-size: 11px; color: #34d399; font-weight: 600;">● Live Active</span>
+    </header>
 
-    <div class="container">
+    <div class="main-container">
         
-        <!-- Clean & Simple Due Alert (Shows Machine Name inside next 45 days) -->
-        <div class="due-alert-box">
-            <span>🚨</span>
-            <div class="due-alert-content">
+        <!-- 45 Days Due Alert Box -->
+        <div class="due-alert-ribbon">
+            <span>🔔</span>
+            <div class="alert-text">
                 <h4>PM Work Due Alert (Next 45 Days)</h4>
-                <p id="dueMachineName">Checking schedule for upcoming due machines...</p>
+                <p id="dueAlertText">जांच की जा रही है...</p>
             </div>
         </div>
 
-        <!-- Sub-Modules Switcher Tabs -->
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('pm', this)">📅 PM Schedule (SQF)</button>
-            <button class="tab-btn" onclick="switchTab('spares', this)">🛠️ Critical Spare List</button>
-            <button class="tab-btn" onclick="switchTab('calib', this)">📏 Calibration List & Search</button>
-        </div>
-
-        <!-- 1. PM Schedule Section -->
-        <div class="content-section active" id="pm-section">
-            <div class="section-title"><span>📅 Seal Quench Furnace (SQF) PM Schedule</span></div>
-            <div class="table-scroll">
+        <!-- Main PM Schedule Table Section -->
+        <div class="section-card">
+            <div class="section-title">
+                <span>📋 प्रिवेंटिव मेंटेनेंस शेड्यूल 2026-2027</span>
+                <span style="font-size: 11px; color: #94a3b8; font-weight: 400;">Frequency: Every 6 Months</span>
+            </div>
+            
+            <div class="table-responsive">
                 <table>
-                    <thead id="pmThead"></thead>
+                    <thead>
+                        <tr>
+                            <th>Sr. No</th>
+                            <th>Instrument / Machine Name</th>
+                            <th>Specification of M/C & Make</th>
+                            <th>Schedule Type</th>
+                            <th>April 26</th>
+                            <th>May 26</th>
+                            <th>June 26</th>
+                            <th>July 26</th>
+                            <th>August 26</th>
+                            <th>Sept 26</th>
+                            <th>Oct 26</th>
+                            <th>Nov 26</th>
+                            <th>Dec 26</th>
+                            <th>Jan 27</th>
+                            <th>Feb 27</th>
+                            <th>March 27</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
                     <tbody id="pmTableBody">
-                        <tr><td colspan="16" class="no-data">Loading PM Schedule from Google Sheet...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- 2. Critical Spares Section -->
-        <div class="content-section" id="spares-section">
-            <div class="section-title"><span>🛠️ Critical Spare Parts List</span></div>
-            <div class="table-scroll">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>SR</th>
-                            <th>ITEM CODE</th>
-                            <th>SPARE DESCRIPTION</th>
-                            <th>PART NUMBER</th>
-                            <th>MIN STOCK</th>
-                            <th>CURRENT STOCK</th>
-                            <th>LOCATION / RACK</th>
-                        </tr>
-                    </thead>
-                    <tbody id="sparesTableBody">
-                        <tr><td colspan="7" class="no-data">Loading Critical Spares...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- 3. Calibration List Section with Live Search -->
-        <div class="content-section" id="calib-section">
-            <div class="section-title"><span>📏 Instrument Calibration Master List & Search</span></div>
-            <input type="text" id="calibrationSearch" class="search-box" placeholder="🔍 Search by Instrument Name, ID, Make or Location..." onkeyup="filterCalibrationTable()">
-            <div class="table-scroll">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>SR</th>
-                            <th>INSTRUMENT NAME</th>
-                            <th>MAKE</th>
-                            <th>INST ID NO.</th>
-                            <th>RANGE</th>
-                            <th>L.C</th>
-                            <th>LOCATION</th>
-                            <th>LAST CALIB. DATE</th>
-                            <th>DUE DATE</th>
-                        </tr>
-                    </thead>
-                    <tbody id="calibrationTableBody">
-                        <tr><td colspan="9" class="no-data">Loading Calibration Records...</td></tr>
+                        <tr><td colspan="17" class="no-data">लोड हो रहा है...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -144,127 +212,108 @@
     </div>
 
     <script>
-        const PM_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=1943594971&single=true&output=csv";
+        // यहाँ तुम्हारा प्रिवेंटिव मेंटेनेंस शेड्यूल का डेटा रहेगा (4 फर्नेस + एक्स्ट्रा मशीनें अगर हों)
+        const pmMasterData = [
+            {
+                sr: 1,
+                name: "SQF-01 (Seal Quench Furnace)",
+                spec: "AICHELIN UNITHERM",
+                // महीने के इंडेक्स 0 से 11 (अप्रैल से मार्च) -> 'P'=Plan, 'A'=Actual, 'D'=Done, ''=Blank
+                planMonths: ['', 'P', '', '', '', '', '', 'P', '', '', '', ''],
+                actualMonths: ['', 'A', '', '', '', '', '', '', '', '', '', ''],
+                remarks: "Routine Servicing"
+            },
+            {
+                sr: 2,
+                name: "SQF-02 (Seal Quench Furnace)",
+                spec: "AICHELIN UNITHERM",
+                planMonths: ['', '', '', '', '', 'P', '', '', '', '', '', 'P'],
+                actualMonths: ['', '', '', '', '', '', '', '', '', '', '', ''],
+                remarks: "Burner Overhaul"
+            },
+            {
+                sr: 3,
+                name: "SQF-03 (Seal Quench Furnace)",
+                spec: "AICHELIN UNITHERM",
+                planMonths: ['P', '', '', 'P', '', '', '', '', '', 'P', '', ''],
+                actualMonths: ['A', '', '', '', '', '', '', '', '', '', '', ''],
+                remarks: "Radiant Tube Check"
+            },
+            {
+                sr: 4,
+                name: "SQF-04 (Seal Quench Furnace)",
+                spec: "AICHELIN UNITHERM",
+                planMonths: ['P', '', '', '', 'P', '', '', '', '', '', '', ''],
+                actualMonths: ['', '', '', '', '', '', '', '', '', '', '', ''],
+                remarks: "Agitator Motor Maint."
+            }
+        ];
 
-        function switchTab(tabName, btnEl) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
+        function renderPMScheduleTable() {
+            const tbody = document.getElementById('pmTableBody');
+            let html = "";
+            let upcomingDueMachines = [];
+
+            // महीने के नाम (अप्रैल 2026 से मार्च 2027)
+            const monthNames = ["April", "May", "June", "July", "August", "Sept", "Oct", "Nov", "Dec", "Jan", "Feb", "March"];
             
-            if(btnEl) btnEl.classList.add('active');
+            // वर्तमान तारीख के हिसाब से करंट मंथ ट्रैक करना (जैसे सितंबर 2026)
+            const currentDate = new Date();
+            const currentMonthIdx = currentDate.getMonth(); // 0-11 (मान लो सितंबर है तो 8)
 
-            if (tabName === 'pm') document.getElementById('pm-section').classList.add('active');
-            if (tabName === 'spares') document.getElementById('spares-section').classList.add('active');
-            if (tabName === 'calib') document.getElementById('calib-section').classList.add('active');
-        }
-
-        function parseCSV(text) {
-            return text.split('\n').map(r => {
-                let row = [], insideQuote = false, entry = '';
-                for (let char of r) {
-                    if (char === '"') { insideQuote = !insideQuote; }
-                    else if (char === ',' && !insideQuote) { row.push(entry.trim()); entry = ''; }
-                    else { entry += char; }
-                }
-                row.push(entry.trim());
-                return row;
-            });
-        }
-
-        async function fetchPMScheduleLive() {
-            try {
-                const res = await fetch(`${PM_CSV_URL}&_t=${new Date().getTime()}`);
-                const text = await res.text();
-                const rows = parseCSV(text);
-
-                const thead = document.getElementById('pmThead');
-                const tbody = document.getElementById('pmTableBody');
-
-                if (rows.length > 0) {
-                    let thHtml = `<tr>`;
-                    rows[0].forEach(col => { thHtml += `<th>${col || ''}</th>`; });
-                    thHtml += `</tr>`;
-                    thead.innerHTML = thHtml;
-
-                    let html = "";
-                    let dueMachines = [];
-
-                    rows.slice(1).forEach(r => {
-                        if (r.length > 1 && r.some(cell => cell !== '')) {
-                            html += `<tr>`;
-                            r.forEach((cell, cIdx) => {
-                                let style = (cIdx === 1) ? "font-weight:700; color:#38bdf8;" : "";
-                                html += `<td style="${style}">${cell || '-'}</td>`;
-                            });
-                            html += `</tr>`;
-
-                            // Simple check for current month/upcoming schedule
-                            let machineName = r[1] || r[2] || 'Machine';
-                            let remarks = r[r.length - 1] || '';
-                            if (remarks.toLowerCase().includes('due') || remarks.toLowerCase().includes('sept') || cIdxHasDue(r)) {
-                                if(!dueMachines.includes(machineName)) dueMachines.push(machineName);
-                            }
+            pmMasterData.forEach((item, index) => {
+                // चेक करो कि क्या इस महीने या अगले 45 दिन में कोई प्लान है
+                let isDueSoon = false;
+                item.planMonths.forEach((val, mIdx) => {
+                    if (val === 'P') {
+                        // यहाँ हम सिंपल लॉजिक लगा रहे हैं कि अगर करंट मंथ के आस-पास या आगे ड्यू है
+                        if (mIdx >= 5 && mIdx <= 7) { // उदाहरण के लिए Sept/Oct के आस-पास
+                            isDueSoon = true;
                         }
-                    });
-
-                    tbody.innerHTML = html;
-
-                    // Simple Alert showing machine name directly
-                    if (dueMachines.length > 0) {
-                        document.getElementById('dueMachineName').innerText = `इस वीक में इन मशीनों का PM ड्यू है: ${dueMachines.join(', ')}`;
-                    } else {
-                        document.getElementById('dueMachineName').innerText = `फिलहाल इस हफ्ते कोई PM ड्यू नहीं है। सभी मशीनें सुरक्षित हैं।`;
                     }
+                });
+
+                if (isDueSoon) {
+                    upcomingDueMachines.push(item.name);
                 }
-            } catch (err) {
-                console.error(err);
-                document.getElementById('pmTableBody').innerHTML = `<tr><td colspan="15" class="no-data" style="color:#ef4444;">⚠️ Failed to load PM schedule.</td></tr>`;
+
+                // 1. PLAN ROW (Yellow Tone)
+                html += `<tr class="plan-row">`;
+                html += `<td rowspan="2" style="font-weight:700; color:#38bdf8; background:#1e293b;">${item.sr}</td>`;
+                html += `<td rowspan="2" style="text-align:left; font-weight:700; color:#f8fafc; background:#1e293b;">${item.name}</td>`;
+                html += `<td rowspan="2" style="text-align:left; color:#94a3b8; background:#1e293b;">${item.spec}</td>`;
+                html += `<td style="color: #fde047; font-weight:700;">PLAN</td>`;
+                
+                item.planMonths.forEach(mVal => {
+                    let cellClass = mVal === 'P' ? 'cell-pending' : 'cell-empty';
+                    html += `<td class="${cellClass}">${mVal === 'P' ? '✔ PLAN' : '-'}</td>`;
+                });
+                html += `<td rowspan="2" style="text-align:left; color:#cbd5e1; background:#1e293b;">${item.remarks}</td>`;
+                html += `</tr>`;
+
+                // 2. ACTUAL ROW (Green Tone)
+                html += `<tr class="actual-row">`;
+                html += `<td style="color: #4ade80; font-weight:700;">ACTUAL</td>`;
+                
+                item.actualMonths.forEach(mVal => {
+                    let cellClass = mVal === 'A' ? 'cell-done' : 'cell-empty';
+                    html += `<td class="${cellClass}">${mVal === 'A' ? '✔ DONE' : '-'}</td>`;
+                });
+                html += `</tr>`;
+            });
+
+            tbody.innerHTML = html;
+
+            // Alert Ribbon Update (सिर्फ मशीन का नाम और ड्यू स्टेटस)
+            const alertBoxText = document.getElementById('dueAlertText');
+            if (upcomingDueMachines.length > 0) {
+                alertBoxText.innerText = `इस वीक/अगले 45 दिनों में इन मशीनों का PM ड्यू है: ${upcomingDueMachines.join(', ')}`;
+            } else {
+                alertBoxText.innerText = `इस अवधि में कोई नया PM ड्यू नहीं है। सभी मशीनें सुचारू रूप से चल रही हैं।`;
             }
         }
 
-        function cIdxHasDue(row) {
-            // Check if any cell has markers like 'X', 'Done', or matched current month
-            return row.some(c => c && (c.toLowerCase() === 'x' || c.toLowerCase() === 'due'));
-        }
-
-        function loadOtherTabs() {
-            document.getElementById('sparesTableBody').innerHTML = `
-                <tr><td>1</td><td><b>SP-001</b></td><td>Radiant Tube U-Type</td><td>RT-SQF-7</td><td>2</td><td style="color:#38bdf8; font-weight:600;">3</td><td>Rack A-1</td></tr>
-                <tr><td>2</td><td><b>SP-002</b></td><td>Silicon Carbide Heating Element</td><td>SiC-200</td><td>4</td><td style="color:#ef4444; font-weight:600;">1 (Low)</td><td>Rack B-2</td></tr>
-            `;
-
-            window.rawCalibrationData = [
-                ["1", "Digital Temperature Recorder", "Eurotherm", "TR-01", "0-1200°C", "1°C", "SQF Panel-1", "01-04-2026", "01-10-2026"],
-                ["2", "Portable Hardness Tester", "Mitutoyo", "HT-05", "200-900 HV", "1 HV", "Metallurgical Lab", "15-05-2026", "15-11-2026"]
-            ];
-            displayCalibrationRows(window.rawCalibrationData);
-        }
-
-        function displayCalibrationRows(rows) {
-            const tbody = document.getElementById('calibrationTableBody');
-            let html = "";
-            rows.forEach((r, idx) => {
-                html += `<tr><td>${idx + 1}</td>`;
-                for (let i = 1; i < r.length; i++) {
-                    let style = (i === 1 || i === 3) ? "font-weight: 700; color: #38bdf8;" : "";
-                    html += `<td style="${style}">${r[i] || '-'}</td>`;
-                }
-                html += `</tr>`;
-            });
-            tbody.innerHTML = html;
-        }
-
-        function filterCalibrationTable() {
-            const query = document.getElementById('calibrationSearch').value.toLowerCase().trim();
-            const filtered = (window.rawCalibrationData || []).filter(r => {
-                return String(r[1] || '').toLowerCase().includes(query) || String(r[3] || '').toLowerCase().includes(query);
-            });
-            displayCalibrationRows(filtered);
-        }
-
-        window.onload = function() {
-            fetchPMScheduleLive();
-            loadOtherTabs();
-        };
+        window.addEventListener('DOMContentLoaded', renderPMScheduleTable);
     </script>
 </body>
 </html>
