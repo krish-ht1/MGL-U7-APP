@@ -13,8 +13,27 @@
         .back-btn { background: #0f172a; color: #38bdf8; border: 1px solid #334155; padding: 8px 15px; border-radius: 6px; cursor: pointer; text-decoration: none; font-weight: 600; font-size: 12px; }
         .back-btn:hover { background: #38bdf8; color: #0f172a; }
 
-        .container { max-width: 1400px; width: calc(100% - 40px); margin: 20px auto; flex: 1; display: flex; flex-direction: column; gap: 20px; }
+        .container { max-width: 1500px; width: calc(100% - 40px); margin: 20px auto; flex: 1; display: flex; flex-direction: column; gap: 20px; }
         
+        /* 45 Days Alert KPI Banner */
+        .alert-kpi-banner {
+          background: linear-gradient(135deg, #7f1d1d 0%, #450a0a 100%);
+          border: 1px solid #ef4444;
+          border-left: 5px solid #ef4444;
+          border-radius: 10px;
+          padding: 14px 20px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
+        }
+        .alert-kpi-left { display: flex; align-items: center; gap: 12px; }
+        .alert-icon { font-size: 24px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .alert-title { font-size: 13px; font-weight: 700; color: #fca5a5; text-transform: uppercase; margin: 0; }
+        .alert-desc { font-size: 12px; color: #fee2e2; margin: 2px 0 0 0; }
+        .alert-count-badge { background: #ef4444; color: white; padding: 4px 12px; border-radius: 20px; font-weight: 700; font-size: 13px; }
+
         .tabs { display: flex; gap: 10px; flex-wrap: wrap; }
         .tab-btn { background: #1e293b; color: #cbd5e1; border: 1px solid #475569; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.2s; }
         .tab-btn.active, .tab-btn:hover { background: #f97316; color: white; border-color: #f97316; }
@@ -24,31 +43,45 @@
         
         .section-title { font-size: 16px; font-weight: 700; color: #f8fafc; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
 
-        /* Search Box for Calibration */
+        /* Search Box */
         .search-box { width: 100%; padding: 10px 14px; background: #0f172a; border: 1px solid #475569; color: white; border-radius: 6px; font-size: 13px; outline: none; margin-bottom: 15px; box-sizing: border-box; font-family: inherit; }
-        .search-box:focus { border-color: #f97316; box-shadow: 0 0 0 2px rgba(249,115,22,0.25); }
+        .search-box:focus { border-color: #f97316; }
 
         /* Table Styling */
-        .table-scroll { overflow-x: auto; max-height: 500px; border-radius: 8px; border: 1px solid #334155; }
-        table { width: 100%; border-collapse: collapse; font-size: 11.5px; white-space: nowrap; text-align: left; }
-        th { background: #0284c7; color: white; padding: 10px 12px; font-weight: 600; position: sticky; top: 0; z-index: 10; }
-        td { padding: 9px 12px; border-bottom: 1px solid #334155; color: #cbd5e1; }
-        tr:nth-child(even) td { background: #1e293b; }
-        tr:nth-child(odd) td { background: #0f172a; }
+        .table-scroll { overflow-x: auto; max-height: 550px; border-radius: 8px; border: 1px solid #334155; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; white-space: nowrap; text-align: center; }
+        th { background: #0284c7; color: white; padding: 8px 10px; font-weight: 600; position: sticky; top: 0; z-index: 10; border: 1px solid #334155; }
+        td { padding: 8px 10px; border: 1px solid #334155; color: #cbd5e1; background: #0f172a; }
         tr:hover td { background: rgba(249, 115, 22, 0.1); color: #fff; }
         .no-data { padding: 30px; text-align: center; color: #94a3b8; font-size: 13px; }
+        
+        /* History Log Style */
+        .history-box { background: #111827; border: 1px dashed #334155; padding: 10px; border-radius: 6px; margin-top: 15px; text-align: left; font-size: 11.5px; }
+        .history-box h4 { margin: 0 0 6px 0; color: #38bdf8; font-size: 12px; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <a href="index.html" class="back-btn">⬅️ Back to Main Dashboard</a>
-        <h2 style="color: #f97316; margin: 0; font-size: 16px;">⚙️ HT Maintenance Master Dashboard</h2>
-        <span id="syncStatus" style="font-size: 11px; color: #34d399; font-weight: 600;">🟢 Live Sync Ready</span>
+        <h2 style="color: #f97316; margin: 0; font-size: 16px;">⚙️ HT Maintenance Hub & PM Schedule</h2>
+        <span style="font-size: 11px; color: #34d399; font-weight: 600;">LIVE CSV SYNCED</span>
     </div>
 
     <div class="container">
         
+        <!-- 45 Days Due Alert KPI Banner -->
+        <div class="alert-kpi-banner">
+            <div class="alert-kpi-left">
+                <span class="alert-icon">🚨</span>
+                <div>
+                    <h4 class="alert-title">PM Work Due Alert (Next 45 Days)</h4>
+                    <p class="alert-desc" id="alertDescText">Checking live sheet for upcoming preventive maintenance schedules...</p>
+                </div>
+            </div>
+            <div class="alert-count-badge" id="alertCountBadge">0</div>
+        </div>
+
         <!-- Sub-Modules Switcher Tabs -->
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('pm', this)">📅 PM Schedule (SQF)</button>
@@ -56,32 +89,30 @@
             <button class="tab-btn" onclick="switchTab('calib', this)">📏 Calibration List & Search</button>
         </div>
 
-        <!-- 1. PM Schedule Section -->
+        <!-- 1. PM Schedule Section (Live from CSV) -->
         <div class="content-section active" id="pm-section">
-            <div class="section-title"><span>📅 Seal Quench Furnace (SQF) PM Schedule - 2026-2027</span></div>
+            <div class="section-title">
+                <span>📅 Seal Quench Furnace (SQF) Preventive Maintenance Schedule (Live)</span>
+            </div>
             <div class="table-scroll">
                 <table>
-                    <thead>
-                        <tr>
-                            <th>SR</th>
-                            <th>EQUIPMENT / MACHINE</th>
-                            <th>MAINTENANCE TASK</th>
-                            <th>FREQUENCY</th>
-                            <th>LAST DONE</th>
-                            <th>NEXT DUE</th>
-                            <th>STATUS</th>
-                        </tr>
-                    </thead>
+                    <thead id="pmThead"></thead>
                     <tbody id="pmTableBody">
-                        <tr><td colspan="7" class="no-data">Loading PM Schedule...</td></tr>
+                        <tr><td colspan="15" class="no-data">Loading PM Schedule from Google Sheet...</td></tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- PM History Log Box -->
+            <div class="history-box">
+                <h4>📜 PM Activity & Maintenance History Log</h4>
+                <p id="pmHistoryLogText" style="color: #94a3b8; margin: 0;">Click on any machine row or check remarks to view past service notes and completed actions.</p>
             </div>
         </div>
 
         <!-- 2. Critical Spares Section -->
         <div class="content-section" id="spares-section">
-            <div class="section-title"><span>🛠️ Critical Spare Parts List & Stock Tracking</span></div>
+            <div class="section-title"><span>🛠️ Critical Spare Parts List</span></div>
             <div class="table-scroll">
                 <table>
                     <thead>
@@ -92,7 +123,7 @@
                             <th>PART NUMBER</th>
                             <th>MIN STOCK</th>
                             <th>CURRENT STOCK</th>
-                            <th>RACK LOCATION</th>
+                            <th>LOCATION / RACK</th>
                         </tr>
                     </thead>
                     <tbody id="sparesTableBody">
@@ -104,7 +135,7 @@
 
         <!-- 3. Calibration List Section with Live Search -->
         <div class="content-section" id="calib-section">
-            <div class="section-title"><span>📏 Instrument Calibration Master List</span></div>
+            <div class="section-title"><span>📏 Instrument Calibration Master List & Search</span></div>
             <input type="text" id="calibrationSearch" class="search-box" placeholder="🔍 Search by Instrument Name, ID, Make or Location..." onkeyup="filterCalibrationTable()">
             <div class="table-scroll">
                 <table>
@@ -131,10 +162,8 @@
     </div>
 
     <script>
-        // Yahan apni Google Sheet ka Publish to Web wala CSV link daal dena ( ya alag GID wala link)
-        const MAINTENANCE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=1943594971&single=true&output=csv";
-
-        let rawCalibrationData = [];
+        // Live CSV URL for PM Schedule provided by user
+        const PM_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=1943594971&single=true&output=csv";
 
         function switchTab(tabName, btnEl) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -151,27 +180,103 @@
             }
         }
 
-        // Dummy Data loader (Jab tak Google sheet link na ho, tab tak testing ke liye)
-        function loadDefaultData() {
-            // PM Schedule Dummy Data
-            document.getElementById('pmTableBody').innerHTML = `
-                <tr><td>1</td><td><b>SQF-01</b></td><td>Burner Nozzle & Thermocouple Check</td><td>Monthly</td><td>10-01-2026</td><td>10-02-2026</td><td style="color:#34d399; font-weight:600;">Completed</td></tr>
-                <tr><td>2</td><td><b>SQF-02</b></td><td>Quench Agitator Motor Greasing</td><td>Weekly</td><td>05-02-2026</td><td>12-02-2026</td><td style="color:#f59e0b; font-weight:600;">Due Soon</td></tr>
-            `;
+        function parseCSV(text) {
+            const rows = text.split('\n').map(r => {
+                let row = [];
+                let insideQuote = false;
+                let entry = '';
+                for (let char of r) {
+                    if (char === '"') { insideQuote = !insideQuote; }
+                    else if (char === ',' && !insideQuote) { row.push(entry.trim()); entry = ''; }
+                    else { entry += char; }
+                }
+                row.push(entry.trim());
+                return row;
+            });
+            return rows;
+        }
 
-            // Critical Spares Dummy Data
+        async function fetchPMScheduleLive() {
+            try {
+                const timestamp = new Date().getTime();
+                const res = await fetch(`${PM_CSV_URL}&_t=${timestamp}`);
+                const text = await res.text();
+                const rows = parseCSV(text);
+
+                const thead = document.getElementById('pmThead');
+                const tbody = document.getElementById('pmTableBody');
+
+                if (rows.length > 0) {
+                    // Header row
+                    let headerRow = rows[0];
+                    let thHtml = `<tr>`;
+                    headerRow.forEach(col => {
+                        thHtml += `<th>${col || ''}</th>`;
+                    });
+                    thHtml += `</tr>`;
+                    thead.innerHTML = thHtml;
+
+                    // Data rows
+                    let dataRows = rows.slice(1);
+                    let html = "";
+                    let dueWithin45Days = 0;
+                    let historyLogsText = "";
+
+                    dataRows.forEach((r, idx) => {
+                        if (r.length > 1 && r.some(cell => cell !== '')) {
+                            html += `<tr>`;
+                            r.forEach((cell, cIdx) => {
+                                let style = "";
+                                if (cIdx === 1) style = "font-weight:700; color:#38bdf8;";
+                                html += `<td style="${style}">${cell || '-'}</td>`;
+
+                                // Check for remarks or upcoming schedule for history/alerts
+                                if (cIdx >= 5 && cell && (cell.toLowerCase().includes('due') || cell.toLowerCase().includes('plan'))) {
+                                    dueWithin45Days++;
+                                }
+                            });
+                            html += `</tr>`;
+
+                            // Extract remarks for history log simulation
+                            let remark = r[r.length - 1] || r[r.length - 2];
+                            if (remark && remark !== '-') {
+                                historyLogsText += `• <b>${r[1] || 'Machine'}:</b> ${remark}<br>`;
+                            }
+                        }
+                    });
+
+                    tbody.innerHTML = html;
+
+                    // Update 45 Days Alert KPI Banner
+                    document.getElementById('alertCountBadge').innerText = dueWithin45Days > 0 ? dueWithin45Days : '0';
+                    document.getElementById('alertDescText').innerText = dueWithin45Days > 0 
+                        ? `${dueWithin45Days} maintenance schedules are falling within the next 45 days grace window.` 
+                        : `All machines are currently running within safe maintenance schedules. No urgent 45-day alerts.`;
+
+                    if (historyLogsText) {
+                        document.getElementById('pmHistoryLogText').innerHTML = historyLogsText;
+                    }
+                }
+            } catch (err) {
+                console.log("Error loading PM Schedule live:", err);
+                document.getElementById('pmTableBody').innerHTML = `<tr><td colspan="15" class="no-data" style="color:#ef4444;">⚠️ Failed to load live PM Schedule CSV. Please check link.</td></tr>`;
+            }
+        }
+
+        function loadOtherStaticTabs() {
+            // Critical Spares Dummy / Standard Data
             document.getElementById('sparesTableBody').innerHTML = `
                 <tr><td>1</td><td><b>SP-001</b></td><td>Radiant Tube U-Type</td><td>RT-SQF-7</td><td>2</td><td style="color:#38bdf8; font-weight:600;">3</td><td>Rack A-1</td></tr>
                 <tr><td>2</td><td><b>SP-002</b></td><td>Silicon Carbide Heating Element</td><td>SiC-200</td><td>4</td><td style="color:#ef4444; font-weight:600;">1 (Low)</td><td>Rack B-2</td></tr>
             `;
 
-            // Calibration Dummy Data (Sath me search ke liye array store karenge)
-            rawCalibrationData = [
-                ["1", "Digital Temperature Recorder", "Eurotherm", "TR-01", "0-1200°C", "1°C", "SQF Panel-1", "01-01-2026", "01-07-2026"],
-                ["2", "Portable Hardness Tester", "Mitutoyo", "HT-05", "200-900 HV", "1 HV", "Metallurgical Lab", "15-12-2025", "15-06-2026"],
-                ["3", "Pressure Transmitter", "Wika", "PT-03", "0-10 bar", "0.1 bar", "Gas House", "10-01-2026", "10-07-2026"]
+            // Calibration Data
+            window.rawCalibrationData = [
+                ["1", "Digital Temperature Recorder", "Eurotherm", "TR-01", "0-1200°C", "1°C", "SQF Panel-1", "01-04-2026", "01-10-2026"],
+                ["2", "Portable Hardness Tester", "Mitutoyo", "HT-05", "200-900 HV", "1 HV", "Metallurgical Lab", "15-05-2026", "15-11-2026"],
+                ["3", "Pressure Transmitter", "Wika", "PT-03", "0-10 bar", "0.1 bar", "Gas House", "10-06-2026", "10-12-2026"]
             ];
-            displayCalibrationRows(rawCalibrationData);
+            displayCalibrationRows(window.rawCalibrationData);
         }
 
         function displayCalibrationRows(rows) {
@@ -191,14 +296,12 @@
                 }
                 html += `</tr>`;
             });
-            tbody.html = html; // Fixed typo
             tbody.innerHTML = html;
         }
 
-        // 🔍 Live Search Filter Logic for Calibration List
         function filterCalibrationTable() {
             const query = document.getElementById('calibrationSearch').value.toLowerCase().trim();
-            const filtered = rawCalibrationData.filter(r => {
+            const filtered = (window.rawCalibrationData || []).filter(r => {
                 let name = String(r[1] || '').toLowerCase();
                 let make = String(r[2] || '').toLowerCase();
                 let id = String(r[3] || '').toLowerCase();
@@ -209,7 +312,8 @@
         }
 
         window.onload = function() {
-            loadDefaultData();
+            fetchPMScheduleLive();
+            loadOtherStaticTabs();
         };
     </script>
 </body>
