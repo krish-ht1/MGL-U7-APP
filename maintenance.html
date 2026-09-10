@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HT Maintenance Hub</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #0f172a; color: #fff; margin: 0; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 15px; margin-bottom: 20px; }
+        .back-btn { background: #3b82f6; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; text-decoration: none; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { background: #1e293b; color: #cbd5e1; border: 1px solid #475569; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+        .tab-btn.active { background: #3b82f6; color: white; border-color: #3b82f6; }
+        .content-section { background: #1e293b; padding: 20px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>⚙️ HT Maintenance Dashboard</h1>
+        <a href="index.html" class="back-btn">⬅️ Back to Main Dashboard</a>
+    </div>
+
+    <!-- Sub-Modules Switcher Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('pm')">📅 PM Schedule (SQF)</button>
+        <button class="tab-btn" onclick="switchTab('spares')">🛠️ Critical Spare List</button>
+        <!-- Kal ko yahan aur bhi tabs add kar sakta hai -->
+    </div>
+
+    <!-- Content Area -->
+    <div class="content-section" id="moduleContent">
+        <p>Loading PM Schedule...</p>
+    </div>
+
+    <script>
+        const WEB_APP_URL = "YAHAN_APNA_APPS_SCRIPT_URL_DAL_DENA";
+
+        function switchTab(tabName) {
+            // Buttons ka active class badalna
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const container = document.getElementById('moduleContent');
+
+            if (tabName === 'pm') {
+                container.innerHTML = "<h3>📅 Seal Quench Furnace (SQF) PM Schedule - 2026-2027</h3><p>Yahan Google Sheet se fetch karke PM Schedule ka table dikhayenge.</p>";
+                // Yahan fetch('...action=pmSchedule') wala code chalega
+            } else if (tabName === 'spares') {
+                container.innerHTML = "<h3>🛠️ Critical Spare Parts List</h3><p>Yahan Critical Spares ka data load hoga.</p>";
+                // Yahan fetch('...action=criticalSpares') wala code chalega
+            }
+        }
+
+        // Page khulte hi default PM Schedule load karega
+        window.onload = function() {
+            switchTab('pm');
+        };
+    </script>
+
+</body>
+</html>
