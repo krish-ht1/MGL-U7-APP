@@ -165,13 +165,13 @@
       border-radius: 8px;
     }
     .legend-item { display: flex; align-items: center; gap: 5px; }
-    .graph-container { position: relative; width: 100%; height: 320px; }
+    .graph-container { position: relative; width: 100%; height: 340px; }
 
     /* Mobile adjustments */
     @media (max-width: 480px) {
       .ewm-container { padding: 8px; gap: 10px; }
       .ewm-brand h1 { font-size: 12px; }
-      .graph-container { height: 280px; }
+      .graph-container { height: 300px; }
       table.yearly-table { font-size: 10.5px; }
     }
   </style>
@@ -334,13 +334,13 @@
 
     function renderYearlyPinkChart(labels, production, targets, avgs) {
       const ctx = document.getElementById('yearlyChart').getContext('2d');
-      const isMobile = window.innerWidth < 768;
+      const isMobile = window.innerWidth <= 768;
 
-      let gradPink = ctx.createLinearGradient(0, 0, 0, 320);
+      let gradPink = ctx.createLinearGradient(0, 0, 0, 340);
       gradPink.addColorStop(0, '#ec4899');
       gradPink.addColorStop(1, '#831843');
 
-      let gradGreen = ctx.createLinearGradient(0, 0, 0, 320);
+      let gradGreen = ctx.createLinearGradient(0, 0, 0, 340);
       gradGreen.addColorStop(0, '#34d399');
       gradGreen.addColorStop(1, '#065f46');
 
@@ -377,7 +377,7 @@
               type: 'line',
               borderColor: '#38bdf8',
               backgroundColor: '#38bdf8',
-              borderWidth: 3,
+              borderWidth: 2.5,
               pointRadius: 4,
               pointBackgroundColor: '#0f172a',
               pointBorderColor: '#38bdf8',
@@ -395,11 +395,27 @@
           plugins: {
             legend: { display: false },
             datalabels: {
-              // Web पर बार के ऊपर, Mobile पर बार के अंदर
-              anchor: isMobile ? 'center' : 'end',
-              align: isMobile ? 'center' : 'top',
-              color: isMobile ? '#ffffff' : '#f8fafc',
-              font: { family: 'Inter', size: isMobile ? 9 : 10, weight: 'bold' },
+              // Web पर बार के ऊपर (Horizontal), Mobile पर बार के अंदर (-90 डिग्री Rotate)
+              anchor: function(context) {
+                if (context.dataset.type === 'line') return 'end';
+                return isMobile ? 'center' : 'end';
+              },
+              align: function(context) {
+                if (context.dataset.type === 'line') return 'top';
+                return isMobile ? 'center' : 'top';
+              },
+              color: function(context) {
+                return context.dataset.type === 'line' ? '#38bdf8' : '#f8fafc';
+              },
+              font: { 
+                family: 'Inter', 
+                size: isMobile ? 8.5 : 10.5, 
+                weight: '700' 
+              },
+              rotation: function(context) {
+                if (isMobile && context.dataset.type !== 'line') return -90;
+                return 0;
+              },
               formatter: function(value) {
                 return value > 0 ? value : '';
               }
@@ -415,19 +431,19 @@
           },
           scales: {
             x: { 
-              grid: { display: false }, // बैकग्राउंड की लाइनें हटाई गई हैं
+              grid: { display: false }, 
               ticks: { color: '#94a3b8', font: { size: 10, weight: '700' } } 
             },
             y: {
               type: 'linear',
               position: 'left',
-              grid: { display: false }, // बैकग्राउंड की लाइनें हटाई गई हैं
+              grid: { display: false },
               ticks: { color: '#f472b6', font: { size: 9 } }
             },
             y1: {
               type: 'linear',
               position: 'right',
-              grid: { display: false }, // बैकग्राउंड की लाइनें हटाई गई हैं
+              grid: { display: false },
               ticks: { color: '#34d399', font: { size: 9 } }
             }
           }
