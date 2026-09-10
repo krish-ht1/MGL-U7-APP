@@ -571,42 +571,71 @@
 
     </div>
 
-    <!-- MAINTENANCE SECTION -->
+    <!-- ================= PLANT MAINTENANCE SECTION ================= -->
     <div class="section-box" id="secMaintenance" style="margin-top: 20px; display: none;">
       <div class="section-title maint-header">🔧 PLANT MAINTENANCE & UTILITIES</div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; max-width: 900px; margin: 0 auto;">
-        
-        <div class="emp-card" onclick="openProfile('Maintenance Lead', 'Sr. Engineer Maintenance', 'B.Tech (Electrical)', '8+ Yrs', 'Furnace Automation, Gas Line & Pyrometry', 'maint_head', 'PLANT MAINTENANCE')">
-          <div class="photo-slot"><img src="image/maint_head.jpeg" data-name="maint_head" onerror="smartImgLoad(this, 'maint_head')"><span class="avatar-fallback">MH</span></div>
-          <h4 class="emp-name">Surinder Singh</h4>
+      
+      <!-- 1. Maintenance Head (Surendra) -->
+      <div style="max-width: 320px; margin: 0 auto 14px auto;">
+        <div class="emp-card" onclick="openProfile('Surendra Singh', 'Sr. Engineer Maintenance', 'ITI (Electrical)', '10+ Yrs Exp.', 'Overall Maintenance Leadership & Plant Utilities', 'maint_head', 'PLANT MAINTENANCE')">
+          <div class="photo-slot">
+            <img src="image/maint_head.jpeg" data-name="maint_head" onerror="smartImgLoad(this, 'maint_head')">
+            <span class="avatar-fallback">SS</span>
+          </div>
+          <h4 class="emp-name">Surendra Singh</h4>
           <p class="emp-role">Sr. Engineer Maintenance</p>
           <span class="emp-badge">ITI (Electrical)</span>
-          <span class="emp-exp">10+ Yrs Exp.</span>
+          <span class="emp-exp">⭐ 10+ Yrs Exp.</span>
         </div>
-<div class="emp-card" onclick="openProfile('Maintenance Lead', 'Sr. Engineer Maintenance', 'B.Tech (Electrical)', '8+ Yrs', 'Furnace Automation, Gas Line & Pyrometry', 'maint_head', 'PLANT MAINTENANCE')">
-          <div class="photo-slot"><img src="image/maint_head.jpeg" data-name="maint_head" onerror="smartImgLoad(this, 'maint_head')"><span class="avatar-fallback">MH</span></div>
-          <h4 class="emp-name">Dalip Saini</h4>
+      </div>
+
+      <!-- 2. Junior Engineer (Dilip Saini) - Directly under Surendra -->
+      <div style="max-width: 280px; margin: 0 auto 16px auto;">
+        <div class="emp-card" onclick="openProfile('Dilip Saini', 'Jr. Engineer Maintenance', 'DME (Electrical)', '5+ Yrs Exp.', 'Furnace Automation, Gas Line & Pyrometry', 'dilip_saini', 'PLANT MAINTENANCE')">
+          <div class="photo-slot">
+            <img src="image/dilip.jpeg" data-name="dilip" onerror="smartImgLoad(this, 'dilip')">
+            <span class="avatar-fallback">DS</span>
+          </div>
+          <h4 class="emp-name">Dilip Saini</h4>
           <p class="emp-role">Jr. Engineer Maintenance</p>
           <span class="emp-badge">DME (Electrical)</span>
           <span class="emp-exp">5+ Yrs Exp.</span>
         </div>
-        <div class="emp-card" onclick="openProfile('Shift Technician', 'Electrical & Instrumentation', 'Diploma / ITI', '5+ Yrs', 'Thermocouple, Burner & Panel Maintenance', 'maint_tech', 'PLANT MAINTENANCE')">
-          <div class="photo-slot"><img src="image/maint_tech.jpeg" data-name="maint_tech" onerror="smartImgLoad(this, 'maint_tech')"><span class="avatar-fallback">ST</span></div>
+      </div>
+
+      <!-- 3. Parallel Bottom Three (Naman, Sameer, Inderjeet) -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 900px; margin: 0 auto;">
+        
+        <!-- Naman -->
+        <div class="emp-card" onclick="openProfile('Naman', 'Electrical & Instruments', 'ITI (Electrician)', '3+ Yrs Exp.', 'Thermocouple & Panel Maintenance', 'naman', 'PLANT MAINTENANCE')">
+          <div class="photo-slot">
+            <img src="image/naman.jpeg" data-name="naman" onerror="smartImgLoad(this, 'naman')">
+            <span class="avatar-fallback">N</span>
+          </div>
           <h4 class="emp-name">Naman</h4>
           <p class="emp-role">Electrical & Instruments</p>
           <span class="emp-badge">ITI (Electrician)</span>
           <span class="emp-exp">3+ Yrs Exp.</span>
         </div>
-        <div class="emp-card" onclick="openProfile('Shift Technician', 'Electrical & Instrumentation', 'Diploma / ITI', '5+ Yrs', 'Thermocouple, Burner & Panel Maintenance', 'maint_tech', 'PLANT MAINTENANCE')">
-          <div class="photo-slot"><img src="image/maint_tech.jpeg" data-name="maint_tech" onerror="smartImgLoad(this, 'maint_tech')"><span class="avatar-fallback">ST</span></div>
+
+        <!-- Sameer -->
+        <div class="emp-card" onclick="openProfile('Sameer', 'Electrical & Instruments', 'ITI (Electrician)', '2+ Yrs Exp.', 'Burner & Panel Maintenance', 'sameer', 'PLANT MAINTENANCE')">
+          <div class="photo-slot">
+            <img src="image/sameer.jpeg" data-name="sameer" onerror="smartImgLoad(this, 'sameer')">
+            <span class="avatar-fallback">S</span>
+          </div>
           <h4 class="emp-name">Sameer</h4>
           <p class="emp-role">Electrical & Instruments</p>
           <span class="emp-badge">ITI (Electrician)</span>
           <span class="emp-exp">2+ Yrs Exp.</span>
         </div>
 
-        <div class="emp-card" onclick="openProfile('Mechanical Fitter', 'Furnace Utility Maintenance', 'ITI (Fitter)', '6+ Yrs', 'Quench Pumps, Agitators & Hydraulics', 'maint_fitter', 'PLANT MAINTENANCE')">
-          <div class="photo-slot"><img src="image/maint_fitter.jpeg" data-name="maint_fitter" onerror="smartImgLoad(this, 'maint_fitter')"><span class="avatar-fallback">MF</span></div>
+        <!-- Inderjeet -->
+        <div class="emp-card" onclick="openProfile('Inderjeet', 'Furnace Utility & Mechanical', 'ITI (Fitter)', '3+ Yrs Exp.', 'Quench Pumps, Agitators & Hydraulics', 'inderjeet', 'PLANT MAINTENANCE')">
+          <div class="photo-slot">
+            <img src="image/inderjeet.jpeg" data-name="inderjeet" onerror="smartImgLoad(this, 'inderjeet')">
+            <span class="avatar-fallback">I</span>
+          </div>
           <h4 class="emp-name">Inderjeet</h4>
           <p class="emp-role">Furnace Utility & Mechanical</p>
           <span class="emp-badge">ITI (Fitter)</span>
