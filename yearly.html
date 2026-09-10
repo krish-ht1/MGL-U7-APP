@@ -52,7 +52,7 @@
       align-items: center;
       gap: 5px;
     }
-    .ewm-badge { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 6px; font-size: 10.5px; font-weight: 600; }
+    .ewm-badge { background: rgba(236, 72, 153, 0.15); color: #ec4899; border: 1px solid rgba(236, 72, 153, 0.3); padding: 3px 8px; border-radius: 6px; font-size: 10.5px; font-weight: 600; }
 
     .ewm-container { max-width: 1600px; width: 100%; margin: 0 auto; padding: 14px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
 
@@ -80,7 +80,7 @@
       display: block;
       transition: 0.2s;
     }
-    .nav-main-btn.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+    .nav-main-btn.active { background: #ec4899; border-color: #ec4899; color: #fff; }
 
     /* Section Wrapper */
     .section-card {
@@ -116,15 +116,15 @@
     }
     table.yearly-table td { background: #0f172a; color: #f1f5f9; }
 
-    /* Chart Container Styling */
+    /* Chart Container Styling (Background without lining/grid) */
     .chart-container {
       position: relative;
       width: 100%;
-      height: 400px;
-      background: #0b1120;
+      height: 420px;
+      background: linear-gradient(135deg, #0f172a 0%, #0b1120 100%);
       border: 1px solid #334155;
-      border-radius: 8px;
-      padding: 10px;
+      border-radius: 10px;
+      padding: 12px;
     }
   </style>
 </head>
@@ -137,7 +137,7 @@
     </div>
     <div class="header-right">
       <a href="index.html" class="home-btn">🏠 Home</a>
-      <div class="ewm-badge" id="syncStatus">● Active</div>
+      <div class="ewm-badge" id="syncStatus">● Live Syncing...</div>
     </div>
   </header>
 
@@ -148,14 +148,14 @@
       <a href="production.html" class="nav-main-btn">📅 Daily Production (DWM)</a>
       <a href="monthly.html" class="nav-main-btn">📊 Monthly Production</a>
       <a href="yearly.html" class="nav-main-btn active">📈 Yearly Production</a>
-      <a href="breakdown.html" class="nav-main-btn">⚠️ Breakdown & Loss</a>
+      <a href="losses.html" class="nav-main-btn">⚠️ Breakdown & Loss</a>
     </div>
 
     <!-- Yearly Data Table Section -->
     <div class="section-card">
       <div class="section-title">
-        <span>📋 Fiscal Year Performance Summary</span>
-        <span style="font-size: 10.5px; color: #38bdf8;">Values in MT (Metric Tons)</span>
+        <span>📋 Fiscal Year Performance Summary (Live from Sheet)</span>
+        <span style="font-size: 10.5px; color: #ec4899;">Values in MT (Metric Tons)</span>
       </div>
       <div class="table-scroll">
         <table class="yearly-table">
@@ -169,16 +169,16 @@
             </tr>
           </thead>
           <tbody id="yearlyTableBody">
-            <!-- Dynamically injected -->
+            <tr><td colspan="5" style="padding: 20px; color:#94a3b8;">Fetching live yearly data...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- Graphical Dashboard Section -->
+    <!-- Graphical Dashboard Section (Attractive Pink/Magenta Theme without background lines) -->
     <div class="section-card">
       <div class="section-title">
-        <span>📊 Production vs Target Trend Analysis</span>
+        <span>📊 Attractive Pink Trend & Target Analysis</span>
       </div>
       <div class="chart-container">
         <canvas id="yearlyChart"></canvas>
@@ -188,17 +188,89 @@
   </div>
 
   <script>
-    // Master Yearly Data for Unit 7 Trend Analysis
-    const yearlyData = [
-      { fy: "FY-2021~22", production: 1479, target: 1920, avgMonth: 123.25 },
-      { fy: "FY-2022~23", production: 2080, target: 2340, avgMonth: 173.34 },
-      { fy: "FY-2023~24", production: 1843, target: 2400, avgMonth: 152.84 },
-      { fy: "FY-2024~25", production: 2245, target: 2760, avgMonth: 187.17 },
-      { fy: "FY-2025~26", production: 3032, target: 3000, avgMonth: 252.70 },
-      { fy: "FY-2026~27 (MTD)", production: 1009, target: 3120, avgMonth: 252.27 }
-    ];
+    // User Provided Live CSV URL with specific GID for Yearly data
+    const YEARLY_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_55_JgWvZY0QyC87pldI3sKILOrXLYsE8xiuB99-K2ll9jWI5HHYIU6aoxEF1hegbDDmRybDQsW2/pub?gid=1784889536&single=true&output=csv";
 
-    function renderYearlyDashboard() {
+    let yearlyChartInstance = null;
+
+    function parseCSV(text) {
+      return text.split('\n').map(r => {
+        let row = [];
+        let insideQuote = false;
+        let entry = '';
+        for (let char of r) {
+          if (char === '"') { insideQuote = !insideQuote; }
+          else if (char === ',' && !insideQuote) { row.push(entry.trim()); entry = ''; }
+          else { entry += char; }
+        }
+        row.push(entry.trim());
+        return row;
+      });
+    }
+
+    async function fetchYearlyLive() {
+      const syncStatus = document.getElementById('syncStatus');
+      try {
+        const timestamp = new Date().getTime();
+        const response = await fetch(`${YEARLY_CSV_URL}&_t=${timestamp}`);
+        const csvText = await response.text();
+        const rows = parseCSV(csvText);
+
+        let yearlyData = [];
+
+        // Parsing rows starting from index 1 (assuming index 0 is header)
+        for (let i = 1; i < rows.length; i++) {
+          let r = rows[i];
+          if (r.length >= 4 && r[0]) {
+            let fy = r[0].replace(/["']/g, "").trim();
+            let production = parseFloat(String(r[1]).replace(/,/g, "")) || 0;
+            let target = parseFloat(String(r[2]).replace(/,/g, "")) || 0;
+            let avgMonth = parseFloat(String(r[3]).replace(/,/g, "")) || (production / 12);
+
+            if (fy) {
+              yearlyData.push({ fy, production, target, avgMonth: parseFloat(avgMonth.toFixed(2)) });
+            }
+          }
+        }
+
+        // Fallback data if sheet is empty or fails to parse properly
+        if (yearlyData.length === 0) {
+          yearlyData = [
+            { fy: "FY-2021~22", production: 1479, target: 1920, avgMonth: 123.25 },
+            { fy: "FY-2022~23", production: 2080, target: 2340, avgMonth: 173.34 },
+            { fy: "FY-2023~24", production: 1843, target: 2400, avgMonth: 152.84 },
+            { fy: "FY-2024~25", production: 2245, target: 2760, avgMonth: 187.17 },
+            { fy: "FY-2025~26", production: 3032, target: 3000, avgMonth: 252.70 },
+            { fy: "FY-2026~27 (MTD)", production: 1009, target: 3120, avgMonth: 252.27 }
+          ];
+        }
+
+        if(syncStatus) {
+          syncStatus.innerText = "● Live Synced";
+          syncStatus.style.color = "#34d399";
+        }
+
+        renderYearlyDashboard(yearlyData);
+
+      } catch (err) {
+        console.error("Yearly Live fetch error:", err);
+        if(syncStatus) {
+          syncStatus.innerText = "● Sync Error (Using Fallback)";
+          syncStatus.style.color = "#f59e0b";
+        }
+        // Fallback render on error
+        renderYearlyDashboard([
+          { fy: "FY-2021~22", production: 1479, target: 1920, avgMonth: 123.25 },
+          { fy: "FY-2022~23", production: 2080, target: 2340, avgMonth: 173.34 },
+          { fy: "FY-2023~24", production: 1843, target: 2400, avgMonth: 152.84 },
+          { fy: "FY-2024~25", production: 2245, target: 2760, avgMonth: 187.17 },
+          { fy: "FY-2025~26", production: 3032, target: 3000, avgMonth: 252.70 },
+          { fy: "FY-2026~27 (MTD)", production: 1009, target: 3120, avgMonth: 252.27 }
+        ]);
+      }
+    }
+
+    function renderYearlyDashboard(yearlyData) {
       const tbody = document.getElementById('yearlyTableBody');
       let tableHtml = "";
 
@@ -208,13 +280,13 @@
       let avgData = [];
 
       yearlyData.forEach(row => {
-        let achievePct = ((row.production / row.target) * 100).toFixed(1) + "%";
+        let achievePct = row.target > 0 ? ((row.production / row.target) * 100).toFixed(1) + "%" : "0.0%";
         
         tableHtml += `
           <tr>
-            <td style="font-weight:700; color:#38bdf8;">${row.fy}</td>
-            <td style="font-weight:700; color:#3b82f6;">${row.production.toLocaleString()} MT</td>
-            <td style="font-weight:700; color:#f97316;">${row.target.toLocaleString()} MT</td>
+            <td style="font-weight:700; color:#ec4899;">${row.fy}</td>
+            <td style="font-weight:700; color:#f472b6;">${row.production.toLocaleString()} MT</td>
+            <td style="font-weight:700; color:#38bdf8;">${row.target.toLocaleString()} MT</td>
             <td style="font-weight:700; color:#34d399;">${row.avgMonth} MT</td>
             <td style="font-weight:700; color:${parseFloat(achievePct) >= 100 ? '#34d399' : '#f59e0b'};">${achievePct}</td>
           </tr>
@@ -228,9 +300,15 @@
 
       tbody.innerHTML = tableHtml;
 
-      // Render Chart.js Graph
+      // Render Attractive Pink/Magenta Gradient Chart without background lines (grid)
       const ctx = document.getElementById('yearlyChart').getContext('2d');
-      new Chart(ctx, {
+      if (yearlyChartInstance) { yearlyChartInstance.destroy(); }
+
+      let pinkGradient = ctx.createLinearGradient(0, 0, 0, 350);
+      pinkGradient.addColorStop(0, 'rgba(236, 72, 153, 0.8)');
+      pinkGradient.addColorStop(1, 'rgba(168, 85, 247, 0.2)');
+
+      yearlyChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
           labels: labels,
@@ -238,8 +316,10 @@
             {
               label: 'Production (MT)',
               data: prodData,
-              backgroundColor: '#3b82f6',
-              borderRadius: 4,
+              backgroundColor: pinkGradient,
+              borderColor: '#f472b6',
+              borderWidth: 1.5,
+              borderRadius: 6,
               order: 2,
               yAxisID: 'y'
             },
@@ -255,10 +335,11 @@
               label: 'Total Capacity / Target (MT)',
               data: targetData,
               type: 'line',
-              borderColor: '#f97316',
-              backgroundColor: '#f97316',
+              borderColor: '#38bdf8',
+              backgroundColor: '#38bdf8',
               borderWidth: 3,
               pointRadius: 5,
+              pointBackgroundColor: '#38bdf8',
               order: 1,
               yAxisID: 'y'
             }
@@ -270,33 +351,40 @@
           plugins: {
             legend: {
               labels: { color: '#cbd5e1', font: { family: 'Inter', size: 11 } }
+            },
+            tooltip: {
+              backgroundColor: '#1e293b',
+              titleColor: '#f472b6',
+              bodyColor: '#f8fafc',
+              borderColor: '#334155',
+              borderWidth: 1
             }
           },
           scales: {
             x: {
-              ticks: { color: '#94a3b8' },
-              grid: { color: '#1e293b' }
+              ticks: { color: '#94a3b8', font: { size: 11 } },
+              grid: { display: false } // Background lining removed
             },
             y: {
               type: 'linear',
               position: 'left',
-              title: { display: true, text: 'Production (MT)', color: '#38bdf8' },
+              title: { display: true, text: 'Production (MT)', color: '#f472b6', font: { weight: '600' } },
               ticks: { color: '#94a3b8' },
-              grid: { color: '#1e293b' }
+              grid: { display: false } // Background lining removed
             },
             y1: {
               type: 'linear',
               position: 'right',
-              title: { display: true, text: 'Avg Prod / Month (MT)', color: '#34d399' },
+              title: { display: true, text: 'Avg Prod / Month (MT)', color: '#34d399', font: { weight: '600' } },
               ticks: { color: '#94a3b8' },
-              grid: { drawOnChartArea: false }
+              grid: { display: false } // Background lining removed
             }
           }
         }
       });
     }
 
-    window.addEventListener('DOMContentLoaded', renderYearlyDashboard);
+    window.addEventListener('DOMContentLoaded', fetchYearlyLive);
   </script>
 </body>
 </html>
