@@ -169,7 +169,7 @@
         }
         tr:hover td { background: rgba(249, 115, 22, 0.08); color: #fff; }
 
-        /* Sticky First Column */
+        /* Compact Width Fixes */
         th:first-child, td:first-child {
             width: 50px;
             min-width: 50px;
@@ -228,7 +228,7 @@
             <button class="tab-btn" onclick="switchMaintenanceTab('calib', this)">📏 Calibration Master</button>
         </div>
 
-        <!-- 1. PM Schedule Section (Live from Google Sheet) -->
+        <!-- 1. PM Schedule Section -->
         <div id="section-pm" class="content-section active">
             <div class="section-card">
                 <div class="section-title">
@@ -286,7 +286,7 @@
         // Live CSV URLs
         const PM_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=1943594971&single=true&output=csv";
         const SPARES_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=1304634560&single=true&output=csv";
-        const CALIB_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=2037689190&single=true&output=csv";[cite: 1]
+        const CALIB_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=2037689190&single=true&output=csv"; //[cite: 1]
 
         let rawSparesData = [];
         let rawCalibData = [];
@@ -401,7 +401,6 @@
                 html += `<tr>`;
                 r.forEach((cell, idx) => {
                     let val = cell || '-';
-                    // Index 4 is Min Stock, Index 5 is Current Stock
                     if (idx === 5) {
                         let current = parseFloat(val) || 0;
                         let minVal = parseFloat(r[4]) || 0;
