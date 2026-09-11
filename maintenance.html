@@ -720,42 +720,35 @@ async function loadPMSchedule() {
             tbody.innerHTML = `<tr><td colspan="9" class="no-data" style="color:#ef4444;">⚠️ Error loading calibration records.</td></tr>`;
         }
 
-       function renderCalibrationTable(rows) {
-    const tbody = document.getElementById('calibrationTableBody');
-    if (!tbody) return;
+ function renderCalibrationTable(rows) {
+            const tbody = document.getElementById('calibrationTableBody');
+            if (!tbody) return;
 
-    if (rows.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="no-data">🔍 No calibration records found.</td></tr>`;
-        return;
-    }
-
-    // मान लेते हैं कि कैलिब्रेशन टेबल में कुल 9 कॉलम हैं (Sr. No से लेकर Due Date तक)
-    const totalColumns = 9; 
-    let html = "";
-
-    rows.forEach((r, idx) => {
-        html += `<tr>`;
-        
-        // हमेशा पहला कॉलम सीरियल नंबर (Sr. No) का होगा
-        html += `<td style="width: 45px; min-width: 45px; font-weight:600; color:#38bdf8; background:#1e293b; text-align:center;">${idx + 1}</td>`;
-
-        // अब बाकी के कॉलम्स के लिए लूप चलाएंगे (Index 1 से लेकर totalColumns - 1 तक)
-        for (let i = 1; i < totalColumns; i++) {
-            let val = (r && r[i] !== undefined && r[i] !== null) ? String(r[i]).trim() : '';
-            
-            // अगर शीट में डेटा खाली है, तो टेबल को फटने या मर्ज होने से बचाने के लिए खाली हाइफन (-) या नॉन-ब्रेकिंग स्पेस दें
-            if (val === '') {
-                val = '-';
+            if (rows.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="no-data">🔍 No calibration records found.</td></tr>`;
+                return;
             }
 
-            html += `<td style="text-align: left; white-space: nowrap;">${val}</td>`;
+            let html = "";
+            rows.forEach(r => {
+                html += `<tr>`;
+                r.forEach((cell, idx) => {
+                    let val = (cell !== undefined && cell !== null) ? String(cell) : '-';
+                    
+                    // 🔥 Line break ko HTML <br> mein convert karna
+                    let formattedVal = val.replace(/\n/g, '<br>');
+                    if (formattedVal.trim() === '') formattedVal = '-';
+
+                    if (idx === 0) {
+                        html += `<td style="width: 50px; min-width: 50px; font-weight:600; color:#38bdf8; text-align:center;">${formattedVal}</td>`;
+                    } else {
+                        html += `<td>${formattedVal}</td>`;
+                    }
+                });
+                html += `</tr>`;
+            });
+            tbody.innerHTML = html;
         }
-
-        html += `</tr>`;
-    });
-
-    tbody.innerHTML = html;
-}
 
         function filterCalibrationTable() {
             const q = document.getElementById('calibrationSearch').value.toLowerCase().trim();
