@@ -90,6 +90,18 @@
             box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
         }
 
+        .pm-alert-box {
+    background: rgba(234, 179, 8, 0.15);
+    border: 1px solid #eab308;
+    color: #fde047;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    margin-bottom: 10px;
+    display: none;
+    font-weight: 500;
+}
+
         /* Content Sections */
         .content-section {
             display: none;
@@ -241,13 +253,16 @@
             <button class="tab-btn" onclick="switchMaintenanceTab('spares', this)">🛠️ Critical Spares</button>
             <button class="tab-btn" onclick="switchMaintenanceTab('calib', this)">📏 Calibration Master</button>
         </div>
-
+<div id="pmDueAlertBox" class="pm-alert-box">
+    ⚠️ <strong>Upcoming PM Due Alert (Next 30 Days):</strong> <span id="pmDueAlertText">Checking schedule...</span>
+</div>
         <!-- 1. PM Schedule Section -->
         <div id="section-pm" class="content-section active">
             <div class="section-card">
                 <div class="section-title">
-                    <span>📋 Preventive Maintenance Schedule 2026-2027</span>
-                </div>
+    <span>📋 Preventive Maintenance Schedule 2026-2027 (Live)</span>
+    <span style="font-size: 11px; color: #f97316; font-weight: 600;">Frequency: After Every 6 Months</span>
+</div>
                 <div class="table-responsive">
                     <table>
                         <thead id="pmThead">
@@ -364,7 +379,7 @@
 
             return null;
         }
-        
+
        // 1. Load PM Schedule Live with Row Span (Merging first 4-5 columns for PLAN & ACTUAL pairs)
         async function loadPMSchedule() {
             const tbody = document.getElementById('pmTableBody');
