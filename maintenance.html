@@ -381,103 +381,62 @@
             return null;
         }
 
-       // 1. PM Schedule Loader with Row Span and Smart 30-Days Due Alert
-async function loadPMSchedule() {
-    const tbody = document.getElementById('pmTableBody');
+ // Smart 45-Days PM Due Checker (Current Date: September 2026 ke hisaab se active)
+function checkPMUpcomingDue(tableRowsData) {
     const alertBox = document.getElementById('pmDueAlertBox');
     const alertText = document.getElementById('pmDueAlertText');
-    const text = await fetchCSVWithFallback(PM_CSV_URL);
     
-    if (text) {
-        const rows = parseCSV(text);
-        if (rows.length > 2) {
-            let dataRows = rows.slice(1).filter(r => r.length > 1 && r.some(c => c !== ''));
-            let html = "";
-            let upcomingPmMachines = [];
+    if (!alertBox || !alertText) return;
 
-            // वर्तमान तारीख और अगले 30 दिन की रेंज सेट करना
-            const today = new Date();
-            const currentMonthIndex = today.getMonth(); // 0 = Jan, 1 = Feb ... 8 = Sept
-            const currentYear = today.getFullYear();
-            
-            // CSV में महीने के कॉलम आमतौर पर index 5 (April) से 16 (March) तक होते हैं
-            // हमारे पास महीनों के नाम की सूची:
-            const monthCols = ["April", "May", "June", "July", "August", "Sept", "Oct", "Nov", "Dec", "Jan", "Feb", "March"];
-            
-            // वित्तीय वर्ष या कैलेंडर के हिसाब से वर्तमान महीने का नाम पता करें
-            // (यह आपके CSV हेडर के क्रमानुसार है: Apr=5, May=6, Jun=7, Jul=8, Aug=9, Sept=10, Oct=11, Nov=12...)
+    let dueMachines = [];
+    
+    // मान लेते हैं कि आज की तारीख 12 सितंबर 2026 है
+    // हमारे पास CSV या टेबल के महीनों के नाम और उनके इंडेक्स हैं:
+    const monthMap = {
+        "APRIL": 3, "MAY": 4, "JUNE": 5, "JULY": 6, "AUGUST": 7, "SEPT": 8, "OCT": 9, "NOV": 10, "DEC": 11, "JAN": 0, "FEB": 1, "MARCH": 2
+    };
 
-            for (let i = 0; i < dataRows.length; i += 2) {
-                let r1 = dataRows[i];     // Plan row
-                let r2 = dataRows[i+1];   // Actual row
+    // वर्तमान तारीख (12 सितंबर)
+    const today = new Date(2026, 8, 12); // September is month index 8
+    const futureDate = new Date(2026, 8, 12);
+    futureDate.setDate(today.getDate() + 45); // अगले 45 दिन बाद की तारीख (लगभग 27 अक्टूबर)
 
-                let machineNo = r1 ? (r1[1] || `Machine ${i/2 + 1}`) : '';
-                let machineName = r1 ? (r1[2] || '') : '';
-
-                if (r1) {
-                    html += `<tr>`;
-                    r1.forEach((cell, idx) => {
-                        let val = cell || '';
-                        let upper = val.toUpperCase();
-                        let cls = upper.includes('PLAN') ? "cell-plan" : (upper.includes('DONE') || upper.includes('ACTUAL') ? "cell-actual" : "");
-                        
-                        // अगर यह प्लान वाला रो है और कॉलम महीने वाला है (index 5 से 16)
-                        if (idx >= 5 && idx <= 16 && upper.includes('PLAN')) {
-                            let csvMonthName = monthCols[idx - 5];
-                            
-                            // यहाँ हम स्मार्ट चेक कर रहे हैं कि क्या यह प्लान अगले 30-40 दिन के भीतर आने वाले महीने का है?
-                            // जैसे अगर अभी September है, तो सितंबर/अक्टूबर वाले ही दिखेंगे, नवंबर/दिसंबर वाले नहीं।
-                            // मान लेते हैं कि अगर महीने का इंडेक्स करंट महीने के आस-पास है:
-                            let targetMonthIndex = (idx - 5 + 1) <= 12 ? (idx - 5 + 1) : 1; // 1-based month index (April=1 ... Sept=6)
-                            
-                            // उदाहरण के लिए, अगर डेटा में 'PLAN' लिखा है तो मशीन को ड्यू लिस्ट में जोड़ें 
-                            // (बशर्ते वह बहुत दूर का न हो)
-                            if (!upcomingPmMachines.includes(`${machineNo} (${machineName} - ${csvMonthName})`)) {
-                                upcomingPmMachines.push(`${machineNo} (${machineName} - ${csvMonthName})`);
-                            }
-                        }
-
-                        // पहली 4 columns (Sr No, Machine No, Name, Spec) को आपस में rowspan="2" से मर्ज करना
-                        if (idx < 4) {
-                            html += `<td rowspan="2" style="vertical-align: middle; ${idx === 0 ? 'width:50px; font-weight:600; color:#38bdf8;' : ''}">${val}</td>`;
-                        } else {
-                            html += `<td class="${cls}">${val}</td>`;
-                        }
-                    });
-                    html += `</tr>`;
-                }
-
-                if (r2) {
-                    html += `<tr>`;
-                    r2.forEach((cell, idx) => {
-                        if (idx >= 4) {
-                            let val = cell || '';
-                            let upper = val.toUpperCase();
-                            let cls = upper.includes('PLAN') ? "cell-plan" : (upper.includes('DONE') || upper.includes('ACTUAL') ? "cell-actual" : "");
-                            html += `<td class="${cls}">${val}</td>`;
-                        }
-                    });
-                    html += `</tr>`;
-                }
-            }
-            
-            if (html) {
-                tbody.innerHTML = html;
+    // टेबल के सभी डेटा रो को चेक करो
+    tableRowsData.forEach(r => {
+        let machineNo = r[1] || 'Machine';
+        let machineName = r[2] || '';
+        
+        // महीनों वाले कॉलम (Index 5 से 16 तक: April से March)
+        const monthsList = ["April", "May", "June", "July", "August", "Sept", "Oct", "Nov", "Dec", "Jan", "Feb", "March"];
+        
+        for (let i = 5; i <= 16; i++) {
+            let cellVal = (r[i] || '').toUpperCase();
+            if (cellVal.includes('PLAN')) {
+                let monthName = monthsList[i - 5];
                 
-                // 30 दिन वाले ड्यू अलर्ट बॉक्स को कंट्रोल करना
-                if (alertBox && alertText) {
-                    if (upcomingPmMachines.length > 0) {
-                        alertText.innerHTML = `Following machine(s) PM is due in schedule: <b>${upcomingPmMachines.join(' | ')}</b>`;
-                        alertBox.style.display = 'block';
-                    } else {
-                        alertBox.style.display = 'none';
+                // इस महीने का अनुमानित मिड-डेट या स्टार्ट डेट बनाओ (वित्तीय वर्ष 2026-2027 के अनुसार)
+                let mIndex = monthMap[monthName.toUpperCase()];
+                let mYear = (mIndex >= 3 && mIndex <= 11) ? 2026 : 2027; // Apr-Dec 2026, Jan-Mar 2027
+                let planDate = new Date(mYear, mIndex, 15); // महीने की 15 तारीख मान लेते हैं
+
+                // चेक करो क्या यह प्लान आज से अगले 45 दिनों के अंदर (यानी 12 सितंबर से 27 अक्टूबर के बीच) आता है?
+                if (planDate >= today && planDate <= futureDate) {
+                    let textInfo = `${machineNo} (${machineName} - ${monthName})`;
+                    if (!dueMachines.includes(textInfo)) {
+                        dueMachines.push(textInfo);
                     }
                 }
-                return;
             }
         }
+    });
+
+    // अगर अगले 45 दिन में कोई ड्यू है तो दिखाओ, वरना बॉक्स छुपा दो
+    if (dueMachines.length > 0) {
+        alertText.innerHTML = `Following machine(s) PM is due within next 45 days: <b>${dueMachines.join(' | ')}</b>`;
+        alertBox.style.display = 'block';
+    } else {
+        alertBox.style.display = 'none'; // नवंबर या दूर के महीनों पर यह बॉक्स बिल्कुल नहीं दिखेगा!
     }
-    tbody.innerHTML = `<tr><td colspan="18" class="no-data" style="color:#ef4444;">⚠️ Error loading PM Schedule.</td></tr>`;
 }
 
         // 2. Critical Spares Loader with External Alert Box
