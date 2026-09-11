@@ -43,6 +43,7 @@
             font-weight: 600;
             text-decoration: none;
             font-size: 11.5px;
+            transition: 0.2s;
         }
         .back-btn:hover { background: #f97316; color: white; }
         .nav-left h1 { font-size: 14px; margin: 0; color: #f8fafc; font-weight: 600; }
@@ -51,17 +52,17 @@
             max-width: 1600px;
             width: 100%;
             margin: 0 auto;
-            padding: 10px;
+            padding: 12px;
             flex: 1;
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
 
-        /* Master Navigation Tabs */
+        /* 3 Master Navigation Buttons (Tabs) */
         .tabs-bar {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             flex-wrap: wrap;
             background: #1e293b;
             padding: 8px;
@@ -72,11 +73,12 @@
             background: #0f172a;
             border: 1px solid #475569;
             color: #94a3b8;
-            padding: 8px 12px;
+            padding: 8px 14px;
             border-radius: 8px;
-            font-size: 11px;
+            font-size: 11.5px;
             font-weight: 600;
             cursor: pointer;
+            transition: 0.2s;
             flex: 1;
             text-align: center;
             white-space: nowrap;
@@ -87,6 +89,17 @@
             border-color: #f97316;
             box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
         }
+        .pm-alert-box {
+    background: rgba(234, 179, 8, 0.15);
+    border: 1px solid #eab308;
+    color: #fde047;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    margin-bottom: 10px;
+    display: none;
+    font-weight: 500;
+}
 
         /* Content Sections */
         .content-section {
@@ -98,15 +111,16 @@
             display: flex;
         }
 
+        /* Section Card */
         .section-card {
             background: #1e293b;
             border: 1px solid #334155;
             border-radius: 12px;
-            padding: 12px;
+            padding: 14px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         .section-title {
-            font-size: 13.5px;
+            font-size: 14px;
             font-weight: 700;
             color: #38bdf8;
             margin-bottom: 10px;
@@ -114,10 +128,9 @@
             justify-content: space-between;
             align-items: center;
             text-transform: uppercase;
-            flex-wrap: wrap;
-            gap: 6px;
         }
 
+        /* Search Box */
         .search-box {
             width: 100%;
             padding: 9px 12px;
@@ -132,39 +145,33 @@
         }
         .search-box:focus { border-color: #f97316; }
 
-        .order-alert-box, .pm-alert-box {
+        /* External Alert Box for Spares Order */
+        .order-alert-box {
             background: rgba(239, 68, 68, 0.15);
             border: 1px solid #ef4444;
             color: #fca5a5;
             padding: 10px 14px;
             border-radius: 8px;
-            font-size: 11.5px;
+            font-size: 12px;
             margin-bottom: 10px;
             display: none;
             font-weight: 500;
         }
-        .pm-alert-box {
-            background: rgba(234, 179, 8, 0.15);
-            border: 1px solid #eab308;
-            color: #fde047;
-        }
+        .order-alert-box strong { color: #f87171; }
 
-        /* Strict Mobile Responsive Table Wrapper */
+        /* Clean Scrollable Table */
         .table-responsive {
-            width: 100%;
             overflow-x: auto;
-            max-height: 520px;
+            max-height: 550px;
             border-radius: 8px;
             border: 1px solid #475569;
             -webkit-overflow-scrolling: touch;
-            background: #0f172a;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 10.5px;
+            font-size: 11px;
             text-align: center;
-            white-space: nowrap;
         }
         th {
             background: #0284c7;
@@ -175,6 +182,7 @@
             top: 0;
             z-index: 10;
             border: 1px solid #0369a1;
+            white-space: nowrap;
             text-transform: uppercase;
         }
         td {
@@ -182,93 +190,184 @@
             border: 1px solid #475569;
             color: #cbd5e1;
             background: #0f172a;
-            white-space: pre-line !important;
-            vertical-align: middle;
-            line-height: 1.3;
+            white-space: nowrap;
         }
         tr:hover td { background: rgba(249, 115, 22, 0.08); color: #fff; }
 
-        /* Compact Sr. No Column */
+        /* Compact Width Fixes for Sr. No */
         th:first-child, td:first-child {
-            width: 45px !important;
-            min-width: 45px !important;
-            max-width: 45px !important;
+            width: 50px;
+            min-width: 50px;
             position: sticky;
             left: 0;
             background: #1e293b;
             z-index: 5;
             border-right: 2px solid #38bdf8;
-            text-align: center;
         }
-        th:first-child { z-index: 12; background: #0284c7 !important; }
+        th:first-child { z-index: 12; background: #0284c7; }
 
-        .cell-plan { background-color: #eab308 !important; color: #000 !important; font-weight: 700; }
-        .cell-actual { background-color: #22c55e !important; color: #fff !important; font-weight: 700; }
+        /* Plan & Actual Box Fills */
+        .cell-plan {
+            background-color: #eab308 !important;
+            color: #000000 !important;
+            font-weight: 700;
+        }
+        .cell-actual {
+            background-color: #22c55e !important;
+            color: #ffffff !important;
+            font-weight: 700;
+        }
+
         .no-data { padding: 25px; text-align: center; color: #94a3b8; font-size: 12px; }
 
-        /* Footer Remark Note */
-        .calibration-footer-remark {
-            margin-top: 10px;
-            padding: 8px 12px;
-            background: rgba(56, 189, 248, 0.1);
-            border-left: 3px solid #38bdf8;
-            color: #38bdf8;
-            font-size: 11px;
-            font-weight: 500;
-            border-radius: 4px;
-        }
-
-        /* Mobile Screen Adjustments */
+        /* Mobile Optimization */
         @media (max-width: 768px) {
             .top-bar { padding: 8px 12px; }
             .nav-left h1 { font-size: 12.5px; }
-            .main-container { padding: 6px; gap: 8px; }
-            .tabs-bar { padding: 6px; gap: 4px; }
-            .tab-btn { padding: 7px 8px; font-size: 10px; }
+            .main-container { padding: 8px; gap: 10px; }
+            .tabs-bar { padding: 6px; gap: 6px; }
+            .tab-btn { padding: 7px 10px; font-size: 10.5px; }
             .section-card { padding: 10px; }
             table { font-size: 10px; }
             th, td { padding: 6px 8px; }
         }
+        /* Calibration & General Table Clean Layout */
+.table-responsive {
+    overflow-x: auto;
+    max-height: 550px;
+    border-radius: 8px;
+    border: 1px solid #475569;
+    -webkit-overflow-scrolling: touch;
+    background: #0f172a;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    text-align: center;
+    table-layout: auto;
+}
+
+/* टेबल के टाइटल्स / हेडर एकदम साफ़ और हाईलाइटेड दिखेंगे */
+th {
+    background: #0284c7 !important;
+    color: #ffffff !important;
+    padding: 10px 12px;
+    font-weight: 700;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border: 1px solid #0369a1;
+    white-space: nowrap;
+    text-transform: uppercase;
+}
+
+td {
+    padding: 7px 10px;
+    border: 1px solid #475569;
+    color: #cbd5e1;
+    background: #0f172a;
+    white-space: pre-line !important; /* 🔥 Ye multi-line text ko break hone aur niche dikhne ki permission deta hai */
+    vertical-align: middle;
+}
+
+/* सीरियल नंबर कॉलम की फिक्स चौड़ाई */
+th:first-child, td:first-child {
+    width: 45px !important;
+    min-width: 45px !important;
+    max-width: 45px !important;
+    text-align: center;
+    position: sticky;
+    left: 0;
+    background: #1e293b;
+    z-index: 5;
+    border-right: 2px solid #38bdf8;
+}
+
+th:first-child {
+    z-index: 12;
+    background: #0284c7 !important;
+}
+
+/* 🎯 सीरियल नंबर (Sr. No) वाले कॉलम की चौड़ाई को पूरी तरह लॉक और कॉम्पैक्ट करना */
+th:first-child, td:first-child {
+    width: 45px !important;
+    min-width: 45px !important;
+    max-width: 45px !important;
+    text-align: center;
+    position: sticky;
+    left: 0;
+    background: #1e293b;
+    z-index: 5;
+    border-right: 2px solid #38bdf8;
+}
+
+th:first-child {
+    z-index: 12;
+    background: #0284c7;
+}
+
+/* मोबाइल और वेब के लिए रिस्पॉन्सिव मीडिया क्वेरी */
+@media (max-width: 768px) {
+    table { font-size: 10px; }
+    th, td { padding: 6px 8px; }
+}
     </style>
 </head>
 <body>
 
+    <!-- Top Bar -->
     <header class="top-bar">
         <div class="nav-left">
             <a href="index.html" class="back-btn">⬅ Home</a>
             <h1>⚙️ HT Maintenance Hub</h1>
         </div>
-        <span style="font-size: 10px; color: #34d399; font-weight: 600;">● Live Hub</span>
+        <span style="font-size: 10.5px; color: #34d399; font-weight: 600;">● Live Hub</span>
     </header>
 
     <div class="main-container">
         
-        <!-- Master Navigation Tabs -->
+        <!-- 3 Master Navigation Buttons (Tabs) -->
         <div class="tabs-bar">
             <button class="tab-btn active" onclick="switchMaintenanceTab('pm', this)">📅 PM Schedule</button>
             <button class="tab-btn" onclick="switchMaintenanceTab('spares', this)">🛠️ Critical Spares</button>
             <button class="tab-btn" onclick="switchMaintenanceTab('calib', this)">📏 Calibration Master</button>
         </div>
-
         <!-- 1. PM Schedule Section -->
         <div id="section-pm" class="content-section active">
             <div class="section-card">
                 <div class="section-title">
-                    <span>📋 Preventive Maintenance Schedule 2026-2027</span>
-                    <span style="font-size: 10.5px; color: #f97316;">Frequency: Every 6 Months</span>
-                </div>
-                
-                <div id="pmDueAlertBox" class="pm-alert-box">
-                    ⚠️ <strong>Upcoming PM Due Alert (Next 30 Days):</strong> <span id="pmDueAlertText">Checking schedule...</span>
-                </div>
+    <span>📋 Preventive Maintenance Schedule 2026-2027 (Live)</span>
+    <span style="font-size: 11px; color: #f97316; font-weight: 600;">Frequency: After Every 6 Months</span>
+</div>
 
+<!-- 30 Days PM Due Alert Box -->
+<div id="pmDueAlertBox" class="pm-alert-box">
+    ⚠️ <span>Upcoming PM Due Alert (Next 30 Days):</span> <span id="pmDueAlertText">Checking schedule...</span>
+</div>
                 <div class="table-responsive">
                     <table>
-                        <thead>
+                        <thead id="pmThead">
                             <tr>
-                                <th>Sr</th><th>Machine No</th><th>Machine Name</th><th>Specification</th><th>Schedule</th>
-                                <th>April</th><th>May</th><th>June</th><th>July</th><th>August</th><th>Sept</th>
-                                <th>Oct</th><th>Nov</th><th>Dec</th><th>Jan</th><th>Feb</th><th>March</th><th>Remarks</th>
+                                <th>Sr. No</th>
+                                <th>Machine No</th>
+                                <th>Machine Name</th>
+                                <th>Specification</th>
+                                <th>Schedule</th>
+                                <th>April</th>
+                                <th>May</th>
+                                <th>June</th>
+                                <th>July</th>
+                                <th>August</th>
+                                <th>Sept</th>
+                                <th>Oct</th>
+                                <th>Nov</th>
+                                <th>Dec</th>
+                                <th>Jan</th>
+                                <th>Feb</th>
+                                <th>March</th>
+                                <th>Remarks</th>
                             </tr>
                         </thead>
                         <tbody id="pmTableBody">
@@ -283,12 +382,11 @@
         <div id="section-spares" class="content-section">
             <div class="section-card">
                 <div class="section-title"><span>🛠️ Critical Spare Parts Stock & List</span></div>
-                
+                <!-- External Alert Box for Low Stock Orders -->
                 <div id="sparesAlertBox" class="order-alert-box">
                     ⚠️ <strong>Low Stock Order Alert:</strong> <span id="sparesAlertText">Checking inventory levels...</span>
                 </div>
-
-                <input type="text" id="spareSearch" class="search-box" placeholder="🔍 Search Description, Part Number, Item Code..." onkeyup="filterSparesTable()">
+                <input type="text" id="spareSearch" class="search-box" placeholder="🔍 Search by Description, Part Number, Item Code..." onkeyup="filterSparesTable()">
                 <div class="table-responsive">
                     <table>
                         <thead id="sparesThead"><tr><th>Loading Spares Headers...</th></tr></thead>
@@ -302,18 +400,12 @@
         <div id="section-calib" class="content-section">
             <div class="section-card">
                 <div class="section-title"><span>📏 Instrument Calibration Master List</span></div>
-                <input type="text" id="calibrationSearch" class="search-box" placeholder="🔍 Search Instrument Name, ID, Make or Location..." onkeyup="filterCalibrationTable()">
-                
+                <input type="text" id="calibrationSearch" class="search-box" placeholder="🔍 Search by Instrument Name, ID, Make or Location..." onkeyup="filterCalibrationTable()">
                 <div class="table-responsive">
                     <table>
                         <thead id="calibThead"><tr><th>Loading Calibration Headers...</th></tr></thead>
                         <tbody id="calibrationTableBody"><tr><td colspan="9" class="no-data">Loading Calibration Records...</td></tr></tbody>
                     </table>
-                </div>
-
-                <!-- Footer Remark as Requested -->
-                <div class="calibration-footer-remark">
-                    Remark:- Retention Period Of Instrument Calibration Record Will Be Minimum 3 Years
                 </div>
             </div>
         </div>
@@ -321,53 +413,70 @@
     </div>
 
     <script>
+        // Tab Switcher Logic
         function switchMaintenanceTab(tabId, btn) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+
             btn.classList.add('active');
             document.getElementById('section-' + tabId).classList.add('active');
         }
 
+        // Live CSV URLs
         const PM_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=1943594971&single=true&output=csv";
         const SPARES_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=1304634560&single=true&output=csv";
-        // Correct Calibration GID Link Provided
-        const CALIB_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=2037689190&single=true&output=csv";[cite: 1]
+        const CALIB_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=2037689190&single=true&output=csv";
 
         let rawSparesData = [];
         let rawCalibData = [];
 
-        function parseCSV(text) {
-            let rows = [];
-            let row = [];
-            let insideQuote = false;
-            let entry = '';
+       // Smart CSV Parser that safely handles Line Breaks inside Quoted Cells without breaking rows
+function parseCSV(text) {
+    let rows = [];
+    let row = [];
+    let insideQuote = false;
+    let entry = '';
 
-            for (let i = 0; i < text.length; i++) {
-                let char = text[i];
-                let nextChar = text[i + 1];
+    for (let i = 0; i < text.length; i++) {
+        let char = text[i];
+        let nextChar = text[i + 1];
 
-                if (char === '"') {
-                    if (insideQuote && nextChar === '"') { entry += '"'; i++; }
-                    else { insideQuote = !insideQuote; }
-                } else if (char === ',' && !insideQuote) {
-                    row.push(entry.trim());
-                    entry = '';
-                } else if ((char === '\r' || char === '\n') && !insideQuote) {
-                    if (char === '\r' && nextChar === '\n') { i++; }
-                    row.push(entry.trim());
-                    if (row.length > 1 || (row.length === 1 && row[0] !== '')) { rows.push(row); }
-                    row = [];
-                    entry = '';
-                } else {
-                    if (char === '\r' && nextChar === '\n') { entry += '\n'; i++; }
-                    else if (char === '\r' || char === '\n') { entry += '\n'; }
-                    else { entry += char; }
-                }
+        if (char === '"') {
+            if (insideQuote && nextChar === '"') {
+                entry += '"'; // Handle escaped quotes
+                i++;
+            } else {
+                insideQuote = !insideQuote;
             }
+        } else if (char === ',' && !insideQuote) {
             row.push(entry.trim());
-            if (row.length > 1 || (row.length === 1 && row[0] !== '')) { rows.push(row); }
-            return rows;
+            entry = '';
+        } else if ((char === '\r' || char === '\n') && !insideQuote) {
+            if (char === '\r' && nextChar === '\n') { i++; }
+            row.push(entry.trim());
+            if (row.length > 1 || (row.length === 1 && row[0] !== '')) {
+                rows.push(row);
+            }
+            row = [];
+            entry = '';
+        } else {
+            // यह कोट के अंदर के लाइन ब्रेक्स (\n या \r) को सुरक्षित रूप से सेल के टेक्स्ट में जोड़ लेता है
+            if (char === '\r' && nextChar === '\n') {
+                entry += '\n';
+                i++;
+            } else if (char === '\r' || char === '\n') {
+                entry += '\n';
+            } else {
+                entry += char;
+            }
         }
+    }
+    row.push(entry.trim());
+    if (row.length > 1 || (row.length === 1 && row[0] !== '')) {
+        rows.push(row);
+    }
+    return rows;
+}
 
         async function fetchCSVWithFallback(url) {
             try {
@@ -377,6 +486,7 @@
                     if (text && text.length > 20) return text;
                 }
             } catch (e) {}
+
             try {
                 const proxyRes = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(url));
                 if (proxyRes.ok) {
@@ -384,104 +494,120 @@
                     if (text && text.length > 20) return text;
                 }
             } catch (e) {}
+
             return null;
         }
 
-        // PM Schedule Loader with Row Span and 30 Days Due Alert
-        async function loadPMSchedule() {
-            const tbody = document.getElementById('pmTableBody');
-            const alertBox = document.getElementById('pmDueAlertBox');
-            const alertText = document.getElementById('pmDueAlertText');
-            const text = await fetchCSVWithFallback(PM_CSV_URL);
+       // 1. PM Schedule Loader with Row Span and Smart 30-Days Due Alert
+async function loadPMSchedule() {
+    const tbody = document.getElementById('pmTableBody');
+    const alertBox = document.getElementById('pmDueAlertBox');
+    const alertText = document.getElementById('pmDueAlertText');
+    const text = await fetchCSVWithFallback(PM_CSV_URL);
+    
+    if (text) {
+        const rows = parseCSV(text);
+        if (rows.length > 2) {
+            let dataRows = rows.slice(1).filter(r => r.length > 1 && r.some(c => c !== ''));
+            let html = "";
+            let upcomingPmMachines = [];
+
+            // वास्तविक आज की तारीख और अगले 30 दिन की रेंज
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const futureDate = new Date();
+            futureDate.setDate(today.getDate() + 30);
+            futureDate.setHours(23, 59, 59, 999);
+
+            // CSV में महीने के कॉलम index 5 (April) से 16 (March) तक होते हैं
+            const monthNames = ["April", "May", "June", "July", "August", "Sept", "Oct", "Nov", "Dec", "Jan", "Feb", "March"];
             
-            if (text) {
-                const rows = parseCSV(text);
-                if (rows.length > 2) {
-                    let dataRows = rows.slice(1).filter(r => r.length > 1 && r.some(c => c !== ''));
-                    let html = "";
-                    let upcomingPmMachines = [];
+            // वित्तीय वर्ष 2026-2027 के अनुसार महीनों के सही JavaScript Month और Year मैपिंग:
+            const jsMonthMap = [
+                { m: 3, y: 2026 }, { m: 4, y: 2026 }, { m: 5, y: 2026 }, { m: 6, y: 2026 },
+                { m: 7, y: 2026 }, { m: 8, y: 2026 }, { m: 9, y: 2026 }, { m: 10, y: 2026 },
+                { m: 11, y: 2026 }, { m: 0, y: 2027 }, { m: 1, y: 2027 }, { m: 2, y: 2027 }
+            ];
 
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    const futureDate = new Date();
-                    futureDate.setDate(today.getDate() + 30);
-                    futureDate.setHours(23, 59, 59, 999);
+            for (let i = 0; i < dataRows.length; i += 2) {
+                let r1 = dataRows[i];     // Plan row
+                let r2 = dataRows[i+1];   // Actual row
 
-                    const monthNames = ["April", "May", "June", "July", "August", "Sept", "Oct", "Nov", "Dec", "Jan", "Feb", "March"];
-                    const jsMonthMap = [
-                        { m: 3, y: 2026 }, { m: 4, y: 2026 }, { m: 5, y: 2026 }, { m: 6, y: 2026 },
-                        { m: 7, y: 2026 }, { m: 8, y: 2026 }, { m: 9, y: 2026 }, { m: 10, y: 2026 },
-                        { m: 11, y: 2026 }, { m: 0, y: 2027 }, { m: 1, y: 2027 }, { m: 2, y: 2027 }
-                    ];
+                let machineNo = r1 ? (r1[1] || `Machine ${i/2 + 1}`) : '';
+                let machineName = r1 ? (r1[2] || '') : '';
 
-                    for (let i = 0; i < dataRows.length; i += 2) {
-                        let r1 = dataRows[i];
-                        let r2 = dataRows[i+1];
-                        let machineNo = r1 ? (r1[1] || `Machine ${i/2 + 1}`) : '';
-                        let machineName = r1 ? (r1[2] || '') : '';
+                if (r1) {
+                    html += `<tr>`;
+                    r1.forEach((cell, idx) => {
+                        let val = cell || '';
+                        let upper = val.toUpperCase();
+                        let cls = upper.includes('PLAN') ? "cell-plan" : (upper.includes('DONE') || upper.includes('ACTUAL') ? "cell-actual" : "");
+                        
+                        // अगर यह प्लान वाला रो है और कॉलम महीने वाला है (index 5 से 16)
+                        if (idx >= 5 && idx <= 16 && upper.includes('PLAN')) {
+                            let monthIdxInMap = idx - 5;
+                            let monthInfo = jsMonthMap[monthIdxInMap];
+                            
+                            if (monthInfo) {
+                                // महीने की 15 तारीख मानकर सटीक तारीख बना रहे हैं
+                                let planDate = new Date(monthInfo.y, monthInfo.m, 15);
+                                planDate.setHours(0, 0, 0, 0);
 
-                        if (r1) {
-                            html += `<tr>`;
-                            r1.forEach((cell, idx) => {
-                                let val = cell || '';
-                                let upper = val.toUpperCase();
-                                let cls = upper.includes('PLAN') ? "cell-plan" : (upper.includes('DONE') || upper.includes('ACTUAL') ? "cell-actual" : "");
-                                
-                                if (idx >= 5 && idx <= 16 && upper.includes('PLAN')) {
-                                    let monthIdxInMap = idx - 5;
-                                    let monthInfo = jsMonthMap[monthIdxInMap];
-                                    if (monthInfo) {
-                                        let planDate = new Date(monthInfo.y, monthInfo.m, 15);
-                                        planDate.setHours(0, 0, 0, 0);
-                                        if (planDate >= today && planDate <= futureDate) {
-                                            let csvMonthName = monthNames[monthIdxInMap];
-                                            let textInfo = `${machineNo} (${machineName} - ${csvMonthName})`;
-                                            if (!upcomingPmMachines.includes(textInfo)) upcomingPmMachines.push(textInfo);
-                                        }
+                                // चेक करो क्या यह प्लान आज से ठीक अगले 30 दिनों के भीतर आता है?
+                                if (planDate >= today && planDate <= futureDate) {
+                                    let csvMonthName = monthNames[monthIdxInMap];
+                                    let textInfo = `${machineNo} (${machineName} - ${csvMonthName})`;
+                                    if (!upcomingPmMachines.includes(textInfo)) {
+                                        upcomingPmMachines.push(textInfo);
                                     }
                                 }
-
-                                if (idx < 4) {
-                                    html += `<td rowspan="2" style="vertical-align: middle; ${idx === 0 ? 'width:50px; font-weight:600; color:#38bdf8;' : ''}">${val.replace(/\n/g, '<br>')}</td>`;
-                                } else {
-                                    html += `<td class="${cls}">${val.replace(/\n/g, '<br>')}</td>`;
-                                }
-                            });
-                            html += `</tr>`;
-                        }
-
-                        if (r2) {
-                            html += `<tr>`;
-                            r2.forEach((cell, idx) => {
-                                if (idx >= 4) {
-                                    let val = cell || '';
-                                    let upper = val.toUpperCase();
-                                    let cls = upper.includes('PLAN') ? "cell-plan" : (upper.includes('DONE') || upper.includes('ACTUAL') ? "cell-actual" : "");
-                                    html += `<td class="${cls}">${val.replace(/\n/g, '<br>')}</td>`;
-                                }
-                            });
-                            html += `</tr>`;
-                        }
-                    }
-                    
-                    if (html) {
-                        tbody.innerHTML = html;
-                        if (alertBox && alertText) {
-                            if (upcomingPmMachines.length > 0) {
-                                alertText.innerHTML = `Following machine(s) PM is due within next 30 days: <b>${upcomingPmMachines.join(' | ')}</b>`;
-                                alertBox.style.display = 'block';
-                            } else {
-                                alertBox.style.display = 'none';
                             }
                         }
-                        return;
-                    }
+
+                        // पहली 4 columns (Sr No, Machine No, Name, Spec) को आपस में rowspan="2" से मर्ज करना
+                        if (idx < 4) {
+                            html += `<td rowspan="2" style="vertical-align: middle; ${idx === 0 ? 'width:50px; font-weight:600; color:#38bdf8;' : ''}">${val}</td>`;
+                        } else {
+                            html += `<td class="${cls}">${val}</td>`;
+                        }
+                    });
+                    html += `</tr>`;
+                }
+
+                if (r2) {
+                    html += `<tr>`;
+                    r2.forEach((cell, idx) => {
+                        if (idx >= 4) {
+                            let val = cell || '';
+                            let upper = val.toUpperCase();
+                            let cls = upper.includes('PLAN') ? "cell-plan" : (upper.includes('DONE') || upper.includes('ACTUAL') ? "cell-actual" : "");
+                            html += `<td class="${cls}">${val}</td>`;
+                        }
+                    });
+                    html += `</tr>`;
                 }
             }
-            tbody.innerHTML = `<tr><td colspan="18" class="no-data" style="color:#ef4444;">⚠️ Error loading PM Schedule.</td></tr>`;
+            
+            if (html) {
+                tbody.innerHTML = html;
+                
+                // 30 दिन वाले ड्यू अलर्ट बॉक्स को कंट्रोल करना
+                if (alertBox && alertText) {
+                    if (upcomingPmMachines.length > 0) {
+                        alertText.innerHTML = `Following machine(s) PM is due within next 30 days: <b>${upcomingPmMachines.join(' | ')}</b>`;
+                        alertBox.style.display = 'block';
+                    } else {
+                        alertBox.style.display = 'none';
+                    }
+                }
+                return;
+            }
         }
+    }
+    tbody.innerHTML = `<tr><td colspan="18" class="no-data" style="color:#ef4444;">⚠️ Error loading PM Schedule.</td></tr>`;
+}
 
-        // Critical Spares Loader
+        // 2. Critical Spares Loader with External Alert Box
         async function loadCriticalSpares() {
             const text = await fetchCSVWithFallback(SPARES_CSV_URL);
             const thead = document.getElementById('sparesThead');
@@ -491,10 +617,7 @@
                 const rows = parseCSV(text);
                 if (rows.length > 0) {
                     let thHtml = `<tr>`;
-                    rows[0].forEach((h, i) => {
-                        let style = i === 0 ? 'width: 45px; min-width: 45px;' : '';
-                        thHtml += `<th style="${style}">${h || ''}</th>`;
-                    });
+                    rows[0].forEach(h => thHtml += `<th>${h || ''}</th>`);
                     thHtml += `</tr>`;
                     thead.innerHTML = thHtml;
 
@@ -507,68 +630,72 @@
         }
 
         function renderSparesTable(rows) {
-            const tbody = document.getElementById('sparesTableBody');
-            const alertBox = document.getElementById('sparesAlertBox');
-            const alertText = document.getElementById('sparesAlertText');
+    const tbody = document.getElementById('sparesTableBody');
+    const alertBox = document.getElementById('sparesAlertBox');
+    const alertText = document.getElementById('sparesAlertText');
 
-            if (!tbody) return;
+    if (!tbody) return;
 
-            if (rows.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="no-data">🔍 No records found.</td></tr>`;
-                if (alertBox) alertBox.style.display = 'none';
-                return;
-            }
+    if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="no-data">🔍 No records found.</td></tr>`;
+        if (alertBox) alertBox.style.display = 'none';
+        return;
+    }
 
-            let lowStockItems = [];
-            let html = "";
-            
-            rows.forEach((r, idx) => {
-                html += `<tr>`;
-                let partDesc = r[1] || 'Unknown Part';
-                let minQty = parseFloat(r[2]) || 0;
-                let availQty = parseFloat(r[4]) || 0;
+    let lowStockItems = [];
+    let html = "";
+    
+    rows.forEach((r, index) => {
+        html += `<tr>`;
+        
+        // r[1] = Column B (Part Description)
+        // r[2] = Column C (Minimum Qty)
+        // r[4] = Column E (Available Qty) - (agar index 0 se shuru ho: A=0, B=1, C=2, D=3, E=4)
+        
+        let partDesc = r[1] || 'Unknown Part';
+        let minQty = parseFloat(r[2]) || 0;
+        let availQty = parseFloat(r[4]) || 0;
 
-                r.forEach((cell, cellIdx) => {
-                    let val = cell || '-';
-                    let formattedVal = val.replace(/\n/g, '<br>');
-                    if (cellIdx === 4) {
-                        if (availQty < minQty) {
-                            html += `<td style="color:#ef4444; font-weight:700; background:rgba(239,68,68,0.1);">${formattedVal} ⚠️</td>`;
-                        } else {
-                            html += `<td>${formattedVal}</td>`;
-                        }
-                    } else if (cellIdx === 0) {
-                        html += `<td style="width: 45px; min-width: 45px; font-weight:600; color:#38bdf8;">${idx + 1}</td>`;
-                    } else {
-                        html += `<td>${formattedVal}</td>`;
-                    }
-                });
-                html += `</tr>`;
-
+        r.forEach((cell, idx) => {
+            let val = cell || '-';
+            // Agar ye Available Qty wala column (Column E / Index 4) hai
+            if (idx === 4) {
                 if (availQty < minQty) {
-                    lowStockItems.push(`${partDesc} (Avail: ${availQty}, Min: ${minQty})`);
-                }
-            });
-            
-            tbody.innerHTML = html;
-
-            if (alertBox && alertText) {
-                if (lowStockItems.length > 0) {
-                    alertText.innerHTML = `Following parts need to be ordered urgently: <br><b>${lowStockItems.join(' | ')}</b>`;
-                    alertBox.style.display = 'block';
+                    html += `<td style="color:#ef4444; font-weight:700; background:rgba(239,68,68,0.1);">${val} ⚠️</td>`;
                 } else {
-                    alertBox.style.display = 'none';
+                    html += `<td>${val}</td>`;
                 }
+            } else {
+                html += `<td>${val}</td>`;
             }
-        }
+        });
+        html += `</tr>`;
 
+        // Check logic for Alert Box
+        if (availQty < minQty) {
+            lowStockItems.push(`${partDesc} (Available: ${availQty}, Minimum: ${minQty})`);
+        }
+    });
+    
+    tbody.innerHTML = html;
+
+    // Alert Box Display Logic
+    if (alertBox && alertText) {
+        if (lowStockItems.length > 0) {
+            alertText.innerHTML = `Following parts are below minimum level and must be ordered urgently: <br><b>${lowStockItems.join(' | ')}</b>`;
+            alertBox.style.display = 'block';
+        } else {
+            alertBox.style.display = 'none';
+        }
+    }
+}
         function filterSparesTable() {
             const q = document.getElementById('spareSearch').value.toLowerCase().trim();
             const filtered = rawSparesData.filter(r => r.some(col => String(col).toLowerCase().includes(q)));
             renderSparesTable(filtered);
         }
 
-        // Calibration Master Loader (with Multi-line Line Break Support & Fixed GID)
+        // 3. Calibration Master Loader with Compact Sr. No Width
         async function loadCalibration() {
             const text = await fetchCSVWithFallback(CALIB_CSV_URL);
             const thead = document.getElementById('calibThead');
@@ -579,7 +706,7 @@
                 if (rows.length > 0) {
                     let thHtml = `<tr>`;
                     rows[0].forEach((h, i) => {
-                        let style = i === 0 ? 'width: 45px; min-width: 45px;' : '';
+                        let style = i === 0 ? 'width: 50px; min-width: 50px;' : '';
                         thHtml += `<th style="${style}">${h || ''}</th>`;
                     });
                     thHtml += `</tr>`;
@@ -593,7 +720,7 @@
             tbody.innerHTML = `<tr><td colspan="9" class="no-data" style="color:#ef4444;">⚠️ Error loading calibration records.</td></tr>`;
         }
 
-        function renderCalibrationTable(rows) {
+ function renderCalibrationTable(rows) {
             const tbody = document.getElementById('calibrationTableBody');
             if (!tbody) return;
 
@@ -603,17 +730,21 @@
             }
 
             let html = "";
-            rows.forEach((r, idx) => {
+            rows.forEach(r => {
                 html += `<tr>`;
-                html += `<td style="width: 45px; min-width: 45px; font-weight:600; color:#38bdf8; background:#1e293b; text-align:center;">${idx + 1}</td>`;
-
-                for (let i = 1; i < r.length; i++) {
-                    let val = (r[i] !== undefined && r[i] !== null) ? String(r[i]) : '-';
+                r.forEach((cell, idx) => {
+                    let val = (cell !== undefined && cell !== null) ? String(cell) : '-';
+                    
+                    // 🔥 Line break ko HTML <br> mein convert karna
                     let formattedVal = val.replace(/\n/g, '<br>');
                     if (formattedVal.trim() === '') formattedVal = '-';
 
-                    html += `<td>${formattedVal}</td>`;
-                }
+                    if (idx === 0) {
+                        html += `<td style="width: 50px; min-width: 50px; font-weight:600; color:#38bdf8; text-align:center;">${formattedVal}</td>`;
+                    } else {
+                        html += `<td>${formattedVal}</td>`;
+                    }
+                });
                 html += `</tr>`;
             });
             tbody.innerHTML = html;
