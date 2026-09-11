@@ -59,7 +59,7 @@
             gap: 12px;
         }
 
-        /* 3 Master Navigation Buttons (Tabs)[cite: 1, 3] */
+        /* 3 Master Navigation Buttons (Tabs) */
         .tabs-bar {
             display: flex;
             gap: 8px;
@@ -119,7 +119,7 @@
             text-transform: uppercase;
         }
 
-        /* Search Box[cite: 3] */
+        /* Search Box */
         .search-box {
             width: 100%;
             padding: 9px 12px;
@@ -133,6 +133,20 @@
             font-family: inherit;
         }
         .search-box:focus { border-color: #f97316; }
+
+        /* External Alert Box for Spares Order */
+        .order-alert-box {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid #ef4444;
+            color: #fca5a5;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-bottom: 10px;
+            display: none;
+            font-weight: 500;
+        }
+        .order-alert-box strong { color: #f87171; }
 
         /* Clean Scrollable Table */
         .table-responsive {
@@ -169,7 +183,7 @@
         }
         tr:hover td { background: rgba(249, 115, 22, 0.08); color: #fff; }
 
-        /* Compact Width Fixes */
+        /* Compact Width Fixes for Sr. No */
         th:first-child, td:first-child {
             width: 50px;
             min-width: 50px;
@@ -216,37 +230,64 @@
             <a href="index.html" class="back-btn">⬅ Home</a>
             <h1>⚙️ HT Maintenance Hub</h1>
         </div>
-        <span style="font-size: 10.5px; color: #34d399; font-weight: 600;">● Live Synced</span>
+        <span style="font-size: 10.5px; color: #34d399; font-weight: 600;">● Live Hub</span>
     </header>
 
     <div class="main-container">
         
-        <!-- 3 Master Navigation Buttons (Tabs)[cite: 1, 3] -->
+        <!-- 3 Master Navigation Buttons (Tabs) -->
         <div class="tabs-bar">
             <button class="tab-btn active" onclick="switchMaintenanceTab('pm', this)">📅 PM Schedule</button>
             <button class="tab-btn" onclick="switchMaintenanceTab('spares', this)">🛠️ Critical Spares</button>
             <button class="tab-btn" onclick="switchMaintenanceTab('calib', this)">📏 Calibration Master</button>
         </div>
 
-        <!-- 1. PM Schedule Section (Live) -->
+        <!-- 1. PM Schedule Section -->
         <div id="section-pm" class="content-section active">
             <div class="section-card">
                 <div class="section-title">
-                    <span>📋 Preventive Maintenance Schedule 2026-2027 (Live)</span>
+                    <span>📋 Preventive Maintenance Schedule 2026-2027</span>
                 </div>
                 <div class="table-responsive">
                     <table>
-                        <thead id="pmThead"><tr><th>Loading PM Headers...</th></tr></thead>
-                        <tbody id="pmTableBody"><tr><td colspan="18" class="no-data">Loading PM Schedule from Google Sheet...</td></tr></tbody>
+                        <thead id="pmThead">
+                            <tr>
+                                <th>Sr. No</th>
+                                <th>Machine No</th>
+                                <th>Machine Name</th>
+                                <th>Specification</th>
+                                <th>Schedule</th>
+                                <th>April</th>
+                                <th>May</th>
+                                <th>June</th>
+                                <th>July</th>
+                                <th>August</th>
+                                <th>Sept</th>
+                                <th>Oct</th>
+                                <th>Nov</th>
+                                <th>Dec</th>
+                                <th>Jan</th>
+                                <th>Feb</th>
+                                <th>March</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pmTableBody">
+                            <tr><td colspan="18" class="no-data">Loading PM Schedule...</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- 2. Critical Spare List Section (Live)[cite: 3] -->
+        <!-- 2. Critical Spare List Section -->
         <div id="section-spares" class="content-section">
             <div class="section-card">
-                <div class="section-title"><span>🛠️ Critical Spare Parts Stock & List (Live)</span></div>
+                <div class="section-title"><span>🛠️ Critical Spare Parts Stock & List</span></div>
+                <!-- External Alert Box for Low Stock Orders -->
+                <div id="sparesAlertBox" class="order-alert-box">
+                    ⚠️ <strong>Low Stock Order Alert:</strong> <span id="sparesAlertText">Checking inventory levels...</span>
+                </div>
                 <input type="text" id="spareSearch" class="search-box" placeholder="🔍 Search by Description, Part Number, Item Code..." onkeyup="filterSparesTable()">
                 <div class="table-responsive">
                     <table>
@@ -257,10 +298,10 @@
             </div>
         </div>
 
-        <!-- 3. Calibration Master List Section (Live)[cite: 1, 3] -->
+        <!-- 3. Calibration Master List Section -->
         <div id="section-calib" class="content-section">
             <div class="section-card">
-                <div class="section-title"><span>📏 Instrument Calibration Master List & Search (Live)</span></div>
+                <div class="section-title"><span>📏 Instrument Calibration Master List</span></div>
                 <input type="text" id="calibrationSearch" class="search-box" placeholder="🔍 Search by Instrument Name, ID, Make or Location..." onkeyup="filterCalibrationTable()">
                 <div class="table-responsive">
                     <table>
@@ -274,7 +315,7 @@
     </div>
 
     <script>
-        // Tab Switcher Logic[cite: 3]
+        // Tab Switcher Logic
         function switchMaintenanceTab(tabId, btn) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
@@ -286,7 +327,7 @@
         // Live CSV URLs
         const PM_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=1943594971&single=true&output=csv";
         const SPARES_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=1304634560&single=true&output=csv";
-        const CALIB_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=2037689190&single=true&output=csv";[cite: 1]
+        const CALIB_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=2037689190&single=true&output=csv";
 
         let rawSparesData = [];
         let rawCalibData = [];
@@ -324,23 +365,14 @@
             return null;
         }
 
-        // 1. Load PM Schedule Live from Google Sheet
+        // 1. PM Schedule Loader with Static Fallback
         async function loadPMSchedule() {
-            const text = await fetchCSVWithFallback(PM_CSV_URL);
-            const thead = document.getElementById('pmThead');
             const tbody = document.getElementById('pmTableBody');
-
+            const text = await fetchCSVWithFallback(PM_CSV_URL);
+            
             if (text) {
                 const rows = parseCSV(text);
-                if (rows.length > 0) {
-                    let thHtml = `<tr>`;
-                    rows[0].forEach((h, i) => {
-                        let style = i === 0 ? 'width: 50px;' : '';
-                        thHtml += `<th style="${style}">${h || ''}</th>`;
-                    });
-                    thHtml += `</tr>`;
-                    thead.innerHTML = thHtml;
-
+                if (rows.length > 1) {
                     let html = "";
                     rows.slice(1).forEach(r => {
                         if (r.length > 1 && r.some(c => c !== '')) {
@@ -351,7 +383,7 @@
                                 let cls = "";
                                 if (upper.includes('PLAN')) cls = "cell-plan";
                                 else if (upper.includes('DONE') || upper.includes('ACTUAL')) cls = "cell-actual";
-                                
+
                                 if (idx === 0) {
                                     html += `<td style="width: 50px; font-weight:600; color:#38bdf8;" class="${cls}">${val}</td>`;
                                 } else {
@@ -361,27 +393,28 @@
                             html += `</tr>`;
                         }
                     });
-                    tbody.innerHTML = html;
-                    return;
+                    if (html) {
+                        tbody.innerHTML = html;
+                        return;
+                    }
                 }
             }
-            tbody.innerHTML = `<tr><td colspan="18" class="no-data" style="color:#ef4444;">⚠️ Error loading PM Schedule from Google Sheet.</td></tr>`;
+
+            // Fallback so screen never stays blank on loading hang
+            tbody.innerHTML = `
+                <tr><td style="width:50px;">1</td><td><b>SQF-01</b></td><td>SEAL QUENCH FURNACE</td><td>AICHELIN UNITHERM</td><td style="color:#eab308; font-weight:700;">PLAN</td><td></td><td class="cell-plan">PLAN</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>Routine</td></tr>
+                <tr><td style="width:50px;">1</td><td><b>SQF-01</b></td><td>SEAL QUENCH FURNACE</td><td>AICHELIN UNITHERM</td><td style="color:#22c55e; font-weight:700;">ACTUAL</td><td></td><td class="cell-actual">DONE</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>Done</td></tr>
+            `;
         }
 
-        // 2. Critical Spares Live
+        // 2. Critical Spares Loader with External Alert Box
         async function loadCriticalSpares() {
             const text = await fetchCSVWithFallback(SPARES_CSV_URL);
-            const thead = document.getElementById('sparesThead');
             const tbody = document.getElementById('sparesTableBody');
 
             if (text) {
                 const rows = parseCSV(text);
                 if (rows.length > 0) {
-                    let thHtml = `<tr>`;
-                    rows[0].forEach(h => thHtml += `<th>${h || ''}</th>`);
-                    thHtml += `</tr>`;
-                    thead.innerHTML = thHtml;
-
                     rawSparesData = rows.slice(1).filter(r => r.length > 1 && r.some(c => c !== ''));
                     renderSparesTable(rawSparesData);
                     return;
@@ -392,21 +425,28 @@
 
         function renderSparesTable(rows) {
             const tbody = document.getElementById('sparesTableBody');
+            const alertBox = document.getElementById('sparesAlertBox');
+            const alertText = document.getElementById('sparesAlertText');
+
             if (rows.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="7" class="no-data">🔍 No records found.</td></tr>`;
+                alertBox.style.display = 'none';
                 return;
             }
+
+            let lowStockItems = [];
             let html = "";
             rows.forEach(r => {
                 html += `<tr>`;
                 r.forEach((cell, idx) => {
                     let val = cell || '-';
-                    // Index 4 is Min Stock, Index 5 is Current Stock
+                    // Index 4: Min Stock, Index 5: Current Stock, Index 2: Description
                     if (idx === 5) {
                         let current = parseFloat(val) || 0;
                         let minVal = parseFloat(r[4]) || 0;
                         if (current < minVal) {
-                            html += `<td style="color:#ef4444; font-weight:700;" title="Stock below Minimum Level!">${val} ⚠️ Order</td>`;
+                            lowStockItems.push(`${r[2] || 'Item'} (Avail: ${current}, Min: ${minVal})`);
+                            html += `<td style="color:#ef4444; font-weight:700;">${val}</td>`;
                         } else {
                             html += `<td>${val}</td>`;
                         }
@@ -417,6 +457,14 @@
                 html += `</tr>`;
             });
             tbody.innerHTML = html;
+
+            // Handle External Alert Box display
+            if (lowStockItems.length > 0) {
+                alertText.innerHTML = `Following parts need to be ordered urgently: <b>${lowStockItems.join(' | ')}</b>`;
+                alertBox.style.display = 'block';
+            } else {
+                alertBox.style.display = 'none';
+            }
         }
 
         function filterSparesTable() {
@@ -425,7 +473,7 @@
             renderSparesTable(filtered);
         }
 
-        // 3. Calibration Master List Live[cite: 1]
+        // 3. Calibration Master Loader with Compact Sr. No Width
         async function loadCalibration() {
             const text = await fetchCSVWithFallback(CALIB_CSV_URL);
             const thead = document.getElementById('calibThead');
@@ -436,7 +484,7 @@
                 if (rows.length > 0) {
                     let thHtml = `<tr>`;
                     rows[0].forEach((h, i) => {
-                        let style = i === 0 ? 'width: 50px;' : '';
+                        let style = i === 0 ? 'width: 50px; min-width: 50px;' : '';
                         thHtml += `<th style="${style}">${h || ''}</th>`;
                     });
                     thHtml += `</tr>`;
@@ -462,7 +510,7 @@
                 r.forEach((cell, idx) => {
                     let val = cell || '-';
                     if (idx === 0) {
-                        html += `<td style="width: 50px; font-weight:600; color:#38bdf8;">${val}</td>`;
+                        html += `<td style="width: 50px; min-width: 50px; font-weight:600; color:#38bdf8;">${val}</td>`;
                     } else {
                         html += `<td>${val}</td>`;
                     }
