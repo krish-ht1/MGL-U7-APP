@@ -90,18 +90,6 @@
             box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
         }
 
-        .pm-alert-box {
-    background: rgba(234, 179, 8, 0.15);
-    border: 1px solid #eab308;
-    color: #fde047;
-    padding: 10px 14px;
-    border-radius: 8px;
-    font-size: 12px;
-    margin-bottom: 10px;
-    display: none;
-    font-weight: 500;
-}
-
         /* Content Sections */
         .content-section {
             display: none;
@@ -146,19 +134,19 @@
         }
         .search-box:focus { border-color: #f97316; }
 
-        /* Order Alert Box for Spares */
-.order-alert-box { 
-    background: rgba(239, 68, 68, 0.15); 
-    border: 1px solid #ef4444; 
-    color: #fca5a5; 
-    padding: 10px 14px; 
-    border-radius: 8px; 
-    font-size: 12px; 
-    margin-bottom: 10px; 
-    display: none; 
-    font-weight: 500; 
-}
-.order-alert-box strong { color: #f87171; }
+        /* External Alert Box for Spares Order */
+        .order-alert-box {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid #ef4444;
+            color: #fca5a5;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-bottom: 10px;
+            display: none;
+            font-weight: 500;
+        }
+        .order-alert-box strong { color: #f87171; }
 
         /* Clean Scrollable Table */
         .table-responsive {
@@ -253,16 +241,13 @@
             <button class="tab-btn" onclick="switchMaintenanceTab('spares', this)">🛠️ Critical Spares</button>
             <button class="tab-btn" onclick="switchMaintenanceTab('calib', this)">📏 Calibration Master</button>
         </div>
-<div id="pmDueAlertBox" class="pm-alert-box">
-    ⚠️ <strong>Upcoming PM Due Alert (Next 30 Days):</strong> <span id="pmDueAlertText">Checking schedule...</span>
-</div>
+
         <!-- 1. PM Schedule Section -->
         <div id="section-pm" class="content-section active">
             <div class="section-card">
                 <div class="section-title">
-    <span>📋 Preventive Maintenance Schedule 2026-2027 (Live)</span>
-    <span style="font-size: 11px; color: #f97316; font-weight: 600;">Frequency: After Every 6 Months</span>
-</div>
+                    <span>📋 Preventive Maintenance Schedule 2026-2027</span>
+                </div>
                 <div class="table-responsive">
                     <table>
                         <thead id="pmThead">
@@ -300,9 +285,9 @@
             <div class="section-card">
                 <div class="section-title"><span>🛠️ Critical Spare Parts Stock & List</span></div>
                 <!-- External Alert Box for Low Stock Orders -->
-<div id="sparesAlertBox" class="order-alert-box">
-    ⚠️ <strong>Low Stock Order Alert:</strong> <span id="sparesAlertText">Checking inventory levels...</span>
-</div>
+                <div id="sparesAlertBox" class="order-alert-box">
+                    ⚠️ <strong>Low Stock Order Alert:</strong> <span id="sparesAlertText">Checking inventory levels...</span>
+                </div>
                 <input type="text" id="spareSearch" class="search-box" placeholder="🔍 Search by Description, Part Number, Item Code..." onkeyup="filterSparesTable()">
                 <div class="table-responsive">
                     <table>
@@ -380,115 +365,118 @@
             return null;
         }
 
-       // 1. Load PM Schedule Live with Row Span (Merging first 4-5 columns for PLAN & ACTUAL pairs)
+        // 1. PM Schedule Loader with Static Fallback
         async function loadPMSchedule() {
             const tbody = document.getElementById('pmTableBody');
             const text = await fetchCSVWithFallback(PM_CSV_URL);
             
             if (text) {
                 const rows = parseCSV(text);
-                if (rows.length > 2) {
-                    let dataRows = rows.slice(1).filter(r => r.length > 1 && r.some(c => c !== ''));
+                if (rows.length > 1) {
                     let html = "";
-                    
-                    // Since each machine takes 2 rows (Plan and Actual)
-                    for (let i = 0; i < dataRows.length; i += 2) {
-                        let r1 = dataRows[i];     // Plan row
-                        let r2 = dataRows[i+1];   // Actual row (if exists)
-
-                        if (r1) {
+                    rows.slice(1).forEach(r => {
+                        if (r.length > 1 && r.some(c => c !== '')) {
                             html += `<tr>`;
-                            r1.forEach((cell, idx) => {
+                            r.forEach((cell, idx) => {
                                 let val = cell || '';
                                 let upper = val.toUpperCase();
-                                let cls = upper.includes('PLAN') ? "cell-plan" : (upper.includes('DONE') || upper.includes('ACTUAL') ? "cell-actual" : "");
-                                
-                                // Merge first 4 columns (Sr No, Machine No, Name, Spec) using rowspan="2"
-                                if (idx < 4) {
-                                    html += `<td rowspan="2" style="vertical-align: middle; ${idx === 0 ? 'width:50px; font-weight:600; color:#38bdf8;' : ''}">${val}</td>`;
+                                let cls = "";
+                                if (upper.includes('PLAN')) cls = "cell-plan";
+                                else if (upper.includes('DONE') || upper.includes('ACTUAL')) cls = "cell-actual";
+
+                                if (idx === 0) {
+                                    html += `<td style="width: 50px; font-weight:600; color:#38bdf8;" class="${cls}">${val}</td>`;
                                 } else {
                                     html += `<td class="${cls}">${val}</td>`;
                                 }
                             });
                             html += `</tr>`;
                         }
-
-                        if (r2) {
-                            html += `<tr>`;
-                            r2.forEach((cell, idx) => {
-                                // Skip first 4 columns because they are already merged by rowspan="2" from the above row
-                                if (idx >= 4) {
-                                    let val = cell || '';
-                                    let upper = val.toUpperCase();
-                                    let cls = upper.includes('PLAN') ? "cell-plan" : (upper.includes('DONE') || upper.includes('ACTUAL') ? "cell-actual" : "");
-                                    html += `<td class="${cls}">${val}</td>`;
-                                }
-                            });
-                            html += `</tr>`;
-                        }
-                    }
-                    
+                    });
                     if (html) {
                         tbody.innerHTML = html;
                         return;
                     }
                 }
             }
-            tbody.innerHTML = `<tr><td colspan="18" class="no-data" style="color:#ef4444;">⚠️ Error loading PM Schedule.</td></tr>`;
+
+            tbody.innerHTML = `
+                <tr><td style="width:50px;">1</td><td><b>SQF-01</b></td><td>SEAL QUENCH FURNACE</td><td>AICHELIN UNITHERM</td><td style="color:#eab308; font-weight:700;">PLAN</td><td></td><td class="cell-plan">PLAN</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>Routine</td></tr>
+                <tr><td style="width:50px;">1</td><td><b>SQF-01</b></td><td>SEAL QUENCH FURNACE</td><td>AICHELIN UNITHERM</td><td style="color:#22c55e; font-weight:700;">ACTUAL</td><td></td><td class="cell-actual">DONE</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>Done</td></tr>
+            `;
+        }
+
+        // 2. Critical Spares Loader with External Alert Box
+        async function loadCriticalSpares() {
+            const text = await fetchCSVWithFallback(SPARES_CSV_URL);
+            const thead = document.getElementById('sparesThead');
+            const tbody = document.getElementById('sparesTableBody');
+
+            if (text) {
+                const rows = parseCSV(text);
+                if (rows.length > 0) {
+                    let thHtml = `<tr>`;
+                    rows[0].forEach(h => thHtml += `<th>${h || ''}</th>`);
+                    thHtml += `</tr>`;
+                    thead.innerHTML = thHtml;
+
+                    rawSparesData = rows.slice(1).filter(r => r.length > 1 && r.some(c => c !== ''));
+                    renderSparesTable(rawSparesData);
+                    return;
+                }
+            }
+            tbody.innerHTML = `<tr><td colspan="7" class="no-data" style="color:#ef4444;">⚠️ Error loading spares list.</td></tr>`;
         }
 
         function renderSparesTable(rows) {
-    const tbody = document.getElementById('sparesTableBody');
-    const alertBox = document.getElementById('sparesAlertBox');
-    const alertText = document.getElementById('sparesAlertText');
+            const tbody = document.getElementById('sparesTableBody');
+            const alertBox = document.getElementById('sparesAlertBox');
+            const alertText = document.getElementById('sparesAlertText');
 
-    if (!tbody) return;
-
-    if (rows.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="no-data">🔍 No records found.</td></tr>`;
-        if (alertBox) alertBox.style.display = 'none';
-        return;
-    }
-
-    let lowStockItems = [];
-    let html = "";
-    
-    rows.forEach(r => {
-        html += `<tr>`;
-        r.forEach((cell, idx) => {
-            let val = cell || '-';
-            // Index 5: Current Stock, Index 4: Min Stock (Google Sheet के कॉलम क्रम के अनुसार)
-            if (idx === 5) {
-                let current = parseFloat(val) || 0;
-                let minVal = parseFloat(r[4]) || 0;
-                
-                if (current < minVal) {
-                    lowStockItems.push(`${r[2] || r[1] || 'Part'} (Avail: ${current}, Min: ${minVal})`);
-                    html += `<td style="color:#ef4444; font-weight:700; background:rgba(239,68,68,0.1);">${val} ⚠️</td>`;
-                } else {
-                    html += `<td>${val}</td>`;
-                }
-            } else if (idx === 0) {
-                html += `<td style="width: 50px; min-width: 50px; font-weight:600; color:#38bdf8;">${val}</td>`;
-            } else {
-                html += `<td>${val}</td>`;
+            if (rows.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="no-data">🔍 No records found.</td></tr>`;
+                alertBox.style.display = 'none';
+                return;
             }
-        });
-        html += `</tr>`;
-    });
-    
-    tbody.innerHTML = html;
 
-    // Alert Box Display Logic
-    if (alertBox && alertText) {
-        if (lowStockItems.length > 0) {
-            alertText.innerHTML = `Following parts are below minimum stock level and must be ordered urgently: <b>${lowStockItems.join(' | ')}</b>`;
-            alertBox.style.display = 'block';
-        } else {
-            alertBox.style.display = 'none';
+            let lowStockItems = [];
+            let html = "";
+            rows.forEach(r => {
+                html += `<tr>`;
+                r.forEach((cell, idx) => {
+                    let val = cell || '-';
+                    // Index 4: Min Stock, Index 5: Current Stock, Index 2: Description
+                    if (idx === 5) {
+                        let current = parseFloat(val) || 0;
+                        let minVal = parseFloat(r[4]) || 0;
+                        if (current < minVal) {
+                            lowStockItems.push(`${r[2] || 'Item'} (Avail: ${current}, Min: ${minVal})`);
+                            html += `<td style="color:#ef4444; font-weight:700; background:rgba(239,68,68,0.1);">${val} ⚠️</td>`;
+                        } else {
+                            html += `<td>${val}</td>`;
+                        }
+                    } else {
+                        html += `<td>${val}</td>`;
+                    }
+                });
+                html += `</tr>`;
+            });
+            tbody.innerHTML = html;
+
+            // Handle External Alert Box display
+            if (lowStockItems.length > 0) {
+                alertText.innerHTML = `Following parts need to be ordered urgently: <b>${lowStockItems.join(' | ')}</b>`;
+                alertBox.style.display = 'block';
+            } else {
+                alertBox.style.display = 'none';
+            }
         }
-    }
-}
+
+        function filterSparesTable() {
+            const q = document.getElementById('spareSearch').value.toLowerCase().trim();
+            const filtered = rawSparesData.filter(r => r.some(col => String(col).toLowerCase().includes(q)));
+            renderSparesTable(filtered);
+        }
 
         // 3. Calibration Master Loader with Compact Sr. No Width
         async function loadCalibration() {
