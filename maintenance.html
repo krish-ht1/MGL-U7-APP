@@ -429,54 +429,18 @@ th:first-child {
         let rawSparesData = [];
         let rawCalibData = [];
 
-       // Smart CSV Parser that safely handles Line Breaks inside Quoted Cells
-function parseCSV(text) {
-    let rows = [];
-    let row = [];
-    let insideQuote = false;
-    let entry = '';
-
-    for (let i = 0; i < text.length; i++) {
-        let char = text[i];
-        let nextChar = text[i + 1];
-
-        if (char === '"') {
-            if (insideQuote && nextChar === '"') {
-                entry += '"'; // Handle escaped quotes
-                i++;
-            } else {
-                insideQuote = !insideQuote;
-            }
-        } else if (char === ',' && !insideQuote) {
-            row.push(entry.trim());
-            entry = '';
-        } else if ((char === '\r' || char === '\n') && !insideQuote) {
-            // Handle standard row separators outside quotes
-            if (char === '\r' && nextChar === '\n') { i++; }
-            row.push(entry.trim());
-            if (row.length > 1 || (row.length === 1 && row[0] !== '')) {
-                rows.push(row);
-            }
-            row = [''];
-            entry = '';
-        } else {
-            // This safely captures line breaks (\n or \r) even if they are inside the cell text (quotes)
-            if (char === '\r' && nextChar === '\n') {
-                entry += '\n';
-                i++;
-            } else if (char === '\r' || char === '\n') {
-                entry += '\n';
-            } else {
-                entry += char;
-            }
+        function parseCSV(text) {
+            return text.split('\n').map(r => {
+                let row = [], insideQuote = false, entry = '';
+                for (let char of r) {
+                    if (char === '"') { insideQuote = !insideQuote; }
+                    else if (char === ',' && !insideQuote) { row.push(entry.trim()); entry = ''; }
+                    else { entry += char; }
+                }
+                row.push(entry.trim());
+                return row;
+            });
         }
-    }
-    row.push(entry.trim());
-    if (row.length > 1 || (row.length === 1 && row[0] !== '')) {
-        rows.push(row);
-    }
-    return rows;
-}
 
         async function fetchCSVWithFallback(url) {
             try {
@@ -497,7 +461,7 @@ function parseCSV(text) {
 
             return null;
         }
-       
+
        // 1. PM Schedule Loader with Row Span and Smart 30-Days Due Alert
 async function loadPMSchedule() {
     const tbody = document.getElementById('pmTableBody');
