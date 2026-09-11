@@ -231,13 +231,14 @@
             table { font-size: 10px; }
             th, td { padding: 6px 8px; }
         }
-        /* Calibration & Spares Table Layout Fixes */
+        /* Calibration & General Table Clean Layout */
 .table-responsive {
     overflow-x: auto;
     max-height: 550px;
     border-radius: 8px;
     border: 1px solid #475569;
     -webkit-overflow-scrolling: touch;
+    background: #0f172a;
 }
 
 table {
@@ -245,15 +246,47 @@ table {
     border-collapse: collapse;
     font-size: 11px;
     text-align: center;
-    table-layout: auto; /* ताकि बाकी कॉलम अपने टेक्स्ट के हिसाब से जगह लें */
+    table-layout: auto;
 }
 
-th, td {
-    padding: 7px 10px;
+/* टेबल के टाइटल्स / हेडर एकदम साफ़ और हाईलाइटेड दिखेंगे */
+th {
+    background: #0284c7 !important;
+    color: #ffffff !important;
+    padding: 10px 12px;
+    font-weight: 700;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border: 1px solid #0369a1;
+    white-space: nowrap;
+    text-transform: uppercase;
+}
+
+td {
+    padding: 8px 10px;
     border: 1px solid #475569;
     color: #cbd5e1;
     background: #0f172a;
     white-space: nowrap;
+}
+
+/* सीरियल नंबर कॉलम की फिक्स चौड़ाई */
+th:first-child, td:first-child {
+    width: 45px !important;
+    min-width: 45px !important;
+    max-width: 45px !important;
+    text-align: center;
+    position: sticky;
+    left: 0;
+    background: #1e293b;
+    z-index: 5;
+    border-right: 2px solid #38bdf8;
+}
+
+th:first-child {
+    z-index: 12;
+    background: #0284c7 !important;
 }
 
 /* 🎯 सीरियल नंबर (Sr. No) वाले कॉलम की चौड़ाई को पूरी तरह लॉक और कॉम्पैक्ट करना */
@@ -652,26 +685,32 @@ async function loadPMSchedule() {
         }
 
         function renderCalibrationTable(rows) {
-            const tbody = document.getElementById('calibrationTableBody');
-            if (rows.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="no-data">🔍 No calibration records found.</td></tr>`;
-                return;
+    const tbody = document.getElementById('calibrationTableBody');
+    if (!tbody) return;
+
+    if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="no-data">🔍 No calibration records found.</td></tr>`;
+        return;
+    }
+
+    let html = "";
+    rows.forEach((r, idx) => {
+        html += `<tr>`;
+        r.forEach((cell, cellIdx) => {
+            let val = cell || '-';
+            // अगर डेटा में कहीं गलती से खाली स्ट्रिंग या अजीब वैल्यू हो, तो उसे हाइफन (-) बना दें ताकि टेबल ब्लैंक न लगे
+            if (val.trim() === '') val = '-';
+
+            if (cellIdx === 0) {
+                html += `<td style="width: 45px; min-width: 45px; font-weight:600; color:#38bdf8; background:#1e293b;">${idx + 1}</td>`;
+            } else {
+                html += `<td>${val}</td>`;
             }
-            let html = "";
-            rows.forEach(r => {
-                html += `<tr>`;
-                r.forEach((cell, idx) => {
-                    let val = cell || '-';
-                    if (idx === 0) {
-                        html += `<td style="width: 50px; min-width: 50px; font-weight:600; color:#38bdf8;">${val}</td>`;
-                    } else {
-                        html += `<td>${val}</td>`;
-                    }
-                });
-                html += `</tr>`;
-            });
-            tbody.innerHTML = html;
-        }
+        });
+        html += `</tr>`;
+    });
+    tbody.innerHTML = html;
+}
 
         function filterCalibrationTable() {
             const q = document.getElementById('calibrationSearch').value.toLowerCase().trim();
