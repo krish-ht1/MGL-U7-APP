@@ -59,7 +59,7 @@
             gap: 12px;
         }
 
-        /* 3 Master Navigation Buttons (Tabs) */
+        /* 3 Master Navigation Buttons (Tabs)[cite: 1, 3] */
         .tabs-bar {
             display: flex;
             gap: 8px;
@@ -119,7 +119,7 @@
             text-transform: uppercase;
         }
 
-        /* Search Box */
+        /* Search Box[cite: 3] */
         .search-box {
             width: 100%;
             padding: 9px 12px;
@@ -169,7 +169,7 @@
         }
         tr:hover td { background: rgba(249, 115, 22, 0.08); color: #fff; }
 
-        /* Compact Width Fixes */
+        /* Sticky First Column */
         th:first-child, td:first-child {
             width: 50px;
             min-width: 50px;
@@ -216,7 +216,7 @@
             <a href="index.html" class="back-btn">⬅ Home</a>
             <h1>⚙️ HT Maintenance Hub</h1>
         </div>
-        <span style="font-size: 10.5px; color: #34d399; font-weight: 600;">● Active Hub</span>
+        <span style="font-size: 10.5px; color: #34d399; font-weight: 600;">● Live Synced</span>
     </header>
 
     <div class="main-container">
@@ -228,93 +228,16 @@
             <button class="tab-btn" onclick="switchMaintenanceTab('calib', this)">📏 Calibration Master</button>
         </div>
 
-        <!-- 1. PM Schedule Section -->
+        <!-- 1. PM Schedule Section (Live from Google Sheet) -->
         <div id="section-pm" class="content-section active">
             <div class="section-card">
                 <div class="section-title">
-                    <span>📋 Preventive Maintenance Schedule 2026-2027</span>
+                    <span>📋 Preventive Maintenance Schedule 2026-2027 (Live)</span>
                 </div>
                 <div class="table-responsive">
                     <table>
-                        <thead>
-                            <tr>
-                                <th>Sr. No</th>
-                                <th>Machine No</th>
-                                <th>Machine Name</th>
-                                <th>Specification</th>
-                                <th>Schedule</th>
-                                <th>April</th>
-                                <th>May</th>
-                                <th>June</th>
-                                <th>July</th>
-                                <th>August</th>
-                                <th>Sept</th>
-                                <th>Oct</th>
-                                <th>Nov</th>
-                                <th>Dec</th>
-                                <th>Jan</th>
-                                <th>Feb</th>
-                                <th>March</th>
-                                <th>Remarks</th>
-                            </tr>
-                        </thead>
-                        <tbody id="pmTableBody">
-                            <tr>
-                                <td rowspan="2" style="font-weight:700; color:#38bdf8;">1</td>
-                                <td rowspan="2" style="font-weight:700;">SQF-01</td>
-                                <td rowspan="2">SEAL QUENCH FURNACE</td>
-                                <td rowspan="2">AICHELIN UNITHERM</td>
-                                <td style="color:#eab308; font-weight:700;">PLAN</td>
-                                <td></td><td class="cell-plan">PLAN</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                                <td rowspan="2">Routine Servicing</td>
-                            </tr>
-                            <tr>
-                                <td style="color:#22c55e; font-weight:700;">ACTUAL</td>
-                                <td></td><td class="cell-actual">DONE</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                            </tr>
-
-                            <tr>
-                                <td rowspan="2" style="font-weight:700; color:#38bdf8;">2</td>
-                                <td rowspan="2" style="font-weight:700;">SQF-02</td>
-                                <td rowspan="2">SEAL QUENCH FURNACE</td>
-                                <td rowspan="2">AICHELIN UNITHERM</td>
-                                <td style="color:#eab308; font-weight:700;">PLAN</td>
-                                <td></td><td></td><td></td><td></td><td></td><td class="cell-plan">PLAN</td><td></td><td></td><td></td><td></td><td></td><td></td>
-                                <td rowspan="2">Burner Overhaul</td>
-                            </tr>
-                            <tr>
-                                <td style="color:#22c55e; font-weight:700;">ACTUAL</td>
-                                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                            </tr>
-
-                            <tr>
-                                <td rowspan="2" style="font-weight:700; color:#38bdf8;">3</td>
-                                <td rowspan="2" style="font-weight:700;">SQF-03</td>
-                                <td rowspan="2">SEAL QUENCH FURNACE</td>
-                                <td rowspan="2">AICHELIN UNITHERM</td>
-                                <td style="color:#eab308; font-weight:700;">PLAN</td>
-                                <td class="cell-plan">PLAN</td><td></td><td></td><td class="cell-plan">PLAN</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                                <td rowspan="2">Radiant Tube Check</td>
-                            </tr>
-                            <tr>
-                                <td style="color:#22c55e; font-weight:700;">ACTUAL</td>
-                                <td class="cell-actual">DONE</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                            </tr>
-
-                            <tr>
-                                <td rowspan="2" style="font-weight:700; color:#38bdf8;">4</td>
-                                <td rowspan="2" style="font-weight:700;">SQF-04</td>
-                                <td rowspan="2">SEAL QUENCH FURNACE</td>
-                                <td rowspan="2">AICHELIN UNITHERM</td>
-                                <td style="color:#eab308; font-weight:700;">PLAN</td>
-                                <td class="cell-plan">PLAN</td><td></td><td></td><td></td><td class="cell-plan">PLAN</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                                <td rowspan="2">Agitator Maint.</td>
-                            </tr>
-                            <tr>
-                                <td style="color:#22c55e; font-weight:700;">ACTUAL</td>
-                                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                            </tr>
-                        </tbody>
+                        <thead id="pmThead"><tr><th>Loading Headers...</th></tr></thead>
+                        <tbody id="pmTableBody"><tr><td colspan="18" class="no-data">Loading PM Schedule from Google Sheet...</td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -361,6 +284,7 @@
         }
 
         // Live CSV URLs
+        const PM_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=1943594971&single=true&output=csv";
         const SPARES_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=1304634560&single=true&output=csv";
         const CALIB_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIjTl05F8eko2YsYFg78qhfZg8vmdx1xYk29kNTnOn5C01lp78J0BuB3CP8OyT8C8qXhQv8PRVSwVK/pub?gid=2037689190&single=true&output=csv";[cite: 1]
 
@@ -400,7 +324,51 @@
             return null;
         }
 
-        // 1. Critical Spares with Minimum Level Order Alert
+        // 1. Load Live PM Schedule from Google Sheet
+        async function loadPMSchedule() {
+            const text = await fetchCSVWithFallback(PM_CSV_URL);
+            const thead = document.getElementById('pmThead');
+            const tbody = document.getElementById('pmTableBody');
+
+            if (text) {
+                const rows = parseCSV(text);
+                if (rows.length > 0) {
+                    let thHtml = `<tr>`;
+                    rows[0].forEach((h, i) => {
+                        let style = i === 0 ? 'width: 50px;' : '';
+                        thHtml += `<th style="${style}">${h || ''}</th>`;
+                    });
+                    thHtml += `</tr>`;
+                    thead.innerHTML = thHtml;
+
+                    let html = "";
+                    rows.slice(1).forEach(r => {
+                        if (r.length > 1 && r.some(c => c !== '')) {
+                            html += `<tr>`;
+                            r.forEach((cell, idx) => {
+                                let val = cell || '';
+                                let upper = val.toUpperCase();
+                                let cls = "";
+                                if (upper.includes('PLAN')) cls = "cell-plan";
+                                else if (upper.includes('DONE') || upper.includes('ACTUAL')) cls = "cell-actual";
+                                
+                                if (idx === 0) {
+                                    html += `<td style="width: 50px; font-weight:600; color:#38bdf8;" class="${cls}">${val}</td>`;
+                                } else {
+                                    html += `<td class="${cls}">${val}</td>`;
+                                }
+                            });
+                            html += `</tr>`;
+                        }
+                    });
+                    tbody.innerHTML = html;
+                    return;
+                }
+            }
+            tbody.innerHTML = `<tr><td colspan="18" class="no-data" style="color:#ef4444;">⚠️ Error loading PM Schedule from Google Sheet.</td></tr>`;
+        }
+
+        // 2. Critical Spares with Minimum Level Order Alert
         async function loadCriticalSpares() {
             const text = await fetchCSVWithFallback(SPARES_CSV_URL);
             const thead = document.getElementById('sparesThead');
@@ -457,7 +425,7 @@
             renderSparesTable(filtered);
         }
 
-        // 2. Calibration Master List[cite: 1]
+        // 3. Calibration Master List[cite: 1]
         async function loadCalibration() {
             const text = await fetchCSVWithFallback(CALIB_CSV_URL);
             const thead = document.getElementById('calibThead');
@@ -468,7 +436,6 @@
                 if (rows.length > 0) {
                     let thHtml = `<tr>`;
                     rows[0].forEach((h, i) => {
-                        // Compact width adjustments for SR No
                         let style = i === 0 ? 'width: 50px;' : '';
                         thHtml += `<th style="${style}">${h || ''}</th>`;
                     });
@@ -512,6 +479,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            loadPMSchedule();
             loadCriticalSpares();
             loadCalibration();
         });
