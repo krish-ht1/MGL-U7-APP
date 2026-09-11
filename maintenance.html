@@ -146,19 +146,19 @@
         }
         .search-box:focus { border-color: #f97316; }
 
-        /* External Alert Box for Spares Order */
-        .order-alert-box {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid #ef4444;
-            color: #fca5a5;
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 12px;
-            margin-bottom: 10px;
-            display: none;
-            font-weight: 500;
-        }
-        .order-alert-box strong { color: #f87171; }
+        /* Order Alert Box for Spares */
+.order-alert-box { 
+    background: rgba(239, 68, 68, 0.15); 
+    border: 1px solid #ef4444; 
+    color: #fca5a5; 
+    padding: 10px 14px; 
+    border-radius: 8px; 
+    font-size: 12px; 
+    margin-bottom: 10px; 
+    display: none; 
+    font-weight: 500; 
+}
+.order-alert-box strong { color: #f87171; }
 
         /* Clean Scrollable Table */
         .table-responsive {
@@ -300,9 +300,9 @@
             <div class="section-card">
                 <div class="section-title"><span>🛠️ Critical Spare Parts Stock & List</span></div>
                 <!-- External Alert Box for Low Stock Orders -->
-                <div id="sparesAlertBox" class="order-alert-box">
-                    ⚠️ <strong>Low Stock Order Alert:</strong> <span id="sparesAlertText">Checking inventory levels...</span>
-                </div>
+<div id="sparesAlertBox" class="order-alert-box">
+    ⚠️ <strong>Low Stock Order Alert:</strong> <span id="sparesAlertText">Checking inventory levels...</span>
+</div>
                 <input type="text" id="spareSearch" class="search-box" placeholder="🔍 Search by Description, Part Number, Item Code..." onkeyup="filterSparesTable()">
                 <div class="table-responsive">
                     <table>
@@ -437,71 +437,58 @@
             tbody.innerHTML = `<tr><td colspan="18" class="no-data" style="color:#ef4444;">⚠️ Error loading PM Schedule.</td></tr>`;
         }
 
-        // 2. Critical Spares Loader with External Alert Box
-        async function loadCriticalSpares() {
-            const text = await fetchCSVWithFallback(SPARES_CSV_URL);
-            const tbody = document.getElementById('sparesTableBody');
-
-            if (text) {
-                const rows = parseCSV(text);
-                if (rows.length > 0) {
-                    rawSparesData = rows.slice(1).filter(r => r.length > 1 && r.some(c => c !== ''));
-                    renderSparesTable(rawSparesData);
-                    return;
-                }
-            }
-            tbody.innerHTML = `<tr><td colspan="7" class="no-data" style="color:#ef4444;">⚠️ Error loading spares list.</td></tr>`;
-        }
-
         function renderSparesTable(rows) {
-            const tbody = document.getElementById('sparesTableBody');
-            const alertBox = document.getElementById('sparesAlertBox');
-            const alertText = document.getElementById('sparesAlertText');
+    const tbody = document.getElementById('sparesTableBody');
+    const alertBox = document.getElementById('sparesAlertBox');
+    const alertText = document.getElementById('sparesAlertText');
 
-            if (rows.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="no-data">🔍 No records found.</td></tr>`;
-                alertBox.style.display = 'none';
-                return;
-            }
+    if (!tbody) return;
 
-            let lowStockItems = [];
-            let html = "";
-            rows.forEach(r => {
-                html += `<tr>`;
-                r.forEach((cell, idx) => {
-                    let val = cell || '-';
-                    // Index 4: Min Stock, Index 5: Current Stock, Index 2: Description
-                    if (idx === 5) {
-                        let current = parseFloat(val) || 0;
-                        let minVal = parseFloat(r[4]) || 0;
-                        if (current < minVal) {
-                            lowStockItems.push(`${r[2] || 'Item'} (Avail: ${current}, Min: ${minVal})`);
-                            html += `<td style="color:#ef4444; font-weight:700;">${val}</td>`;
-                        } else {
-                            html += `<td>${val}</td>`;
-                        }
-                    } else {
-                        html += `<td>${val}</td>`;
-                    }
-                });
-                html += `</tr>`;
-            });
-            tbody.innerHTML = html;
+    if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="no-data">🔍 No records found.</td></tr>`;
+        if (alertBox) alertBox.style.display = 'none';
+        return;
+    }
 
-            // Handle External Alert Box display
-            if (lowStockItems.length > 0) {
-                alertText.innerHTML = `Following parts need to be ordered urgently: <b>${lowStockItems.join(' | ')}</b>`;
-                alertBox.style.display = 'block';
+    let lowStockItems = [];
+    let html = "";
+    
+    rows.forEach(r => {
+        html += `<tr>`;
+        r.forEach((cell, idx) => {
+            let val = cell || '-';
+            // Index 5: Current Stock, Index 4: Min Stock (Google Sheet के कॉलम क्रम के अनुसार)
+            if (idx === 5) {
+                let current = parseFloat(val) || 0;
+                let minVal = parseFloat(r[4]) || 0;
+                
+                if (current < minVal) {
+                    lowStockItems.push(`${r[2] || r[1] || 'Part'} (Avail: ${current}, Min: ${minVal})`);
+                    html += `<td style="color:#ef4444; font-weight:700; background:rgba(239,68,68,0.1);">${val} ⚠️</td>`;
+                } else {
+                    html += `<td>${val}</td>`;
+                }
+            } else if (idx === 0) {
+                html += `<td style="width: 50px; min-width: 50px; font-weight:600; color:#38bdf8;">${val}</td>`;
             } else {
-                alertBox.style.display = 'none';
+                html += `<td>${val}</td>`;
             }
-        }
+        });
+        html += `</tr>`;
+    });
+    
+    tbody.innerHTML = html;
 
-        function filterSparesTable() {
-            const q = document.getElementById('spareSearch').value.toLowerCase().trim();
-            const filtered = rawSparesData.filter(r => r.some(col => String(col).toLowerCase().includes(q)));
-            renderSparesTable(filtered);
+    // Alert Box Display Logic
+    if (alertBox && alertText) {
+        if (lowStockItems.length > 0) {
+            alertText.innerHTML = `Following parts are below minimum stock level and must be ordered urgently: <b>${lowStockItems.join(' | ')}</b>`;
+            alertBox.style.display = 'block';
+        } else {
+            alertBox.style.display = 'none';
         }
+    }
+}
 
         // 3. Calibration Master Loader with Compact Sr. No Width
         async function loadCalibration() {
