@@ -395,17 +395,22 @@ async function loadPMSchedule() {
             let html = "";
             let upcomingPmMachines = [];
 
-            // वर्तमान तारीख और अगले 30 दिन की रेंज सेट करना
+            // वास्तविक आज की तारीख और अगले 30 दिन की रेंज
             const today = new Date();
-            const currentMonthIndex = today.getMonth(); // 0 = Jan, 1 = Feb ... 8 = Sept
-            const currentYear = today.getFullYear();
+            today.setHours(0, 0, 0, 0);
+            const futureDate = new Date();
+            futureDate.setDate(today.getDate() + 30);
+            futureDate.setHours(23, 59, 59, 999);
+
+            // CSV में महीने के कॉलम index 5 (April) से 16 (March) तक होते हैं
+            const monthNames = ["April", "May", "June", "July", "August", "Sept", "Oct", "Nov", "Dec", "Jan", "Feb", "March"];
             
-            // CSV में महीने के कॉलम आमतौर पर index 5 (April) से 16 (March) तक होते हैं
-            // हमारे पास महीनों के नाम की सूची:
-            const monthCols = ["April", "May", "June", "July", "August", "Sept", "Oct", "Nov", "Dec", "Jan", "Feb", "March"];
-            
-            // वित्तीय वर्ष या कैलेंडर के हिसाब से वर्तमान महीने का नाम पता करें
-            // (यह आपके CSV हेडर के क्रमानुसार है: Apr=5, May=6, Jun=7, Jul=8, Aug=9, Sept=10, Oct=11, Nov=12...)
+            // वित्तीय वर्ष 2026-2027 के अनुसार महीनों के सही JavaScript Month और Year मैपिंग:
+            const jsMonthMap = [
+                { m: 3, y: 2026 }, { m: 4, y: 2026 }, { m: 5, y: 2026 }, { m: 6, y: 2026 },
+                { m: 7, y: 2026 }, { m: 8, y: 2026 }, { m: 9, y: 2026 }, { m: 10, y: 2026 },
+                { m: 11, y: 2026 }, { m: 0, y: 2027 }, { m: 1, y: 2027 }, { m: 2, y: 2027 }
+            ];
 
             for (let i = 0; i < dataRows.length; i += 2) {
                 let r1 = dataRows[i];     // Plan row
@@ -423,17 +428,22 @@ async function loadPMSchedule() {
                         
                         // अगर यह प्लान वाला रो है और कॉलम महीने वाला है (index 5 से 16)
                         if (idx >= 5 && idx <= 16 && upper.includes('PLAN')) {
-                            let csvMonthName = monthCols[idx - 5];
+                            let monthIdxInMap = idx - 5;
+                            let monthInfo = jsMonthMap[monthIdxInMap];
                             
-                            // यहाँ हम स्मार्ट चेक कर रहे हैं कि क्या यह प्लान अगले 30-40 दिन के भीतर आने वाले महीने का है?
-                            // जैसे अगर अभी September है, तो सितंबर/अक्टूबर वाले ही दिखेंगे, नवंबर/दिसंबर वाले नहीं।
-                            // मान लेते हैं कि अगर महीने का इंडेक्स करंट महीने के आस-पास है:
-                            let targetMonthIndex = (idx - 5 + 1) <= 12 ? (idx - 5 + 1) : 1; // 1-based month index (April=1 ... Sept=6)
-                            
-                            // उदाहरण के लिए, अगर डेटा में 'PLAN' लिखा है तो मशीन को ड्यू लिस्ट में जोड़ें 
-                            // (बशर्ते वह बहुत दूर का न हो)
-                            if (!upcomingPmMachines.includes(`${machineNo} (${machineName} - ${csvMonthName})`)) {
-                                upcomingPmMachines.push(`${machineNo} (${machineName} - ${csvMonthName})`);
+                            if (monthInfo) {
+                                // महीने की 15 तारीख मानकर सटीक तारीख बना रहे हैं
+                                let planDate = new Date(monthInfo.y, monthInfo.m, 15);
+                                planDate.setHours(0, 0, 0, 0);
+
+                                // चेक करो क्या यह प्लान आज से ठीक अगले 30 दिनों के भीतर आता है?
+                                if (planDate >= today && planDate <= futureDate) {
+                                    let csvMonthName = monthNames[monthIdxInMap];
+                                    let textInfo = `${machineNo} (${machineName} - ${csvMonthName})`;
+                                    if (!upcomingPmMachines.includes(textInfo)) {
+                                        upcomingPmMachines.push(textInfo);
+                                    }
+                                }
                             }
                         }
 
@@ -467,7 +477,7 @@ async function loadPMSchedule() {
                 // 30 दिन वाले ड्यू अलर्ट बॉक्स को कंट्रोल करना
                 if (alertBox && alertText) {
                     if (upcomingPmMachines.length > 0) {
-                        alertText.innerHTML = `Following machine(s) PM is due in schedule: <b>${upcomingPmMachines.join(' | ')}</b>`;
+                        alertText.innerHTML = `Following machine(s) PM is due within next 30 days: <b>${upcomingPmMachines.join(' | ')}</b>`;
                         alertBox.style.display = 'block';
                     } else {
                         alertBox.style.display = 'none';
