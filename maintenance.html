@@ -684,7 +684,7 @@ async function loadPMSchedule() {
             tbody.innerHTML = `<tr><td colspan="9" class="no-data" style="color:#ef4444;">⚠️ Error loading calibration records.</td></tr>`;
         }
 
-        function renderCalibrationTable(rows) {
+       function renderCalibrationTable(rows) {
     const tbody = document.getElementById('calibrationTableBody');
     if (!tbody) return;
 
@@ -693,22 +693,31 @@ async function loadPMSchedule() {
         return;
     }
 
+    // मान लेते हैं कि कैलिब्रेशन टेबल में कुल 9 कॉलम हैं (Sr. No से लेकर Due Date तक)
+    const totalColumns = 9; 
     let html = "";
+
     rows.forEach((r, idx) => {
         html += `<tr>`;
-        r.forEach((cell, cellIdx) => {
-            let val = cell || '-';
-            // अगर डेटा में कहीं गलती से खाली स्ट्रिंग या अजीब वैल्यू हो, तो उसे हाइफन (-) बना दें ताकि टेबल ब्लैंक न लगे
-            if (val.trim() === '') val = '-';
+        
+        // हमेशा पहला कॉलम सीरियल नंबर (Sr. No) का होगा
+        html += `<td style="width: 45px; min-width: 45px; font-weight:600; color:#38bdf8; background:#1e293b; text-align:center;">${idx + 1}</td>`;
 
-            if (cellIdx === 0) {
-                html += `<td style="width: 45px; min-width: 45px; font-weight:600; color:#38bdf8; background:#1e293b;">${idx + 1}</td>`;
-            } else {
-                html += `<td>${val}</td>`;
+        // अब बाकी के कॉलम्स के लिए लूप चलाएंगे (Index 1 से लेकर totalColumns - 1 तक)
+        for (let i = 1; i < totalColumns; i++) {
+            let val = (r && r[i] !== undefined && r[i] !== null) ? String(r[i]).trim() : '';
+            
+            // अगर शीट में डेटा खाली है, तो टेबल को फटने या मर्ज होने से बचाने के लिए खाली हाइफन (-) या नॉन-ब्रेकिंग स्पेस दें
+            if (val === '') {
+                val = '-';
             }
-        });
+
+            html += `<td style="text-align: left; white-space: nowrap;">${val}</td>`;
+        }
+
         html += `</tr>`;
     });
+
     tbody.innerHTML = html;
 }
 
