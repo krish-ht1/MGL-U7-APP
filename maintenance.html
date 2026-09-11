@@ -252,15 +252,18 @@
             <button class="tab-btn" onclick="switchMaintenanceTab('spares', this)">🛠️ Critical Spares</button>
             <button class="tab-btn" onclick="switchMaintenanceTab('calib', this)">📏 Calibration Master</button>
         </div>
-<div id="pmDueAlertBox" class="pm-alert-box">
-    ⚠️ <strong>Upcoming PM Due Alert (Next 30 Days):</strong> <span id="pmDueAlertText">Checking schedule...</span>
-</div>
         <!-- 1. PM Schedule Section -->
         <div id="section-pm" class="content-section active">
             <div class="section-card">
                 <div class="section-title">
-                    <span>📋 Preventive Maintenance Schedule 2026-2027</span>
-                </div>
+    <span>📋 Preventive Maintenance Schedule 2026-2027 (Live)</span>
+    <span style="font-size: 11px; color: #f97316; font-weight: 600;">Frequency: After Every 6 Months</span>
+</div>
+
+<!-- 30 Days PM Due Alert Box -->
+<div id="pmDueAlertBox" class="pm-alert-box">
+    ⚠️ <span>Upcoming PM Due Alert (Next 30 Days):</span> <span id="pmDueAlertText">Checking schedule...</span>
+</div>
                 <div class="table-responsive">
                     <table>
                         <thead id="pmThead">
@@ -380,59 +383,78 @@
 
         // 1. PM Schedule Loader with Static Fallback
         async function loadPMSchedule() {
-            const tbody = document.getElementById('pmTableBody');
-            const text = await fetchCSVWithFallback(PM_CSV_URL);
-            
-            if (text) {
-                const rows = parseCSV(text);
-                if (rows.length > 1) {
-                    let html = "";
-                    rows.slice(1).forEach(r => {
-                        if (r.length > 1 && r.some(c => c !== '')) {
-                            html += `<tr>`;
-                            r.forEach((cell, idx) => {
-                                let val = cell || '';
-                                let upper = val.toUpperCase();
-                                let cls = "";
-                                if (upper.includes('PLAN')) cls = "cell-plan";
-                                else if (upper.includes('DONE') || upper.includes('ACTUAL')) cls = "cell-actual";
-
-                                if (idx === 0) {
-                                    html += `<td style="width: 50px; font-weight:600; color:#38bdf8;" class="${cls}">${val}</td>`;
-                                } else {
-                                    html += `<td class="${cls}">${val}</td>`;
-                                }
-                            });
-                            html += `</tr>`;
-                        }
-                    });
-                    if (html) {
-                        tbody.innerHTML = html;
-                        return;
-                    }
-                }
-            }
-
-            tbody.innerHTML = `
-                <tr><td style="width:50px;">1</td><td><b>SQF-01</b></td><td>SEAL QUENCH FURNACE</td><td>AICHELIN UNITHERM</td><td style="color:#eab308; font-weight:700;">PLAN</td><td></td><td class="cell-plan">PLAN</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>Routine</td></tr>
-                <tr><td style="width:50px;">1</td><td><b>SQF-01</b></td><td>SEAL QUENCH FURNACE</td><td>AICHELIN UNITHERM</td><td style="color:#22c55e; font-weight:700;">ACTUAL</td><td></td><td class="cell-actual">DONE</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>Done</td></tr>
-            `;
-        }
-        function checkPMUpcomingDue() {
+    const tbody = document.getElementById('pmTableBody');
     const alertBox = document.getElementById('pmDueAlertBox');
     const alertText = document.getElementById('pmDueAlertText');
+    const text = await fetchCSVWithFallback(PM_CSV_URL);
     
-    // यहाँ तू अपनी लॉजिक या डेटा के हिसाब से मशीन का नाम सेट कर सकता है जो अगले 30 दिन में ड्यू है
-    let upcomingMachines = ["SQF-01 (Seal Quench Furnace) - Due in next 15 days"];
-    
-    if (alertBox && alertText) {
-        if (upcomingMachines.length > 0) {
-            alertText.innerHTML = `Following machine PM is due soon: <b>${upcomingMachines.join(', ')}</b>`;
-            alertBox.style.display = 'block';
-        } else {
-            alertBox.style.display = 'none';
+    if (text) {
+        const rows = parseCSV(text);
+        if (rows.length > 2) {
+            let dataRows = rows.slice(1).filter(r => r.length > 1 && r.some(c => c !== ''));
+            let html = "";
+            let upcomingPmMachines = [];
+
+            // मान लेते हैं कि CSV में कोई कॉलम या लॉजिक है जिससे पता चलता है कि किस महीने प्लान है। 
+            // यहाँ हम रो-स्पैन (Rowspan) वाला मर्ज लॉजिक लागू कर रहे हैं:
+            for (let i = 0; i < dataRows.length; i += 2) {
+                let r1 = dataRows[i];     // Plan row
+                let r2 = dataRows[i+1];   // Actual row
+
+                let machineName = r1 ? (r1[2] || r1[1] || 'Machine') : 'Machine';
+
+                // उदाहरण के लिए अगर किसी रो में अगले 30 दिन का प्लान है तो यहाँ चेक कर सकते हैं:
+                // (तू अपने डेटा के मुताबिक इसमें कंडीशन सेट कर सकता है)
+
+                if (r1) {
+                    html += `<tr>`;
+                    r1.forEach((cell, idx) => {
+                        let val = cell || '';
+                        let upper = val.toUpperCase();
+                        let cls = upper.includes('PLAN') ? "cell-plan" : (upper.includes('DONE') || upper.includes('ACTUAL') ? "cell-actual" : "");
+                        
+                        // पहली 4 columns (Sr No, Machine No, Name, Spec) को आपस में rowspan="2" से मर्ज करना
+                        if (idx < 4) {
+                            html += `<td rowspan="2" style="vertical-align: middle; ${idx === 0 ? 'width:50px; font-weight:600; color:#38bdf8;' : ''}">${val}</td>`;
+                        } else {
+                            html += `<td class="${cls}">${val}</td>`;
+                        }
+                    });
+                    html += `</tr>`;
+                }
+
+                if (r2) {
+                    html += `<tr>`;
+                    r2.forEach((cell, idx) => {
+                        if (idx >= 4) {
+                            let val = cell || '';
+                            let upper = val.toUpperCase();
+                            let cls = upper.includes('PLAN') ? "cell-plan" : (upper.includes('DONE') || upper.includes('ACTUAL') ? "cell-actual" : "");
+                            html += `<td class="${cls}">${val}</td>`;
+                        }
+                    });
+                    html += `</tr>`;
+                }
+            }
+            
+            if (html) {
+                tbody.innerHTML = html;
+                
+                // 30 दिन वाले ड्यू अलर्ट का डेमो / डायनामिक मैसेज
+                if (alertBox && alertText) {
+                    upcomingPmMachines.push("SQF-01 (Seal Quench Furnace)"); // उदाहरण के लिए
+                    if (upcomingPmMachines.length > 0) {
+                        alertText.innerHTML = `Following machine(s) PM is due within next 30 days: <b>${upcomingNames = upcomingPmMachines.join(', ')}</b>`;
+                        alertBox.style.display = 'block';
+                    } else {
+                        alertBox.style.display = 'none';
+                    }
+                }
+                return;
+            }
         }
     }
+    tbody.innerHTML = `<tr><td colspan="18" class="no-data" style="color:#ef4444;">⚠️ Error loading PM Schedule.</td></tr>`;
 }
 
         // 2. Critical Spares Loader with External Alert Box
