@@ -429,18 +429,53 @@ th:first-child {
         let rawSparesData = [];
         let rawCalibData = [];
 
-        function parseCSV(text) {
-            return text.split('\n').map(r => {
-                let row = [], insideQuote = false, entry = '';
-                for (let char of r) {
-                    if (char === '"') { insideQuote = !insideQuote; }
-                    else if (char === ',' && !insideQuote) { row.push(entry.trim()); entry = ''; }
-                    else { entry += char; }
-                }
-                row.push(entry.trim());
-                return row;
-            });
+       // Smart CSV Parser that safely handles Line Breaks inside Quoted Cells without breaking rows
+function parseCSV(text) {
+    let rows = [];
+    let row = [];
+    let insideQuote = false;
+    let entry = '';
+
+    for (let i = 0; i < text.length; i++) {
+        let char = text[i];
+        let nextChar = text[i + 1];
+
+        if (char === '"') {
+            if (insideQuote && nextChar === '"') {
+                entry += '"'; // Handle escaped quotes
+                i++;
+            } else {
+                insideQuote = !insideQuote;
+            }
+        } else if (char === ',' && !insideQuote) {
+            row.push(entry.trim());
+            entry = '';
+        } else if ((char === '\r' || char === '\n') && !insideQuote) {
+            if (char === '\r' && nextChar === '\n') { i++; }
+            row.push(entry.trim());
+            if (row.length > 1 || (row.length === 1 && row[0] !== '')) {
+                rows.push(row);
+            }
+            row = [];
+            entry = '';
+        } else {
+            // यह कोट के अंदर के लाइन ब्रेक्स (\n या \r) को सुरक्षित रूप से सेल के टेक्स्ट में जोड़ लेता है
+            if (char === '\r' && nextChar === '\n') {
+                entry += '\n';
+                i++;
+            } else if (char === '\r' || char === '\n') {
+                entry += '\n';
+            } else {
+                entry += char;
+            }
         }
+    }
+    row.push(entry.trim());
+    if (row.length > 1 || (row.length === 1 && row[0] !== '')) {
+        rows.push(row);
+    }
+    return rows;
+}
 
         async function fetchCSVWithFallback(url) {
             try {
