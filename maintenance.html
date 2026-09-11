@@ -364,47 +364,62 @@
 
             return null;
         }
-
-        // 1. PM Schedule Loader with Static Fallback
+        
+       // 1. Load PM Schedule Live with Row Span (Merging first 4-5 columns for PLAN & ACTUAL pairs)
         async function loadPMSchedule() {
             const tbody = document.getElementById('pmTableBody');
             const text = await fetchCSVWithFallback(PM_CSV_URL);
             
             if (text) {
                 const rows = parseCSV(text);
-                if (rows.length > 1) {
+                if (rows.length > 2) {
+                    let dataRows = rows.slice(1).filter(r => r.length > 1 && r.some(c => c !== ''));
                     let html = "";
-                    rows.slice(1).forEach(r => {
-                        if (r.length > 1 && r.some(c => c !== '')) {
+                    
+                    // Since each machine takes 2 rows (Plan and Actual)
+                    for (let i = 0; i < dataRows.length; i += 2) {
+                        let r1 = dataRows[i];     // Plan row
+                        let r2 = dataRows[i+1];   // Actual row (if exists)
+
+                        if (r1) {
                             html += `<tr>`;
-                            r.forEach((cell, idx) => {
+                            r1.forEach((cell, idx) => {
                                 let val = cell || '';
                                 let upper = val.toUpperCase();
-                                let cls = "";
-                                if (upper.includes('PLAN')) cls = "cell-plan";
-                                else if (upper.includes('DONE') || upper.includes('ACTUAL')) cls = "cell-actual";
-
-                                if (idx === 0) {
-                                    html += `<td style="width: 50px; font-weight:600; color:#38bdf8;" class="${cls}">${val}</td>`;
+                                let cls = upper.includes('PLAN') ? "cell-plan" : (upper.includes('DONE') || upper.includes('ACTUAL') ? "cell-actual" : "");
+                                
+                                // Merge first 4 columns (Sr No, Machine No, Name, Spec) using rowspan="2"
+                                if (idx < 4) {
+                                    html += `<td rowspan="2" style="vertical-align: middle; ${idx === 0 ? 'width:50px; font-weight:600; color:#38bdf8;' : ''}">${val}</td>`;
                                 } else {
                                     html += `<td class="${cls}">${val}</td>`;
                                 }
                             });
                             html += `</tr>`;
                         }
-                    });
+
+                        if (r2) {
+                            html += `<tr>`;
+                            r2.forEach((cell, idx) => {
+                                // Skip first 4 columns because they are already merged by rowspan="2" from the above row
+                                if (idx >= 4) {
+                                    let val = cell || '';
+                                    let upper = val.toUpperCase();
+                                    let cls = upper.includes('PLAN') ? "cell-plan" : (upper.includes('DONE') || upper.includes('ACTUAL') ? "cell-actual" : "");
+                                    html += `<td class="${cls}">${val}</td>`;
+                                }
+                            });
+                            html += `</tr>`;
+                        }
+                    }
+                    
                     if (html) {
                         tbody.innerHTML = html;
                         return;
                     }
                 }
             }
-
-            // Fallback so screen never stays blank on loading hang
-            tbody.innerHTML = `
-                <tr><td style="width:50px;">1</td><td><b>SQF-01</b></td><td>SEAL QUENCH FURNACE</td><td>AICHELIN UNITHERM</td><td style="color:#eab308; font-weight:700;">PLAN</td><td></td><td class="cell-plan">PLAN</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>Routine</td></tr>
-                <tr><td style="width:50px;">1</td><td><b>SQF-01</b></td><td>SEAL QUENCH FURNACE</td><td>AICHELIN UNITHERM</td><td style="color:#22c55e; font-weight:700;">ACTUAL</td><td></td><td class="cell-actual">DONE</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>Done</td></tr>
-            `;
+            tbody.innerHTML = `<tr><td colspan="18" class="no-data" style="color:#ef4444;">⚠️ Error loading PM Schedule.</td></tr>`;
         }
 
         // 2. Critical Spares Loader with External Alert Box
