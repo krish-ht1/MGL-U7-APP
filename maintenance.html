@@ -231,6 +231,54 @@
             table { font-size: 10px; }
             th, td { padding: 6px 8px; }
         }
+        /* Calibration & Spares Table Layout Fixes */
+.table-responsive {
+    overflow-x: auto;
+    max-height: 550px;
+    border-radius: 8px;
+    border: 1px solid #475569;
+    -webkit-overflow-scrolling: touch;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    text-align: center;
+    table-layout: auto; /* ताकि बाकी कॉलम अपने टेक्स्ट के हिसाब से जगह लें */
+}
+
+th, td {
+    padding: 7px 10px;
+    border: 1px solid #475569;
+    color: #cbd5e1;
+    background: #0f172a;
+    white-space: nowrap;
+}
+
+/* 🎯 सीरियल नंबर (Sr. No) वाले कॉलम की चौड़ाई को पूरी तरह लॉक और कॉम्पैक्ट करना */
+th:first-child, td:first-child {
+    width: 45px !important;
+    min-width: 45px !important;
+    max-width: 45px !important;
+    text-align: center;
+    position: sticky;
+    left: 0;
+    background: #1e293b;
+    z-index: 5;
+    border-right: 2px solid #38bdf8;
+}
+
+th:first-child {
+    z-index: 12;
+    background: #0284c7;
+}
+
+/* मोबाइल और वेब के लिए रिस्पॉन्सिव मीडिया क्वेरी */
+@media (max-width: 768px) {
+    table { font-size: 10px; }
+    th, td { padding: 6px 8px; }
+}
     </style>
 </head>
 <body>
