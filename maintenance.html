@@ -429,49 +429,65 @@
         }
 
         function renderSparesTable(rows) {
-            const tbody = document.getElementById('sparesTableBody');
-            const alertBox = document.getElementById('sparesAlertBox');
-            const alertText = document.getElementById('sparesAlertText');
+    const tbody = document.getElementById('sparesTableBody');
+    const alertBox = document.getElementById('sparesAlertBox');
+    const alertText = document.getElementById('sparesAlertText');
 
-            if (rows.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="no-data">🔍 No records found.</td></tr>`;
-                alertBox.style.display = 'none';
-                return;
-            }
+    if (!tbody) return;
 
-            let lowStockItems = [];
-            let html = "";
-            rows.forEach(r => {
-                html += `<tr>`;
-                r.forEach((cell, idx) => {
-                    let val = cell || '-';
-                    // Index 4: Min Stock, Index 5: Current Stock, Index 2: Description
-                    if (idx === 5) {
-                        let current = parseFloat(val) || 0;
-                        let minVal = parseFloat(r[4]) || 0;
-                        if (current < minVal) {
-                            lowStockItems.push(`${r[2] || 'Item'} (Avail: ${current}, Min: ${minVal})`);
-                            html += `<td style="color:#ef4444; font-weight:700; background:rgba(239,68,68,0.1);">${val} ⚠️</td>`;
-                        } else {
-                            html += `<td>${val}</td>`;
-                        }
-                    } else {
-                        html += `<td>${val}</td>`;
-                    }
-                });
-                html += `</tr>`;
-            });
-            tbody.innerHTML = html;
+    if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="no-data">🔍 No records found.</td></tr>`;
+        if (alertBox) alertBox.style.display = 'none';
+        return;
+    }
 
-            // Handle External Alert Box display
-            if (lowStockItems.length > 0) {
-                alertText.innerHTML = `Following parts need to be ordered urgently: <b>${lowStockItems.join(' | ')}</b>`;
-                alertBox.style.display = 'block';
+    let lowStockItems = [];
+    let html = "";
+    
+    rows.forEach((r, index) => {
+        html += `<tr>`;
+        
+        // r[1] = Column B (Part Description)
+        // r[2] = Column C (Minimum Qty)
+        // r[4] = Column E (Available Qty) - (agar index 0 se shuru ho: A=0, B=1, C=2, D=3, E=4)
+        
+        let partDesc = r[1] || 'Unknown Part';
+        let minQty = parseFloat(r[2]) || 0;
+        let availQty = parseFloat(r[4]) || 0;
+
+        r.forEach((cell, idx) => {
+            let val = cell || '-';
+            // Agar ye Available Qty wala column (Column E / Index 4) hai
+            if (idx === 4) {
+                if (availQty < minQty) {
+                    html += `<td style="color:#ef4444; font-weight:700; background:rgba(239,68,68,0.1);">${val} ⚠️</td>`;
+                } else {
+                    html += `<td>${val}</td>`;
+                }
             } else {
-                alertBox.style.display = 'none';
+                html += `<td>${val}</td>`;
             }
-        }
+        });
+        html += `</tr>`;
 
+        // Check logic for Alert Box
+        if (availQty < minQty) {
+            lowStockItems.push(`${partDesc} (Available: ${availQty}, Minimum: ${minQty})`);
+        }
+    });
+    
+    tbody.innerHTML = html;
+
+    // Alert Box Display Logic
+    if (alertBox && alertText) {
+        if (lowStockItems.length > 0) {
+            alertText.innerHTML = `Following parts are below minimum level and must be ordered urgently: <br><b>${lowStockItems.join(' | ')}</b>`;
+            alertBox.style.display = 'block';
+        } else {
+            alertBox.style.display = 'none';
+        }
+    }
+}
         function filterSparesTable() {
             const q = document.getElementById('spareSearch').value.toLowerCase().trim();
             const filtered = rawSparesData.filter(r => r.some(col => String(col).toLowerCase().includes(q)));
