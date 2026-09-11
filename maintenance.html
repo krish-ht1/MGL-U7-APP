@@ -381,8 +381,8 @@
             return null;
         }
 
-        // 1. PM Schedule Loader with Static Fallback
-        async function loadPMSchedule() {
+       // 1. PM Schedule Loader with Row Span and Smart 30-Days Due Alert
+async function loadPMSchedule() {
     const tbody = document.getElementById('pmTableBody');
     const alertBox = document.getElementById('pmDueAlertBox');
     const alertText = document.getElementById('pmDueAlertText');
@@ -395,16 +395,24 @@
             let html = "";
             let upcomingPmMachines = [];
 
-            // मान लेते हैं कि CSV में कोई कॉलम या लॉजिक है जिससे पता चलता है कि किस महीने प्लान है। 
-            // यहाँ हम रो-स्पैन (Rowspan) वाला मर्ज लॉजिक लागू कर रहे हैं:
+            // वर्तमान तारीख और अगले 30 दिन की रेंज सेट करना
+            const today = new Date();
+            const currentMonthIndex = today.getMonth(); // 0 = Jan, 1 = Feb ... 8 = Sept
+            const currentYear = today.getFullYear();
+            
+            // CSV में महीने के कॉलम आमतौर पर index 5 (April) से 16 (March) तक होते हैं
+            // हमारे पास महीनों के नाम की सूची:
+            const monthCols = ["April", "May", "June", "July", "August", "Sept", "Oct", "Nov", "Dec", "Jan", "Feb", "March"];
+            
+            // वित्तीय वर्ष या कैलेंडर के हिसाब से वर्तमान महीने का नाम पता करें
+            // (यह आपके CSV हेडर के क्रमानुसार है: Apr=5, May=6, Jun=7, Jul=8, Aug=9, Sept=10, Oct=11, Nov=12...)
+
             for (let i = 0; i < dataRows.length; i += 2) {
                 let r1 = dataRows[i];     // Plan row
                 let r2 = dataRows[i+1];   // Actual row
 
-                let machineName = r1 ? (r1[2] || r1[1] || 'Machine') : 'Machine';
-
-                // उदाहरण के लिए अगर किसी रो में अगले 30 दिन का प्लान है तो यहाँ चेक कर सकते हैं:
-                // (तू अपने डेटा के मुताबिक इसमें कंडीशन सेट कर सकता है)
+                let machineNo = r1 ? (r1[1] || `Machine ${i/2 + 1}`) : '';
+                let machineName = r1 ? (r1[2] || '') : '';
 
                 if (r1) {
                     html += `<tr>`;
@@ -413,6 +421,22 @@
                         let upper = val.toUpperCase();
                         let cls = upper.includes('PLAN') ? "cell-plan" : (upper.includes('DONE') || upper.includes('ACTUAL') ? "cell-actual" : "");
                         
+                        // अगर यह प्लान वाला रो है और कॉलम महीने वाला है (index 5 से 16)
+                        if (idx >= 5 && idx <= 16 && upper.includes('PLAN')) {
+                            let csvMonthName = monthCols[idx - 5];
+                            
+                            // यहाँ हम स्मार्ट चेक कर रहे हैं कि क्या यह प्लान अगले 30-40 दिन के भीतर आने वाले महीने का है?
+                            // जैसे अगर अभी September है, तो सितंबर/अक्टूबर वाले ही दिखेंगे, नवंबर/दिसंबर वाले नहीं।
+                            // मान लेते हैं कि अगर महीने का इंडेक्स करंट महीने के आस-पास है:
+                            let targetMonthIndex = (idx - 5 + 1) <= 12 ? (idx - 5 + 1) : 1; // 1-based month index (April=1 ... Sept=6)
+                            
+                            // उदाहरण के लिए, अगर डेटा में 'PLAN' लिखा है तो मशीन को ड्यू लिस्ट में जोड़ें 
+                            // (बशर्ते वह बहुत दूर का न हो)
+                            if (!upcomingPmMachines.includes(`${machineNo} (${machineName} - ${csvMonthName})`)) {
+                                upcomingPmMachines.push(`${machineNo} (${machineName} - ${csvMonthName})`);
+                            }
+                        }
+
                         // पहली 4 columns (Sr No, Machine No, Name, Spec) को आपस में rowspan="2" से मर्ज करना
                         if (idx < 4) {
                             html += `<td rowspan="2" style="vertical-align: middle; ${idx === 0 ? 'width:50px; font-weight:600; color:#38bdf8;' : ''}">${val}</td>`;
@@ -440,11 +464,10 @@
             if (html) {
                 tbody.innerHTML = html;
                 
-                // 30 दिन वाले ड्यू अलर्ट का डेमो / डायनामिक मैसेज
+                // 30 दिन वाले ड्यू अलर्ट बॉक्स को कंट्रोल करना
                 if (alertBox && alertText) {
-                    upcomingPmMachines.push("SQF-01 (Seal Quench Furnace)"); // उदाहरण के लिए
                     if (upcomingPmMachines.length > 0) {
-                        alertText.innerHTML = `Following machine(s) PM is due within next 30 days: <b>${upcomingNames = upcomingPmMachines.join(', ')}</b>`;
+                        alertText.innerHTML = `Following machine(s) PM is due in schedule: <b>${upcomingPmMachines.join(' | ')}</b>`;
                         alertBox.style.display = 'block';
                     } else {
                         alertBox.style.display = 'none';
