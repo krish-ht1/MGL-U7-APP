@@ -89,6 +89,17 @@
             border-color: #f97316;
             box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
         }
+        .pm-alert-box {
+    background: rgba(234, 179, 8, 0.15);
+    border: 1px solid #eab308;
+    color: #fde047;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    margin-bottom: 10px;
+    display: none;
+    font-weight: 500;
+}
 
         /* Content Sections */
         .content-section {
@@ -241,7 +252,9 @@
             <button class="tab-btn" onclick="switchMaintenanceTab('spares', this)">🛠️ Critical Spares</button>
             <button class="tab-btn" onclick="switchMaintenanceTab('calib', this)">📏 Calibration Master</button>
         </div>
-
+<div id="pmDueAlertBox" class="pm-alert-box">
+    ⚠️ <strong>Upcoming PM Due Alert (Next 30 Days):</strong> <span id="pmDueAlertText">Checking schedule...</span>
+</div>
         <!-- 1. PM Schedule Section -->
         <div id="section-pm" class="content-section active">
             <div class="section-card">
@@ -405,6 +418,22 @@
                 <tr><td style="width:50px;">1</td><td><b>SQF-01</b></td><td>SEAL QUENCH FURNACE</td><td>AICHELIN UNITHERM</td><td style="color:#22c55e; font-weight:700;">ACTUAL</td><td></td><td class="cell-actual">DONE</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>Done</td></tr>
             `;
         }
+        function checkPMUpcomingDue() {
+    const alertBox = document.getElementById('pmDueAlertBox');
+    const alertText = document.getElementById('pmDueAlertText');
+    
+    // यहाँ तू अपनी लॉजिक या डेटा के हिसाब से मशीन का नाम सेट कर सकता है जो अगले 30 दिन में ड्यू है
+    let upcomingMachines = ["SQF-01 (Seal Quench Furnace) - Due in next 15 days"];
+    
+    if (alertBox && alertText) {
+        if (upcomingMachines.length > 0) {
+            alertText.innerHTML = `Following machine PM is due soon: <b>${upcomingMachines.join(', ')}</b>`;
+            alertBox.style.display = 'block';
+        } else {
+            alertBox.style.display = 'none';
+        }
+    }
+}
 
         // 2. Critical Spares Loader with External Alert Box
         async function loadCriticalSpares() {
