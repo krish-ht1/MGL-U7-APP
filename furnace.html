@@ -1,0 +1,59 @@
+<!-- 🔥 Live Furnace Control Module -->
+<div id="view-furnaceControl" class="module-view" style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 16px; margin-top: 10px; display: block;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+    <h3 style="color: #38bdf8; margin: 0; font-size: 15px; text-transform: uppercase;">🔥 Live Furnace Control — SQF2 Panel</h3>
+    <span style="font-size: 11px; color: #34d399; font-weight: 600;">● Live SCADA Status</span>
+  </div>
+
+  <div style="background: #0f172a; border: 1px solid #475569; border-radius: 8px; padding: 15px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; text-align: center;">
+      <div style="background: #1e293b; padding: 10px; border-radius: 6px; border: 1px solid #334155;">
+        <span style="color: #94a3b8; display: block; font-size: 10px; font-weight: 600;">ACTUAL TEMP</span>
+        <strong id="liveActTemp" style="color: #22c55e; font-size: 16px;">864°C</strong>
+      </div>
+      <div style="background: #1e293b; padding: 10px; border-radius: 6px; border: 1px solid #334155;">
+        <span style="color: #94a3b8; display: block; font-size: 10px; font-weight: 600;">CARBON % (ACT)</span>
+        <strong id="liveActPct" style="color: #38bdf8; font-size: 16px;">0.52%</strong>
+      </div>
+      <div style="background: #1e293b; padding: 10px; border-radius: 6px; border: 1px solid #334155;">
+        <span style="color: #94a3b8; display: block; font-size: 10px; font-weight: 600;">FAN RPM</span>
+        <strong id="liveFanRpm" style="color: #22c55e; font-size: 16px;">950 rpm</strong>
+      </div>
+      <div style="background: #1e293b; padding: 10px; border-radius: 6px; border: 1px solid #334155;">
+        <span style="color: #94a3b8; display: block; font-size: 10px; font-weight: 600;">SAFETY TEMP</span>
+        <strong id="liveSafety" style="color: #ef4444; font-size: 16px;">874°C</strong>
+      </div>
+      <div style="background: #1e293b; padding: 10px; border-radius: 6px; border: 1px solid #334155;">
+        <span style="color: #94a3b8; display: block; font-size: 10px; font-weight: 600;">AGITATOR 1</span>
+        <strong id="liveAg1" style="color: #22c55e; font-size: 16px;">511 rpm</strong>
+      </div>
+      <div style="background: #1e293b; padding: 10px; border-radius: 6px; border: 1px solid #334155;">
+        <span style="color: #94a3b8; display: block; font-size: 10px; font-weight: 600;">QUENCH OIL</span>
+        <strong id="liveQuench" style="color: #38bdf8; font-size: 16px;">72°C</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function jitterInt(v, spread) { return Math.round(v + (Math.random() - 0.5) * spread); }
+  function jitterF(v, spread) { return (v + (Math.random() - 0.5) * spread).toFixed(2); }
+
+  function updateFurnaceLiveFeed() {
+    const actTempEl = document.getElementById('liveActTemp');
+    const actPctEl = document.getElementById('liveActPct');
+    const fanRpmEl = document.getElementById('liveFanRpm');
+    const safetyEl = document.getElementById('liveSafety');
+    const ag1El = document.getElementById('liveAg1');
+    const quenchEl = document.getElementById('liveQuench');
+
+    if (actTempEl) actTempEl.textContent = jitterInt(864, 4) + '°C';
+    if (actPctEl) actPctEl.textContent = jitterF(0.52, 0.03) + '%';
+    if (fanRpmEl) fanRpmEl.textContent = jitterInt(950, 6) + ' rpm';
+    if (safetyEl) safetyEl.textContent = jitterInt(874, 3) + '°C';
+    if (ag1El) ag1El.textContent = 'Ag1: ' + jitterInt(511, 4) + ' rpm';
+    if (quenchEl) quenchEl.textContent = jitterInt(72, 2) + '°C';
+  }
+
+  setInterval(updateFurnaceLiveFeed, 1500);
+</script>
