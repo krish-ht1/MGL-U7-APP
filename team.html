@@ -373,17 +373,64 @@
     </div>
 
     <!-- H.O.D -->
+    <!-- ================= 1. H.O.D SECTION (DYNAMIC) ================= -->
     <div class="hod-container" id="hodSection">
-      <div class="emp-card hod-card" onclick="openProfile('Mr ANAND BHATT', 'Head of Department (H.O.D)', 'Diploma HT & Metallurgy + B.Sc + MBA Opr Mgt.', '18 Year Experience', 'Overall Plant Operations & Metallurgical Leadership', 'anand', 'MANAGEMENT & METALLURGY')">
-        <div class="photo-slot">
-          <img src="image/anand.jpeg" data-name="anand" onerror="smartImgLoad(this, 'anand')">
-          <span class="avatar-fallback">AB</span>
+      
+      <!-- (A) Default Single HOD (All / Operation / Lab के लिए) -->
+      <div id="singleHod" style="display: flex; justify-content: center; width: 100%;">
+        <div class="emp-card hod-card" onclick="openProfile('Mr ANAND BHATT', 'Head of Department (H.O.D)', 'Diploma HT & Metallurgy + B.Sc + MBA Opr Mgt.', '18 Year Experience', 'Overall Plant Operations & Metallurgical Leadership', 'anand', 'MANAGEMENT & METALLURGY')">
+          <div class="photo-slot">
+            <img src="image/anand.jpg" onerror="autoLoadImage(this, 'anand', 'AB')">
+            <span class="avatar-fallback">AB</span>
+          </div>
+          <h3 class="emp-name">Mr ANAND BHATT</h3>
+          <p class="emp-role">Head of Department (H.O.D)</p>
+          <span class="emp-badge">Diploma HT & Metallurgy + B.Sc + MBA Opr Mgt.</span>
+          <span class="emp-exp">⭐ 18 Year Experience</span>
         </div>
-        <h3 class="emp-name">Mr ANAND BHATT</h3>
-        <p class="emp-role">Head of Department (H.O.D)</p>
-        <span class="emp-badge">Diploma HT & Metallurgy + B.Sc + MBA Opr Mgt.</span>
-        <span class="emp-exp">⭐ 18 Year Experience</span>
       </div>
+
+      <!-- (B) 3 HODs Parallel (सिर्फ Maintenance पर क्लिक करने पर दिखेगा) -->
+      <div id="maintHodGroup" style="display: none; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; max-width: 1050px; width: 100%; margin: 0 auto;">
+        
+        <!-- 1. Rajan Babbar Sir -->
+        <div class="emp-card hod-card" style="width: 100%;" onclick="openProfile('Mr. RAJAN BABBAR', 'Head of Department / Director', 'B.Tech / Senior Leadership', '20+ Year Experience', 'Strategic Plant Operations & Plant Engineering', 'rajan', 'MANAGEMENT')">
+          <div class="photo-slot">
+            <img src="image/rajan.jpeg" onerror="autoLoadImage(this, 'rajan', 'RB')">
+            <span class="avatar-fallback">RB</span>
+          </div>
+          <h3 class="emp-name">Mr. RAJAN BABBAR</h3>
+          <p class="emp-role">Head of Department / Director</p>
+          <span class="emp-badge">B.Tech / Senior Leadership</span>
+          <span class="emp-exp">⭐ 20+ Year Experience</span>
+        </div>
+
+        <!-- 2. Pankaj Sir -->
+        <div class="emp-card hod-card" style="width: 100%;" onclick="openProfile('Mr. PANKAJ', 'Head of Maintenance & Reliability', 'B.Tech / Engineering', '15+ Year Experience', 'Plant Maintenance, Utilities & Automation', 'pankaj_sir', 'PLANT MAINTENANCE')">
+          <div class="photo-slot">
+            <img src="image/pankaj_sir.jpeg" onerror="autoLoadImage(this, 'pankaj_sir', 'PS')">
+            <span class="avatar-fallback">PS</span>
+          </div>
+          <h3 class="emp-name">Mr. PANKAJ</h3>
+          <p class="emp-role">Head of Maintenance & Utilities</p>
+          <span class="emp-badge">B.Tech / Engineering</span>
+          <span class="emp-exp">⭐ 15+ Year Experience</span>
+        </div>
+
+        <!-- 3. Anand Sir -->
+        <div class="emp-card hod-card" style="width: 100%;" onclick="openProfile('Mr ANAND BHATT', 'Head of Department (H.O.D)', 'Diploma HT & Metallurgy + B.Sc + MBA Opr Mgt.', '18 Year Experience', 'Overall Plant Operations & Metallurgical Leadership', 'anand', 'MANAGEMENT & METALLURGY')">
+          <div class="photo-slot">
+            <img src="image/anand.jpg" onerror="autoLoadImage(this, 'anand', 'AB')">
+            <span class="avatar-fallback">AB</span>
+          </div>
+          <h3 class="emp-name">Mr ANAND BHATT</h3>
+          <p class="emp-role">Head of Department (H.O.D)</p>
+          <span class="emp-badge">Diploma HT & Metallurgy + B.Sc + MBA Opr Mgt.</span>
+          <span class="emp-exp">⭐ 18 Year Experience</span>
+        </div>
+
+      </div>
+
     </div>
 
     <!-- Main Tree Grid -->
@@ -738,40 +785,49 @@
       document.getElementById('profileModal').style.display = 'none';
     }
 
-    // --- Tab Switching ---
     function switchOrgView(view, btn) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
-      const hod = document.getElementById('hodSection');
+      const singleHod = document.getElementById('singleHod');
+      const maintHodGroup = document.getElementById('maintHodGroup');
       const op = document.getElementById('secOperation');
       const lab = document.getElementById('secLab');
       const maint = document.getElementById('secMaintenance');
       const mainGrid = document.getElementById('mainTreeGrid');
 
-      if (view === 'ALL') {
-        hod.style.display = 'flex';
-        mainGrid.style.display = 'grid';
-        op.style.display = 'block';
-        lab.style.display = 'block';
-        maint.style.display = 'none';
-      } else if (view === 'OPERATION') {
-        hod.style.display = 'flex';
-        mainGrid.style.display = 'block';
-        op.style.display = 'block';
-        lab.style.display = 'none';
-        maint.style.display = 'none';
-      } else if (view === 'LAB') {
-        hod.style.display = 'flex';
-        mainGrid.style.display = 'block';
-        op.style.display = 'none';
-        lab.style.display = 'block';
-        maint.style.display = 'none';
-      } else if (view === 'MAINTENANCE') {
-        hod.style.display = 'flex';
-        mainGrid.style.display = 'none';
-        maint.style.display = 'block';
+      // 🔥 Maintenance पर क्लिक करने का लॉजिक
+      if (view === 'MAINTENANCE') {
+        // Single HOD छुपाओ और 3 Parallel HODs दिखाओ
+        if (singleHod) singleHod.style.display = 'none';
+        if (maintHodGroup) maintHodGroup.style.display = 'grid';
+
+        if (mainGrid) mainGrid.style.display = 'none';
+        if (maint) maint.style.display = 'block';
+      } 
+      // 🏢 बाकी सभी टैब्स (ALL, OPERATION, LAB) के लिए
+      else {
+        // 3 HODs छुपाओ और सिर्फ Anand Sir (Single HOD) दिखाओ
+        if (singleHod) singleHod.style.display = 'flex';
+        if (maintHodGroup) maintHodGroup.style.display = 'none';
+
+        if (maint) maint.style.display = 'none';
+
+        if (view === 'ALL') {
+          if (mainGrid) mainGrid.style.display = 'grid';
+          if (op) op.style.display = 'block';
+          if (lab) lab.style.display = 'block';
+        } else if (view === 'OPERATION') {
+          if (mainGrid) mainGrid.style.display = 'block';
+          if (op) op.style.display = 'block';
+          if (lab) lab.style.display = 'none';
+        } else if (view === 'LAB') {
+          if (mainGrid) mainGrid.style.display = 'block';
+          if (op) op.style.display = 'none';
+          if (lab) lab.style.display = 'block';
+        }
       }
+    }
     }
   </script>
 </body>
