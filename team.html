@@ -80,7 +80,6 @@
       box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
     }
 
-    /* Clean & Simple Card */
     .emp-card {
       background: #1e293b;
       border: 1px solid #334155;
@@ -134,7 +133,6 @@
     .emp-name { font-size: 13.5px; font-weight: 700; color: #f8fafc; margin: 0 0 3px 0; }
     .emp-role { font-size: 11.5px; font-weight: 600; color: #38bdf8; margin: 0; }
 
-    /* VC Card */
     .vc-container {
       display: flex;
       justify-content: center;
@@ -150,7 +148,6 @@
     .vc-card .photo-slot { width: 88px; height: 88px; border-color: #eab308; }
     .vc-card .emp-role { color: #facc15; }
 
-    /* HOD Card */
     .hod-container {
       display: flex;
       flex-direction: column;
@@ -227,7 +224,7 @@
     }
     .band-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-    /* Modal */
+    /* Modal - Simple & Minimalist */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -244,7 +241,7 @@
       border: 2px solid #f97316;
       border-radius: 16px;
       width: 100%;
-      max-width: 420px;
+      max-width: 380px;
       color: white;
       box-shadow: 0 25px 60px rgba(0,0,0,0.9);
       overflow: hidden;
@@ -261,11 +258,11 @@
     .modal-close-icon:hover { color: #f97316; }
 
     .modal-body {
-      padding: 20px;
+      padding: 24px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 14px;
+      gap: 16px;
     }
     .modal-photo-wrap {
       width: 110px;
@@ -288,34 +285,18 @@
       border-radius: 50%;
     }
     .modal-meta { text-align: center; width: 100%; }
-    .modal-emp-name { font-size: 18px; font-weight: 700; color: #f8fafc; margin: 0 0 3px 0; }
-    .modal-emp-role { font-size: 13.5px; font-weight: 600; color: #38bdf8; margin: 0 0 6px 0; }
+    .modal-emp-name { font-size: 18px; font-weight: 700; color: #f8fafc; margin: 0 0 4px 0; }
+    .modal-emp-role { font-size: 13.5px; font-weight: 600; color: #38bdf8; margin: 0 0 10px 0; }
     .modal-dept-chip {
       display: inline-block;
       background: rgba(249, 115, 22, 0.15);
       border: 1px solid #f97316;
       color: #f97316;
-      padding: 3px 12px;
+      padding: 4px 14px;
       border-radius: 20px;
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 600;
     }
-
-    .modal-detail-table {
-      width: 100%;
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 10px;
-      padding: 12px;
-      font-size: 12px;
-    }
-    .detail-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 6px 0;
-    }
-    .detail-label { color: #94a3b8; font-weight: 500; }
-    .detail-val { font-weight: 600; color: #f8fafc; text-align: right; }
 
     @media (max-width: 1024px) {
       .org-main-grid { grid-template-columns: 1fr; }
@@ -329,25 +310,25 @@
   </style>
 
   <script>
-    // 🔥 Multi-Format Image Scanner (.png, .jpeg, .jpg, lowercase/uppercase)
+    // 🔥 Multi-Format Image Scanner (.jpeg, .png, .jpg, uppercase/lowercase, image/ & images/)
     function autoLoadImg(img, baseName) {
       if (!img) return;
       let raw = String(baseName || img.getAttribute('data-name') || '').trim();
-      let clean = raw.replace(/^(images?\/)/, '').replace(/\.[a-zA-Z0-9]+$/, '');
+      let clean = raw.replace(/^(images?\/)/, '').replace(/\.(jpeg|jpg|png|webp|JPG|JPEG|PNG)$/i, '');
       if (!clean) return;
 
       let names = [clean];
-      if (clean === 'pankaj_sir') names.push('pankaj');
-      if (clean === 'pankaj') names.push('pankaj_sir');
-      if (clean === 'surinder1') names.push('surinder');
-      if (clean === 'surinder') names.push('surinder1');
-      if (clean === 'dalip') names.push('dilip_saini');
-      if (clean === 'dilip_saini') names.push('dalip');
-      if (clean === 'khajan') names.push('khajan_singh');
-      if (clean === 'khajan_singh') names.push('khajan');
+      if (clean === 'kst.sir' || clean === 'kst' || clean === 'khajan') {
+        names.push('kst.sir', 'kst', 'khajan', 'khajan_singh');
+      }
+      if (clean === 'pankaj_sir' || clean === 'pankaj') names.push('pankaj', 'pankaj_sir');
+      if (clean === 'surinder1' || clean === 'surinder') names.push('surinder', 'surinder1');
+      if (clean === 'dalip' || clean === 'dilip_saini') names.push('dalip', 'dilip_saini');
+
+      names = [...new Set(names)];
 
       const folders = ['image/', 'images/', ''];
-      const exts = ['.png', '.jpeg', '.jpg', '.PNG', '.JPEG', '.JPG', '.webp'];
+      const exts = ['.jpeg', '.png', '.jpg', '.JPEG', '.PNG', '.JPG', '.webp'];
 
       let candidates = [];
       names.forEach(n => {
@@ -391,12 +372,10 @@
       const maint = document.getElementById('secMaintenance');
       const mainGrid = document.getElementById('mainTreeGrid');
 
-      // VC profile sirf HT Production (OPERATION) me visible
       if (vcSection) {
         vcSection.style.display = (view === 'OPERATION') ? 'flex' : 'none';
       }
 
-      // Maintenance view me 3 HOD parallel
       if (view === 'MAINTENANCE') {
         if (singleHod) singleHod.style.display = 'none';
         if (maintHodGroup) maintHodGroup.style.display = 'grid';
@@ -406,7 +385,6 @@
         if (lab) lab.style.display = 'none';
         if (maint) maint.style.display = 'block';
       } else {
-        // Baaki sabhi views me Single HOD (Anand Sir)
         if (singleHod) singleHod.style.display = 'flex';
         if (maintHodGroup) maintHodGroup.style.display = 'none';
         if (maint) maint.style.display = 'none';
@@ -427,11 +405,10 @@
       }
     }
 
-    // 👤 Simple Profile Modal
-    function openProfile(name, role, focus, imgKey, dept) {
+    // 👤 Minimalist Profile Modal (No Key Scope)
+    function openProfile(name, role, imgKey, dept) {
       const mName = document.getElementById('mName');
       const mRole = document.getElementById('mRole');
-      const mFocus = document.getElementById('mFocus');
       const mDept = document.getElementById('mDept');
       const mPhoto = document.getElementById('mPhoto');
       const mFallback = document.getElementById('mFallback');
@@ -439,7 +416,6 @@
 
       if (mName) mName.innerText = name || '';
       if (mRole) mRole.innerText = role || '';
-      if (mFocus) mFocus.innerText = focus || '-';
       if (mDept) mDept.innerText = dept || 'HEAT TREATMENT';
 
       if (mFallback) {
@@ -453,7 +429,7 @@
         mPhoto.setAttribute('data-name', imgKey);
         mPhoto.setAttribute('data-step', '0');
         mPhoto.onerror = function() { autoLoadImg(this, imgKey); };
-        mPhoto.src = 'image/' + imgKey + '.png';
+        mPhoto.src = 'image/' + imgKey + '.jpeg';
       }
 
       if (modal) modal.style.display = 'flex';
@@ -482,11 +458,11 @@
       <button class="tab-btn" onclick="switchOrgView('MAINTENANCE', this)">🔧 Plant Maintenance</button>
     </div>
 
-    <!-- 0. VC SECTION (Sirf Production tab par dikhega) -->
+    <!-- 0. VC SECTION (KST.SIR Image Source - Sirf Production me visible) -->
     <div class="vc-container" id="vcSection" style="display: none;">
-      <div class="emp-card vc-card" onclick="openProfile('Mr. KHAJAN SINGH THAKUR', 'Vice Chairman (VC)', 'Strategic Plant Management & Operational Vision', 'khajan', 'TOP MANAGEMENT')">
+      <div class="emp-card vc-card" onclick="openProfile('Mr. KHAJAN SINGH THAKUR', 'Vice Chairman (VC)', 'kst.sir', 'TOP MANAGEMENT')">
         <div class="photo-slot">
-          <img src="image/khajan.png" data-name="khajan" onerror="autoLoadImg(this, 'khajan')">
+          <img src="image/kst.sir.jpeg" data-name="kst.sir" onerror="autoLoadImg(this, 'kst.sir')">
           <span class="avatar-fallback">KT</span>
         </div>
         <h3 class="emp-name">Mr. KHAJAN SINGH THAKUR</h3>
@@ -498,43 +474,43 @@
     <div class="hod-container" id="hodSection">
       <!-- Single HOD (Anand Sir) -->
       <div id="singleHod" style="display: flex; justify-content: center; width: 100%;">
-        <div class="emp-card hod-card" onclick="openProfile('Mr ANAND BHATT', 'Head of Department (H.O.D)', 'Overall Plant Operations & Metallurgical Leadership', 'anand', 'MANAGEMENT & METALLURGY')">
+        <div class="emp-card hod-card" onclick="openProfile('Mr ANAND BHATT', 'Head of Department (H.O.D)', 'anand', 'MANAGEMENT & METALLURGY')">
           <div class="photo-slot">
-            <img src="image/anand.png" data-name="anand" onerror="autoLoadImg(this, 'anand')">
+            <img src="image/anand.jpeg" data-name="anand" onerror="autoLoadImg(this, 'anand')">
             <span class="avatar-fallback">AB</span>
           </div>
           <h3 class="emp-name">Mr ANAND BHATT</h3>
-          <p class="emp-role">Head of Department (H.O.D)</p>
+          <p class="emp-role">Head of Department (H.T)</p>
         </div>
       </div>
 
       <!-- 3 Parallel HODs for Maintenance -->
       <div id="maintHodGroup" style="display: none; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; max-width: 1050px; width: 100%; margin: 0 auto;">
-        <div class="emp-card hod-card" style="width: 100%;" onclick="openProfile('Mr. RAJAN BABBAR', 'Head of Department / Director', 'Strategic Plant Operations & Plant Engineering', 'rajan', 'MANAGEMENT')">
+        <div class="emp-card hod-card" style="width: 100%;" onclick="openProfile('Mr. RAJAN BABBAR', 'Head of Department / Director', 'rajan', 'MANAGEMENT')">
           <div class="photo-slot">
-            <img src="image/rajan.png" data-name="rajan" onerror="autoLoadImg(this, 'rajan')">
+            <img src="image/rajan.jpeg" data-name="rajan" onerror="autoLoadImg(this, 'rajan')">
             <span class="avatar-fallback">RB</span>
           </div>
           <h3 class="emp-name">Mr. RAJAN BABBAR</h3>
-          <p class="emp-role">Head of Department / Director</p>
+          <p class="emp-role">Head of Group </p>
         </div>
 
-        <div class="emp-card hod-card" style="width: 100%;" onclick="openProfile('Mr. PANKAJ', 'Head of Maintenance & Reliability', 'Plant Maintenance, Utilities & Automation', 'pankaj_sir', 'PLANT MAINTENANCE')">
+        <div class="emp-card hod-card" style="width: 100%;" onclick="openProfile('Mr. PANKAJ', 'Head of Maintenance & Reliability', 'pankaj_sir', 'PLANT MAINTENANCE')">
           <div class="photo-slot">
-            <img src="image/pankaj_sir.png" data-name="pankaj_sir" onerror="autoLoadImg(this, 'pankaj_sir')">
+            <img src="image/pankaj_sir.jpeg" data-name="pankaj_sir" onerror="autoLoadImg(this, 'pankaj_sir')">
             <span class="avatar-fallback">PS</span>
           </div>
           <h3 class="emp-name">Mr. PANKAJ</h3>
           <p class="emp-role">Head of Maintenance & Utilities</p>
         </div>
 
-        <div class="emp-card hod-card" style="width: 100%;" onclick="openProfile('Mr ANAND BHATT', 'Head of Department (H.O.D)', 'Overall Plant Operations & Metallurgical Leadership', 'anand', 'MANAGEMENT & METALLURGY')">
+        <div class="emp-card hod-card" style="width: 100%;" onclick="openProfile('Mr ANAND BHATT', 'Head of Department (H.O.D)', 'anand', 'MANAGEMENT & METALLURGY')">
           <div class="photo-slot">
-            <img src="image/anand.png" data-name="anand" onerror="autoLoadImg(this, 'anand')">
+            <img src="image/anand.jpeg" data-name="anand" onerror="autoLoadImg(this, 'anand')">
             <span class="avatar-fallback">AB</span>
           </div>
           <h3 class="emp-name">Mr ANAND BHATT</h3>
-          <p class="emp-role">Head of Department (H.O.D)</p>
+          <p class="emp-role">H.T H.O.D</p>
         </div>
       </div>
     </div>
@@ -544,13 +520,13 @@
       <div class="section-box" id="secOperation">
         <div class="section-title op-header">⚙️ OPERATION (HEAT TREATMENT)</div>
         <div style="max-width: 280px; margin: 0 auto 14px auto;">
-          <div class="emp-card" onclick="openProfile('Mr. Kapil Raj', 'Sr. Engineer H.T Production', 'H.T Production Bay Management & Execution', 'kapil', 'OPERATION')">
+          <div class="emp-card" onclick="openProfile('Mr. Kapil Raj', 'Sr. Engineer H.T Production', 'kapil', 'OPERATION')">
             <div class="photo-slot">
-              <img src="image/kapil.png" data-name="kapil" onerror="autoLoadImg(this, 'kapil')">
+              <img src="image/kapil.jpeg" data-name="kapil" onerror="autoLoadImg(this, 'kapil')">
               <span class="avatar-fallback">KR</span>
             </div>
             <h4 class="emp-name">Mr. Kapil Raj</h4>
-            <p class="emp-role">Sr. Engineer H.T Production</p>
+            <p class="emp-role">Sr. Engineer</p>
           </div>
         </div>
 
@@ -558,24 +534,23 @@
           <!-- Shift A -->
           <div class="sub-col">
             <div class="sub-col-header">SHIFT - A</div>
-            <div class="emp-card" onclick="openProfile('Sujeet Kumar', 'Shift Engineer', 'Shift - A Production Control', 'sujeet', 'OPERATION')">
-              <div class="photo-slot"><img src="image/sujeet.png" data-name="sujeet" onerror="autoLoadImg(this, 'sujeet')"><span class="avatar-fallback">SK</span></div>
+            <div class="emp-card" onclick="openProfile('Sujeet Kumar', 'Shift Engineer', 'sujeet', 'OPERATION')">
+              <div class="photo-slot"><img src="image/sujeet.jpeg" data-name="sujeet" onerror="autoLoadImg(this, 'sujeet')"><span class="avatar-fallback">SK</span></div>
               <h5 class="emp-name">Sujeet Kumar</h5>
-              <p class="emp-role">Shift Engineer</p>
+              <p class="emp-role">Engineer</p>
             </div>
-            <div class="emp-card" onclick="openProfile('Yaman Tyagi', 'Sr. Operator', 'Shift - A SQF Operations', 'yaman', 'OPERATION')">
-              <div class="photo-slot"><img src="image/yaman.png" data-name="yaman" onerror="autoLoadImg(this, 'yaman')"><span class="avatar-fallback">YT</span></div>
+            <div class="emp-card" onclick="openProfile('Yaman Tyagi', 'Sr. Operator', 'yaman', 'OPERATION')">
+              <div class="photo-slot"><img src="image/yaman.jpeg" data-name="yaman" onerror="autoLoadImg(this, 'yaman')"><span class="avatar-fallback">YT</span></div>
               <h5 class="emp-name">Yaman Tyagi</h5>
               <p class="emp-role">Sr. Operator</p>
             </div>
-            <div class="emp-card" onclick="openProfile('Vishal Kumar', 'Operator', 'Shift - A Furnace Loading', 'vishal', 'OPERATION')">
-              <div class="photo-slot"><img src="image/vishal.png" data-name="vishal" onerror="autoLoadImg(this, 'vishal')"><span class="avatar-fallback">VK</span></div>
-              <h5 class="emp-name">Vishal Kumar</h5>
+            <div class="emp-card" onclick="openProfile('Surinder', 'Operator', 'surinder', 'OPERATION')">
+              <div class="photo-slot"><img src="image/surinder.jpeg" data-name="surinder" onerror="autoLoadImg(this, 'surinder')"><span class="avatar-fallback">SR</span></div>
+              <h5 class="emp-name">Surinder</h5>
               <p class="emp-role">Operator</p>
             </div>
-            <!-- Arun (Vishal ke theek neeche) -->
-            <div class="emp-card" onclick="openProfile('Arun', 'Operator', 'Shift - A Furnace Operations & Loading', 'arun', 'OPERATION')">
-              <div class="photo-slot"><img src="image/arun.png" data-name="arun" onerror="autoLoadImg(this, 'arun')"><span class="avatar-fallback">AR</span></div>
+            <div class="emp-card" onclick="openProfile('Arun', 'Operator', 'arun', 'OPERATION')">
+              <div class="photo-slot"><img src="image/arun.jpeg" data-name="arun" onerror="autoLoadImg(this, 'arun')"><span class="avatar-fallback">AR</span></div>
               <h5 class="emp-name">Arun</h5>
               <p class="emp-role">Operator</p>
             </div>
@@ -584,24 +559,23 @@
           <!-- Shift B -->
           <div class="sub-col">
             <div class="sub-col-header">SHIFT - B</div>
-            <div class="emp-card" onclick="openProfile('Amrinder Yadav', 'Shift Engineer', 'Shift - B Production Control', 'amrinder', 'OPERATION')">
-              <div class="photo-slot"><img src="image/amrinder.png" data-name="amrinder" onerror="autoLoadImg(this, 'amrinder')"><span class="avatar-fallback">AY</span></div>
+            <div class="emp-card" onclick="openProfile('Amrinder Yadav', 'Shift Engineer', 'amrinder', 'OPERATION')">
+              <div class="photo-slot"><img src="image/amrinder.jpeg" data-name="amrinder" onerror="autoLoadImg(this, 'amrinder')"><span class="avatar-fallback">AY</span></div>
               <h5 class="emp-name">Amrinder Yadav</h5>
-              <p class="emp-role">Shift Engineer</p>
+              <p class="emp-role">Engineer</p>
             </div>
-            <div class="emp-card" onclick="openProfile('Vivek Siyal', 'Sr. Operator', 'Shift - B SQF Operations', 'vivek', 'OPERATION')">
-              <div class="photo-slot"><img src="image/vivek.png" data-name="vivek" onerror="autoLoadImg(this, 'vivek')"><span class="avatar-fallback">VS</span></div>
+            <div class="emp-card" onclick="openProfile('Vivek Siyal', 'Sr. Operator', 'vivek', 'OPERATION')">
+              <div class="photo-slot"><img src="image/vivek.jpeg" data-name="vivek" onerror="autoLoadImg(this, 'vivek')"><span class="avatar-fallback">VS</span></div>
               <h5 class="emp-name">Vivek Siyal</h5>
               <p class="emp-role">Sr. Operator</p>
             </div>
-            <div class="emp-card" onclick="openProfile('Ajay Saini', 'Operator', 'Shift - B Furnace Loading', 'ajay', 'OPERATION')">
-              <div class="photo-slot"><img src="image/ajay.png" data-name="ajay" onerror="autoLoadImg(this, 'ajay')"><span class="avatar-fallback">AS</span></div>
+            <div class="emp-card" onclick="openProfile('Ajay Saini', 'Operator', 'ajay', 'OPERATION')">
+              <div class="photo-slot"><img src="image/ajay.jpeg" data-name="ajay" onerror="autoLoadImg(this, 'ajay')"><span class="avatar-fallback">AS</span></div>
               <h5 class="emp-name">Ajay Saini</h5>
               <p class="emp-role">Operator</p>
             </div>
-            <!-- Krishna (Ajay ke theek neeche) -->
-            <div class="emp-card" onclick="openProfile('Krishna', 'Operator', 'Shift - B Furnace Operations & Loading', 'krishna', 'OPERATION')">
-              <div class="photo-slot"><img src="image/krishna.png" data-name="krishna" onerror="autoLoadImg(this, 'krishna')"><span class="avatar-fallback">KR</span></div>
+            <div class="emp-card" onclick="openProfile('Krishna', 'Operator', 'krishna', 'OPERATION')">
+              <div class="photo-slot"><img src="image/krishna.jpeg" data-name="krishna" onerror="autoLoadImg(this, 'krishna')"><span class="avatar-fallback">KR</span></div>
               <h5 class="emp-name">Krishna</h5>
               <p class="emp-role">Operator</p>
             </div>
@@ -610,28 +584,28 @@
           <!-- Backup Man Power -->
           <div class="sub-col">
             <div class="sub-col-header">BACKUP MAN POWER</div>
-            <div class="emp-card" onclick="openProfile('Murari Singh', 'Engineer', 'Backup Engineering & Shift Support', 'murari', 'OPERATION')">
-              <div class="photo-slot"><img src="image/murari.png" data-name="murari" onerror="autoLoadImg(this, 'murari')"><span class="avatar-fallback">MS</span></div>
+            <div class="emp-card" onclick="openProfile('Murari Singh', 'Engineer', 'murari', 'OPERATION')">
+              <div class="photo-slot"><img src="image/murari.jpeg" data-name="murari" onerror="autoLoadImg(this, 'murari')"><span class="avatar-fallback">MS</span></div>
               <h5 class="emp-name">Murari Singh</h5>
               <p class="emp-role">Engineer</p>
             </div>
-            <div class="emp-card" onclick="openProfile('Surinder', 'Operator', 'Backup Operation Support', 'surinder', 'OPERATION')">
-              <div class="photo-slot"><img src="image/surinder.png" data-name="surinder" onerror="autoLoadImg(this, 'surinder')"><span class="avatar-fallback">SR</span></div>
-              <h5 class="emp-name">Surinder</h5>
-              <p class="emp-role">Operator</p>
+            <div class="emp-card" onclick="openProfile('Vishal Kumar', 'Operator', 'vishal', 'OPERATION')">
+              <div class="photo-slot"><img src="image/vishal.jpeg" data-name="vishal" onerror="autoLoadImg(this, 'vishal')"><span class="avatar-fallback">VK</span></div>
+              <h5 class="emp-name">Vishal Kumar</h5>
+              <p class="emp-role">Vacant</p>
             </div>
           </div>
 
           <!-- HT PPC / SAP -->
           <div class="sub-col">
             <div class="sub-col-header">HT PPC / SAP</div>
-            <div class="emp-card" onclick="openProfile('Aadarsh Sharma', 'HT PPC / SAP', 'Production Planning & SAP Control', 'aadarsh', 'OPERATION')">
-              <div class="photo-slot"><img src="image/aadarsh.png" data-name="aadarsh" onerror="autoLoadImg(this, 'aadarsh')"><span class="avatar-fallback">AS</span></div>
+            <div class="emp-card" onclick="openProfile('Aadarsh Sharma', 'HT PPC / SAP', 'aadarsh', 'OPERATION')">
+              <div class="photo-slot"><img src="image/aadarsh.jpeg" data-name="aadarsh" onerror="autoLoadImg(this, 'aadarsh')"><span class="avatar-fallback">AS</span></div>
               <h5 class="emp-name">Aadarsh Sharma</h5>
               <p class="emp-role">PPC / SAP</p>
             </div>
-            <div class="emp-card" onclick="openProfile('Tarun Sharma', 'HT PPC / SAP', 'SAP Entry & PPC Tracking', 'tarun', 'OPERATION')">
-              <div class="photo-slot"><img src="image/tarun.png" data-name="tarun" onerror="autoLoadImg(this, 'tarun')"><span class="avatar-fallback">TS</span></div>
+            <div class="emp-card" onclick="openProfile('Tarun Sharma', 'HT PPC / SAP', 'tarun', 'OPERATION')">
+              <div class="photo-slot"><img src="image/tarun.jpeg" data-name="tarun" onerror="autoLoadImg(this, 'tarun')"><span class="avatar-fallback">TS</span></div>
               <h5 class="emp-name">Tarun Sharma</h5>
               <p class="emp-role">PPC / SAP</p>
             </div>
@@ -640,15 +614,15 @@
 
         <!-- Quality Inspector -->
         <div class="horizontal-band">
-          <div class="band-title">HT Quality Inspector (VISUAL AHT/ BHT)</div>
+          <div class="band-title">HT Quality Inspector (QA)</div>
           <div class="band-grid">
-            <div class="emp-card" onclick="openProfile('Rakesh Giri', 'HT Quality Inspector', 'Visual Inspection After/Before Heat Treat', 'rakesh', 'OPERATION / QA')">
-              <div class="photo-slot"><img src="image/rakesh.png" data-name="rakesh" onerror="autoLoadImg(this, 'rakesh')"><span class="avatar-fallback">RG</span></div>
+            <div class="emp-card" onclick="openProfile('Rakesh Giri', 'HT Quality Inspector', 'rakesh', 'OPERATION / QA')">
+              <div class="photo-slot"><img src="image/rakesh.jpeg" data-name="rakesh" onerror="autoLoadImg(this, 'rakesh')"><span class="avatar-fallback">RG</span></div>
               <h5 class="emp-name">Rakesh Giri</h5>
               <p class="emp-role">HT Quality Inspector</p>
             </div>
-            <div class="emp-card" onclick="openProfile('Ravinder', 'HT Quality Inspector', 'Visual Inspection After/Before Heat Treat', 'ravindra', 'OPERATION / QA')">
-              <div class="photo-slot"><img src="image/ravindra.png" data-name="ravindra" onerror="autoLoadImg(this, 'ravindra')"><span class="avatar-fallback">RV</span></div>
+            <div class="emp-card" onclick="openProfile('Ravinder', 'HT Quality Inspector', 'ravindra', 'OPERATION / QA')">
+              <div class="photo-slot"><img src="image/ravindra.jpeg" data-name="ravindra" onerror="autoLoadImg(this, 'ravindra')"><span class="avatar-fallback">RV</span></div>
               <h5 class="emp-name">Ravinder</h5>
               <p class="emp-role">HT Quality Inspector</p>
             </div>
@@ -660,9 +634,9 @@
       <div class="section-box" id="secLab">
         <div class="section-title lab-header">🔬 METALLURGICAL LAB</div>
         <div style="max-width: 280px; margin: 0 auto 10px auto;">
-          <div class="emp-card" onclick="openProfile('Mr. Rahul Rai', 'Sr. Engineer LAB', 'Metallurgical Testing, Case Depth & Microstructure Evaluation', 'rahul', 'METALLURGICAL LAB')">
+          <div class="emp-card" onclick="openProfile('Mr. Rahul Rai', 'Sr. Engineer LAB', 'rahul', 'METALLURGICAL LAB')">
             <div class="photo-slot">
-              <img src="image/rahul.png" data-name="rahul" onerror="autoLoadImg(this, 'rahul')">
+              <img src="image/rahul.jpeg" data-name="rahul" onerror="autoLoadImg(this, 'rahul')">
               <span class="avatar-fallback">RR</span>
             </div>
             <h4 class="emp-name">Mr. Rahul Rai</h4>
@@ -671,9 +645,9 @@
         </div>
 
         <div style="max-width: 280px; margin: 0 auto 12px auto;">
-          <div class="emp-card" onclick="openProfile('Mr. Pankaj', 'Engineer LAB', 'Microhardness & Metallurgical Lab Testing', 'pankaj', 'METALLURGICAL LAB')">
+          <div class="emp-card" onclick="openProfile('Mr. Pankaj', 'Engineer LAB', 'pankaj', 'METALLURGICAL LAB')">
             <div class="photo-slot">
-              <img src="image/pankaj.png" data-name="pankaj" onerror="autoLoadImg(this, 'pankaj')">
+              <img src="image/pankaj.jpeg" data-name="pankaj" onerror="autoLoadImg(this, 'pankaj')">
               <span class="avatar-fallback">PK</span>
             </div>
             <h4 class="emp-name">Mr. Pankaj</h4>
@@ -682,18 +656,18 @@
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px;">
-          <div class="emp-card" onclick="openProfile('Mr. Chetan', 'Jr. Engineer', 'Sample Preparation & Lab Testing', 'chetan', 'METALLURGICAL LAB')">
-            <div class="photo-slot"><img src="image/chetan.png" data-name="chetan" onerror="autoLoadImg(this, 'chetan')"><span class="avatar-fallback">CH</span></div>
+          <div class="emp-card" onclick="openProfile('Mr. Chetan', 'Jr. Engineer', 'chetan', 'METALLURGICAL LAB')">
+            <div class="photo-slot"><img src="image/chetan.jpeg" data-name="chetan" onerror="autoLoadImg(this, 'chetan')"><span class="avatar-fallback">CH</span></div>
             <h5 class="emp-name">Mr. Chetan</h5>
             <p class="emp-role">Jr. Engineer</p>
           </div>
-          <div class="emp-card" onclick="openProfile('Mr. Ankit', 'Jr. Engineer', 'Sample Preparation & Hardness Testing', 'ankit', 'METALLURGICAL LAB')">
-            <div class="photo-slot"><img src="image/ankit.png" data-name="ankit" onerror="autoLoadImg(this, 'ankit')"><span class="avatar-fallback">AK</span></div>
+          <div class="emp-card" onclick="openProfile('Mr. Ankit', 'Jr. Engineer', 'ankit', 'METALLURGICAL LAB')">
+            <div class="photo-slot"><img src="image/ankit.jpeg" data-name="ankit" onerror="autoLoadImg(this, 'ankit')"><span class="avatar-fallback">AK</span></div>
             <h5 class="emp-name">Mr. Ankit</h5>
             <p class="emp-role">Jr. Engineer</p>
           </div>
-          <div class="emp-card" onclick="openProfile('Mr. Ajeet', 'Lab- Inspector', 'Chemical Etching & Hardness Inspection', 'ajeet', 'METALLURGICAL LAB')">
-            <div class="photo-slot"><img src="image/ajeet.png" data-name="ajeet" onerror="autoLoadImg(this, 'ajeet')"><span class="avatar-fallback">AJ</span></div>
+          <div class="emp-card" onclick="openProfile('Mr. Ajeet', 'Lab- Inspector', 'ajeet', 'METALLURGICAL LAB')">
+            <div class="photo-slot"><img src="image/ajeet.jpeg" data-name="ajeet" onerror="autoLoadImg(this, 'ajeet')"><span class="avatar-fallback">AJ</span></div>
             <h5 class="emp-name">Mr. Ajeet</h5>
             <p class="emp-role">Lab- Inspector</p>
           </div>
@@ -706,9 +680,9 @@
       <div class="section-title maint-header">🔧 PLANT MAINTENANCE & UTILITIES</div>
       
       <div style="max-width: 320px; margin: 0 auto 14px auto;">
-        <div class="emp-card" onclick="openProfile('Surendra Singh', 'Sr. Engineer Maintenance', 'Overall Maintenance Leadership & Plant Utilities', 'surinder1', 'PLANT MAINTENANCE')">
+        <div class="emp-card" onclick="openProfile('Surendra Singh', 'Sr. Engineer Maintenance', 'surinder1', 'PLANT MAINTENANCE')">
           <div class="photo-slot">
-            <img src="image/surinder1.png" data-name="surinder1" onerror="autoLoadImg(this, 'surinder1')">
+            <img src="image/surinder1.jpeg" data-name="surinder1" onerror="autoLoadImg(this, 'surinder1')">
             <span class="avatar-fallback">SS</span>
           </div>
           <h4 class="emp-name">Surinder Singh</h4>
@@ -717,9 +691,9 @@
       </div>
 
       <div style="max-width: 280px; margin: 0 auto 16px auto;">
-        <div class="emp-card" onclick="openProfile('Dalip Saini', 'Assit. Electrical Engineer', 'Furnace Automation, Gas Line & Pyrometry', 'dalip', 'PLANT MAINTENANCE')">
+        <div class="emp-card" onclick="openProfile('Dalip Saini', 'Assit. Electrical Engineer', 'dalip', 'PLANT MAINTENANCE')">
           <div class="photo-slot">
-            <img src="image/dalip.png" data-name="dalip" onerror="autoLoadImg(this, 'dalip')">
+            <img src="image/dalip.jpeg" data-name="dalip" onerror="autoLoadImg(this, 'dalip')">
             <span class="avatar-fallback">DS</span>
           </div>
           <h4 class="emp-name">Dalip Saini</h4>
@@ -728,20 +702,20 @@
       </div>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; max-width: 900px; margin: 0 auto;">
-        <div class="emp-card" onclick="openProfile('Naman', 'Electrical & Instruments', 'Thermocouple & Panel Maintenance', 'naman', 'PLANT MAINTENANCE')">
-          <div class="photo-slot"><img src="image/naman.png" data-name="naman" onerror="autoLoadImg(this, 'naman')"><span class="avatar-fallback">N</span></div>
+        <div class="emp-card" onclick="openProfile('Naman', 'Electrical & Instruments', 'naman', 'PLANT MAINTENANCE')">
+          <div class="photo-slot"><img src="image/naman.jpeg" data-name="naman" onerror="autoLoadImg(this, 'naman')"><span class="avatar-fallback">N</span></div>
           <h4 class="emp-name">Naman</h4>
           <p class="emp-role">Electrical & Instruments</p>
         </div>
 
-        <div class="emp-card" onclick="openProfile('Sameer', 'Electrical & Instruments', 'Burner & Panel Maintenance', 'sameer', 'PLANT MAINTENANCE')">
-          <div class="photo-slot"><img src="image/sameer.png" data-name="sameer" onerror="autoLoadImg(this, 'sameer')"><span class="avatar-fallback">S</span></div>
+        <div class="emp-card" onclick="openProfile('Sameer', 'Electrical & Instruments', 'sameer', 'PLANT MAINTENANCE')">
+          <div class="photo-slot"><img src="image/sameer.jpeg" data-name="sameer" onerror="autoLoadImg(this, 'sameer')"><span class="avatar-fallback">S</span></div>
           <h4 class="emp-name">Sameer</h4>
           <p class="emp-role">Electrical & Instruments</p>
         </div>
 
-        <div class="emp-card" onclick="openProfile('Inderjeet', 'Furnace Utility & Mechanical', 'Quench Pumps, Agitators & Hydraulics', 'inderjeet', 'PLANT MAINTENANCE')">
-          <div class="photo-slot"><img src="image/inderjeet.png" data-name="inderjeet" onerror="autoLoadImg(this, 'inderjeet')"><span class="avatar-fallback">I</span></div>
+        <div class="emp-card" onclick="openProfile('Inderjeet', 'Furnace Utility & Mechanical', 'inderjeet', 'PLANT MAINTENANCE')">
+          <div class="photo-slot"><img src="image/inderjeet.jpeg" data-name="inderjeet" onerror="autoLoadImg(this, 'inderjeet')"><span class="avatar-fallback">I</span></div>
           <h4 class="emp-name">Inderjeet</h4>
           <p class="emp-role">Furnace Utility & Mechanical</p>
         </div>
@@ -749,7 +723,7 @@
     </div>
   </div>
 
-  <!-- Profile Modal (Clean & Simple) -->
+  <!-- Profile Modal (Minimalist: Photo, Name, Role, Department) -->
   <div class="modal-overlay" id="profileModal" onclick="closeProfile()">
     <div class="modal-content" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -765,12 +739,6 @@
           <h3 class="modal-emp-name" id="mName">Employee Name</h3>
           <p class="modal-emp-role" id="mRole">Designation</p>
           <span class="modal-dept-chip" id="mDept">DEPARTMENT</span>
-        </div>
-        <div class="modal-detail-table">
-          <div class="detail-row">
-            <span class="detail-label">🎯 Key Scope / Area:</span>
-            <span class="detail-val" id="mFocus" style="color: #cbd5e1;">-</span>
-          </div>
         </div>
         <button onclick="closeProfile()" style="width: 100%; background: #f97316; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer;">Done / Close</button>
       </div>
