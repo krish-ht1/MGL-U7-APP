@@ -437,7 +437,9 @@
   </div>
 
   <script>
-    const MONTHLY_CSV_URL = "https://docs.google.com/spreadsheets/d/1ZKl4Nzxfwrt5MO11Iy-S-Yjiq0t9MHoQrryAE1paqXw/export?format=csv&gid=539352874";
+    // Apps Script Web App se aata hai (CORS-safe, chahe file:// se khulo ya kahin bhi host ho) -
+    // ?gid=... se master sheet ke "Monthly" tab ka data milta hai
+    const MONTHLY_CSV_URL = "https://script.google.com/macros/s/AKfycbz8h1AjEbXSSFgk1n0viBwGT6QB0SCNh1djlFiXzR0TOncPzkD-j6UzXrsyJkdpOGAq/exec?gid=1782658228";
 
     let monthlyData = [];
     let trendChartInstance = null;

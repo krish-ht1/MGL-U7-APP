@@ -101,6 +101,48 @@
       border: 1px solid #334155; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;
     }
     .graph-container { position: relative; width: 100%; height: 260px; }
+
+    /* MS Number Search Section */
+    .ms-search-bar input[type="text"], .ms-search-bar input[type="date"], .ms-search-bar select {
+      background: #1e293b; border: 1px solid #334155; color: #f8fafc;
+      padding: 6px 10px; border-radius: 6px; font-size: 12px; outline: none; font-family: inherit;
+    }
+    .ms-search-bar input[type="text"] { min-width: 170px; }
+    .ms-search-btn {
+      background: #3b82f6; border: none; color: #fff; padding: 7px 14px; border-radius: 6px;
+      font-size: 11px; font-weight: 700; cursor: pointer;
+    }
+    .ms-search-btn:hover { background: #2563eb; }
+    .view-detail-btn {
+      background: #1e293b; border: 1px solid #38bdf8; color: #38bdf8; padding: 5px 12px;
+      border-radius: 6px; font-size: 10.5px; font-weight: 700; cursor: pointer; white-space: nowrap;
+    }
+    .view-detail-btn:hover { background: rgba(56,189,248,0.15); }
+
+    /* New Entry Form */
+    .entry-form-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 10px;
+    }
+    @media (min-width: 768px) { .entry-form-grid { grid-template-columns: repeat(4, 1fr); } }
+    .entry-field { display: flex; flex-direction: column; gap: 3px; }
+    .entry-field label { font-size: 10px; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
+    .entry-field input, .entry-field select {
+      background: #1e293b; border: 1px solid #334155; color: #f8fafc;
+      padding: 6px 8px; border-radius: 6px; font-size: 12px; outline: none; font-family: inherit; width: 100%;
+    }
+    .entry-field input:read-only { color: #94a3b8; }
+    .entry-submit-btn {
+      background: #10b981; border: none; color: #04140d; padding: 9px 16px; border-radius: 6px;
+      font-size: 12px; font-weight: 700; cursor: pointer;
+    }
+    .entry-submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .entry-cancel-btn {
+      background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 9px 16px; border-radius: 6px;
+      font-size: 12px; font-weight: 700; cursor: pointer;
+    }
+    .entry-status { font-size: 11.5px; padding: 8px 10px; border-radius: 6px; line-height: 1.5; }
+    .entry-status.ok { background: rgba(16,185,129,0.12); border: 1px solid #10b981; color: #34d399; }
+    .entry-status.fail { background: rgba(239,68,68,0.12); border: 1px solid #ef4444; color: #f87171; }
   </style>
 </head>
 <body>
@@ -126,6 +168,137 @@
 
     <!-- MODULE 1: DAILY PRODUCTION (DWM) -->
     <div id="view-dwm" class="module-view active">
+
+      <!-- MS NUMBER / SQF WISE SEARCH SECTION -->
+      <div class="dwm-section">
+        <div class="dwm-title-row">
+          <h3>🔎 MS Number / SQF Wise Search</h3>
+        </div>
+        <div class="control-bar" style="padding:10px 12px;">
+          <div class="filters-group ms-search-bar">
+            <input type="text" id="msSearchInput" placeholder="Search MS Number...">
+            <select id="msSearchSQF">
+              <option value="ALL">All SQF</option>
+              <option value="1">SQF-1</option>
+              <option value="2">SQF-2</option>
+              <option value="3">SQF-3</option>
+              <option value="4">SQF-4</option>
+            </select>
+            <input type="date" id="msSearchDate">
+            <button class="ms-search-btn" onclick="runMsSearch()">🔍 Search</button>
+            <button class="ms-search-btn" style="background:#1e293b; border:1px solid #f87171; color:#f87171;" onclick="resetMsSearch()">♻ Reset</button>
+            <button class="ms-search-btn" style="background:#1e293b; border:1px solid #38bdf8; color:#38bdf8;" onclick="toggleTdPanel()">🗓 TD Production</button>
+            <button class="ms-search-btn" style="background:#1e293b; border:1px solid #34d399; color:#34d399;" onclick="toggleEntryPanel()">📝 New Entry</button>
+          </div>
+        </div>
+
+        <div id="msLogError" style="display:none; background:rgba(239,68,68,0.12); border:1px solid #ef4444; color:#f87171; font-size:11.5px; padding:8px 10px; border-radius:6px; line-height:1.5;"></div>
+
+        <!-- TD PRODUCTION PANEL -->
+        <div id="tdProductionPanel" style="display:none;">
+          <div class="control-bar" style="padding:8px 12px;">
+            <div class="filters-group">
+              <span style="font-size:11px; color:#94a3b8; font-weight:600;">TD Date:</span>
+              <input type="date" id="tdDateInput" onchange="renderTdProduction()">
+            </div>
+          </div>
+          <div class="table-scroll" style="margin-top:8px;">
+            <div style="font-size:11px; color:#94a3b8; font-weight:700; margin-bottom:6px;" id="tdTitleLine"></div>
+            <table class="dwm-table">
+              <thead>
+                <tr><th>Furnace No</th><th>TD Qty</th><th>MTD Qty</th><th>TD Ton</th><th>MTD Ton</th></tr>
+              </thead>
+              <tbody id="tdProductionTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- NEW ENTRY FORM (Google Sheet mein seedhe entry ke liye) -->
+        <div id="entryFormPanel" style="display:none; border-top:1px solid #1e293b; padding-top:10px; margin-top:4px; flex-direction:column; gap:10px;">
+          <div class="entry-form-grid">
+            <div class="entry-field">
+              <label>Date</label>
+              <input type="date" id="entryDate">
+            </div>
+            <div class="entry-field">
+              <label>SQF No</label>
+              <select id="entrySqf">
+                <option value="1">SQF-1</option>
+                <option value="2">SQF-2</option>
+                <option value="3">SQF-3</option>
+                <option value="4">SQF-4</option>
+              </select>
+            </div>
+            <div class="entry-field">
+              <label>Batch No</label>
+              <input type="text" id="entryBatch" placeholder="Batch No">
+            </div>
+            <div class="entry-field">
+              <label>MS No</label>
+              <input type="text" id="entryMsNo" placeholder="MS Number">
+            </div>
+            <div class="entry-field">
+              <label>Qty (Nos)</label>
+              <input type="number" id="entryQty" placeholder="0" oninput="updateEntryTotalWt()">
+            </div>
+            <div class="entry-field">
+              <label>Wt/Pc (Kg)</label>
+              <input type="number" step="0.01" id="entryWtPc" placeholder="0.00" oninput="updateEntryTotalWt()">
+            </div>
+            <div class="entry-field">
+              <label>Total Wt (Kg)</label>
+              <input type="text" id="entryTotalWt" readonly value="0.00">
+            </div>
+            <div class="entry-field">
+              <label>Submit Code</label>
+              <input type="password" id="entryCode" placeholder="Code" inputmode="numeric" maxlength="10">
+            </div>
+          </div>
+
+          <div id="entryStatus" class="entry-status" style="display:none;"></div>
+
+          <div style="display:flex; gap:8px;">
+            <button class="entry-submit-btn" id="entrySubmitBtn" onclick="submitNewEntry()">✅ Submit Entry</button>
+            <button class="entry-cancel-btn" onclick="clearEntryForm()">✖ Clear</button>
+          </div>
+        </div>
+
+        <div class="kpi-grid" id="msSearchKpiGrid" style="display:none;">
+          <div class="kpi-card-mini">
+            <span class="kpi-title-mini">Total Production</span>
+            <span class="kpi-val-mini" id="kpiMsProduction">0 T</span>
+          </div>
+          <div class="kpi-card-mini">
+            <span class="kpi-title-mini">Number of Parts</span>
+            <span class="kpi-val-mini" id="kpiMsParts">0 Nos</span>
+          </div>
+          <div class="kpi-card-mini">
+            <span class="kpi-title-mini">Total Weight</span>
+            <span class="kpi-val-mini" id="kpiMsWeight">0 Kg</span>
+          </div>
+          <div class="kpi-card-mini">
+            <span class="kpi-title-mini">No of Lots</span>
+            <span class="kpi-val-mini" id="kpiMsLots">0</span>
+          </div>
+        </div>
+
+        <div id="msSearchDetailWrap" style="display:none;">
+          <div class="dwm-title-row">
+            <span style="font-size:11px; color:#94a3b8; font-weight:600;" id="msSearchSummary"></span>
+            <button class="view-detail-btn" onclick="toggleMsDetail()">👁 View Detail</button>
+          </div>
+          <div class="table-scroll" id="msDetailTableWrap" style="display:none; margin-top:8px;">
+            <table class="dwm-table">
+              <thead>
+                <tr><th>Date</th><th>Furnace</th><th>MS No</th><th>Batch No</th><th>Qty (Nos)</th><th>Weight (Kg)</th></tr>
+              </thead>
+              <tbody id="msDetailTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- DWM BOARD (existing) -->
       <div class="control-bar">
         <div class="filters-group">
           <div class="month-select-wrap">
@@ -209,7 +382,10 @@
   </div>
 
   <script>
-    const LIVE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_55_JgWvZY0QyC87pldI3sKILOrXLYsE8xiuB99-K2ll9jWI5HHYIU6aoxEF1hegbDDmRybDQsW2/pub?gid=0&single=true&output=csv";
+    // Ab EK hi CSV (MS PRODUCTION LOG) se DWM board aur MS/SQF search dono chalte hain - single source of truth
+    // Pehle "Publish to web" wala link CORS block kar raha tha (null origin allow nahi karta), isliye
+    // Apps Script Web App URL use ho raha hai - ye hamesha sahi CORS headers ke saath data deta hai
+    const MS_LOG_CSV_URL = "https://script.google.com/macros/s/AKfycbz8h1AjEbXSSFgk1n0viBwGT6QB0SCNh1djlFiXzR0TOncPzkD-j6UzXrsyJkdpOGAq/exec";
 
     // अप्रैल से अगस्त तक का फिक्स्ड डेटाबेस
     const fixedDatabase = {
@@ -316,61 +492,10 @@
         return;
       }
 
-      try {
-        const timestamp = new Date().getTime();
-        const response = await fetch(`${LIVE_CSV_URL}&_t=${timestamp}`);
-        const csvText = await response.text();
-        const rows = parseCSV(csvText);
-
-        let dynamicMonthTarget = 0;
-        let dynamicTotalTargetMTD = 0;
-
-        // सितंबर डेटा रीसेट करना
-        Object.keys(liveSeptemberData.furnaces).forEach(fc => {
-          liveSeptemberData.furnaces[fc].days = Array(30).fill(0);
-          liveSeptemberData.furnaces[fc].targetMTD = 0;
-        });
-
-        rows.forEach(r => {
-          let rowStr = r.join(" ").toUpperCase();
-          let fcName = "";
-          if (rowStr.includes("SQF-1")) fcName = "SQF-1";
-          else if (rowStr.includes("SQF-2")) fcName = "SQF-2";
-          else if (rowStr.includes("SQF-3")) fcName = "SQF-3";
-          else if (rowStr.includes("SQF-4")) fcName = "SQF-4";
-
-          if (fcName) {
-            if (r[1] && !isNaN(parseFloat(r[1]))) liveSeptemberData.furnaces[fcName].capacity = parseFloat(r[1]);
-            if (r[2] && !isNaN(parseFloat(r[2]))) liveSeptemberData.furnaces[fcName].monthTarget = parseFloat(r[2]);
-            if (r[3] && !isNaN(parseFloat(r[3]))) liveSeptemberData.furnaces[fcName].targetMTD = parseFloat(r[3]);
-
-            let dayValues = [];
-            for (let j = 6; j < r.length; j++) {
-              let val = parseFloat(r[j]);
-              if (!isNaN(val) && r[j] !== "") dayValues.push(val);
-            }
-            liveSeptemberData.daysCount = Math.max(liveSeptemberData.daysCount, dayValues.length);
-            for (let d = 0; d < Math.min(dayValues.length, 30); d++) {
-              liveSeptemberData.furnaces[fcName].days[d] = dayValues[d];
-            }
-          }
-
-          if (rowStr.includes("TOTAL") || rowStr.includes("CUMULATIVE")) {
-            if (r[2] && !isNaN(parseFloat(r[2]))) dynamicMonthTarget = parseFloat(r[2]);
-            if (r[3] && !isNaN(parseFloat(r[3]))) dynamicTotalTargetMTD = parseFloat(r[3]);
-          }
-        });
-
-        liveSeptemberData.monthTarget = dynamicMonthTarget > 0 ? dynamicMonthTarget : 270.0;
-        liveSeptemberData.totalTargetMTD = dynamicTotalTargetMTD > 0 ? dynamicTotalTargetMTD : Object.values(liveSeptemberData.furnaces).reduce((acc, f) => acc + (f.targetMTD || 0), 0);
-
-        if(syncStatus) { syncStatus.innerText = "● Live Synced"; syncStatus.style.color = "#34d399"; }
-        renderDWMData();
-      } catch (err) {
-        console.error("Live fetch error:", err);
-        if(syncStatus) { syncStatus.innerText = "● Cached Mode"; syncStatus.style.color = "#f59e0b"; }
-        renderDWMData();
-      }
+      // Live month (September) - ek hi MS PRODUCTION LOG CSV se fresh data lao,
+      // usi se DWM board bhi banega aur MS/SQF search bhi usi data par chalega
+      await loadMsLogData();
+      renderDWMData();
     }
 
     function renderDWMData() {
@@ -624,7 +749,382 @@
       });
     }
 
+    // ===================== MS NUMBER / SQF WISE SEARCH + DWM (EK HI CSV SE) =====================
+    let msLogRows = [];
+
+    async function loadMsLogData() {
+      const syncStatus = document.getElementById('syncStatus');
+      const errBox = document.getElementById('msLogError');
+      if (errBox) { errBox.style.display = 'none'; errBox.innerText = ''; }
+
+      try {
+        const timestamp = new Date().getTime();
+        // URL mein pehle se "?" hai ya nahi, us hisaab se sahi separator (? ya &) use karna
+        const sep = MS_LOG_CSV_URL.includes('?') ? '&' : '?';
+        const response = await fetch(`${MS_LOG_CSV_URL}${sep}_t=${timestamp}`);
+
+        if (!response.ok) {
+          throw new Error(`Google Sheet ne HTTP ${response.status} (${response.statusText}) diya. Matlab: ya to sheet "Publish to web" se published nahi hai, ya link expire/change ho gaya hai.`);
+        }
+
+        const csvText = await response.text();
+        const peek = csvText.trim().slice(0, 20).toLowerCase();
+        if (peek.startsWith('<!doctype') || peek.startsWith('<html')) {
+          throw new Error('CSV ki jagah Google ka login/HTML page mila hai. Matlab sheet "Publish to web" se properly publish nahi hai, ya organization ke bahar (public) access allow nahi hai.');
+        }
+
+        const rows = parseCSV(csvText);
+        if (!rows.length) throw new Error('CSV khaali aaya - link sahi hai lekin sheet mein data nahi mila.');
+
+        // header se column-index nikalna, taaki agar sheet mein column ka order badle to bhi ye tootega nahi
+        const header = rows[0].map(h => h.trim().toLowerCase());
+        const findCol = (...keys) => header.findIndex(h => keys.some(k => h.includes(k)));
+        const idx = {
+          date: findCol('date'),
+          sqf: findCol('sqf no', 'sqf'),
+          batch: findCol('batch no', 'batch'),
+          msno: findCol('ms no'),
+          qty: findCol('qty (nos)', 'qty(nos)', 'qty nos'),
+          wt: findCol('total wt', 'total weight')
+        };
+
+        if (idx.msno === -1 || idx.date === -1) {
+          throw new Error(`Column headers match nahi hue (MS No / Date wali column nahi mili). Sheet mein pehli row ke headers: "${rows[0].join(' | ')}"`);
+        }
+
+        msLogRows = rows.slice(1)
+          .filter(r => r[idx.msno] && r[idx.msno].trim() !== "")
+          .map(r => ({
+            date: (r[idx.date] || "").trim(),
+            sqf: (r[idx.sqf] || "").trim(),
+            batch: (r[idx.batch] || "").trim(),
+            msNo: (r[idx.msno] || "").trim(),
+            qty: parseFloat(r[idx.qty]) || 0,
+            wt: parseFloat(r[idx.wt]) || 0
+          }));
+
+        if (!msLogRows.length) throw new Error('Header mil gaye lekin neeche koi valid MS No wali row nahi mili - check karo sheet mein data hai ya nahi.');
+
+        // usi log data se DWM board (furnace x day matrix) auto-calculate karna
+        buildSeptemberFromLog();
+
+        if (syncStatus) { syncStatus.innerText = "● Live Synced"; syncStatus.style.color = "#34d399"; }
+      } catch (err) {
+        console.error("MS Log fetch error:", err);
+        if (syncStatus) { syncStatus.innerText = "● Cached Mode"; syncStatus.style.color = "#f59e0b"; }
+        if (errBox) {
+          errBox.innerText = "⚠ Data load nahi hua: " + err.message;
+          errBox.style.display = 'block';
+        }
+      }
+    }
+
+    // MS PRODUCTION LOG ke raw rows se DWM ka furnace x day matrix (Total Wt ka Ton mein sum) auto-calculate karna
+    function buildSeptemberFromLog() {
+      const daysInSept = 30;
+      liveSeptemberData.daysCount = daysInSept;
+      Object.keys(liveSeptemberData.furnaces).forEach(fc => {
+        liveSeptemberData.furnaces[fc].days = Array(daysInSept).fill(0);
+      });
+
+      let lastFilledDay = 0; // sabse aakhri date jiske liye kisi bhi furnace ka row mila - chahe uski value 0 hi ho
+
+      msLogRows.forEach(row => {
+        // Log mein date "DD-MM-YYYY" (ya "DD/MM/YYYY") format mein hai
+        const parts = (row.date || "").split(/[\/\-]/);
+        if (parts.length !== 3) return;
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10);
+        let year = parseInt(parts[2], 10);
+        if (year < 100) year += 2000;
+        if (!day || month !== 9 || year !== 2026) return; // abhi live board sirf September-2026 ka hai
+
+        // "data filled hai" ka matlab hai row hi maujood hai us date ke liye - value 0 bhi
+        // ho sakti hai (jaise us din furnace band tha), fir bhi wo din "filled" maana jayega
+        if (day > lastFilledDay) lastFilledDay = day;
+
+        const dIdx = day - 1;
+        if (dIdx < 0 || dIdx >= daysInSept) return;
+
+        const sqfDigit = String(row.sqf || "").replace(/\D/g, '');
+        const fcName = "SQF-" + sqfDigit;
+        if (!liveSeptemberData.furnaces[fcName]) return;
+
+        liveSeptemberData.furnaces[fcName].days[dIdx] += (row.wt || 0) / 1000; // Kg -> Ton
+      });
+
+      // Target figures log sheet mein nahi hote (wo sirf actual production ka data hai),
+      // isliye fixed daily target 2.25 T/furnace/day use ho raha hai
+      const dailyTargetPerFurnace = 2.25;
+      const monthTargetPerFurnace = dailyTargetPerFurnace * daysInSept; // 67.5
+      liveSeptemberData.monthTarget = monthTargetPerFurnace * 4; // 270
+
+      // MTD target aaj ki real calendar date se nahi, balki DWM mein jis aakhri date tak
+      // (charon mein se kisi bhi ek furnace mein) data fill hai usi date tak nikalta hai -
+      // jaise 18 tarikh tak kisi bhi furnace ka row mila to Target MTD = 18 x 2.5 (per furnace,
+      // charon furnace ke liye same) hoga - value 0 ho ya positive, farak nahi padta
+      const elapsedDays = lastFilledDay;
+
+      Object.keys(liveSeptemberData.furnaces).forEach(fc => {
+        liveSeptemberData.furnaces[fc].capacity = 69.75;
+        liveSeptemberData.furnaces[fc].monthTarget = monthTargetPerFurnace;
+        liveSeptemberData.furnaces[fc].targetMTD = dailyTargetPerFurnace * elapsedDays;
+      });
+
+      liveSeptemberData.totalTargetMTD = dailyTargetPerFurnace * 4 * elapsedDays;
+    }
+
+    // Log sheet mein date "DD-MM-YYYY" format mein hai; date input se "YYYY-MM-DD" aata hai - dono ko match karne layak banana
+    function normalizeDateForCompare(d) {
+      if (!d) return "";
+      const parts = d.split(/[\/\-]/);
+      if (parts.length === 3 && parts[0].length <= 2) {
+        return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+      }
+      return d;
+    }
+
+    function runMsSearch() {
+      const q = document.getElementById('msSearchInput').value.trim().toUpperCase();
+      const sqfFilter = document.getElementById('msSearchSQF').value;
+      const dateFilter = document.getElementById('msSearchDate').value;
+
+      const matches = msLogRows.filter(row => {
+        const matchMs = !q || row.msNo.toUpperCase().includes(q);
+        const matchSqf = sqfFilter === 'ALL' || String(row.sqf) === sqfFilter;
+        const matchDate = !dateFilter || normalizeDateForCompare(row.date) === dateFilter;
+        return matchMs && matchSqf && matchDate;
+      });
+
+      const totalQty = matches.reduce((a, r) => a + r.qty, 0);
+      const totalWt = matches.reduce((a, r) => a + r.wt, 0);
+      const distinctLots = new Set(matches.map(r => r.batch)).size;
+
+      document.getElementById('kpiMsProduction').innerText = `${(totalWt / 1000).toFixed(2)} T`;
+      document.getElementById('kpiMsParts').innerText = `${totalQty.toLocaleString('en-IN')} Nos`;
+      document.getElementById('kpiMsWeight').innerText = `${totalWt.toFixed(2)} Kg`;
+      document.getElementById('kpiMsLots').innerText = `${distinctLots}`;
+
+      document.getElementById('msSearchKpiGrid').style.display = 'grid';
+      document.getElementById('msSearchDetailWrap').style.display = 'block';
+      document.getElementById('msSearchSummary').innerText = `${matches.length} record(s) found`;
+
+      renderMsDetailTable(matches);
+      // agar table pehle se khuli thi to naye search par bhi khuli rahe
+      const tableWrap = document.getElementById('msDetailTableWrap');
+      if (tableWrap.style.display === 'block') { /* keep open */ }
+    }
+
+    function resetMsSearch() {
+      document.getElementById('msSearchInput').value = '';
+      document.getElementById('msSearchSQF').value = 'ALL';
+      document.getElementById('msSearchDate').value = '';
+
+      document.getElementById('msSearchKpiGrid').style.display = 'none';
+      document.getElementById('msSearchDetailWrap').style.display = 'none';
+      document.getElementById('msDetailTableWrap').style.display = 'none';
+
+      const errBox = document.getElementById('msLogError');
+      if (errBox) { errBox.style.display = 'none'; errBox.innerText = ''; }
+    }
+
+    function renderMsDetailTable(matches) {
+      const tbody = document.getElementById('msDetailTableBody');
+      if (!matches.length) {
+        tbody.innerHTML = `<tr><td colspan="6" style="padding:14px; color:#94a3b8;">No matching records found.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = matches.map(r => `
+        <tr>
+          <td>${r.date}</td>
+          <td style="font-weight:700; color:#38bdf8;">SQF-${r.sqf}</td>
+          <td style="font-weight:700;">${r.msNo}</td>
+          <td>${r.batch}</td>
+          <td>${r.qty.toLocaleString('en-IN')}</td>
+          <td>${r.wt.toFixed(2)}</td>
+        </tr>
+      `).join('');
+    }
+
+    function toggleMsDetail() {
+      const wrap = document.getElementById('msDetailTableWrap');
+      wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // ===================== TD PRODUCTION (single day snapshot + MTD) =====================
+    // MS PRODUCTION LOG ke raw rows se hi TD/MTD sheet jaisa summary table banata hai
+    function parseLogDateParts(d) {
+      if (!d) return null;
+      const parts = d.split(/[\/\-]/);
+      if (parts.length !== 3) return null;
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10);
+      let year = parseInt(parts[2], 10);
+      if (year < 100) year += 2000;
+      if (!day || !month || !year) return null;
+      return { day, month, year };
+    }
+
+    function toggleTdPanel() {
+      const panel = document.getElementById('tdProductionPanel');
+      const willShow = panel.style.display === 'none';
+      panel.style.display = willShow ? 'block' : 'none';
+      if (willShow) {
+        const dateInput = document.getElementById('tdDateInput');
+        if (!dateInput.value) {
+          // default aaj ki date par (YYYY-MM-DD format, jo <input type=date> chahta hai)
+          const today = new Date();
+          dateInput.value = today.toISOString().slice(0, 10);
+        }
+        renderTdProduction();
+      }
+    }
+
+    function renderTdProduction() {
+      const dateVal = document.getElementById('tdDateInput').value; // "YYYY-MM-DD"
+      if (!dateVal) return;
+      const [y, m, d] = dateVal.split('-').map(n => parseInt(n, 10));
+
+      const furnaceNos = ["1", "2", "3", "4"];
+      const monthNames = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+      let grandTdQty = 0, grandMtdQty = 0, grandTdTon = 0, grandMtdTon = 0;
+
+      let rowsHtml = furnaceNos.map(fn => {
+        let tdQty = 0, tdWt = 0, mtdQty = 0, mtdWt = 0;
+        msLogRows.forEach(row => {
+          const rowSqf = String(row.sqf || "").replace(/\D/g, '');
+          if (rowSqf !== fn) return;
+          const dp = parseLogDateParts(row.date);
+          if (!dp || dp.month !== m || dp.year !== y) return;
+
+          if (dp.day === d) { tdQty += row.qty; tdWt += row.wt; }
+          if (dp.day <= d) { mtdQty += row.qty; mtdWt += row.wt; }
+        });
+
+        const tdTon = tdWt / 1000, mtdTon = mtdWt / 1000;
+        grandTdQty += tdQty; grandMtdQty += mtdQty; grandTdTon += tdTon; grandMtdTon += mtdTon;
+
+        return `<tr>
+          <td style="font-weight:700; color:#38bdf8;">SQF - 0${fn}</td>
+          <td>${tdQty.toLocaleString('en-IN')}</td>
+          <td>${mtdQty.toLocaleString('en-IN')}</td>
+          <td>${tdTon.toFixed(2)}</td>
+          <td>${mtdTon.toFixed(2)}</td>
+        </tr>`;
+      }).join('');
+
+      rowsHtml += `<tr class="total-row">
+        <td>TOTAL</td>
+        <td>${grandTdQty.toLocaleString('en-IN')}</td>
+        <td>${grandMtdQty.toLocaleString('en-IN')}</td>
+        <td>${grandTdTon.toFixed(2)}</td>
+        <td>${grandMtdTon.toFixed(2)}</td>
+      </tr>`;
+
+      document.getElementById('tdProductionTableBody').innerHTML = rowsHtml;
+      const ddmmyyyy = `${String(d).padStart(2,'0')}-${String(m).padStart(2,'0')}-${y}`;
+      document.getElementById('tdTitleLine').innerText = `HEAT TREATMENT - U7 (${monthNames[m-1]}-${y})   DATE - ${ddmmyyyy}`;
+    }
+
+    // ===================== NEW ENTRY FORM (form se seedhe Google Sheet mein likhna) =====================
+    function toggleEntryPanel() {
+      const panel = document.getElementById('entryFormPanel');
+      const willShow = panel.style.display === 'none' || panel.style.display === '';
+      panel.style.display = willShow ? 'flex' : 'none';
+      if (willShow) {
+        const dateInput = document.getElementById('entryDate');
+        if (!dateInput.value) {
+          dateInput.value = new Date().toISOString().slice(0, 10);
+        }
+      }
+    }
+
+    function updateEntryTotalWt() {
+      const qty = parseFloat(document.getElementById('entryQty').value) || 0;
+      const wtPc = parseFloat(document.getElementById('entryWtPc').value) || 0;
+      document.getElementById('entryTotalWt').value = (qty * wtPc).toFixed(2);
+    }
+
+    function clearEntryForm() {
+      ['entryBatch','entryMsNo','entryQty','entryWtPc','entryCode']
+        .forEach(id => { document.getElementById(id).value = ''; });
+      document.getElementById('entryTotalWt').value = '0.00';
+      document.getElementById('entrySqf').value = '1';
+      const statusEl = document.getElementById('entryStatus');
+      statusEl.style.display = 'none';
+    }
+
+    async function submitNewEntry() {
+      const statusEl = document.getElementById('entryStatus');
+      statusEl.style.display = 'none';
+
+      const code = document.getElementById('entryCode').value.trim();
+      if (code !== '2020') {
+        statusEl.className = 'entry-status fail';
+        statusEl.innerText = '⚠ Galat code — sahi code daal ke dobara try karo.';
+        statusEl.style.display = 'block';
+        return;
+      }
+
+      const dateVal = document.getElementById('entryDate').value;
+      const msNo = document.getElementById('entryMsNo').value.trim();
+      if (!dateVal || !msNo) {
+        statusEl.className = 'entry-status fail';
+        statusEl.innerText = '⚠ Date aur MS No bharna zaroori hai.';
+        statusEl.style.display = 'block';
+        return;
+      }
+
+      const qty = parseFloat(document.getElementById('entryQty').value) || 0;
+      const wtPc = parseFloat(document.getElementById('entryWtPc').value) || 0;
+
+      // POST ki jagah GET use ho raha hai - Apps Script ka /exec URL redirect karta hai, aur
+      // us redirect par POST ka method browser GET mein badal deta hai (data kho jata hai),
+      // isliye "action=addEntry" ek GET request ke through bheja ja raha hai - ye reliable hai
+      const params = new URLSearchParams({
+        action: 'addEntry',
+        code: code,
+        date: dateVal, // "YYYY-MM-DD" - Apps Script isse real Date bana ke save karega
+        sqf: document.getElementById('entrySqf').value,
+        batch: document.getElementById('entryBatch').value.trim(),
+        msNo: msNo,
+        qty: qty,
+        wtPc: wtPc,
+        _t: Date.now()
+      });
+
+      const submitBtn = document.getElementById('entrySubmitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Saving...';
+
+      try {
+        const sep = MS_LOG_CSV_URL.includes('?') ? '&' : '?';
+        const res = await fetch(`${MS_LOG_CSV_URL}${sep}${params.toString()}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Unknown error');
+
+        statusEl.className = 'entry-status ok';
+        statusEl.innerText = '✅ Entry Google Sheet mein save ho gayi!';
+        statusEl.style.display = 'block';
+        clearEntryForm();
+        document.getElementById('entryDate').value = dateVal; // date wapas bhar do agla entry usi din ka ho sakta hai
+
+        // naya data turant DWM aur search mein bhi dikhe, isliye CSV dobara load karo
+        loadMsLogData().then(renderDWMData);
+      } catch (err) {
+        statusEl.className = 'entry-status fail';
+        statusEl.innerText = '⚠ Save nahi hua: ' + err.message + ' — check karo Apps Script sahi se deploy hui hai ya nahi.';
+        statusEl.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = '✅ Submit Entry';
+      }
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
+      // onMonthChange -> fetchLiveSheet already loads MS PRODUCTION LOG CSV (September = live month by default),
+      // jisse DWM board aur MS/SQF search dono ka data ek hi jagah se aa jata hai
       onMonthChange();
     });
   </script>

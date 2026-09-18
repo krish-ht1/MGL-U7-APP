@@ -355,36 +355,98 @@
   </div>
 
   <script>
-    // Live Google Sheet CSV URL[cite: 1, 2]
-    const LOSSES_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRu_55_JgWvZY0QyC87pldI3sKILOrXLYsE8xiuB99-K2ll9jWI5HHYIU6aoxEF1hegbDDmRybDQsW2/pub?gid=989589292&single=true&output=csv";
+    // Apps Script Web App se aata hai (CORS-safe) - ?gid=... se master sheet ke "Losses" tab ka data milta hai
+    const LOSSES_CSV_URL = "https://script.google.com/macros/s/AKfycbz8h1AjEbXSSFgk1n0viBwGT6QB0SCNh1djlFiXzR0TOncPzkD-j6UzXrsyJkdpOGAq/exec?gid=1055291323";
 
-    // Image Exact Data (Fallback)
+    // Sheet se data na milne par yehi 0 dikhega (fake demo numbers ki jagah)
     let lossData = {
-      idling: { hrs: 75.85, ton: 6.64 },
-      breakdown: { hrs: 6.64, ton: 0.71 },
-      manpower: { hrs: 708.00, ton: 61.95 },
-      fixture: { hrs: 61.95, ton: 14.70 },
-      totalLossTon: 81.69,
-      totalMtdHrs: 783.85,
-      totalMtdTon: 81.69
+      idling: { hrs: 0, ton: 0 },
+      breakdown: { hrs: 0, ton: 0 },
+      manpower: { hrs: 0, ton: 0 },
+      fixture: { hrs: 0, ton: 0 },
+      totalLossTon: 0,
+      totalMtdHrs: 0,
+      totalMtdTon: 0
     };
 
     let tonChartInstance = null;
     let hoursChartInstance = null;
 
+    function parseCsvText(csvText) {
+      return csvText.split('\n').map(r => {
+        let row = [];
+        let insideQuote = false;
+        let entry = '';
+        for (let char of r) {
+          if (char === '"') { insideQuote = !insideQuote; }
+          else if (char === ',' && !insideQuote) { row.push(entry.trim()); entry = ''; }
+          else { entry += char; }
+        }
+        row.push(entry.trim());
+        return row;
+      }).filter(r => r.length > 1 && r.some(c => c !== ''));
+    }
+
     async function fetchLossesLive() {
       try {
         const response = await fetch(LOSSES_CSV_URL);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const csvText = await response.text();
-        const rows = csvText.split('\n').map(r => r.split(',').map(v => v.trim()));
+        const rows = parseCsvText(csvText);
 
-        // CSV parsing logic can be mapped here if your sheet has specific rows
-        document.getElementById('syncStatus').innerText = "● Live Synced";
-        document.getElementById('syncStatus').style.color = "#34d399";
+        const parseVal = (val) => {
+          if (!val) return 0;
+          const clean = String(val).replace(/["']/g, "").replace(/,/g, "").trim();
+          const num = parseFloat(clean);
+          return isNaN(num) ? 0 : num;
+        };
+
+        // Sheet mein har loss category apni row mein hai: Category | Hours | Ton
+        // (naam se match karte hain, isliye row/column order thoda idhar-udhar ho to bhi chalega)
+        const findRow = (...keys) => rows.find(r => {
+          const label = String(r[0] || '').toLowerCase();
+          return keys.some(k => label.includes(k));
+        });
+        const readHrsTon = (row) => {
+          if (!row) return { hrs: 0, ton: 0 };
+          const nums = row.slice(1).map(parseVal).filter(n => !isNaN(n));
+          return { hrs: nums[0] || 0, ton: nums[1] || 0 };
+        };
+
+        const idlingRow = findRow('idling');
+        const breakdownRow = findRow('breakdown');
+        const manpowerRow = findRow('manpower');
+        const fixtureRow = findRow('fixture');
+        const totalMtdRow = findRow('total loss', 'mtd');
+
+        lossData.idling = readHrsTon(idlingRow);
+        lossData.breakdown = readHrsTon(breakdownRow);
+        lossData.manpower = readHrsTon(manpowerRow);
+        lossData.fixture = readHrsTon(fixtureRow);
+
+        lossData.totalLossTon = lossData.idling.ton + lossData.breakdown.ton + lossData.manpower.ton + lossData.fixture.ton;
+
+        if (totalMtdRow) {
+          const t = readHrsTon(totalMtdRow);
+          lossData.totalMtdHrs = t.hrs || (lossData.idling.hrs + lossData.breakdown.hrs + lossData.manpower.hrs + lossData.fixture.hrs);
+          lossData.totalMtdTon = t.ton || lossData.totalLossTon;
+        } else {
+          lossData.totalMtdHrs = lossData.idling.hrs + lossData.breakdown.hrs + lossData.manpower.hrs + lossData.fixture.hrs;
+          lossData.totalMtdTon = lossData.totalLossTon;
+        }
+
+        const foundAny = idlingRow || breakdownRow || manpowerRow || fixtureRow;
+        if (foundAny) {
+          document.getElementById('syncStatus').innerText = "● Live Synced";
+          document.getElementById('syncStatus').style.color = "#34d399";
+        } else {
+          document.getElementById('syncStatus').innerText = "● Rows not matched";
+          document.getElementById('syncStatus').style.color = "#f59e0b";
+        }
       } catch (err) {
-        console.log("Using default fallback data:", err);
-        document.getElementById('syncStatus').innerText = "● Synced (Ready)";
-        document.getElementById('syncStatus').style.color = "#34d399";
+        console.log("Losses CSV fetch error:", err);
+        document.getElementById('syncStatus').innerText = "● Sync Error";
+        document.getElementById('syncStatus').style.color = "#ef4444";
       }
       renderLossesDashboard();
     }
