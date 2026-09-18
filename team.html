@@ -498,7 +498,7 @@
       const maint = document.getElementById('secMaintenance');
       const mainGrid = document.getElementById('mainTreeGrid');
 
-      // VC sirf HT Production (OPERATION) me visible
+      // VC sirf HT Production (OPERATION) me visible rahega
       if (vcSection) {
         vcSection.style.display = (view === 'OPERATION') ? 'flex' : 'none';
       }
@@ -566,6 +566,14 @@
       const modal = document.getElementById('profileModal');
       if (modal) modal.style.display = 'none';
     }
+
+    // By default: Page load par Production button active set hoga
+    window.addEventListener('DOMContentLoaded', () => {
+      const prodBtn = document.getElementById('btnDefaultProduction');
+      if (prodBtn) {
+        switchOrgView('OPERATION', prodBtn);
+      }
+    });
   </script>
 </head>
 <body>
@@ -578,16 +586,16 @@
   </header>
 
   <div class="main-wrapper">
-    <!-- Top Tab Bar: 'Full Plant View' button replaced with '📸 TEAM HT'[cite: 1] -->
+    <!-- Top Tab Bar: 'HT Production (Operation)' button by default active -->
     <div class="tab-bar">
-      <button class="tab-btn active" onclick="switchOrgView('ALL', this); openGalleryModal();">📸 TEAM HT</button>
-      <button class="tab-btn" onclick="switchOrgView('OPERATION', this)">⚙️ HT Production (Operation)</button>
+      <button class="tab-btn" onclick="switchOrgView('ALL', this); openGalleryModal();">📸 TEAM HT</button>
+      <button class="tab-btn active" id="btnDefaultProduction" onclick="switchOrgView('OPERATION', this)">⚙️ HT Production (Operation)</button>
       <button class="tab-btn" onclick="switchOrgView('LAB', this)">🔬 Metallurgical Lab</button>
       <button class="tab-btn" onclick="switchOrgView('MAINTENANCE', this)">🔧 Plant Maintenance</button>
     </div>
 
-    <!-- 0. VC SECTION (Sirf Production me visible) -->
-    <div class="vc-container" id="vcSection" style="display: none;">
+    <!-- 0. VC SECTION (By default Production view me display hoga) -->
+    <div class="vc-container" id="vcSection" style="display: flex;">
       <div class="emp-card vc-card" onclick="openProfile('Mr. KHAJAN SINGH THAKUR', 'Vice Chairman (VC)', 'kst.sir', 'TOP MANAGEMENT')">
         <div class="photo-slot">
           <img src="image/kst.sir.jpeg" data-name="kst.sir" onerror="autoLoadImg(this, 'kst.sir')">
@@ -645,7 +653,7 @@
 
     <!-- 2. Main Department Divisions[cite: 2] -->
     <div class="org-main-grid" id="mainTreeGrid">
-      <div class="section-box" id="secOperation">
+      <div class="section-box" id="secOperation" style="display: block;">
         <div class="section-title op-header">⚙️ OPERATION (HEAT TREATMENT)</div>
         <div style="max-width: 280px; margin: 0 auto 14px auto;">
           <div class="emp-card" onclick="openProfile('Mr. Kapil Raj', 'Sr. Engineer H.T Production', 'kapil', 'OPERATION')">
@@ -759,7 +767,7 @@
       </div>
 
       <!-- Lab Pillar[cite: 2] -->
-      <div class="section-box" id="secLab">
+      <div class="section-box" id="secLab" style="display: none;">
         <div class="section-title lab-header">🔬 METALLURGICAL LAB</div>
         <div style="max-width: 280px; margin: 0 auto 10px auto;">
           <div class="emp-card" onclick="openProfile('Mr. Rahul Rai', 'Sr. Engineer LAB', 'rahul', 'METALLURGICAL LAB')">
