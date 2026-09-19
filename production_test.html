@@ -304,7 +304,7 @@
           <div class="table-scroll" id="msDetailTableWrap" style="display:none; margin-top:8px;">
             <table class="dwm-table">
               <thead>
-                <tr><th>Date</th><th>Furnace</th><th>MS No</th><th>Batch No</th><th>Qty (Nos)</th><th>Weight (Kg)</th></tr>
+                <tr><th>Date</th><th>Furnace</th><th>MS No</th><th>Batch No</th><th>Qty (Nos)</th><th>Weight (Kg)</th><th>In Time</th><th>Out Time</th></tr>
               </thead>
               <tbody id="msDetailTableBody"></tbody>
             </table>
@@ -799,7 +799,9 @@
           batch: findCol('batch no', 'batch'),
           msno: findCol('ms no'),
           qty: findCol('qty (nos)', 'qty(nos)', 'qty nos'),
-          wt: findCol('total wt', 'total weight')
+          wt: findCol('total wt', 'total weight'),
+          inTime: findCol('in time', 'intime'),
+          outTime: findCol('out time', 'outtime')
         };
 
         if (idx.msno === -1 || idx.date === -1) {
@@ -814,7 +816,9 @@
             batch: (r[idx.batch] || "").trim(),
             msNo: (r[idx.msno] || "").trim(),
             qty: parseFloat(r[idx.qty]) || 0,
-            wt: parseFloat(r[idx.wt]) || 0
+            wt: parseFloat(r[idx.wt]) || 0,
+            inTime: idx.inTime > -1 ? (r[idx.inTime] || "").trim() : "",
+            outTime: idx.outTime > -1 ? (r[idx.outTime] || "").trim() : ""
           }));
 
         if (!msLogRows.length) throw new Error('Header mil gaye lekin neeche koi valid MS No wali row nahi mili - check karo sheet mein data hai ya nahi.');
@@ -945,7 +949,7 @@
     function renderMsDetailTable(matches) {
       const tbody = document.getElementById('msDetailTableBody');
       if (!matches.length) {
-        tbody.innerHTML = `<tr><td colspan="6" style="padding:14px; color:#94a3b8;">No matching records found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="padding:14px; color:#94a3b8;">No matching records found.</td></tr>`;
         return;
       }
       tbody.innerHTML = matches.map(r => `
@@ -956,6 +960,8 @@
           <td>${r.batch}</td>
           <td>${r.qty.toLocaleString('en-IN')}</td>
           <td>${r.wt.toFixed(2)}</td>
+          <td>${r.inTime || '-'}</td>
+          <td>${r.outTime || '-'}</td>
         </tr>
       `).join('');
     }

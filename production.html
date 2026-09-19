@@ -304,7 +304,7 @@
           <div class="table-scroll" id="msDetailTableWrap" style="display:none; margin-top:8px;">
             <table class="dwm-table">
               <thead>
-                <tr><th>Date</th><th>Furnace</th><th>MS No</th><th>Batch No</th><th>Qty (Nos)</th><th>Weight (Kg)</th></tr>
+                <tr><th>Date</th><th>Furnace</th><th>MS No</th><th>Batch No</th><th>Qty (Nos)</th><th>Weight (Kg)</th><th>In Time</th><th>Out Time</th></tr>
               </thead>
               <tbody id="msDetailTableBody"></tbody>
             </table>
@@ -799,7 +799,9 @@
           batch: findCol('batch no', 'batch'),
           msno: findCol('ms no'),
           qty: findCol('qty (nos)', 'qty(nos)', 'qty nos'),
-          wt: findCol('total wt', 'total weight')
+          wt: findCol('total wt', 'total weight'),
+          inTime: findCol('in time', 'intime'),
+          outTime: findCol('out time', 'outtime')
         };
 
         if (idx.msno === -1 || idx.date === -1) {
@@ -814,7 +816,9 @@
             batch: (r[idx.batch] || "").trim(),
             msNo: (r[idx.msno] || "").trim(),
             qty: parseFloat(r[idx.qty]) || 0,
-            wt: parseFloat(r[idx.wt]) || 0
+            wt: parseFloat(r[idx.wt]) || 0,
+            inTime: idx.inTime > -1 ? (r[idx.inTime] || "").trim() : "",
+            outTime: idx.outTime > -1 ? (r[idx.outTime] || "").trim() : ""
           }));
 
         if (!msLogRows.length) throw new Error('Header mil gaye lekin neeche koi valid MS No wali row nahi mili - check karo sheet mein data hai ya nahi.');
@@ -945,7 +949,7 @@
     function renderMsDetailTable(matches) {
       const tbody = document.getElementById('msDetailTableBody');
       if (!matches.length) {
-        tbody.innerHTML = `<tr><td colspan="6" style="padding:14px; color:#94a3b8;">No matching records found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="padding:14px; color:#94a3b8;">No matching records found.</td></tr>`;
         return;
       }
       tbody.innerHTML = matches.map(r => `
@@ -956,6 +960,8 @@
           <td>${r.batch}</td>
           <td>${r.qty.toLocaleString('en-IN')}</td>
           <td>${r.wt.toFixed(2)}</td>
+          <td>${r.inTime || '-'}</td>
+          <td>${r.outTime || '-'}</td>
         </tr>
       `).join('');
     }
@@ -1091,58 +1097,49 @@
 
       const qty = parseFloat(document.getElementById('entryQty').value) || 0;
       const wtPc = parseFloat(document.getElementById('entryWtPc').value) || 0;
-      const sqf = document.getElementById('entrySqf').value;
-      const batch = document.getElementById('entryBatch').value.trim();
 
-      // fetch()/CORS se local file (file://) ke liye ye request block ho rahi thi
-      // (Google isko "null" origin allow nahi karta), chahe seedha browser mein link khol ke
-      // ye hamesha kaam karta hai. Isliye ab ek chhupa hua <form> (hidden iframe ko target
-      // karte hue) submit karte hain - ye bilkul waisa hi hai jaise link seedha khola ho,
-      // CORS ka sawaal hi nahi uthta. Result janne ke liye thodi der baad CSV dobara
-      // fetch karke check karte hain ki entry sach mein Sheet mein aa gayi ya nahi.
-      document.getElementById('hfCode').value = code;
-      document.getElementById('hfDate').value = dateVal;
-      document.getElementById('hfSqf').value = sqf;
-      document.getElementById('hfBatch').value = batch;
-      document.getElementById('hfMsNo').value = msNo;
-      document.getElementById('hfQty').value = qty;
-      document.getElementById('hfWtPc').value = wtPc;
-
-      const hiddenForm = document.getElementById('hiddenEntryForm');
-      hiddenForm.action = MS_LOG_CSV_URL;
+      // POST ki jagah GET use ho raha hai - Apps Script ka /exec URL redirect karta hai, aur
+      // us redirect par POST ka method browser GET mein badal deta hai (data kho jata hai),
+      // isliye "action=addEntry" ek GET request ke through bheja ja raha hai - ye reliable hai
+      const params = new URLSearchParams({
+        action: 'addEntry',
+        code: code,
+        date: dateVal, // "YYYY-MM-DD" - Apps Script isse real Date bana ke save karega
+        sqf: document.getElementById('entrySqf').value,
+        batch: document.getElementById('entryBatch').value.trim(),
+        msNo: msNo,
+        qty: qty,
+        wtPc: wtPc,
+        _t: Date.now()
+      });
 
       const submitBtn = document.getElementById('entrySubmitBtn');
       submitBtn.disabled = true;
       submitBtn.innerText = 'Saving...';
-      statusEl.className = 'entry-status ok';
-      statusEl.innerText = '⏳ Google Sheet mein bhej rahe hain, confirm ho raha hai...';
-      statusEl.style.display = 'block';
 
-      hiddenForm.submit();
+      try {
+        const sep = MS_LOG_CSV_URL.includes('?') ? '&' : '?';
+        const res = await fetch(`${MS_LOG_CSV_URL}${sep}${params.toString()}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Unknown error');
 
-      // 2.5 second ruk kar CSV dobara load karo aur check karo ki entry mil rahi hai ya nahi
-      setTimeout(async () => {
-        await loadMsLogData();
-        const found = msLogRows.some(r =>
-          r.msNo.trim().toUpperCase() === msNo.toUpperCase() &&
-          normalizeDateForCompare(r.date) === dateVal &&
-          String(r.sqf).replace(/\D/g, '') === sqf
-        );
-
-        if (found) {
-          statusEl.className = 'entry-status ok';
-          statusEl.innerText = '✅ Entry Google Sheet mein save ho gayi aur confirm bhi ho gayi!';
-          clearEntryForm();
-          document.getElementById('entryDate').value = dateVal; // date wapas bhar do, agla entry usi din ka ho sakta hai
-          renderDWMData();
-        } else {
-          statusEl.className = 'entry-status fail';
-          statusEl.innerText = '⚠ Submit ho gaya lekin turant confirm nahi mila — apni Google Sheet mein khud jaakar check kar lijiye ki entry aayi ya nahi (kabhi kabhi thoda time lag sakta hai, dobara search kar lena).';
-        }
+        statusEl.className = 'entry-status ok';
+        statusEl.innerText = '✅ Entry Google Sheet mein save ho gayi!';
         statusEl.style.display = 'block';
+        clearEntryForm();
+        document.getElementById('entryDate').value = dateVal; // date wapas bhar do agla entry usi din ka ho sakta hai
+
+        // naya data turant DWM aur search mein bhi dikhe, isliye CSV dobara load karo
+        loadMsLogData().then(renderDWMData);
+      } catch (err) {
+        statusEl.className = 'entry-status fail';
+        statusEl.innerText = '⚠ Save nahi hua: ' + err.message + ' — check karo Apps Script sahi se deploy hui hai ya nahi.';
+        statusEl.style.display = 'block';
+      } finally {
         submitBtn.disabled = false;
         submitBtn.innerText = '✅ Submit Entry';
-      }, 2500);
+      }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
