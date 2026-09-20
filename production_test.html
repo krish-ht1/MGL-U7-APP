@@ -131,13 +131,17 @@
       padding: 6px 8px; border-radius: 6px; font-size: 12px; outline: none; font-family: inherit; width: 100%;
     }
     .entry-field input:read-only { color: #94a3b8; }
-    /* Phone browsers (Android/iOS) apne time/date picker ko light theme mein khol dete hain jab tak
+    /* Phone browsers (Android/iOS) apne date picker ko light theme mein khol dete hain jab tak
        color-scheme na bataya jaye - isse laptop jaisa hi dark, consistent look milta hai aur tap
        karne ke liye box thoda bada bhi ho jaata hai */
-    .entry-field input[type="time"], .entry-field input[type="date"] {
+    .entry-field input[type="date"] {
       color-scheme: dark;
       min-height: 34px;
     }
+    /* In/Out Time ab native time-picker (jo phone par analog clock dikha raha tha) ki jagah
+       simple HH / MM dropdown hai - har device par ek jaisa, sirf digits mein dikhta hai */
+    .time-select-pair { display: flex; align-items: center; gap: 4px; }
+    .time-select-pair select { flex: 1; min-width: 0; }
     .entry-submit-btn {
       background: #10b981; border: none; color: #04140d; padding: 9px 16px; border-radius: 6px;
       font-size: 12px; font-weight: 700; cursor: pointer;
@@ -289,11 +293,19 @@
             </div>
             <div class="entry-field">
               <label>In Time</label>
-              <input type="time" id="entryInTime">
+              <div class="time-select-pair">
+                <select id="entryInTimeHH"></select>
+                <span>:</span>
+                <select id="entryInTimeMM"></select>
+              </div>
             </div>
             <div class="entry-field">
               <label>Out Time</label>
-              <input type="time" id="entryOutTime">
+              <div class="time-select-pair">
+                <select id="entryOutTimeHH"></select>
+                <span>:</span>
+                <select id="entryOutTimeMM"></select>
+              </div>
             </div>
             <div class="entry-field">
               <label>Submit Code</label>
@@ -395,7 +407,7 @@
       <div class="kpi-grid">
         <div class="kpi-card-mini">
           <span class="kpi-title-mini">Month Target</span>
-          <span class="kpi-val-mini" id="kpiMonthTarget">279 T</span>
+          <span class="kpi-val-mini" id="kpiMonthTarget">260 T</span>
         </div>
         <div class="kpi-card-mini">
           <span class="kpi-title-mini">Target MTD</span>
@@ -677,7 +689,7 @@
       // 1. Total Row
       tbodyHtml += `<tr class="total-row">
         <td>TOTAL TON</td>
-        <td>279.0</td>
+        <td>${monthTarget.toFixed(1)}</td>
         <td>${monthTarget}</td>
         <td>${totalTargetMTD.toFixed(2)}</td>
         <td>${actualMTD.toFixed(2)}</td>
@@ -1179,6 +1191,29 @@
       addComponentRow();
     }
 
+    // In/Out Time HH:MM dropdowns - phone ke native time-picker (jo device ke hisaab se kabhi analog
+    // clock, kabhi digital dikhta tha) ki jagah har device par same, simple digit dropdown
+    function populateHourMinuteSelect(selEl, max) {
+      let optionsHtml = '<option value="">--</option>';
+      for (let i = 0; i < max; i++) {
+        const v = String(i).padStart(2, '0');
+        optionsHtml += `<option value="${v}">${v}</option>`;
+      }
+      selEl.innerHTML = optionsHtml;
+    }
+
+    function initTimeSelects() {
+      ['entryInTimeHH', 'entryOutTimeHH'].forEach(id => populateHourMinuteSelect(document.getElementById(id), 24));
+      ['entryInTimeMM', 'entryOutTimeMM'].forEach(id => populateHourMinuteSelect(document.getElementById(id), 60));
+    }
+
+    function getTimeValue(hhId, mmId) {
+      const hh = document.getElementById(hhId).value;
+      const mm = document.getElementById(mmId).value;
+      if (!hh || !mm) return '';
+      return hh + ':' + mm;
+    }
+
     function toggleEntryPanel() {
       const panel = document.getElementById('entryFormPanel');
       const willShow = panel.style.display === 'none' || panel.style.display === '';
@@ -1195,7 +1230,7 @@
     }
 
     function clearEntryForm() {
-      ['entryBatch','entryCode','entryInTime','entryOutTime']
+      ['entryBatch','entryCode','entryInTimeHH','entryInTimeMM','entryOutTimeHH','entryOutTimeMM']
         .forEach(id => { document.getElementById(id).value = ''; });
       document.getElementById('entrySqf').value = '1';
       resetComponentRows();
@@ -1270,8 +1305,8 @@
       const dateVal = document.getElementById('entryDate').value;
       const sqf = document.getElementById('entrySqf').value;
       const batch = document.getElementById('entryBatch').value.trim();
-      const inTime = document.getElementById('entryInTime').value;
-      const outTime = document.getElementById('entryOutTime').value;
+      const inTime = getTimeValue('entryInTimeHH', 'entryInTimeMM');
+      const outTime = getTimeValue('entryOutTimeHH', 'entryOutTimeMM');
       const components = collectComponents();
 
       if (!dateVal) {
@@ -1396,6 +1431,7 @@
       // onMonthChange -> fetchLiveSheet already loads MS PRODUCTION LOG CSV (September = live month by default),
       // jisse DWM board aur MS/SQF search dono ka data ek hi jagah se aa jata hai
       onMonthChange();
+      initTimeSelects();
     });
   </script>
 </body>
