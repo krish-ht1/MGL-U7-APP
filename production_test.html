@@ -249,15 +249,15 @@
         </div>
         <div class="control-bar" style="padding:10px 12px;">
           <div class="filters-group ms-search-bar">
-            <input type="text" id="msSearchInput" placeholder="Search MS Number...">
-            <select id="msSearchSQF">
+            <input type="text" id="msSearchInput" placeholder="Search MS Number..." oninput="debouncedMsSearch()">
+            <select id="msSearchSQF" onchange="runMsSearch()">
               <option value="ALL">All SQF</option>
               <option value="1">SQF-1</option>
               <option value="2">SQF-2</option>
               <option value="3">SQF-3</option>
               <option value="4">SQF-4</option>
             </select>
-            <input type="date" id="msSearchDate">
+            <input type="date" id="msSearchDate" onchange="runMsSearch()">
             <button class="ms-search-btn" onclick="runMsSearch()">🔍 Search</button>
             <button class="ms-search-btn" style="background:#1e293b; border:1px solid #f87171; color:#f87171;" onclick="resetMsSearch()">♻ Reset</button>
             <button class="ms-search-btn" style="background:#1e293b; border:1px solid #38bdf8; color:#38bdf8;" onclick="toggleTdPanel()">🗓 TD Production</button>
@@ -578,17 +578,137 @@
       }
     };
 
-    let liveSeptemberData = {
-      daysCount: 30,
-      monthTarget: 260.0,
-      totalTargetMTD: 0,
-      furnaces: {
-        "SQF-1": { capacity: 65.0, monthTarget: 65.0, targetMTD: 0, days: Array(30).fill(0) },
-        "SQF-2": { capacity: 65.0, monthTarget: 65.0, targetMTD: 0, days: Array(30).fill(0) },
-        "SQF-3": { capacity: 65.0, monthTarget: 65.0, targetMTD: 0, days: Array(30).fill(0) },
-        "SQF-4": { capacity: 65.0, monthTarget: 65.0, targetMTD: 0, days: Array(30).fill(0) }
+    // SEPTEMBER ke baad October, November... jo bhi mahina aaye, uska data isi Google Sheet
+    // (MS PRODUCTION LOG) mein hi save hota rehta hai - kabhi delete/move nahi hota. Isliye
+    // purane mahino ka DWM aur MS/SQF Search hamesha kaam karta rahega, aur naya mahina shuru
+    // hote hi apne aap "Live" ban ke dropdown mein aa jaata hai - iske liye code change karne
+    // ki zaroorat nahi padegi.
+    const FULL_MONTH_NAMES = ["JANUARY","FEBRUARY","MARCH","APRIL","MAY","JUNE","JULY","AUGUST","SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"];
+    let liveMonthDataCache = {}; // key jaise "OCTOBER-2026" -> computed DWM data (fixedDatabase jaisa hi shape)
+
+    function monthKeyToParts(key) {
+      const idx = key.lastIndexOf('-');
+      const name = key.slice(0, idx);
+      const year = parseInt(key.slice(idx + 1), 10);
+      const month = FULL_MONTH_NAMES.indexOf(name) + 1;
+      return { year, month };
+    }
+
+    function partsToMonthKey(year, month) {
+      return `${FULL_MONTH_NAMES[month - 1]}-${year}`;
+    }
+
+    function monthKeyToLabel(key, tag) {
+      const { year, month } = monthKeyToParts(key);
+      const name = FULL_MONTH_NAMES[month - 1];
+      const nice = name.charAt(0) + name.slice(1).toLowerCase();
+      return `${nice} ${year} (${tag})`;
+    }
+
+    // MS PRODUCTION LOG ke raw rows se kisi bhi ek diye gaye mahine (year, month) ka
+    // furnace x day matrix (Total Wt ka Ton mein sum) calculate karta hai - September ke
+    // liye bhi, October ke liye bhi, kisi bhi future mahine ke liye bhi, same tareeke se
+    function computeLiveMonthData(year, month) {
+      const daysInMonth = new Date(year, month, 0).getDate();
+      const data = {
+        daysCount: daysInMonth,
+        monthTarget: 260.0,
+        totalTargetMTD: 0,
+        furnaces: {
+          "SQF-1": { capacity: 0, monthTarget: 0, targetMTD: 0, days: Array(daysInMonth).fill(0) },
+          "SQF-2": { capacity: 0, monthTarget: 0, targetMTD: 0, days: Array(daysInMonth).fill(0) },
+          "SQF-3": { capacity: 0, monthTarget: 0, targetMTD: 0, days: Array(daysInMonth).fill(0) },
+          "SQF-4": { capacity: 0, monthTarget: 0, targetMTD: 0, days: Array(daysInMonth).fill(0) }
+        }
+      };
+
+      let lastFilledDay = 0; // sabse aakhri date jiske liye kisi bhi furnace ka row mila - chahe uski value 0 hi ho
+
+      msLogRows.forEach(row => {
+        const parts = (row.date || "").split(/[\/\-]/);
+        if (parts.length !== 3) return;
+        const day = parseInt(parts[0], 10);
+        const rowMonth = parseInt(parts[1], 10);
+        let rowYear = parseInt(parts[2], 10);
+        if (rowYear < 100) rowYear += 2000;
+        if (!day || rowMonth !== month || rowYear !== year) return;
+
+        if (day > lastFilledDay) lastFilledDay = day;
+
+        const dIdx = day - 1;
+        if (dIdx < 0 || dIdx >= daysInMonth) return;
+
+        const sqfDigit = String(row.sqf || "").replace(/\D/g, '');
+        const fcName = "SQF-" + sqfDigit;
+        if (!data.furnaces[fcName]) return;
+
+        data.furnaces[fcName].days[dIdx] += (row.wt || 0) / 1000; // Kg -> Ton
+      });
+
+      // Plant ka total month target 260 T hai (4 furnace milaake) - har mahine ke liye same
+      const totalMonthTarget = 260;
+      const monthTargetPerFurnace = totalMonthTarget / 4;
+      const dailyTargetPerFurnace = monthTargetPerFurnace / daysInMonth;
+      data.monthTarget = totalMonthTarget;
+
+      const elapsedDays = lastFilledDay;
+      Object.keys(data.furnaces).forEach(fc => {
+        data.furnaces[fc].capacity = monthTargetPerFurnace;
+        data.furnaces[fc].monthTarget = monthTargetPerFurnace;
+        data.furnaces[fc].targetMTD = dailyTargetPerFurnace * elapsedDays;
+      });
+      data.totalTargetMTD = dailyTargetPerFurnace * 4 * elapsedDays;
+
+      return data;
+    }
+
+    // Sheet mein jitne bhi mahine mile (jo fixedDatabase mein pehle se nahi hain), un sabko
+    // "Live" maan ke calculate kar leta hai aur dropdown mein daal deta hai - isliye October
+    // shuru hote hi, bina kisi code change ke, apne aap dropdown mein aa jayega
+    function refreshLiveMonths() {
+      const liveKeys = new Set();
+      msLogRows.forEach(row => {
+        const parts = (row.date || "").split(/[\/\-]/);
+        if (parts.length !== 3) return;
+        const month = parseInt(parts[1], 10);
+        let year = parseInt(parts[2], 10);
+        if (year < 100) year += 2000;
+        if (!month || !year) return;
+        const key = partsToMonthKey(year, month);
+        if (!fixedDatabase[key]) liveKeys.add(key);
+      });
+
+      liveMonthDataCache = {};
+      liveKeys.forEach(key => {
+        const { year, month } = monthKeyToParts(key);
+        liveMonthDataCache[key] = computeLiveMonthData(year, month);
+      });
+
+      populateMonthDropdown(Array.from(liveKeys));
+    }
+
+    function populateMonthDropdown(liveKeysList) {
+      const dropdown = document.getElementById('dwmMonthDropdown');
+      const previousValue = dropdown.value;
+      const hadOptionsBefore = dropdown.options.length > 0;
+
+      // Naye (live) mahine sabse upar, sabse latest sabse pehle
+      const sortedLive = liveKeysList.slice().sort((a, b) => {
+        const pa = monthKeyToParts(a), pb = monthKeyToParts(b);
+        return (pb.year * 12 + pb.month) - (pa.year * 12 + pa.month);
+      });
+
+      let html = sortedLive.map(key => `<option value="${key}">${monthKeyToLabel(key, 'Live')}</option>`).join('');
+      html += Object.keys(fixedDatabase).map(key => `<option value="${key}">${monthKeyToLabel(key, 'Fixed')}</option>`).join('');
+
+      dropdown.innerHTML = html;
+
+      if (hadOptionsBefore && [...dropdown.options].some(o => o.value === previousValue)) {
+        dropdown.value = previousValue; // user pehle se jo dekh raha tha wahi rakho
+      } else if (sortedLive.length) {
+        dropdown.value = sortedLive[0]; // pehli baar load ho raha hai - sabse naya live mahina dikhao
       }
-    };
+    }
 
     let trendChartInstance = null;
     let furnaceChartInstance = null;
@@ -611,8 +731,12 @@
     function onMonthChange() {
       const selectedMonth = document.getElementById('dwmMonthDropdown').value;
       let daysCount = 30;
-      if (selectedMonth === "SEPTEMBER-2026") daysCount = liveSeptemberData.daysCount;
-      else if (fixedDatabase[selectedMonth]) daysCount = fixedDatabase[selectedMonth].daysCount;
+      if (fixedDatabase[selectedMonth]) {
+        daysCount = fixedDatabase[selectedMonth].daysCount;
+      } else if (selectedMonth) {
+        const { year, month } = monthKeyToParts(selectedMonth);
+        if (year && month) daysCount = new Date(year, month, 0).getDate();
+      }
 
       const dateDropdown = document.getElementById('dwmDateDropdown');
       let optionsHtml = `<option value="ALL" selected>All Days (Full Month)</option>`;
@@ -625,18 +749,18 @@
     }
 
     async function fetchLiveSheet() {
-      const selectedMonth = document.getElementById('dwmMonthDropdown').value;
       const syncStatus = document.getElementById('syncStatus');
 
-      if (selectedMonth !== "SEPTEMBER-2026") {
-        if(syncStatus) { syncStatus.innerText = `● Fixed (${selectedMonth})`; syncStatus.style.color = "#38bdf8"; }
-        renderDWMData();
-        return;
-      }
-
-      // Live month (September) - ek hi MS PRODUCTION LOG CSV se fresh data lao,
-      // usi se DWM board bhi banega aur MS/SQF search bhi usi data par chalega
+      // MS PRODUCTION LOG CSV hamesha fresh fetch karte hain, chahe koi bhi mahina select ho -
+      // isi se DWM board banega, MS/SQF Search bhi hamesha up-to-date rahega, aur agar koi naya
+      // mahina (October, etc.) Sheet mein shuru ho gaya ho to wo bhi apne aap detect ho jayega
       await loadMsLogData();
+
+      const selectedMonth = document.getElementById('dwmMonthDropdown').value;
+      if (fixedDatabase[selectedMonth] && syncStatus) {
+        syncStatus.innerText = `● Fixed (${selectedMonth})`;
+        syncStatus.style.color = "#38bdf8";
+      }
       renderDWMData();
     }
 
@@ -645,22 +769,25 @@
       const selectedDate = document.getElementById('dwmDateDropdown').value;
 
       let dataDaysCount = 30;
-      let monthTarget = 270.0;
+      let monthTarget = 260.0;
       let totalTargetMTD = 0;
       let rawFurnacesMap = {};
 
-      if (selectedMonth === "SEPTEMBER-2026") {
-        dataDaysCount = liveSeptemberData.daysCount;
-        monthTarget = liveSeptemberData.monthTarget;
-        totalTargetMTD = liveSeptemberData.totalTargetMTD;
-        rawFurnacesMap = liveSeptemberData.furnaces;
-      } else {
+      if (fixedDatabase[selectedMonth]) {
         let fData = fixedDatabase[selectedMonth];
         dataDaysCount = fData.daysCount;
         monthTarget = fData.monthTarget;
         totalTargetMTD = fData.totalTargetMTD || 270.0;
         rawFurnacesMap = fData.furnaces;
+      } else if (liveMonthDataCache[selectedMonth]) {
+        let lData = liveMonthDataCache[selectedMonth];
+        dataDaysCount = lData.daysCount;
+        monthTarget = lData.monthTarget;
+        totalTargetMTD = lData.totalTargetMTD;
+        rawFurnacesMap = lData.furnaces;
       }
+      // (agar dono mein se kuch na mile - jaise pehli hi baar page abhi load ho raha hai -
+      // to upar wale default values se khaali/shuruaati board dikh jaata hai, error nahi aata)
 
       // Unified Normalization (fixed and live format handling)
       let furnacesMap = {};
@@ -958,8 +1085,8 @@
 
         if (!msLogRows.length) throw new Error('Header mil gaye lekin neeche koi valid MS No wali row nahi mili - check karo sheet mein data hai ya nahi.');
 
-        // usi log data se DWM board (furnace x day matrix) auto-calculate karna
-        buildSeptemberFromLog();
+        // usi log data se DWM board (furnace x day matrix, sabhi mahino ke liye) auto-calculate karna
+        refreshLiveMonths();
 
         if (syncStatus) { syncStatus.innerText = "● Live Synced"; syncStatus.style.color = "#34d399"; }
       } catch (err) {
@@ -970,63 +1097,6 @@
           errBox.style.display = 'block';
         }
       }
-    }
-
-    // MS PRODUCTION LOG ke raw rows se DWM ka furnace x day matrix (Total Wt ka Ton mein sum) auto-calculate karna
-    function buildSeptemberFromLog() {
-      const daysInSept = 30;
-      liveSeptemberData.daysCount = daysInSept;
-      Object.keys(liveSeptemberData.furnaces).forEach(fc => {
-        liveSeptemberData.furnaces[fc].days = Array(daysInSept).fill(0);
-      });
-
-      let lastFilledDay = 0; // sabse aakhri date jiske liye kisi bhi furnace ka row mila - chahe uski value 0 hi ho
-
-      msLogRows.forEach(row => {
-        // Log mein date "DD-MM-YYYY" (ya "DD/MM/YYYY") format mein hai
-        const parts = (row.date || "").split(/[\/\-]/);
-        if (parts.length !== 3) return;
-        const day = parseInt(parts[0], 10);
-        const month = parseInt(parts[1], 10);
-        let year = parseInt(parts[2], 10);
-        if (year < 100) year += 2000;
-        if (!day || month !== 9 || year !== 2026) return; // abhi live board sirf September-2026 ka hai
-
-        // "data filled hai" ka matlab hai row hi maujood hai us date ke liye - value 0 bhi
-        // ho sakti hai (jaise us din furnace band tha), fir bhi wo din "filled" maana jayega
-        if (day > lastFilledDay) lastFilledDay = day;
-
-        const dIdx = day - 1;
-        if (dIdx < 0 || dIdx >= daysInSept) return;
-
-        const sqfDigit = String(row.sqf || "").replace(/\D/g, '');
-        const fcName = "SQF-" + sqfDigit;
-        if (!liveSeptemberData.furnaces[fcName]) return;
-
-        liveSeptemberData.furnaces[fcName].days[dIdx] += (row.wt || 0) / 1000; // Kg -> Ton
-      });
-
-      // Target figures log sheet mein nahi hote (wo sirf actual production ka data hai),
-      // isliye fixed target use ho raha hai - PLANT ka total month target 260 T hai (4 furnace milaake),
-      // usi se per-furnace aur per-day target nikal rahe hain
-      const totalMonthTarget = 260; // poore plant (4 furnace) ka month target, Tons mein
-      const monthTargetPerFurnace = totalMonthTarget / 4; // 65
-      const dailyTargetPerFurnace = monthTargetPerFurnace / daysInSept; // 65/30 = 2.1667
-      liveSeptemberData.monthTarget = totalMonthTarget; // 260
-
-      // MTD target aaj ki real calendar date se nahi, balki DWM mein jis aakhri date tak
-      // (charon mein se kisi bhi ek furnace mein) data fill hai usi date tak nikalta hai -
-      // jaise 18 tarikh tak kisi bhi furnace ka row mila to Target MTD = 18 x 2.5 (per furnace,
-      // charon furnace ke liye same) hoga - value 0 ho ya positive, farak nahi padta
-      const elapsedDays = lastFilledDay;
-
-      Object.keys(liveSeptemberData.furnaces).forEach(fc => {
-        liveSeptemberData.furnaces[fc].capacity = monthTargetPerFurnace;
-        liveSeptemberData.furnaces[fc].monthTarget = monthTargetPerFurnace;
-        liveSeptemberData.furnaces[fc].targetMTD = dailyTargetPerFurnace * elapsedDays;
-      });
-
-      liveSeptemberData.totalTargetMTD = dailyTargetPerFurnace * 4 * elapsedDays;
     }
 
     // Log sheet mein date "DD-MM-YYYY" format mein hai; date input se "YYYY-MM-DD" aata hai - dono ko match karne layak banana
@@ -1040,6 +1110,15 @@
     }
 
     let msDetailMatches = []; // "Out Time" action button ke liye - View Detail table ki last search results
+
+    // MS No type karte hi (har letter/digit ke baad) automatic search ho jaaye - alag se "Search"
+    // button dabane ki zaroorat nahi. 300ms ka chhota sa wait rakha hai taaki fast typing mein
+    // har single keystroke par baar-baar search na chale.
+    let msSearchDebounceTimer = null;
+    function debouncedMsSearch() {
+      clearTimeout(msSearchDebounceTimer);
+      msSearchDebounceTimer = setTimeout(runMsSearch, 300);
+    }
 
     function runMsSearch() {
       const q = document.getElementById('msSearchInput').value.trim().toUpperCase();
