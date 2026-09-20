@@ -119,6 +119,33 @@
     }
     .view-detail-btn:hover { background: rgba(56,189,248,0.15); }
 
+    /* New Entry / TD Production - ab inline panel ki jagah popup (modal) mein khulte hain,
+       taaki baaki page clean/uncluttered rahe aur ye alag se, focus karne layak dikhein */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0; background: rgba(2,6,15,0.72);
+      z-index: 1000; align-items: flex-start; justify-content: center;
+      padding: 16px; overflow-y: auto;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-card {
+      background: #0f172a; border: 1px solid #1e293b; border-radius: 12px;
+      padding: 14px; width: 100%; max-width: 540px; margin-top: 28px;
+      display: flex; flex-direction: column; gap: 10px;
+      max-height: calc(100vh - 56px); overflow-y: auto;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+    }
+    .modal-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: -14px; background: #0f172a; margin: -14px -14px 0; padding: 12px 14px;
+      border-bottom: 1px solid #1e293b; border-radius: 12px 12px 0 0;
+    }
+    .modal-card-header h3 { margin: 0; font-size: 13px; color: #f8fafc; font-weight: 700; }
+    .modal-close-btn {
+      background: rgba(239,68,68,0.12); border: 1px solid #ef4444; color: #f87171;
+      font-size: 13px; font-weight: 700; cursor: pointer; padding: 3px 9px; border-radius: 6px; line-height: 1.4;
+    }
+
     /* New Entry Form */
     .entry-form-grid {
       display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 10px;
@@ -240,22 +267,28 @@
 
         <div id="msLogError" style="display:none; background:rgba(239,68,68,0.12); border:1px solid #ef4444; color:#f87171; font-size:11.5px; padding:8px 10px; border-radius:6px; line-height:1.5;"></div>
 
-        <!-- TD PRODUCTION PANEL -->
-        <div id="tdProductionPanel" style="display:none;">
-          <div class="control-bar" style="padding:8px 12px;">
-            <div class="filters-group">
-              <span style="font-size:11px; color:#94a3b8; font-weight:600;">TD Date:</span>
-              <input type="date" id="tdDateInput" onchange="renderTdProduction()">
+        <!-- TD PRODUCTION - popup mein khulta hai -->
+        <div id="tdProductionModal" class="modal-overlay" onclick="if(event.target===this) toggleTdPanel()">
+          <div class="modal-card">
+            <div class="modal-card-header">
+              <h3>🗓 TD Production</h3>
+              <button type="button" class="modal-close-btn" onclick="toggleTdPanel()">✖ Close</button>
             </div>
-          </div>
-          <div class="table-scroll" style="margin-top:8px;">
-            <div style="font-size:11px; color:#94a3b8; font-weight:700; margin-bottom:6px;" id="tdTitleLine"></div>
-            <table class="dwm-table">
-              <thead>
-                <tr><th>Furnace No</th><th>TD Qty</th><th>MTD Qty</th><th>TD Ton</th><th>MTD Ton</th></tr>
-              </thead>
-              <tbody id="tdProductionTableBody"></tbody>
-            </table>
+            <div class="control-bar" style="padding:8px 12px;">
+              <div class="filters-group">
+                <span style="font-size:11px; color:#94a3b8; font-weight:600;">TD Date:</span>
+                <input type="date" id="tdDateInput" onchange="renderTdProduction()">
+              </div>
+            </div>
+            <div class="table-scroll" style="margin-top:8px;">
+              <div style="font-size:11px; color:#94a3b8; font-weight:700; margin-bottom:6px;" id="tdTitleLine"></div>
+              <table class="dwm-table">
+                <thead>
+                  <tr><th>Furnace No</th><th>TD Qty</th><th>MTD Qty</th><th>TD Ton</th><th>MTD Ton</th></tr>
+                </thead>
+                <tbody id="tdProductionTableBody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -275,7 +308,13 @@
           <input type="hidden" name="msNo" id="hfMsNo">
         </form>
 
-        <div id="entryFormPanel" style="display:none; border-top:1px solid #1e293b; padding-top:10px; margin-top:4px; flex-direction:column; gap:10px;">
+        <!-- NEW ENTRY - popup mein khulta hai -->
+        <div id="entryFormModal" class="modal-overlay" onclick="if(event.target===this) toggleEntryPanel()">
+          <div class="modal-card">
+            <div class="modal-card-header">
+              <h3>📝 New Entry</h3>
+              <button type="button" class="modal-close-btn" onclick="toggleEntryPanel()">✖ Close</button>
+            </div>
           <div id="entryEditableSection" style="display:flex; flex-direction:column; gap:10px;">
           <div class="entry-form-grid">
             <div class="entry-field">
@@ -339,6 +378,7 @@
           </div>
 
           <div id="entryStatus" class="entry-status" style="display:none;"></div>
+          </div>
         </div>
 
         <div class="kpi-grid" id="msSearchKpiGrid" style="display:none;">
@@ -1089,9 +1129,9 @@
     }
 
     function toggleTdPanel() {
-      const panel = document.getElementById('tdProductionPanel');
-      const willShow = panel.style.display === 'none';
-      panel.style.display = willShow ? 'block' : 'none';
+      const panel = document.getElementById('tdProductionModal');
+      const willShow = !panel.classList.contains('open');
+      panel.classList.toggle('open', willShow);
       if (willShow) {
         const dateInput = document.getElementById('tdDateInput');
         if (!dateInput.value) {
@@ -1234,9 +1274,9 @@
     }
 
     function toggleEntryPanel() {
-      const panel = document.getElementById('entryFormPanel');
-      const willShow = panel.style.display === 'none' || panel.style.display === '';
-      panel.style.display = willShow ? 'flex' : 'none';
+      const panel = document.getElementById('entryFormModal');
+      const willShow = !panel.classList.contains('open');
+      panel.classList.toggle('open', willShow);
       if (willShow) {
         const dateInput = document.getElementById('entryDate');
         if (!dateInput.value) {
@@ -1563,6 +1603,15 @@
       // onMonthChange -> fetchLiveSheet already loads MS PRODUCTION LOG CSV (September = live month by default),
       // jisse DWM board aur MS/SQF search dono ka data ek hi jagah se aa jata hai
       onMonthChange();
+    });
+
+    // Popup (New Entry / TD Production) khula ho to Escape dabane se bhi band ho jaaye
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      const entryModal = document.getElementById('entryFormModal');
+      const tdModal = document.getElementById('tdProductionModal');
+      if (entryModal && entryModal.classList.contains('open')) toggleEntryPanel();
+      else if (tdModal && tdModal.classList.contains('open')) toggleTdPanel();
     });
   </script>
 </body>
