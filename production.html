@@ -138,10 +138,13 @@
       color-scheme: dark;
       min-height: 34px;
     }
-    /* In/Out Time ab native time-picker (jo phone par analog clock dikha raha tha) ki jagah
-       simple HH / MM dropdown hai - har device par ek jaisa, sirf digits mein dikhta hai */
-    .time-select-pair { display: flex; align-items: center; gap: 4px; }
-    .time-select-pair select { flex: 1; min-width: 0; }
+    /* In/Out Time ab native time-picker (jo phone par kabhi analog clock dikha raha tha) ki jagah
+       plain type-to-enter box hai - jaise "0930" type karo to khud-ba-khud "09:30" ban jaata hai.
+       Har device (laptop ho ya phone) par bilkul same dikhta hai, koi OS ka apna picker nahi khulta. */
+    .entry-field input[inputmode="numeric"][placeholder="HH:MM"] {
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.5px;
+    }
     .entry-submit-btn {
       background: #10b981; border: none; color: #04140d; padding: 9px 16px; border-radius: 6px;
       font-size: 12px; font-weight: 700; cursor: pointer;
@@ -294,19 +297,11 @@
             </div>
             <div class="entry-field">
               <label>In Time</label>
-              <div class="time-select-pair">
-                <select id="entryInTimeHH"></select>
-                <span>:</span>
-                <select id="entryInTimeMM"></select>
-              </div>
+              <input type="text" id="entryInTime" placeholder="HH:MM" inputmode="numeric" maxlength="5" oninput="formatTimeInput(this)">
             </div>
             <div class="entry-field">
               <label>Out Time</label>
-              <div class="time-select-pair">
-                <select id="entryOutTimeHH"></select>
-                <span>:</span>
-                <select id="entryOutTimeMM"></select>
-              </div>
+              <input type="text" id="entryOutTime" placeholder="HH:MM" inputmode="numeric" maxlength="5" oninput="formatTimeInput(this)">
             </div>
             <div class="entry-field">
               <label>Submit Code</label>
@@ -389,11 +384,7 @@
             <div class="entry-form-grid" style="grid-template-columns: repeat(2,1fr);">
               <div class="entry-field">
                 <label>Out Time</label>
-                <div class="time-select-pair">
-                  <select id="outTimeHH"></select>
-                  <span>:</span>
-                  <select id="outTimeMM"></select>
-                </div>
+                <input type="text" id="outTimeInput" placeholder="HH:MM" inputmode="numeric" maxlength="5" oninput="formatTimeInput(this)">
               </div>
               <div class="entry-field">
                 <label>Submit Code</label>
@@ -1226,27 +1217,20 @@
       addComponentRow();
     }
 
-    // In/Out Time HH:MM dropdowns - phone ke native time-picker (jo device ke hisaab se kabhi analog
-    // clock, kabhi digital dikhta tha) ki jagah har device par same, simple digit dropdown
-    function populateHourMinuteSelect(selEl, max) {
-      let optionsHtml = '<option value="">--</option>';
-      for (let i = 0; i < max; i++) {
-        const v = String(i).padStart(2, '0');
-        optionsHtml += `<option value="${v}">${v}</option>`;
+    // In/Out Time ab plain type-to-enter box hai (phone ke native time-picker mein kabhi analog
+    // clock dikh raha tha, isliye) - jaise-jaise digit type karo, khud-ba-khud "HH:MM" ban jaata
+    // hai, jaise "0930" -> "09:30". Har device par bilkul same.
+    function formatTimeInput(inputEl) {
+      let digits = inputEl.value.replace(/\D/g, '').slice(0, 4);
+      if (digits.length >= 3) {
+        inputEl.value = digits.slice(0, 2) + ':' + digits.slice(2);
+      } else {
+        inputEl.value = digits;
       }
-      selEl.innerHTML = optionsHtml;
     }
 
-    function initTimeSelects() {
-      ['entryInTimeHH', 'entryOutTimeHH'].forEach(id => populateHourMinuteSelect(document.getElementById(id), 24));
-      ['entryInTimeMM', 'entryOutTimeMM'].forEach(id => populateHourMinuteSelect(document.getElementById(id), 60));
-    }
-
-    function getTimeValue(hhId, mmId) {
-      const hh = document.getElementById(hhId).value;
-      const mm = document.getElementById(mmId).value;
-      if (!hh || !mm) return '';
-      return hh + ':' + mm;
+    function isValidTimeStr(str) {
+      return /^([01]\d|2[0-3]):[0-5]\d$/.test(str);
     }
 
     function toggleEntryPanel() {
@@ -1265,7 +1249,7 @@
     }
 
     function clearEntryForm() {
-      ['entryBatch','entryCode','entryInTimeHH','entryInTimeMM','entryOutTimeHH','entryOutTimeMM']
+      ['entryBatch','entryCode','entryInTime','entryOutTime']
         .forEach(id => { document.getElementById(id).value = ''; });
       document.getElementById('entrySqf').value = '1';
       resetComponentRows();
@@ -1340,13 +1324,19 @@
       const dateVal = document.getElementById('entryDate').value;
       const sqf = document.getElementById('entrySqf').value;
       const batch = document.getElementById('entryBatch').value.trim();
-      const inTime = getTimeValue('entryInTimeHH', 'entryInTimeMM');
-      const outTime = getTimeValue('entryOutTimeHH', 'entryOutTimeMM');
+      const inTime = document.getElementById('entryInTime').value.trim();
+      const outTime = document.getElementById('entryOutTime').value.trim();
       const components = collectComponents();
 
       if (!dateVal) {
         statusEl.className = 'entry-status fail';
         statusEl.innerText = '⚠ Date bharna zaroori hai.';
+        statusEl.style.display = 'block';
+        return;
+      }
+      if ((inTime && !isValidTimeStr(inTime)) || (outTime && !isValidTimeStr(outTime))) {
+        statusEl.className = 'entry-status fail';
+        statusEl.innerText = '⚠ In/Out Time sahi format (HH:MM, jaise 09:30) mein bharo.';
         statusEl.style.display = 'block';
         return;
       }
@@ -1481,8 +1471,7 @@
       };
       document.getElementById('outTimeContextInfo').innerHTML =
         `Date: <b>${row.date}</b> &nbsp; SQF: <b>SQF-${sqfDigit}</b> &nbsp; Batch: <b>${row.batch || '-'}</b> &nbsp; MS No: <b>${row.msNo}</b><br>In Time: <b>${row.inTime || '-'}</b> (Out Time abhi khaali hai)`;
-      document.getElementById('outTimeHH').value = '';
-      document.getElementById('outTimeMM').value = '';
+      document.getElementById('outTimeInput').value = '';
       document.getElementById('outTimeCode').value = '';
       document.getElementById('outTimeStatus').style.display = 'none';
       const panel = document.getElementById('outTimePanel');
@@ -1507,10 +1496,10 @@
         statusEl.style.display = 'block';
         return;
       }
-      const outTime = getTimeValue('outTimeHH', 'outTimeMM');
-      if (!outTime) {
+      const outTime = document.getElementById('outTimeInput').value.trim();
+      if (!outTime || !isValidTimeStr(outTime)) {
         statusEl.className = 'entry-status fail';
-        statusEl.innerText = '⚠ Out Time (Hour aur Minute dono) select karo.';
+        statusEl.innerText = '⚠ Out Time sahi format (HH:MM, jaise 14:45) mein bharo.';
         statusEl.style.display = 'block';
         return;
       }
@@ -1574,7 +1563,6 @@
       // onMonthChange -> fetchLiveSheet already loads MS PRODUCTION LOG CSV (September = live month by default),
       // jisse DWM board aur MS/SQF search dono ka data ek hi jagah se aa jata hai
       onMonthChange();
-      initTimeSelects();
     });
   </script>
 </body>
