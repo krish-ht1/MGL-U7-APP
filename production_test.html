@@ -131,6 +131,13 @@
       padding: 6px 8px; border-radius: 6px; font-size: 12px; outline: none; font-family: inherit; width: 100%;
     }
     .entry-field input:read-only { color: #94a3b8; }
+    /* Phone browsers (Android/iOS) apne time/date picker ko light theme mein khol dete hain jab tak
+       color-scheme na bataya jaye - isse laptop jaisa hi dark, consistent look milta hai aur tap
+       karne ke liye box thoda bada bhi ho jaata hai */
+    .entry-field input[type="time"], .entry-field input[type="date"] {
+      color-scheme: dark;
+      min-height: 34px;
+    }
     .entry-submit-btn {
       background: #10b981; border: none; color: #04140d; padding: 9px 16px; border-radius: 6px;
       font-size: 12px; font-weight: 700; cursor: pointer;
@@ -145,11 +152,28 @@
     .entry-status.fail { background: rgba(239,68,68,0.12); border: 1px solid #ef4444; color: #f87171; }
 
     /* Multiple MS No components (ek Batch ke andar kayi components) */
+    /* Phone/narrow screen par MS No ko poori width mili hai (lamba alphanumeric code hota hai),
+       Qty/Wt-Pc/Total Wt neeche ek chhoti row mein - taaki MS No कटा हुआ (truncated) na dikhe */
     .component-row {
-      display: grid; grid-template-columns: repeat(3, 1fr) auto; gap: 8px; align-items: end;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr) auto;
+      grid-template-areas:
+        "msno msno msno remove"
+        "qty wtpc total total";
+      gap: 8px; align-items: end;
       background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 8px; margin-bottom: 6px;
     }
-    @media (min-width: 768px) { .component-row { grid-template-columns: repeat(4, 1fr) auto; } }
+    .comp-msno-wrap { grid-area: msno; }
+    .comp-qty-wrap { grid-area: qty; }
+    .comp-wtpc-wrap { grid-area: wtpc; }
+    .comp-total-wrap { grid-area: total; }
+    .component-row .component-remove-btn { grid-area: remove; justify-self: end; }
+    @media (min-width: 768px) {
+      .component-row {
+        grid-template-columns: 1.6fr 0.9fr 0.9fr 1fr auto;
+        grid-template-areas: "msno qty wtpc total remove";
+      }
+    }
     .component-remove-btn {
       background: rgba(239,68,68,0.12); border: 1px solid #ef4444; color: #f87171; border-radius: 6px;
       width: 30px; height: 30px; font-size: 13px; font-weight: 700; cursor: pointer;
@@ -273,7 +297,7 @@
             </div>
             <div class="entry-field">
               <label>Submit Code</label>
-              <input type="text" id="entryCode" placeholder="Code" inputmode="numeric" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" style="-webkit-text-security: disc; text-security: disc;">
+              <input type="password" id="entryCode" placeholder="Code" inputmode="numeric" maxlength="10">
             </div>
           </div>
 
@@ -572,7 +596,7 @@
         let item = rawFurnacesMap[fcName];
         if (Array.isArray(item)) {
           furnacesMap[fcName] = {
-            capacity: monthTarget / 4,
+            capacity: 69.75,
             monthTarget: monthTarget / 4,
             targetMTD: totalTargetMTD / 4,
             days: item
@@ -618,8 +642,8 @@
 
         tbodyHtml += `<tr>
           <td style="font-weight:700; color:#38bdf8;">${fcName}</td>
-          <td>${(fc.capacity !== undefined ? fc.capacity : (monthTarget/4)).toFixed(2)}</td>
-          <td>${(fc.monthTarget !== undefined ? fc.monthTarget : (monthTarget/4)).toFixed(2)}</td>
+          <td>${fc.capacity || 69.75}</td>
+          <td>${fc.monthTarget || (monthTarget/4).toFixed(2)}</td>
           <td style="font-weight:600; color:#fbbf24;">${targetVal.toFixed(2)}</td>
           <td style="font-weight:700;">${fActual.toFixed(2)}</td>
           <td>${util}</td>`;
@@ -1095,19 +1119,19 @@
     function componentRowHtml(id) {
       return `
         <div class="component-row" data-comp-id="${id}">
-          <div class="entry-field">
+          <div class="entry-field comp-msno-wrap">
             <label>MS No</label>
             <input type="text" class="comp-msno" placeholder="MS Number">
           </div>
-          <div class="entry-field">
+          <div class="entry-field comp-qty-wrap">
             <label>Qty (Nos)</label>
             <input type="number" class="comp-qty" placeholder="0" oninput="updateComponentTotal(this)">
           </div>
-          <div class="entry-field">
+          <div class="entry-field comp-wtpc-wrap">
             <label>Wt/Pc (Kg)</label>
             <input type="number" step="0.01" class="comp-wtpc" placeholder="0.00" oninput="updateComponentTotal(this)">
           </div>
-          <div class="entry-field">
+          <div class="entry-field comp-total-wrap">
             <label>Total Wt (Kg)</label>
             <input type="text" class="comp-total" readonly value="0.00">
           </div>
