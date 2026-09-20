@@ -269,6 +269,7 @@
           <input type="hidden" name="inTime" id="hfInTime">
           <input type="hidden" name="outTime" id="hfOutTime">
           <input type="hidden" name="components" id="hfComponents">
+          <input type="hidden" name="msNo" id="hfMsNo">
         </form>
 
         <div id="entryFormPanel" style="display:none; border-top:1px solid #1e293b; padding-top:10px; margin-top:4px; flex-direction:column; gap:10px;">
@@ -372,10 +373,38 @@
           <div class="table-scroll" id="msDetailTableWrap" style="display:none; margin-top:8px;">
             <table class="dwm-table">
               <thead>
-                <tr><th>Date</th><th>Furnace</th><th>MS No</th><th>Batch No</th><th>Qty (Nos)</th><th>Weight (Kg)</th><th>In Time</th><th>Out Time</th></tr>
+                <tr><th>Date</th><th>Furnace</th><th>MS No</th><th>Batch No</th><th>Qty (Nos)</th><th>Weight (Kg)</th><th>In Time</th><th>Out Time</th><th>Action</th></tr>
               </thead>
               <tbody id="msDetailTableBody"></tbody>
             </table>
+          </div>
+
+          <!-- OUT TIME UPDATE: jab batch furnace mein daala jaata hai to sirf In Time pata hota hai,
+               Out Time baad mein (process poora hone par) pata chalta hai. Ye sirf Out Time (jo abhi
+               khaali hai) bharne ke liye hai - baaki kuch bhi is se edit nahi hota, aur ek baar Out
+               Time bhar jaaye to ye bhi dobara is se change nahi ho sakta. -->
+          <div id="outTimePanel" style="display:none; border-top:1px solid #1e293b; padding-top:10px; margin-top:8px; flex-direction:column; gap:10px;">
+            <div style="font-size:11px; font-weight:700; color:#38bdf8;">⏱ Out Time Update</div>
+            <div style="font-size:11px; color:#94a3b8; line-height:1.6;" id="outTimeContextInfo"></div>
+            <div class="entry-form-grid" style="grid-template-columns: repeat(2,1fr);">
+              <div class="entry-field">
+                <label>Out Time</label>
+                <div class="time-select-pair">
+                  <select id="outTimeHH"></select>
+                  <span>:</span>
+                  <select id="outTimeMM"></select>
+                </div>
+              </div>
+              <div class="entry-field">
+                <label>Submit Code</label>
+                <input type="text" id="outTimeCode" placeholder="Code" inputmode="numeric" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" style="-webkit-text-security: disc; text-security: disc;">
+              </div>
+            </div>
+            <div id="outTimeStatus" class="entry-status" style="display:none;"></div>
+            <div style="display:flex; gap:8px;">
+              <button class="entry-submit-btn" id="outTimeSubmitBtn" onclick="submitOutTime()">✅ Out Time Save Karo</button>
+              <button class="entry-cancel-btn" onclick="closeOutTimePanel()">✖ Cancel</button>
+            </div>
           </div>
         </div>
       </div>
@@ -979,6 +1008,8 @@
       return d;
     }
 
+    let msDetailMatches = []; // "Out Time" action button ke liye - View Detail table ki last search results
+
     function runMsSearch() {
       const q = document.getElementById('msSearchInput').value.trim().toUpperCase();
       const sqfFilter = document.getElementById('msSearchSQF').value;
@@ -990,6 +1021,7 @@
         const matchDate = !dateFilter || normalizeDateForCompare(row.date) === dateFilter;
         return matchMs && matchSqf && matchDate;
       });
+      msDetailMatches = matches;
 
       const totalQty = matches.reduce((a, r) => a + r.qty, 0);
       const totalWt = matches.reduce((a, r) => a + r.wt, 0);
@@ -1026,10 +1058,10 @@
     function renderMsDetailTable(matches) {
       const tbody = document.getElementById('msDetailTableBody');
       if (!matches.length) {
-        tbody.innerHTML = `<tr><td colspan="8" style="padding:14px; color:#94a3b8;">No matching records found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" style="padding:14px; color:#94a3b8;">No matching records found.</td></tr>`;
         return;
       }
-      tbody.innerHTML = matches.map(r => `
+      tbody.innerHTML = matches.map((r, i) => `
         <tr>
           <td>${r.date}</td>
           <td style="font-weight:700; color:#38bdf8;">SQF-${r.sqf}</td>
@@ -1039,6 +1071,9 @@
           <td>${r.wt.toFixed(2)}</td>
           <td>${r.inTime || '-'}</td>
           <td>${r.outTime || '-'}</td>
+          <td>${r.outTime
+            ? '<span style="color:#34d399; font-size:10.5px;">✓ Done</span>'
+            : `<button type="button" class="component-add-btn" style="padding:4px 10px; font-size:10.5px;" onclick="openOutTimeEntry(${i})">⏱ Out Time</button>`}</td>
         </tr>
       `).join('');
     }
@@ -1425,6 +1460,114 @@
           pendingEntry = null;
         }
       }, waitMs);
+    }
+
+    // ===================== OUT TIME UPDATE (jab batch furnace mein daala jaata hai tab sirf In
+    // Time pata hota hai, Out Time baad mein - batch process ho ke nikalne par - pata chalta hai) =====================
+    // Ye sirf khaali Out Time bharne ke liye hai - Date/SQF/Batch/MS No/Qty/Wt/In Time kuch bhi
+    // isse touch nahi hota, aur ek baar Out Time bhar jaaye to Apps Script khud ise dobara change
+    // nahi hone dega (chahe koi is button se dobara try bhi kare) - sirf admin Sheet mein jaake kar sakta hai.
+    let pendingOutTimeTarget = null;
+
+    function openOutTimeEntry(i) {
+      const row = msDetailMatches[i];
+      if (!row) return;
+      const sqfDigit = String(row.sqf || '').replace(/\D/g, '');
+      pendingOutTimeTarget = {
+        dateVal: normalizeDateForCompare(row.date), // "YYYY-MM-DD" - hfDate isi format mein chahiye
+        sqf: sqfDigit,
+        msNo: row.msNo,
+        batch: row.batch
+      };
+      document.getElementById('outTimeContextInfo').innerHTML =
+        `Date: <b>${row.date}</b> &nbsp; SQF: <b>SQF-${sqfDigit}</b> &nbsp; Batch: <b>${row.batch || '-'}</b> &nbsp; MS No: <b>${row.msNo}</b><br>In Time: <b>${row.inTime || '-'}</b> (Out Time abhi khaali hai)`;
+      document.getElementById('outTimeHH').value = '';
+      document.getElementById('outTimeMM').value = '';
+      document.getElementById('outTimeCode').value = '';
+      document.getElementById('outTimeStatus').style.display = 'none';
+      const panel = document.getElementById('outTimePanel');
+      panel.style.display = 'flex';
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function closeOutTimePanel() {
+      document.getElementById('outTimePanel').style.display = 'none';
+      pendingOutTimeTarget = null;
+    }
+
+    async function submitOutTime() {
+      if (!pendingOutTimeTarget) return;
+      const statusEl = document.getElementById('outTimeStatus');
+      statusEl.style.display = 'none';
+
+      const code = document.getElementById('outTimeCode').value.trim();
+      if (code !== '2020') {
+        statusEl.className = 'entry-status fail';
+        statusEl.innerText = '⚠ Galat code — sahi code daal ke dobara try karo.';
+        statusEl.style.display = 'block';
+        return;
+      }
+      const outTime = getTimeValue('outTimeHH', 'outTimeMM');
+      if (!outTime) {
+        statusEl.className = 'entry-status fail';
+        statusEl.innerText = '⚠ Out Time (Hour aur Minute dono) select karo.';
+        statusEl.style.display = 'block';
+        return;
+      }
+
+      const { dateVal, sqf, msNo } = pendingOutTimeTarget;
+
+      document.getElementById('hfAction').value = 'setOutTime';
+      document.getElementById('hfCode').value = code;
+      document.getElementById('hfDate').value = dateVal;
+      document.getElementById('hfSqf').value = sqf;
+      document.getElementById('hfMsNo').value = msNo;
+      document.getElementById('hfOutTime').value = outTime;
+
+      const submitBtn = document.getElementById('outTimeSubmitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Saving...';
+      statusEl.className = 'entry-status';
+      statusEl.style.color = '#f59e0b';
+      statusEl.innerHTML = '⏳ Out Time Google Sheet mein save ho raha hai, confirm ho raha hai...';
+      statusEl.style.display = 'block';
+
+      const hiddenForm = document.getElementById('hiddenEntryForm');
+      hiddenForm.action = MS_LOG_CSV_URL;
+      hiddenForm.submit();
+
+      setTimeout(async () => {
+        try {
+          await loadMsLogData();
+          const sqfDigits = String(sqf).replace(/\D/g, '');
+          const updatedRow = msLogRows.find(r =>
+            r.msNo.trim().toUpperCase() === msNo.toUpperCase() &&
+            normalizeDateForCompare(r.date) === dateVal &&
+            String(r.sqf).replace(/\D/g, '') === sqfDigits
+          );
+
+          if (updatedRow && updatedRow.outTime === outTime) {
+            statusEl.className = 'entry-status ok';
+            statusEl.innerHTML = '✅ Out Time save ho gaya aur confirm bhi ho gaya!' + buildReviewTableHtml([updatedRow]);
+            closeOutTimePanel();
+            // list mein bhi turant reflect ho jaaye
+            if (typeof runMsSearch === 'function' && document.getElementById('msSearchDetailWrap').style.display !== 'none') {
+              runMsSearch();
+            }
+          } else {
+            statusEl.className = 'entry-status fail';
+            statusEl.innerHTML = '⚠ Confirm nahi ho paya — ya to Out Time pehle se bhara tha (dusre kisi ne bhar diya), ya deploy purana hai. Sheet mein jaake check karo.';
+          }
+          statusEl.style.display = 'block';
+        } catch (err) {
+          statusEl.className = 'entry-status fail';
+          statusEl.innerText = '⚠ Confirm karte waqt error: ' + err.message;
+          statusEl.style.display = 'block';
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerText = '✅ Out Time Save Karo';
+        }
+      }, 3500);
     }
 
     window.addEventListener('DOMContentLoaded', () => {
