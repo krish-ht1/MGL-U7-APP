@@ -273,7 +273,7 @@
             </div>
             <div class="entry-field">
               <label>Submit Code</label>
-              <input type="text" id="entryCode" placeholder="Code" inputmode="numeric" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" style="-webkit-text-security: disc; text-security: disc;">
+              <input type="password" id="entryCode" placeholder="Code" inputmode="numeric" maxlength="10">
             </div>
           </div>
 
@@ -436,7 +436,7 @@
     // अप्रैल से अगस्त तक का फिक्स्ड डेटाबेस
     const fixedDatabase = {
       "AUGUST-2026": {
-        daysCount: 31, monthTarget: 279.0, totalTargetMTD: 279.0,
+        daysCount: 31, monthTarget: 260.0, totalTargetMTD: 260.0,
         furnaces: {
           "SQF-1": [1.74, 3.06, 2.23, 2.23, 1.97, 2.53, 2.53, 2.79, 2.53, 1.87, 1.87, 2.53, 2.87, 1.87, 1.99, 0.79, 2.62, 2.53, 2.87, 1.75, 2.53, 1.84, 2.35, 2.38, 2.53, 0.85, 2.53, 2.76, 2.53, 2.62, 1.19],
           "SQF-2": [2.89, 2.03, 2.53, 1.69, 1.75, 2.97, 1.89, 2.09, 1.74, 1.85, 2.68, 2.64, 1.74, 2.68, 1.87, 1.98, 2.84, 1.66, 2.68, 2.60, 0.87, 2.68, 2.53, 2.45, 1.83, 1.97, 1.79, 2.73, 1.82, 1.98, 2.49],
@@ -445,7 +445,7 @@
         }
       },
       "JULY-2026": {
-        daysCount: 31, monthTarget: 279.0, totalTargetMTD: 279.0,
+        daysCount: 31, monthTarget: 260.0, totalTargetMTD: 260.0,
         furnaces: {
           "SQF-1": [3.32, 2.53, 2.77, 1.58, 0.79, 2.61, 2.06, 1.83, 1.74, 2.93, 2.78, 1.83, 2.44, 1.53, 1.83, 2.37, 2.65, 1.28, 0.95, 2.53, 2.60, 2.23, 2.62, 1.89, 2.10, 2.68, 2.44, 2.61, 2.53, 2.68, 1.83],
           "SQF-2": [2.37, 2.00, 2.58, 1.79, 1.00, 2.58, 2.53, 2.74, 1.79, 2.26, 2.00, 2.68, 1.47, 2.68, 2.78, 2.88, 1.79, 1.74, 2.73, 1.00, 1.79, 2.04, 1.91, 2.58, 2.37, 2.10, 2.68, 2.53, 2.08, 2.68, 2.53],
@@ -454,7 +454,7 @@
         }
       },
       "JUNE-2026": {
-        daysCount: 30, monthTarget: 270.0, totalTargetMTD: 270.0,
+        daysCount: 30, monthTarget: 260.0, totalTargetMTD: 260.0,
         furnaces: {
           "SQF-1": [2.01, 2.53, 2.78, 1.79, 1.67, 2.53, 2.37, 2.68, 2.74, 1.74, 2.74, 2.37, 0,0,0,0,0, 1.79, 2.01, 1.83, 2.08, 1.95, 2.53, 2.97, 1.83, 2.37, 1.85, 1.95, 2.68, 2.53],
           "SQF-2": [1.79, 2.58, 1.37, 1.04, 2.82, 1.67, 2.02, 1.51, 2.09, 2.16, 2.06, 1.95, 2.68, 1.79, 2.68, 2.78, 2.78, 2.68, 2.53, 2.00, 1.94, 2.66, 1.85, 1.95, 1.58, 2.81, 1.95, 2.62, 1.49, 2.37],
@@ -463,7 +463,7 @@
         }
       },
       "MAY-2026": {
-        daysCount: 31, monthTarget: 279.0, totalTargetMTD: 279.0,
+        daysCount: 31, monthTarget: 260.0, totalTargetMTD: 260.0,
         furnaces: {
           "SQF-1": [2.02, 2.49, 0.95, 2.37, 2.52, 3.47, 2.81, 1.89, 2.53, 2.68, 2.37, 2.37, 2.50, 0,0,0,0,0, 2.68, 2.04, 2.53, 2.62, 2.04, 2.83, 1.74, 2.68, 2.64, 1.87, 3.02, 1.92, 2.01],
           "SQF-2": [2.53, 2.94, 1.74, 1.69, 1.03, 2.63, 1.79, 2.58, 1.74, 2.37, 0.95, 1.94, 1.99, 1.58, 2.68, 2.68, 2.54, 2.55, 2.68, 2.79, 1.03, 1.82, 2.37, 2.37, 1.82, 1.74, 2.00, 2.73, 1.91, 1.86, 2.53],
@@ -472,7 +472,7 @@
         }
       },
       "APRIL-2026": {
-        daysCount: 30, monthTarget: 270.0, totalTargetMTD: 270.0,
+        daysCount: 30, monthTarget: 260.0, totalTargetMTD: 260.0,
         furnaces: {
           "SQF-1": [1.66, 1.58, 3.16, 2.53, 2.37, 3.16, 2.37, 2.53, 3.18, 2.02, 2.53, 2.53, 2.37, 0.79, 3.47, 2.53, 2.53, 2.53, 2.53, 1.67, 2.53, 2.15, 2.02, 2.97, 2.14, 1.74, 2.53, 1.74, 1.46, 2.37],
           "SQF-2": [2.18, 2.74, 1.95, 1.81, 2.24, 2.89, 1.87, 1.00, 2.02, 0.72, 2.83, 1.67, 2.00, 1.74, 1.51, 0.88, 2.66, 1.67, 1.00, 2.38, 1.82, 2.53, 1.77, 0.60, 2.06, 1.74, 3.32, 1.84, 2.29, 2.02],
@@ -549,7 +549,7 @@
       const selectedDate = document.getElementById('dwmDateDropdown').value;
 
       let dataDaysCount = 30;
-      let monthTarget = 270.0;
+      let monthTarget = 260.0;
       let totalTargetMTD = 0;
       let rawFurnacesMap = {};
 
@@ -572,7 +572,7 @@
         let item = rawFurnacesMap[fcName];
         if (Array.isArray(item)) {
           furnacesMap[fcName] = {
-            capacity: monthTarget / 4,
+            capacity: 65,
             monthTarget: monthTarget / 4,
             targetMTD: totalTargetMTD / 4,
             days: item
@@ -618,8 +618,8 @@
 
         tbodyHtml += `<tr>
           <td style="font-weight:700; color:#38bdf8;">${fcName}</td>
-          <td>${(fc.capacity !== undefined ? fc.capacity : (monthTarget/4)).toFixed(2)}</td>
-          <td>${(fc.monthTarget !== undefined ? fc.monthTarget : (monthTarget/4)).toFixed(2)}</td>
+          <td>${fc.capacity || 69.75}</td>
+          <td>${fc.monthTarget || (monthTarget/4).toFixed(2)}</td>
           <td style="font-weight:600; color:#fbbf24;">${targetVal.toFixed(2)}</td>
           <td style="font-weight:700;">${fActual.toFixed(2)}</td>
           <td>${util}</td>`;
