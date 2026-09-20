@@ -143,6 +143,21 @@
     .entry-status { font-size: 11.5px; padding: 8px 10px; border-radius: 6px; line-height: 1.5; }
     .entry-status.ok { background: rgba(16,185,129,0.12); border: 1px solid #10b981; color: #34d399; }
     .entry-status.fail { background: rgba(239,68,68,0.12); border: 1px solid #ef4444; color: #f87171; }
+
+    /* Multiple MS No components (ek Batch ke andar kayi components) */
+    .component-row {
+      display: grid; grid-template-columns: repeat(3, 1fr) auto; gap: 8px; align-items: end;
+      background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 8px; margin-bottom: 6px;
+    }
+    @media (min-width: 768px) { .component-row { grid-template-columns: repeat(4, 1fr) auto; } }
+    .component-remove-btn {
+      background: rgba(239,68,68,0.12); border: 1px solid #ef4444; color: #f87171; border-radius: 6px;
+      width: 30px; height: 30px; font-size: 13px; font-weight: 700; cursor: pointer;
+    }
+    .component-add-btn {
+      background: rgba(56,189,248,0.12); border: 1px solid #38bdf8; color: #38bdf8; padding: 7px 14px;
+      border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -218,17 +233,18 @@
              seedha browser navigation jaisa, jo humne test karke confirm kiya ki kaam karta hai) -->
         <iframe name="hiddenSubmitFrame" id="hiddenSubmitFrame" style="display:none;"></iframe>
         <form id="hiddenEntryForm" method="GET" target="hiddenSubmitFrame" style="display:none;">
-          <input type="hidden" name="action" value="addEntry">
+          <input type="hidden" name="action" id="hfAction" value="addBatchEntry">
           <input type="hidden" name="code" id="hfCode">
           <input type="hidden" name="date" id="hfDate">
           <input type="hidden" name="sqf" id="hfSqf">
           <input type="hidden" name="batch" id="hfBatch">
-          <input type="hidden" name="msNo" id="hfMsNo">
-          <input type="hidden" name="qty" id="hfQty">
-          <input type="hidden" name="wtPc" id="hfWtPc">
+          <input type="hidden" name="inTime" id="hfInTime">
+          <input type="hidden" name="outTime" id="hfOutTime">
+          <input type="hidden" name="components" id="hfComponents">
         </form>
 
         <div id="entryFormPanel" style="display:none; border-top:1px solid #1e293b; padding-top:10px; margin-top:4px; flex-direction:column; gap:10px;">
+          <div id="entryEditableSection" style="display:flex; flex-direction:column; gap:10px;">
           <div class="entry-form-grid">
             <div class="entry-field">
               <label>Date</label>
@@ -248,20 +264,12 @@
               <input type="text" id="entryBatch" placeholder="Batch No">
             </div>
             <div class="entry-field">
-              <label>MS No</label>
-              <input type="text" id="entryMsNo" placeholder="MS Number">
+              <label>In Time</label>
+              <input type="time" id="entryInTime">
             </div>
             <div class="entry-field">
-              <label>Qty (Nos)</label>
-              <input type="number" id="entryQty" placeholder="0" oninput="updateEntryTotalWt()">
-            </div>
-            <div class="entry-field">
-              <label>Wt/Pc (Kg)</label>
-              <input type="number" step="0.01" id="entryWtPc" placeholder="0.00" oninput="updateEntryTotalWt()">
-            </div>
-            <div class="entry-field">
-              <label>Total Wt (Kg)</label>
-              <input type="text" id="entryTotalWt" readonly value="0.00">
+              <label>Out Time</label>
+              <input type="time" id="entryOutTime">
             </div>
             <div class="entry-field">
               <label>Submit Code</label>
@@ -269,12 +277,36 @@
             </div>
           </div>
 
-          <div id="entryStatus" class="entry-status" style="display:none;"></div>
+          <div>
+            <div style="font-size:10px; font-weight:600; color:#94a3b8; text-transform:uppercase; margin-bottom:6px;">
+              Components (isi Batch ke saare MS No — same In/Out Time sabke liye)
+            </div>
+            <div id="entryComponentsList"></div>
+            <button type="button" id="addComponentBtn" class="component-add-btn" onclick="addComponentRow()">+ Add MS No</button>
+          </div>
 
           <div style="display:flex; gap:8px;">
-            <button class="entry-submit-btn" id="entrySubmitBtn" onclick="submitNewEntry()">✅ Submit Entry</button>
+            <button class="entry-submit-btn" id="entrySubmitBtn" onclick="reviewNewEntry()">👁 Review Entry</button>
             <button class="entry-cancel-btn" onclick="clearEntryForm()">✖ Clear</button>
           </div>
+          </div>
+
+          <!-- REVIEW STEP: final submit se pehle operator yahan apna bhara hua data dekh ke
+               "Confirm & Submit" dabata hai - tabhi Sheet mein data jaata hai. Ek baar Confirm
+               ho gaya to entry LOCK ho jaati hai - app se dobara edit nahi ho sakti, sirf
+               admin Google Sheet mein jaake seedha change kar sakta hai. -->
+          <div id="entryReviewWrap" style="display:none; flex-direction:column; gap:10px;">
+            <div style="font-size:10px; font-weight:600; color:#fbbf24; text-transform:uppercase;">
+              ⚠ Neeche dhyan se check karo — Confirm karne ke baad ye entry app se edit nahi ho payegi
+            </div>
+            <div id="entryReviewTableHolder"></div>
+            <div style="display:flex; gap:8px;">
+              <button class="entry-submit-btn" id="entryConfirmBtn" onclick="performActualSubmit()">✅ Haan, Confirm & Submit</button>
+              <button class="entry-cancel-btn" onclick="backToEditFromReview()">⬅ Wapas Edit Karo</button>
+            </div>
+          </div>
+
+          <div id="entryStatus" class="entry-status" style="display:none;"></div>
         </div>
 
         <div class="kpi-grid" id="msSearchKpiGrid" style="display:none;">
@@ -452,13 +484,13 @@
 
     let liveSeptemberData = {
       daysCount: 30,
-      monthTarget: 270.0,
+      monthTarget: 260.0,
       totalTargetMTD: 0,
       furnaces: {
-        "SQF-1": { capacity: 69.75, monthTarget: 69.75, targetMTD: 0, days: Array(30).fill(0) },
-        "SQF-2": { capacity: 69.75, monthTarget: 69.75, targetMTD: 0, days: Array(30).fill(0) },
-        "SQF-3": { capacity: 69.75, monthTarget: 69.75, targetMTD: 0, days: Array(30).fill(0) },
-        "SQF-4": { capacity: 69.75, monthTarget: 69.75, targetMTD: 0, days: Array(30).fill(0) }
+        "SQF-1": { capacity: 65.0, monthTarget: 65.0, targetMTD: 0, days: Array(30).fill(0) },
+        "SQF-2": { capacity: 65.0, monthTarget: 65.0, targetMTD: 0, days: Array(30).fill(0) },
+        "SQF-3": { capacity: 65.0, monthTarget: 65.0, targetMTD: 0, days: Array(30).fill(0) },
+        "SQF-4": { capacity: 65.0, monthTarget: 65.0, targetMTD: 0, days: Array(30).fill(0) }
       }
     };
 
@@ -592,18 +624,23 @@
           <td style="font-weight:700;">${fActual.toFixed(2)}</td>
           <td>${util}</td>`;
 
+        // har furnace ka apna daily target uske monthTarget se nikala - taaki September (65T/30din = 2.1667)
+        // aur baaki months (jinka target alag ho sakta hai) dono ke liye sahi color threshold aaye
+        const fcMonthTarget = fc.monthTarget || (monthTarget / 4);
+        const fcDailyTarget = dataDaysCount > 0 ? fcMonthTarget / dataDaysCount : 0;
+
         if (selectedDate === "ALL") {
           for(let i = 0; i < dataDaysCount; i++) {
             let val = daysArr[i] || 0;
             totals[i] += val;
-            let cssClass = val >= 2.25 ? "cell-green" : (val > 0 ? "cell-red" : "");
+            let cssClass = val >= fcDailyTarget ? "cell-green" : (val > 0 ? "cell-red" : "");
             tbodyHtml += `<td class="${cssClass}">${val > 0 ? val.toFixed(2) : '-'}</td>`;
           }
         } else {
           let dIdx = parseInt(selectedDate) - 1;
           let val = daysArr[dIdx] || 0;
           totals[dIdx] += val;
-          let cssClass = val >= 2.25 ? "cell-green" : (val > 0 ? "cell-red" : "");
+          let cssClass = val >= fcDailyTarget ? "cell-green" : (val > 0 ? "cell-red" : "");
           tbodyHtml += `<td class="${cssClass}">${val > 0 ? val.toFixed(2) : '-'}</td>`;
         }
         tbodyHtml += `</tr>`;
@@ -800,6 +837,7 @@
           msno: findCol('ms no'),
           qty: findCol('qty (nos)', 'qty(nos)', 'qty nos'),
           wt: findCol('total wt', 'total weight'),
+          wtPc: findCol('wt/pc', 'wt per pc', 'weight/pc', 'wtpc'),
           inTime: findCol('in time', 'intime'),
           outTime: findCol('out time', 'outtime')
         };
@@ -817,6 +855,7 @@
             msNo: (r[idx.msno] || "").trim(),
             qty: parseFloat(r[idx.qty]) || 0,
             wt: parseFloat(r[idx.wt]) || 0,
+            wtPc: idx.wtPc > -1 ? (parseFloat(r[idx.wtPc]) || 0) : 0,
             inTime: idx.inTime > -1 ? (r[idx.inTime] || "").trim() : "",
             outTime: idx.outTime > -1 ? (r[idx.outTime] || "").trim() : ""
           }));
@@ -872,10 +911,12 @@
       });
 
       // Target figures log sheet mein nahi hote (wo sirf actual production ka data hai),
-      // isliye fixed daily target 2.25 T/furnace/day use ho raha hai
-      const dailyTargetPerFurnace = 2.25;
-      const monthTargetPerFurnace = dailyTargetPerFurnace * daysInSept; // 67.5
-      liveSeptemberData.monthTarget = monthTargetPerFurnace * 4; // 270
+      // isliye fixed target use ho raha hai - PLANT ka total month target 260 T hai (4 furnace milaake),
+      // usi se per-furnace aur per-day target nikal rahe hain
+      const totalMonthTarget = 260; // poore plant (4 furnace) ka month target, Tons mein
+      const monthTargetPerFurnace = totalMonthTarget / 4; // 65
+      const dailyTargetPerFurnace = monthTargetPerFurnace / daysInSept; // 65/30 = 2.1667
+      liveSeptemberData.monthTarget = totalMonthTarget; // 260
 
       // MTD target aaj ki real calendar date se nahi, balki DWM mein jis aakhri date tak
       // (charon mein se kisi bhi ek furnace mein) data fill hai usi date tak nikalta hai -
@@ -884,7 +925,7 @@
       const elapsedDays = lastFilledDay;
 
       Object.keys(liveSeptemberData.furnaces).forEach(fc => {
-        liveSeptemberData.furnaces[fc].capacity = 69.75;
+        liveSeptemberData.furnaces[fc].capacity = monthTargetPerFurnace;
         liveSeptemberData.furnaces[fc].monthTarget = monthTargetPerFurnace;
         liveSeptemberData.furnaces[fc].targetMTD = dailyTargetPerFurnace * elapsedDays;
       });
@@ -1047,6 +1088,73 @@
     }
 
     // ===================== NEW ENTRY FORM (form se seedhe Google Sheet mein likhna) =====================
+    // Ek Batch mein kayi MS No (components) ho sakte hain - Date/SQF/Batch/In Time/Out Time sabke
+    // liye COMMON rehte hain, sirf MS No/Qty/Wt-Pc har component ke liye alag hote hain
+    let componentRowSeq = 0;
+
+    function componentRowHtml(id) {
+      return `
+        <div class="component-row" data-comp-id="${id}">
+          <div class="entry-field">
+            <label>MS No</label>
+            <input type="text" class="comp-msno" placeholder="MS Number">
+          </div>
+          <div class="entry-field">
+            <label>Qty (Nos)</label>
+            <input type="number" class="comp-qty" placeholder="0" oninput="updateComponentTotal(this)">
+          </div>
+          <div class="entry-field">
+            <label>Wt/Pc (Kg)</label>
+            <input type="number" step="0.01" class="comp-wtpc" placeholder="0.00" oninput="updateComponentTotal(this)">
+          </div>
+          <div class="entry-field">
+            <label>Total Wt (Kg)</label>
+            <input type="text" class="comp-total" readonly value="0.00">
+          </div>
+          <button type="button" class="component-remove-btn" onclick="removeComponentRow(this)" title="Remove">✖</button>
+        </div>`;
+    }
+
+    function addComponentRow() {
+      componentRowSeq++;
+      document.getElementById('entryComponentsList').insertAdjacentHTML('beforeend', componentRowHtml(componentRowSeq));
+    }
+
+    function removeComponentRow(btn) {
+      const list = document.getElementById('entryComponentsList');
+      // kam se kam 1 row hamesha rahe
+      if (list.children.length <= 1) return;
+      btn.closest('.component-row').remove();
+    }
+
+    function updateComponentTotal(inputEl) {
+      const row = inputEl.closest('.component-row');
+      const qty = parseFloat(row.querySelector('.comp-qty').value) || 0;
+      const wtPc = parseFloat(row.querySelector('.comp-wtpc').value) || 0;
+      row.querySelector('.comp-total').value = (qty * wtPc).toFixed(2);
+    }
+
+    // Sirf wo rows lo jinmein MS No bhara ho
+    function collectComponents() {
+      const rows = document.querySelectorAll('#entryComponentsList .component-row');
+      const components = [];
+      rows.forEach(row => {
+        const msNo = row.querySelector('.comp-msno').value.trim();
+        if (!msNo) return;
+        const qty = parseFloat(row.querySelector('.comp-qty').value) || 0;
+        const wtPc = parseFloat(row.querySelector('.comp-wtpc').value) || 0;
+        components.push({ msNo, qty, wtPc });
+      });
+      return components;
+    }
+
+    function resetComponentRows() {
+      const list = document.getElementById('entryComponentsList');
+      list.innerHTML = '';
+      componentRowSeq = 0;
+      addComponentRow();
+    }
+
     function toggleEntryPanel() {
       const panel = document.getElementById('entryFormPanel');
       const willShow = panel.style.display === 'none' || panel.style.display === '';
@@ -1056,25 +1164,74 @@
         if (!dateInput.value) {
           dateInput.value = new Date().toISOString().slice(0, 10);
         }
+        if (!document.getElementById('entryComponentsList').children.length) {
+          resetComponentRows();
+        }
       }
     }
 
-    function updateEntryTotalWt() {
-      const qty = parseFloat(document.getElementById('entryQty').value) || 0;
-      const wtPc = parseFloat(document.getElementById('entryWtPc').value) || 0;
-      document.getElementById('entryTotalWt').value = (qty * wtPc).toFixed(2);
-    }
-
     function clearEntryForm() {
-      ['entryBatch','entryMsNo','entryQty','entryWtPc','entryCode']
+      ['entryBatch','entryCode','entryInTime','entryOutTime']
         .forEach(id => { document.getElementById(id).value = ''; });
-      document.getElementById('entryTotalWt').value = '0.00';
       document.getElementById('entrySqf').value = '1';
+      resetComponentRows();
+      pendingEntry = null;
+      document.getElementById('entryReviewWrap').style.display = 'none';
+      document.getElementById('entryEditableSection').style.display = 'flex';
       const statusEl = document.getElementById('entryStatus');
       statusEl.style.display = 'none';
     }
 
-    async function submitNewEntry() {
+    // Ek baar Sheet mein save/confirm ho jaaye, us data ko app se edit karne ka koi option nahi hai
+    // (jaan-boojh kar) - agar kisi entry mein galti mil jaaye to sirf admin Google Sheet mein
+    // seedha jaake usse theek kar sakta hai. Isiliye yahan koi "loadEntryForEdit" jaisa function nahi hai.
+
+    // Submit ke baad (ya submit se pehle review mein) jo bhi data hai, usse ek chhoti table mein
+    // dikhate hain - taaki operator (jiske paas Google Sheet ka access nahi hai) khud aankhon se
+    // cross-check kar sake, sirf "success" message pe bharosa na karna pade
+    function buildReviewTableHtml(rows, footerText) {
+      if (!rows.length) return '';
+      const body = rows.map(r => `
+        <tr>
+          <td style="padding:4px 6px; border-top:1px solid #1e293b;">${r.date}</td>
+          <td style="padding:4px 6px; border-top:1px solid #1e293b;">SQF-${r.sqf}</td>
+          <td style="padding:4px 6px; border-top:1px solid #1e293b;">${r.batch || '-'}</td>
+          <td style="padding:4px 6px; border-top:1px solid #1e293b; font-weight:700;">${r.msNo}</td>
+          <td style="padding:4px 6px; border-top:1px solid #1e293b;">${r.qty}</td>
+          <td style="padding:4px 6px; border-top:1px solid #1e293b;">${(r.wtPc || 0).toFixed(2)}</td>
+          <td style="padding:4px 6px; border-top:1px solid #1e293b;">${r.wt.toFixed(2)}</td>
+          <td style="padding:4px 6px; border-top:1px solid #1e293b;">${r.inTime || '-'}</td>
+          <td style="padding:4px 6px; border-top:1px solid #1e293b;">${r.outTime || '-'}</td>
+        </tr>`).join('');
+      const footer = footerText || '👆 Ye wahi data hai jo abhi Google Sheet mein save hua hai — khud cross-check kar lo.';
+      return `
+        <div style="margin-top:8px; overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:10.5px;">
+            <thead><tr style="color:#94a3b8; text-align:left;">
+              <th style="padding:4px 6px;">Date</th><th style="padding:4px 6px;">SQF</th><th style="padding:4px 6px;">Batch</th>
+              <th style="padding:4px 6px;">MS No</th><th style="padding:4px 6px;">Qty</th><th style="padding:4px 6px;">Wt/Pc</th>
+              <th style="padding:4px 6px;">Total Wt</th><th style="padding:4px 6px;">In</th><th style="padding:4px 6px;">Out</th>
+            </tr></thead>
+            <tbody>${body}</tbody>
+          </table>
+          <div style="color:#94a3b8; font-size:10px; margin-top:4px;">${footer}</div>
+        </div>`;
+    }
+
+    function toDisplayDate(ymd) {
+      if (!ymd) return '';
+      const [y, m, d] = ymd.split('-');
+      return `${d}-${m}-${y}`;
+    }
+
+    let pendingEntry = null; // review step ke dauraan form ka data yahan hold hota hai - jab tak
+                              // "Confirm & Submit" na dabe, kuch bhi Sheet mein nahi jaata
+
+    // STEP 1: Form validate karke, ABHI TAK Sheet mein kuch bhi bheje bina, sirf ek review table
+    // dikhata hai. Operator ko yahan se ya to "Confirm & Submit" dabana hai (tabhi Sheet mein
+    // jaayega) ya "Wapas Edit Karo" dabake values badalni hain - jab tak Confirm na ho, jitni
+    // baar chaho utni baar free mein edit kar sakte ho.
+    function reviewNewEntry() {
       const statusEl = document.getElementById('entryStatus');
       statusEl.style.display = 'none';
 
@@ -1087,59 +1244,128 @@
       }
 
       const dateVal = document.getElementById('entryDate').value;
-      const msNo = document.getElementById('entryMsNo').value.trim();
-      if (!dateVal || !msNo) {
+      const sqf = document.getElementById('entrySqf').value;
+      const batch = document.getElementById('entryBatch').value.trim();
+      const inTime = document.getElementById('entryInTime').value;
+      const outTime = document.getElementById('entryOutTime').value;
+      const components = collectComponents();
+
+      if (!dateVal) {
         statusEl.className = 'entry-status fail';
-        statusEl.innerText = '⚠ Date aur MS No bharna zaroori hai.';
+        statusEl.innerText = '⚠ Date bharna zaroori hai.';
+        statusEl.style.display = 'block';
+        return;
+      }
+      if (!components.length) {
+        statusEl.className = 'entry-status fail';
+        statusEl.innerText = '⚠ Kam se kam ek MS No bharna zaroori hai.';
         statusEl.style.display = 'block';
         return;
       }
 
-      const qty = parseFloat(document.getElementById('entryQty').value) || 0;
-      const wtPc = parseFloat(document.getElementById('entryWtPc').value) || 0;
+      pendingEntry = { dateVal, sqf, batch, inTime, outTime, components, code };
 
-      // POST ki jagah GET use ho raha hai - Apps Script ka /exec URL redirect karta hai, aur
-      // us redirect par POST ka method browser GET mein badal deta hai (data kho jata hai),
-      // isliye "action=addEntry" ek GET request ke through bheja ja raha hai - ye reliable hai
-      const params = new URLSearchParams({
-        action: 'addEntry',
-        code: code,
-        date: dateVal, // "YYYY-MM-DD" - Apps Script isse real Date bana ke save karega
-        sqf: document.getElementById('entrySqf').value,
-        batch: document.getElementById('entryBatch').value.trim(),
-        msNo: msNo,
-        qty: qty,
-        wtPc: wtPc,
-        _t: Date.now()
-      });
+      const sqfDigits = String(sqf).replace(/\D/g, '');
+      const displayDate = toDisplayDate(dateVal);
+      const previewRows = components.map(comp => ({
+        date: displayDate, sqf: sqfDigits, batch, msNo: comp.msNo,
+        qty: comp.qty, wtPc: comp.wtPc, wt: comp.qty * comp.wtPc,
+        inTime, outTime
+      }));
 
-      const submitBtn = document.getElementById('entrySubmitBtn');
-      submitBtn.disabled = true;
-      submitBtn.innerText = 'Saving...';
+      document.getElementById('entryReviewTableHolder').innerHTML = buildReviewTableHtml(
+        previewRows,
+        '👆 Ye data ABHI TAK Google Sheet mein NAHI gaya hai — dhyan se check karo, phir "Confirm & Submit" dabao.'
+      );
 
-      try {
-        const sep = MS_LOG_CSV_URL.includes('?') ? '&' : '?';
-        const res = await fetch(`${MS_LOG_CSV_URL}${sep}${params.toString()}`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        if (!data.success) throw new Error(data.error || 'Unknown error');
+      document.getElementById('entryEditableSection').style.display = 'none';
+      const reviewWrap = document.getElementById('entryReviewWrap');
+      reviewWrap.style.display = 'flex';
+      reviewWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
 
-        statusEl.className = 'entry-status ok';
-        statusEl.innerText = '✅ Entry Google Sheet mein save ho gayi!';
-        statusEl.style.display = 'block';
-        clearEntryForm();
-        document.getElementById('entryDate').value = dateVal; // date wapas bhar do agla entry usi din ka ho sakta hai
+    // "Wapas Edit Karo" - Confirm hone se pehle tak jitni baar chaho values badal sakte ho
+    function backToEditFromReview() {
+      document.getElementById('entryReviewWrap').style.display = 'none';
+      document.getElementById('entryEditableSection').style.display = 'flex';
+    }
 
-        // naya data turant DWM aur search mein bhi dikhe, isliye CSV dobara load karo
-        loadMsLogData().then(renderDWMData);
-      } catch (err) {
-        statusEl.className = 'entry-status fail';
-        statusEl.innerText = '⚠ Save nahi hua: ' + err.message + ' — check karo Apps Script sahi se deploy hui hai ya nahi.';
-        statusEl.style.display = 'block';
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerText = '✅ Submit Entry';
-      }
+    // STEP 2: Sirf yahan se, Confirm & Submit dabane ke baad, data asal mein Google Sheet mein
+    // jaata hai. Ye ek baar ho jaaye to entry LOCK hai - app mein isse dobara edit karne ka koi
+    // option nahi hai, sirf admin Sheet mein seedha jaake change kar sakta hai.
+    async function performActualSubmit() {
+      if (!pendingEntry) return;
+      const { dateVal, sqf, batch, inTime, outTime, components, code } = pendingEntry;
+      const statusEl = document.getElementById('entryStatus');
+
+      // fetch() se seedha Apps Script ke URL par GET bhejne par "null origin" CORS error aata hai
+      // (file:// se khole gaye page ki wajah se), isliye hidden iframe + form submission use ho
+      // raha hai - ye ek normal browser navigation ki tarah treat hota hai, CORS iske raaste
+      // mein nahi aata. Saare components ek hi JSON array mein bhej rahe hain, taaki ek hi Batch
+      // ke multiple MS No ek hi submit mein, sabke liye SAME Date/SQF/Batch/In-Out Time ke saath, jayein
+      document.getElementById('hfCode').value = code;
+      document.getElementById('hfDate').value = dateVal; // "YYYY-MM-DD" - Apps Script isse fixed "DD-MM-YYYY" text bana ke save karega
+      document.getElementById('hfSqf').value = sqf;
+      document.getElementById('hfBatch').value = batch;
+      document.getElementById('hfInTime').value = inTime;
+      document.getElementById('hfOutTime').value = outTime;
+      document.getElementById('hfComponents').value = JSON.stringify(components);
+      document.getElementById('hfAction').value = 'addBatchEntry';
+
+      const confirmBtn = document.getElementById('entryConfirmBtn');
+      confirmBtn.disabled = true;
+      confirmBtn.innerText = 'Saving...';
+      statusEl.className = 'entry-status';
+      statusEl.style.color = '#f59e0b';
+      statusEl.innerHTML = `⏳ ${components.length} MS No Google Sheet mein save ho rahe hain, confirm ho raha hai...`;
+      statusEl.style.display = 'block';
+
+      const hiddenForm = document.getElementById('hiddenEntryForm');
+      hiddenForm.action = MS_LOG_CSV_URL;
+      hiddenForm.submit();
+
+      // hidden iframe ka response cross-origin hone ki wajah se seedha padh nahi sakte, isliye
+      // wait karke CSV dobara load karke check karte hain ki saare naye rows aa gaye ya nahi
+      // (jitne zyada components utna thoda zyada wait - Apps Script ek-ek karke rows insert karti hai)
+      const waitMs = 3500 + (components.length - 1) * 400;
+      setTimeout(async () => {
+        try {
+          await loadMsLogData();
+          const sqfDigits = String(sqf).replace(/\D/g, '');
+          const savedRows = [];
+          const missing = [];
+          components.forEach(comp => {
+            const match = msLogRows.find(r =>
+              r.msNo.trim().toUpperCase() === comp.msNo.toUpperCase() &&
+              normalizeDateForCompare(r.date) === dateVal &&
+              String(r.sqf).replace(/\D/g, '') === sqfDigits
+            );
+            if (match) savedRows.push(match); else missing.push(comp);
+          });
+
+          if (!missing.length) {
+            statusEl.className = 'entry-status ok';
+            statusEl.innerHTML = `✅ ${components.length} MS No Google Sheet mein save ho gaye aur confirm bhi ho gaye!` + buildReviewTableHtml(savedRows);
+            const keepDate = dateVal, keepSqf = sqf;
+            clearEntryForm();
+            document.getElementById('entryDate').value = keepDate; // agla entry usi din ka ho sakta hai
+            document.getElementById('entrySqf').value = keepSqf;
+          } else {
+            statusEl.className = 'entry-status fail';
+            statusEl.innerHTML = `⚠ ${missing.length}/${components.length} MS No confirm nahi ho paye (${missing.map(m => m.msNo).join(', ')}) — Sheet mein jaake check karo. Agar nahi gaye, Apps Script deploy check karo.` + buildReviewTableHtml(savedRows);
+          }
+          statusEl.style.display = 'block';
+          renderDWMData();
+        } catch (err) {
+          statusEl.className = 'entry-status fail';
+          statusEl.innerText = '⚠ Confirm karte waqt error: ' + err.message;
+          statusEl.style.display = 'block';
+        } finally {
+          confirmBtn.disabled = false;
+          confirmBtn.innerText = '✅ Haan, Confirm & Submit';
+          pendingEntry = null;
+        }
+      }, waitMs);
     }
 
     window.addEventListener('DOMContentLoaded', () => {
