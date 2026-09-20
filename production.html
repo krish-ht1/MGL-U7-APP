@@ -273,7 +273,7 @@
             </div>
             <div class="entry-field">
               <label>Submit Code</label>
-              <input type="password" id="entryCode" placeholder="Code" inputmode="numeric" maxlength="10">
+              <input type="text" id="entryCode" placeholder="Code" inputmode="numeric" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" style="-webkit-text-security: disc; text-security: disc;">
             </div>
           </div>
 
@@ -572,7 +572,7 @@
         let item = rawFurnacesMap[fcName];
         if (Array.isArray(item)) {
           furnacesMap[fcName] = {
-            capacity: 69.75,
+            capacity: monthTarget / 4,
             monthTarget: monthTarget / 4,
             targetMTD: totalTargetMTD / 4,
             days: item
@@ -618,8 +618,8 @@
 
         tbodyHtml += `<tr>
           <td style="font-weight:700; color:#38bdf8;">${fcName}</td>
-          <td>${fc.capacity || 69.75}</td>
-          <td>${fc.monthTarget || (monthTarget/4).toFixed(2)}</td>
+          <td>${(fc.capacity !== undefined ? fc.capacity : (monthTarget/4)).toFixed(2)}</td>
+          <td>${(fc.monthTarget !== undefined ? fc.monthTarget : (monthTarget/4)).toFixed(2)}</td>
           <td style="font-weight:600; color:#fbbf24;">${targetVal.toFixed(2)}</td>
           <td style="font-weight:700;">${fActual.toFixed(2)}</td>
           <td>${util}</td>`;
