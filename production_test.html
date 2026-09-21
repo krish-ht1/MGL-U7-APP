@@ -306,6 +306,8 @@
           <input type="hidden" name="outTime" id="hfOutTime">
           <input type="hidden" name="components" id="hfComponents">
           <input type="hidden" name="msNo" id="hfMsNo">
+          <input type="hidden" name="qty" id="hfQty">
+          <input type="hidden" name="wt" id="hfWt">
         </form>
 
         <!-- NEW ENTRY - popup mein khulta hai -->
@@ -414,27 +416,25 @@
             </table>
           </div>
 
-          <!-- OUT TIME UPDATE: jab batch furnace mein daala jaata hai to sirf In Time pata hota hai,
-               Out Time baad mein (process poora hone par) pata chalta hai. Ye sirf Out Time (jo abhi
-               khaali hai) bharne ke liye hai - baaki kuch bhi is se edit nahi hota, aur ek baar Out
-               Time bhar jaaye to ye bhi dobara is se change nahi ho sakta. -->
-          <div id="outTimePanel" style="display:none; border-top:1px solid #1e293b; padding-top:10px; margin-top:8px; flex-direction:column; gap:10px;">
-            <div style="font-size:11px; font-weight:700; color:#38bdf8;">⏱ Out Time Update</div>
-            <div style="font-size:11px; color:#94a3b8; line-height:1.6;" id="outTimeContextInfo"></div>
-            <div class="entry-form-grid" style="grid-template-columns: repeat(2,1fr);">
-              <div class="entry-field">
-                <label>Out Time</label>
-                <input type="text" id="outTimeInput" placeholder="HH:MM" inputmode="numeric" maxlength="5" oninput="formatTimeInput(this)">
-              </div>
-              <div class="entry-field">
+          <!-- PENDING FIELD UPDATE: koi bhi row jisme Batch/Qty/Weight/In Time/Out Time mein se
+               koi field khaali reh gaya ho (jaise Out Time - jo batch process ho ke nikalne ke
+               baad pata chalta hai), use baad mein bharne ke liye. Jo field pehle se bhara hai
+               use ye kabhi touch/overwrite nahi karta, aur ek baar koi field bhar jaaye to use
+               dobara isse change nahi kiya ja sakta - sirf admin Sheet mein jaake. -->
+          <div id="pendingFieldPanel" style="display:none; border-top:1px solid #1e293b; padding-top:10px; margin-top:8px; flex-direction:column; gap:10px;">
+            <div style="font-size:11px; font-weight:700; color:#38bdf8;">⚠ Pending Fields Bharo</div>
+            <div style="font-size:11px; color:#94a3b8; line-height:1.6;" id="pendingFieldContextInfo"></div>
+            <div class="entry-form-grid" id="pendingFieldInputsGrid" style="grid-template-columns: repeat(2,1fr);"></div>
+            <div class="entry-form-grid" style="grid-template-columns: 1fr;">
+              <div class="entry-field" style="max-width:200px;">
                 <label>Submit Code</label>
-                <input type="text" id="outTimeCode" placeholder="Code" inputmode="numeric" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" style="-webkit-text-security: disc; text-security: disc;">
+                <input type="text" id="pendingFieldCode" placeholder="Code" inputmode="numeric" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" style="-webkit-text-security: disc; text-security: disc;">
               </div>
             </div>
-            <div id="outTimeStatus" class="entry-status" style="display:none;"></div>
+            <div id="pendingFieldStatus" class="entry-status" style="display:none;"></div>
             <div style="display:flex; gap:8px;">
-              <button class="entry-submit-btn" id="outTimeSubmitBtn" onclick="submitOutTime()">✅ Out Time Save Karo</button>
-              <button class="entry-cancel-btn" onclick="closeOutTimePanel()">✖ Cancel</button>
+              <button class="entry-submit-btn" id="pendingFieldSubmitBtn" onclick="submitPendingFields()">✅ Save Karo</button>
+              <button class="entry-cancel-btn" onclick="closePendingFieldPanel()">✖ Cancel</button>
             </div>
           </div>
         </div>
@@ -1109,7 +1109,22 @@
       return d;
     }
 
-    let msDetailMatches = []; // "Out Time" action button ke liye - View Detail table ki last search results
+    let msDetailMatches = []; // "Pending" action button ke liye - View Detail table ki last search results
+
+    // Ek row mein Batch/Qty/Weight/In Time/Out Time mein se jo bhi khaali hai, wo "Pending" hai.
+    // Date/SQF/MS No isme shaamil nahi hain kyunki New Entry form mein ye zaroori (required) hain
+    // - kabhi khaali save hi nahi ho sakte - aur inhi teeno se row ko dhoonda jaata hai, isliye in
+    // fields ko "baad mein bharna" possible hi nahi hai.
+    const FIELD_LABELS = { batch: 'Batch No', qty: 'Qty (Nos)', wt: 'Weight (Kg)', inTime: 'In Time', outTime: 'Out Time' };
+    function getMissingFields(r) {
+      const missing = [];
+      if (!r.batch) missing.push('batch');
+      if (!r.qty) missing.push('qty');
+      if (!r.wt) missing.push('wt');
+      if (!r.inTime) missing.push('inTime');
+      if (!r.outTime) missing.push('outTime');
+      return missing;
+    }
 
     // MS No type karte hi (har letter/digit ke baad) automatic search ho jaaye - alag se "Search"
     // button dabane ki zaroorat nahi. 300ms ka chhota sa wait rakha hai taaki fast typing mein
@@ -1171,21 +1186,25 @@
         tbody.innerHTML = `<tr><td colspan="9" style="padding:14px; color:#94a3b8;">No matching records found.</td></tr>`;
         return;
       }
-      tbody.innerHTML = matches.map((r, i) => `
+      tbody.innerHTML = matches.map((r, i) => {
+        const missing = getMissingFields(r);
+        const actionCell = !missing.length
+          ? '<span style="color:#34d399; font-size:10.5px;">✓ Done</span>'
+          : `<button type="button" class="component-add-btn" style="padding:4px 10px; font-size:10.5px;" onclick="openPendingFieldEntry(${i})">⚠ Pending (${missing.length})</button>`;
+        return `
         <tr>
           <td>${r.date}</td>
           <td style="font-weight:700; color:#38bdf8;">SQF-${r.sqf}</td>
           <td style="font-weight:700;">${r.msNo}</td>
-          <td>${r.batch}</td>
-          <td>${r.qty.toLocaleString('en-IN')}</td>
-          <td>${r.wt.toFixed(2)}</td>
+          <td>${r.batch || '-'}</td>
+          <td>${r.qty ? r.qty.toLocaleString('en-IN') : '-'}</td>
+          <td>${r.wt ? r.wt.toFixed(2) : '-'}</td>
           <td>${r.inTime || '-'}</td>
           <td>${r.outTime || '-'}</td>
-          <td>${r.outTime
-            ? '<span style="color:#34d399; font-size:10.5px;">✓ Done</span>'
-            : `<button type="button" class="component-add-btn" style="padding:4px 10px; font-size:10.5px;" onclick="openOutTimeEntry(${i})">⏱ Out Time</button>`}</td>
+          <td>${actionCell}</td>
         </tr>
-      `).join('');
+      `;
+      }).join('');
     }
 
     function toggleMsDetail() {
@@ -1571,73 +1590,109 @@
       }, waitMs);
     }
 
-    // ===================== OUT TIME UPDATE (jab batch furnace mein daala jaata hai tab sirf In
-    // Time pata hota hai, Out Time baad mein - batch process ho ke nikalne par - pata chalta hai) =====================
-    // Ye sirf khaali Out Time bharne ke liye hai - Date/SQF/Batch/MS No/Qty/Wt/In Time kuch bhi
-    // isse touch nahi hota, aur ek baar Out Time bhar jaaye to Apps Script khud ise dobara change
+    // ===================== PENDING FIELD UPDATE (koi bhi row jisme Batch/Qty/Weight/In Time/Out
+    // Time mein se koi field khaali reh gaya ho - jaise Out Time, jo batch process ho ke nikalne
+    // ke baad pata chalta hai) =====================
+    // Ye sirf khaali fields bharne ke liye hai - jo field pehle se bhara hai use kabhi touch/
+    // overwrite nahi karta, aur ek baar koi field bhar jaaye to Apps Script khud use dobara change
     // nahi hone dega (chahe koi is button se dobara try bhi kare) - sirf admin Sheet mein jaake kar sakta hai.
-    let pendingOutTimeTarget = null;
+    let pendingFieldTarget = null;
 
-    function openOutTimeEntry(i) {
+    function pendingFieldInputHtml(key) {
+      if (key === 'batch') return `<div class="entry-field"><label>Batch No</label><input type="text" id="pf_batch" placeholder="Batch No"></div>`;
+      if (key === 'qty') return `<div class="entry-field"><label>Qty (Nos)</label><input type="number" id="pf_qty" placeholder="0"></div>`;
+      if (key === 'wt') return `<div class="entry-field"><label>Weight (Kg)</label><input type="number" step="0.01" id="pf_wt" placeholder="0.00"></div>`;
+      if (key === 'inTime') return `<div class="entry-field"><label>In Time</label><input type="text" id="pf_inTime" placeholder="HH:MM" inputmode="numeric" maxlength="5" oninput="formatTimeInput(this)"></div>`;
+      if (key === 'outTime') return `<div class="entry-field"><label>Out Time</label><input type="text" id="pf_outTime" placeholder="HH:MM" inputmode="numeric" maxlength="5" oninput="formatTimeInput(this)"></div>`;
+      return '';
+    }
+
+    function openPendingFieldEntry(i) {
       const row = msDetailMatches[i];
       if (!row) return;
+      const missing = getMissingFields(row);
+      if (!missing.length) return;
       const sqfDigit = String(row.sqf || '').replace(/\D/g, '');
-      pendingOutTimeTarget = {
+      pendingFieldTarget = {
         dateVal: normalizeDateForCompare(row.date), // "YYYY-MM-DD" - hfDate isi format mein chahiye
         sqf: sqfDigit,
         msNo: row.msNo,
-        batch: row.batch
+        missing: missing
       };
-      document.getElementById('outTimeContextInfo').innerHTML =
-        `Date: <b>${row.date}</b> &nbsp; SQF: <b>SQF-${sqfDigit}</b> &nbsp; Batch: <b>${row.batch || '-'}</b> &nbsp; MS No: <b>${row.msNo}</b><br>In Time: <b>${row.inTime || '-'}</b> (Out Time abhi khaali hai)`;
-      document.getElementById('outTimeInput').value = '';
-      document.getElementById('outTimeCode').value = '';
-      document.getElementById('outTimeStatus').style.display = 'none';
-      const panel = document.getElementById('outTimePanel');
+      document.getElementById('pendingFieldContextInfo').innerHTML =
+        `Date: <b>${row.date}</b> &nbsp; SQF: <b>SQF-${sqfDigit}</b> &nbsp; MS No: <b>${row.msNo}</b><br>Khaali fields: <b>${missing.map(k => FIELD_LABELS[k]).join(', ')}</b>`;
+      document.getElementById('pendingFieldInputsGrid').innerHTML = missing.map(pendingFieldInputHtml).join('');
+      document.getElementById('pendingFieldCode').value = '';
+      document.getElementById('pendingFieldStatus').style.display = 'none';
+      const panel = document.getElementById('pendingFieldPanel');
       panel.style.display = 'flex';
       panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    function closeOutTimePanel() {
-      document.getElementById('outTimePanel').style.display = 'none';
-      pendingOutTimeTarget = null;
+    function closePendingFieldPanel() {
+      document.getElementById('pendingFieldPanel').style.display = 'none';
+      pendingFieldTarget = null;
     }
 
-    async function submitOutTime() {
-      if (!pendingOutTimeTarget) return;
-      const statusEl = document.getElementById('outTimeStatus');
+    async function submitPendingFields() {
+      if (!pendingFieldTarget) return;
+      const statusEl = document.getElementById('pendingFieldStatus');
       statusEl.style.display = 'none';
 
-      const code = document.getElementById('outTimeCode').value.trim();
+      const code = document.getElementById('pendingFieldCode').value.trim();
       if (code !== '2020') {
         statusEl.className = 'entry-status fail';
         statusEl.innerText = '⚠ Galat code — sahi code daal ke dobara try karo.';
         statusEl.style.display = 'block';
         return;
       }
-      const outTime = document.getElementById('outTimeInput').value.trim();
-      if (!outTime || !isValidTimeStr(outTime)) {
+
+      const { dateVal, sqf, msNo, missing } = pendingFieldTarget;
+
+      // hfBatch/hfQty/hfWt/hfInTime/hfOutTime New Entry form ke saath SHARE hote hain - purani
+      // value reh na jaaye, pehle sab blank karo, phir sirf jo is baar bhara gaya hai wahi bharo
+      ['hfBatch', 'hfQty', 'hfWt', 'hfInTime', 'hfOutTime'].forEach(id => { document.getElementById(id).value = ''; });
+
+      const valuesToSubmit = {};
+      for (const key of missing) {
+        const inputEl = document.getElementById('pf_' + key);
+        if (!inputEl) continue;
+        const val = inputEl.value.trim();
+        if (!val) continue; // is baar chhod diya - baad mein bhar sakte hain
+        if ((key === 'inTime' || key === 'outTime') && !isValidTimeStr(val)) {
+          statusEl.className = 'entry-status fail';
+          statusEl.innerText = `⚠ ${FIELD_LABELS[key]} sahi format (HH:MM, jaise 14:45) mein bharo.`;
+          statusEl.style.display = 'block';
+          return;
+        }
+        valuesToSubmit[key] = val;
+      }
+
+      if (!Object.keys(valuesToSubmit).length) {
         statusEl.className = 'entry-status fail';
-        statusEl.innerText = '⚠ Out Time sahi format (HH:MM, jaise 14:45) mein bharo.';
+        statusEl.innerText = '⚠ Kam se kam ek field bharo.';
         statusEl.style.display = 'block';
         return;
       }
 
-      const { dateVal, sqf, msNo } = pendingOutTimeTarget;
+      if (valuesToSubmit.batch !== undefined) document.getElementById('hfBatch').value = valuesToSubmit.batch;
+      if (valuesToSubmit.qty !== undefined) document.getElementById('hfQty').value = valuesToSubmit.qty;
+      if (valuesToSubmit.wt !== undefined) document.getElementById('hfWt').value = valuesToSubmit.wt;
+      if (valuesToSubmit.inTime !== undefined) document.getElementById('hfInTime').value = valuesToSubmit.inTime;
+      if (valuesToSubmit.outTime !== undefined) document.getElementById('hfOutTime').value = valuesToSubmit.outTime;
 
-      document.getElementById('hfAction').value = 'setOutTime';
+      document.getElementById('hfAction').value = 'setFields';
       document.getElementById('hfCode').value = code;
       document.getElementById('hfDate').value = dateVal;
       document.getElementById('hfSqf').value = sqf;
       document.getElementById('hfMsNo').value = msNo;
-      document.getElementById('hfOutTime').value = outTime;
 
-      const submitBtn = document.getElementById('outTimeSubmitBtn');
+      const submitBtn = document.getElementById('pendingFieldSubmitBtn');
       submitBtn.disabled = true;
       submitBtn.innerText = 'Saving...';
       statusEl.className = 'entry-status';
       statusEl.style.color = '#f59e0b';
-      statusEl.innerHTML = '⏳ Out Time Google Sheet mein save ho raha hai, confirm ho raha hai...';
+      statusEl.innerHTML = '⏳ Google Sheet mein save ho raha hai, confirm ho raha hai...';
       statusEl.style.display = 'block';
 
       const hiddenForm = document.getElementById('hiddenEntryForm');
@@ -1654,17 +1709,24 @@
             String(r.sqf).replace(/\D/g, '') === sqfDigits
           );
 
-          if (updatedRow && updatedRow.outTime === outTime) {
+          const confirmedKeys = updatedRow
+            ? Object.keys(valuesToSubmit).filter(key => {
+                if (key === 'qty' || key === 'wt') return Number(updatedRow[key]) === Number(valuesToSubmit[key]);
+                return String(updatedRow[key] || '') === valuesToSubmit[key];
+              })
+            : [];
+
+          if (updatedRow && confirmedKeys.length === Object.keys(valuesToSubmit).length) {
             statusEl.className = 'entry-status ok';
-            statusEl.innerHTML = '✅ Out Time save ho gaya aur confirm bhi ho gaya!' + buildReviewTableHtml([updatedRow]);
-            closeOutTimePanel();
+            statusEl.innerHTML = '✅ Save ho gaya aur confirm bhi ho gaya!' + buildReviewTableHtml([updatedRow]);
+            closePendingFieldPanel();
             // list mein bhi turant reflect ho jaaye
             if (typeof runMsSearch === 'function' && document.getElementById('msSearchDetailWrap').style.display !== 'none') {
               runMsSearch();
             }
           } else {
             statusEl.className = 'entry-status fail';
-            statusEl.innerHTML = '⚠ Confirm nahi ho paya — ya to Out Time pehle se bhara tha (dusre kisi ne bhar diya), ya deploy purana hai. Sheet mein jaake check karo.';
+            statusEl.innerHTML = '⚠ Poora confirm nahi ho paya — ya to koi field pehle se bhara tha (dusre kisi ne bhar diya), ya deploy purana hai. Sheet mein jaake check karo.';
           }
           statusEl.style.display = 'block';
         } catch (err) {
@@ -1673,7 +1735,7 @@
           statusEl.style.display = 'block';
         } finally {
           submitBtn.disabled = false;
-          submitBtn.innerText = '✅ Out Time Save Karo';
+          submitBtn.innerText = '✅ Save Karo';
         }
       }, 3500);
     }
