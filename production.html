@@ -300,14 +300,10 @@
                 <tbody id="tdProductionTableBody"></tbody>
               </table>
             </div>
-            <div style="display:flex; flex-direction:column; gap:6px; font-size:11px; color:#94a3b8; border-top:1px dashed #334155; margin-top:10px; padding:10px 12px 4px;">
-              <span>📧 Ye TD Production report email par bhi ja sakta hai. Email address "EMAIL SETTINGS" sheet mein daalo (ek column "Email", jitne chaho utne rows), phir yahan se test kar lo:</span>
-              <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                <input type="text" id="tdEmailCode" placeholder="Code" style="width:70px; background:#1e293b; border:1px solid #334155; color:#f8fafc; border-radius:6px; padding:5px 8px; font-size:11px;">
-                <button type="button" onclick="sendTdReportNow()" style="background:#1e293b; border:1px solid #38bdf8; color:#38bdf8; padding:5px 10px; border-radius:6px; font-size:11px; cursor:pointer;">📧 Test Email Now</button>
-                <span id="tdEmailStatus"></span>
-              </div>
-              <span style="color:#64748b;">Roz apne aap bhejne ke liye ek baar Apps Script editor mein Trigger set karna hoga — "sendDailyTdReport" function, Time-driven, Day timer.</span>
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; border-top:1px dashed #334155; margin-top:10px; padding:10px 12px 4px;">
+              <input type="text" id="tdEmailCode" placeholder="Code" style="width:70px; background:#1e293b; border:1px solid #334155; color:#f8fafc; border-radius:6px; padding:5px 8px; font-size:11px;">
+              <button type="button" onclick="sendTdReportNow()" style="background:#1e293b; border:1px solid #38bdf8; color:#38bdf8; padding:5px 10px; border-radius:6px; font-size:11px; cursor:pointer;">📧 Email Send</button>
+              <span id="tdEmailStatus" style="font-size:11px; color:#94a3b8;"></span>
             </div>
           </div>
         </div>
@@ -1484,14 +1480,16 @@
       const statusEl = document.getElementById('tdEmailStatus');
       if (code !== '2020') {
         statusEl.style.color = '#f87171';
-        statusEl.innerText = '⚠ Galat code.';
+        statusEl.innerText = 'Wrong code';
         return;
       }
+      const tdDateVal = document.getElementById('tdDateInput').value; // "YYYY-MM-DD" - jo date selected hai wahi bhejni hai
       document.getElementById('hfAction').value = 'sendTdReportNow';
       document.getElementById('hfCode').value = code;
+      document.getElementById('hfDate').value = tdDateVal;
 
       statusEl.style.color = '#f59e0b';
-      statusEl.innerText = '⏳ Email bheja ja raha hai...';
+      statusEl.innerText = 'Sending...';
 
       const hiddenForm = document.getElementById('hiddenEntryForm');
       hiddenForm.action = MS_LOG_CSV_URL;
@@ -1499,7 +1497,7 @@
 
       setTimeout(() => {
         statusEl.style.color = '#34d399';
-        statusEl.innerText = '✅ Bhej diya — "EMAIL SETTINGS" sheet mein jo bhi email hain, unke inbox check karo (2-3 min lag sakte hain, spam bhi check kar lena).';
+        statusEl.innerText = 'Sent';
       }, 2500);
     }
 
