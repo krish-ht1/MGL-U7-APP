@@ -468,11 +468,16 @@
             <div style="display:flex; flex-direction:column; gap:10px;">
               <div style="display:flex; gap:8px; flex-wrap:wrap;">
                 <select id="partSummaryMonth" class="month-filter" onchange="renderPartSummary()"></select>
+                <select id="partSummaryUnit" class="month-filter" onchange="renderPartSummary()">
+                  <option value="ALL" selected>All Units</option>
+                  <option value="UNIT 4">Unit 4</option>
+                  <option value="UNIT 9">Unit 9</option>
+                </select>
                 <input type="text" id="partSummarySearch" placeholder="MS No ya Part naam se search karo..." oninput="renderPartSummary()" style="flex:1; min-width:160px; background:#1e293b; border:1px solid #334155; color:#f8fafc; border-radius:6px; padding:6px 8px; font-size:12px;">
               </div>
               <div class="table-scroll">
                 <table class="dwm-table">
-                  <thead><tr><th>MS No</th><th>Part</th><th>Lots</th><th>Qty (Nos)</th><th>Weight</th></tr></thead>
+                  <thead><tr><th>MS No</th><th>Part</th><th>Unit</th><th>Lots</th><th>Qty (Nos)</th><th>Weight</th></tr></thead>
                   <tbody id="partSummaryTableBody"></tbody>
                 </table>
               </div>
@@ -1162,7 +1167,8 @@
         const idx = {
           msNo: findCol('ms no', 'msno'),
           desc: findCol('part description', 'description', 'part name'),
-          wtPc: findCol('weight/piece', 'wt/pc', 'wtpc')
+          wtPc: findCol('weight/piece', 'wt/pc', 'wtpc'),
+          unit: findCol('unit')
         };
         if (idx.msNo === -1) return;
         const map = {};
@@ -1171,7 +1177,8 @@
           if (!msNo) return;
           map[msNo] = {
             description: idx.desc > -1 ? (r[idx.desc] || '').trim() : '',
-            wtPc: idx.wtPc > -1 ? (parseFloat(r[idx.wtPc]) || 0) : 0
+            wtPc: idx.wtPc > -1 ? (parseFloat(r[idx.wtPc]) || 0) : 0,
+            unit: idx.unit > -1 ? (r[idx.unit] || '').trim() : ''
           };
         });
         partsMaster = map;
@@ -1475,6 +1482,14 @@
             <label>⚠ Naya Part - Description</label>
             <input type="text" class="comp-desc" placeholder="Part ka naam (jaise BULL GEAR)">
           </div>
+          <div class="entry-field comp-unit-wrap" style="display:none;">
+            <label>⚠ Naya Part - Unit (kahan se aaya)</label>
+            <select class="comp-unit">
+              <option value="">-- Select --</option>
+              <option value="UNIT 4">Unit 4</option>
+              <option value="UNIT 9">Unit 9</option>
+            </select>
+          </div>
           <div class="entry-field comp-qty-wrap">
             <label>Qty (Nos)</label>
             <input type="number" class="comp-qty" placeholder="0" oninput="updateComponentTotal(this)">
@@ -1498,18 +1513,21 @@
       const row = inputEl.closest('.component-row');
       const msNo = normalizeMsNo(inputEl.value);
       const descWrap = row.querySelector('.comp-desc-wrap');
+      const unitWrap = row.querySelector('.comp-unit-wrap');
       const infoDiv = row.querySelector('.comp-part-info');
       const wtpcInput = row.querySelector('.comp-wtpc');
       if (!msNo) {
         descWrap.style.display = 'none';
+        unitWrap.style.display = 'none';
         infoDiv.style.display = 'none';
         return;
       }
       const known = partsMaster[msNo];
       if (known) {
         descWrap.style.display = 'none';
+        unitWrap.style.display = 'none';
         infoDiv.style.display = 'block';
-        infoDiv.innerText = `✓ ${known.description || 'Known part'}${known.wtPc ? ' · ' + known.wtPc + ' Kg/pc' : ''}`;
+        infoDiv.innerText = `✓ ${known.description || 'Known part'}${known.wtPc ? ' · ' + known.wtPc + ' Kg/pc' : ''}${known.unit ? ' · ' + known.unit : ''}`;
         if (known.wtPc && !wtpcInput.value) {
           wtpcInput.value = known.wtPc;
           updateComponentTotal(wtpcInput);
@@ -1517,6 +1535,7 @@
       } else {
         infoDiv.style.display = 'none';
         descWrap.style.display = 'flex';
+        unitWrap.style.display = 'flex';
       }
     }
 
@@ -1551,8 +1570,10 @@
         const wtPc = parseFloat(row.querySelector('.comp-wtpc').value) || 0;
         const isKnown = !!partsMaster[msNo];
         const descInput = row.querySelector('.comp-desc');
+        const unitInput = row.querySelector('.comp-unit');
         const description = isKnown ? '' : (descInput ? descInput.value.trim() : '');
-        components.push({ msNo, qty, wtPc, description, isNewPart: !isKnown });
+        const unit = isKnown ? '' : (unitInput ? unitInput.value.trim() : '');
+        components.push({ msNo, qty, wtPc, description, unit, isNewPart: !isKnown });
       });
       return components;
     }
@@ -1704,6 +1725,13 @@
       if (missingDesc.length) {
         statusEl.className = 'entry-status fail';
         statusEl.innerText = `⚠ ${missingDesc.map(c => c.msNo).join(', ')} — yeh naya MS No hai, iska Part Description bharna zaroori hai.`;
+        statusEl.style.display = 'block';
+        return;
+      }
+      const missingUnit = components.filter(c => c.isNewPart && !c.unit);
+      if (missingUnit.length) {
+        statusEl.className = 'entry-status fail';
+        statusEl.innerText = `⚠ ${missingUnit.map(c => c.msNo).join(', ')} — yeh naya MS No hai, iska Unit (Unit 4 / Unit 9) select karna zaroori hai.`;
         statusEl.style.display = 'block';
         return;
       }
@@ -1992,6 +2020,7 @@
           ? liveKeys.map(key => `<option value="${key}">${monthKeyToLabel(key, 'Live')}</option>`).join('')
           : `<option value="">Koi live mahina nahi mila</option>`;
         document.getElementById('partSummarySearch').value = '';
+        document.getElementById('partSummaryUnit').value = 'ALL';
         expandedPartMsNo = null;
         renderPartSummary();
       }
@@ -2030,9 +2059,10 @@
     function renderPartSummary() {
       const selectedMonth = document.getElementById('partSummaryMonth').value;
       const searchQ = document.getElementById('partSummarySearch').value.trim().toUpperCase();
+      const unitFilter = document.getElementById('partSummaryUnit').value;
       const tbody = document.getElementById('partSummaryTableBody');
       if (!selectedMonth) {
-        tbody.innerHTML = `<tr><td colspan="5" style="padding:14px; color:#94a3b8;">Koi live mahina nahi mila - New Entry se data aane ke baad yahan dikhega.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="padding:14px; color:#94a3b8;">Koi live mahina nahi mila - New Entry se data aane ke baad yahan dikhega.</td></tr>`;
         return;
       }
       const { year, month } = monthKeyToParts(selectedMonth);
@@ -2054,18 +2084,22 @@
       let rows = Object.values(agg).map(a => ({
         msNo: a.msNo,
         description: (partsMaster[a.msNo.toUpperCase()] || {}).description || '-',
+        unit: (partsMaster[a.msNo.toUpperCase()] || {}).unit || '-',
         qty: a.qty,
         wt: a.wt,
         lots: a.lots.size
       }));
 
+      if (unitFilter && unitFilter !== 'ALL') {
+        rows = rows.filter(r => r.unit.toUpperCase() === unitFilter);
+      }
       if (searchQ) {
         rows = rows.filter(r => r.msNo.toUpperCase().includes(searchQ) || r.description.toUpperCase().includes(searchQ));
       }
       rows.sort((a, b) => b.wt - a.wt); // sabse zyada produce hua part sabse upar
 
       if (!rows.length) {
-        tbody.innerHTML = `<tr><td colspan="5" style="padding:14px; color:#94a3b8;">Is mahine/search ka koi data nahi mila.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="padding:14px; color:#94a3b8;">Is mahine/search/unit ka koi data nahi mila.</td></tr>`;
         return;
       }
       tbody.innerHTML = rows.map(r => {
@@ -2075,6 +2109,7 @@
         <tr onclick="togglePartDetailRow('${key}')" style="cursor:pointer;" title="Date / Batch Code wise breakup dekhne ke liye click karo">
           <td style="font-weight:700; color:#38bdf8;">${isOpen ? '▼' : '▶'} ${r.msNo}</td>
           <td style="color:#94a3b8;">${r.description}</td>
+          <td style="color:#94a3b8;">${r.unit}</td>
           <td>${r.lots}</td>
           <td>${r.qty.toLocaleString('en-IN')}</td>
           <td>${r.wt.toFixed(2)} Kg <span style="color:#94a3b8; font-size:10px;">(${(r.wt / 1000).toFixed(3)} T)</span></td>
@@ -2094,7 +2129,7 @@
           : `<tr><td colspan="5" style="padding:6px 8px; color:#94a3b8; font-size:12px;">Koi detail nahi mili.</td></tr>`;
         const detailRow = `
         <tr>
-          <td colspan="5" style="background:#0f172a; padding:8px 12px; border-bottom:2px solid #334155;">
+          <td colspan="6" style="background:#0f172a; padding:8px 12px; border-bottom:2px solid #334155;">
             <table style="width:100%; border-collapse:collapse;">
               <thead>
                 <tr style="color:#94a3b8; font-size:11px;">
