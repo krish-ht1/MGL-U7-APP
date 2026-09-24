@@ -300,6 +300,15 @@
                 <tbody id="tdProductionTableBody"></tbody>
               </table>
             </div>
+            <div style="display:flex; flex-direction:column; gap:6px; font-size:11px; color:#94a3b8; border-top:1px dashed #334155; margin-top:10px; padding:10px 12px 4px;">
+              <span>📧 Ye TD Production report email par bhi ja sakta hai. Email address "EMAIL SETTINGS" sheet mein daalo (ek column "Email", jitne chaho utne rows), phir yahan se test kar lo:</span>
+              <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                <input type="text" id="tdEmailCode" placeholder="Code" style="width:70px; background:#1e293b; border:1px solid #334155; color:#f8fafc; border-radius:6px; padding:5px 8px; font-size:11px;">
+                <button type="button" onclick="sendTdReportNow()" style="background:#1e293b; border:1px solid #38bdf8; color:#38bdf8; padding:5px 10px; border-radius:6px; font-size:11px; cursor:pointer;">📧 Test Email Now</button>
+                <span id="tdEmailStatus"></span>
+              </div>
+              <span style="color:#64748b;">Roz apne aap bhejne ke liye ek baar Apps Script editor mein Trigger set karna hoga — "sendDailyTdReport" function, Time-driven, Day timer.</span>
+            </div>
           </div>
         </div>
 
@@ -1140,12 +1149,14 @@
 
     // Kai operator MS No ke aage kuch na kuch likh dete hain - "MS18000", "BG18000",
     // ya sirf "18000" - asal mein ye teeno EK hi part hain, lekin app inhe alag-alag
-    // (duplicate) maan raha tha. MS No hamesha sirf NUMBER hota hai, isliye safest fix:
-    // shuru mein jo bhi non-number cheez ho (MS, BG, AG, space, dash, kuch bhi) - hata do,
-    // pehla digit aane tak. Ye helper har jagah MS No padhte/likhte waqt use hota hai
-    // taaki hamesha ek hi, saaf (sirf number-wala) form mein store/match/dikhe.
+    // (duplicate) maan raha tha. Lekin CAREFUL: kuch MS No genuinely alphanumeric hote hain
+    // (jaise "P0003") - unke letter ko hatana galat hoga. Isliye sirf JAANE-PEHCHANE junk
+    // prefixes (MS = generic label, aur part-category ke short-form: BG=Bull Gear, AG=Axle,
+    // GR=Gear, RG=Ring Gear, SH=Shaft) hi hataate hain, baaki kisi bhi letter ko chhedte nahi.
     function normalizeMsNo(val) {
-      return (val || '').toString().trim().toUpperCase().replace(/^[^0-9]+/, '');
+      let v = (val || '').toString().trim().toUpperCase();
+      v = v.replace(/^(MS|BG|AG|GR|RG|SH)[\s.\-]*/, '');
+      return v;
     }
 
     // ===================== PARTS MASTER (MS No -> Part Description + standard Wt/Pc) =====================
@@ -1463,6 +1474,33 @@
       document.getElementById('tdProductionTableBody').innerHTML = rowsHtml;
       const ddmmyyyy = `${String(d).padStart(2,'0')}-${String(m).padStart(2,'0')}-${y}`;
       document.getElementById('tdTitleLine').innerText = `HEAT TREATMENT - U7 (${monthNames[m-1]}-${y})   DATE - ${ddmmyyyy}`;
+    }
+
+    // Aaj ki TD Production report turant email kar deta hai - "EMAIL SETTINGS" sheet mein
+    // jitne bhi email hain (Apps Script khud padhta hai), sabko. Isse trigger set karne se
+    // PEHLE confirm kar sakte ho ki email sahi format mein aa raha hai.
+    function sendTdReportNow() {
+      const code = document.getElementById('tdEmailCode').value.trim();
+      const statusEl = document.getElementById('tdEmailStatus');
+      if (code !== '2020') {
+        statusEl.style.color = '#f87171';
+        statusEl.innerText = '⚠ Galat code.';
+        return;
+      }
+      document.getElementById('hfAction').value = 'sendTdReportNow';
+      document.getElementById('hfCode').value = code;
+
+      statusEl.style.color = '#f59e0b';
+      statusEl.innerText = '⏳ Email bheja ja raha hai...';
+
+      const hiddenForm = document.getElementById('hiddenEntryForm');
+      hiddenForm.action = MS_LOG_CSV_URL;
+      hiddenForm.submit();
+
+      setTimeout(() => {
+        statusEl.style.color = '#34d399';
+        statusEl.innerText = '✅ Bhej diya — "EMAIL SETTINGS" sheet mein jo bhi email hain, unke inbox check karo (2-3 min lag sakte hain, spam bhi check kar lena).';
+      }, 2500);
     }
 
     // ===================== NEW ENTRY FORM (form se seedhe Google Sheet mein likhna) =====================
