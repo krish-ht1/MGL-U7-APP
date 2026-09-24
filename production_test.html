@@ -145,6 +145,16 @@
       background: rgba(239,68,68,0.12); border: 1px solid #ef4444; color: #f87171;
       font-size: 13px; font-weight: 700; cursor: pointer; padding: 3px 9px; border-radius: 6px; line-height: 1.4;
     }
+    /* Phone (chhoti screen) par modal/panel poori screen bhar jaaye - koi bahar khaali jagah
+       na ho, scroll ho sake, aur ऊपर hamesha ✖ Close button chipka rahe band karne ke liye */
+    @media (max-width: 767px) {
+      .modal-overlay { padding: 0; align-items: stretch; }
+      .modal-card {
+        max-width: 100%; width: 100%; margin-top: 0; border-radius: 0;
+        max-height: 100vh; height: 100vh;
+      }
+      .modal-card-header { border-radius: 0; }
+    }
 
     /* New Entry Form */
     .entry-form-grid {
@@ -262,6 +272,7 @@
             <button class="ms-search-btn" style="background:#1e293b; border:1px solid #f87171; color:#f87171;" onclick="resetMsSearch()">♻ Reset</button>
             <button class="ms-search-btn" style="background:#1e293b; border:1px solid #38bdf8; color:#38bdf8;" onclick="toggleTdPanel()">🗓 TD Production</button>
             <button class="ms-search-btn" style="background:#1e293b; border:1px solid #34d399; color:#34d399;" onclick="toggleEntryPanel()">📝 New Entry</button>
+            <button class="ms-search-btn" style="background:#1e293b; border:1px solid #a78bfa; color:#a78bfa;" onclick="togglePartSummaryPanel()">📦 Part-wise Summary</button>
           </div>
         </div>
 
@@ -308,6 +319,13 @@
           <input type="hidden" name="msNo" id="hfMsNo">
           <input type="hidden" name="qty" id="hfQty">
           <input type="hidden" name="wt" id="hfWt">
+          <input type="hidden" name="gapLoss" id="hfGapLoss">
+          <input type="hidden" name="reasonGap" id="hfReasonGap">
+          <input type="hidden" name="chargeLoss" id="hfChargeLoss">
+          <input type="hidden" name="reasonLoss" id="hfReasonLoss">
+          <input type="hidden" name="remarks" id="hfRemarks">
+          <input type="hidden" name="furnaceRunning" id="hfFurnaceRunning">
+          <input type="hidden" name="remark" id="hfDailyRemark">
         </form>
 
         <!-- NEW ENTRY - popup mein khulta hai -->
@@ -345,8 +363,28 @@
               <input type="text" id="entryOutTime" placeholder="HH:MM" inputmode="numeric" maxlength="5" oninput="formatTimeInput(this)">
             </div>
             <div class="entry-field">
+              <label>Gap/Loss Time (min)</label>
+              <input type="number" id="entryGapLoss" placeholder="0">
+            </div>
+            <div class="entry-field">
+              <label>Reason of Gap</label>
+              <input type="text" id="entryReasonGap" placeholder="Optional">
+            </div>
+            <div class="entry-field">
+              <label>Charge Wt Loss (Kg)</label>
+              <input type="number" step="0.01" id="entryChargeLoss" placeholder="0.00">
+            </div>
+            <div class="entry-field">
+              <label>Reason of Loss</label>
+              <input type="text" id="entryReasonLoss" placeholder="Optional">
+            </div>
+            <div class="entry-field" style="grid-column: 1 / -1;">
+              <label>Remarks</label>
+              <input type="text" id="entryRemarks" placeholder="Optional">
+            </div>
+            <div class="entry-field">
               <label>Submit Code</label>
-              <input type="password" id="entryCode" placeholder="Code" inputmode="numeric" maxlength="10">
+              <input type="text" id="entryCode" placeholder="Code" inputmode="numeric" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" style="-webkit-text-security: disc; text-security: disc;">
             </div>
           </div>
 
@@ -383,6 +421,65 @@
           </div>
         </div>
 
+        <!-- DAILY NOTE - poore din ki ek chhoti summary (batch-entry se alag hai) - popup mein khulta hai -->
+        <div id="dailyNoteModal" class="modal-overlay" onclick="if(event.target===this) toggleDailyNotePanel()">
+          <div class="modal-card">
+            <div class="modal-card-header">
+              <h3>📋 Daily Note</h3>
+              <button type="button" class="modal-close-btn" onclick="toggleDailyNotePanel()">✖ Close</button>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div class="entry-form-grid">
+                <div class="entry-field">
+                  <label>Date</label>
+                  <input type="date" id="dnDate">
+                </div>
+                <div class="entry-field">
+                  <label>Furnace Running (0-4)</label>
+                  <input type="number" id="dnFurnaceRunning" placeholder="4" min="0" max="4">
+                </div>
+                <div class="entry-field" style="grid-column: 1 / -1;">
+                  <label>Remark</label>
+                  <input type="text" id="dnRemark" placeholder="jaise: DE-SHOOTING OF SQF-1 & 2">
+                </div>
+                <div class="entry-field">
+                  <label>Submit Code</label>
+                  <input type="text" id="dnCode" placeholder="Code" inputmode="numeric" maxlength="10" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" style="-webkit-text-security: disc; text-security: disc;">
+                </div>
+              </div>
+              <div id="dnStatus" class="entry-status" style="display:none;"></div>
+              <div style="display:flex; gap:8px;">
+                <button class="entry-submit-btn" id="dnSubmitBtn" onclick="submitDailyNote()">✅ Save Karo</button>
+                <button class="entry-cancel-btn" onclick="toggleDailyNotePanel()">✖ Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PART-WISE SUMMARY - MS No-wise total (Furnace-wise DWM jaisa hi, bas MS No se group hota hai) -
+             sirf LIVE (app se track hue) mahino ke liye kaam karta hai, kyunki purane "fixed" mahino ka
+             MS-No level raw data nahi hai, sirf pehle se jod-a hua Furnace-din total hai -->
+        <div id="partSummaryModal" class="modal-overlay" onclick="if(event.target===this) togglePartSummaryPanel()">
+          <div class="modal-card">
+            <div class="modal-card-header">
+              <h3>📦 Part-wise Summary</h3>
+              <button type="button" class="modal-close-btn" onclick="togglePartSummaryPanel()">✖ Close</button>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <select id="partSummaryMonth" class="month-filter" onchange="renderPartSummary()"></select>
+                <input type="text" id="partSummarySearch" placeholder="MS No ya Part naam se search karo..." oninput="renderPartSummary()" style="flex:1; min-width:160px; background:#1e293b; border:1px solid #334155; color:#f8fafc; border-radius:6px; padding:6px 8px; font-size:12px;">
+              </div>
+              <div class="table-scroll">
+                <table class="dwm-table">
+                  <thead><tr><th>MS No</th><th>Part</th><th>Lots</th><th>Qty (Nos)</th><th>Weight</th></tr></thead>
+                  <tbody id="partSummaryTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="kpi-grid" id="msSearchKpiGrid" style="display:none;">
           <div class="kpi-card-mini">
             <span class="kpi-title-mini">Total Production</span>
@@ -410,7 +507,7 @@
           <div class="table-scroll" id="msDetailTableWrap" style="display:none; margin-top:8px;">
             <table class="dwm-table">
               <thead>
-                <tr><th>Date</th><th>Furnace</th><th>MS No</th><th>Batch No</th><th>Qty (Nos)</th><th>Weight (Kg)</th><th>In Time</th><th>Out Time</th><th>Action</th></tr>
+                <tr><th>Date</th><th>Furnace</th><th>MS No</th><th>Part</th><th>Batch No</th><th>Qty (Nos)</th><th>Weight (Kg)</th><th>In Time</th><th>Out Time</th><th>Action</th></tr>
               </thead>
               <tbody id="msDetailTableBody"></tbody>
             </table>
@@ -484,6 +581,10 @@
         <div class="kpi-card-mini">
           <span class="kpi-title-mini">Variance</span>
           <span class="kpi-val-mini" id="kpiVariance">0 T</span>
+        </div>
+        <div class="kpi-card-mini">
+          <span class="kpi-title-mini">MTD Loads</span>
+          <span class="kpi-val-mini" id="kpiMtdLoads">0</span>
         </div>
       </div>
 
@@ -623,6 +724,7 @@
       };
 
       let lastFilledDay = 0; // sabse aakhri date jiske liye kisi bhi furnace ka row mila - chahe uski value 0 hi ho
+      const lotsSet = new Set(); // ek Lot = ek unique Batch+SQF+Date (chahe usmein kayi MS No/components ho)
 
       msLogRows.forEach(row => {
         const parts = (row.date || "").split(/[\/\-]/);
@@ -635,6 +737,8 @@
 
         if (day > lastFilledDay) lastFilledDay = day;
 
+        lotsSet.add((row.batch || '').trim().toUpperCase() + '|' + row.sqf + '|' + row.date);
+
         const dIdx = day - 1;
         if (dIdx < 0 || dIdx >= daysInMonth) return;
 
@@ -644,6 +748,8 @@
 
         data.furnaces[fcName].days[dIdx] += (row.wt || 0) / 1000; // Kg -> Ton
       });
+
+      data.totalLotsMTD = lotsSet.size;
 
       // Plant ka total month target 260 T hai (4 furnace milaake) - har mahine ke liye same
       const totalMonthTarget = 260;
@@ -772,6 +878,7 @@
       let monthTarget = 260.0;
       let totalTargetMTD = 0;
       let rawFurnacesMap = {};
+      let totalLotsMTD = null; // fixed (purane) mahino ka raw lot data nahi hai, isliye null = "-"
 
       if (fixedDatabase[selectedMonth]) {
         let fData = fixedDatabase[selectedMonth];
@@ -779,12 +886,14 @@
         monthTarget = fData.monthTarget;
         totalTargetMTD = fData.totalTargetMTD || 270.0;
         rawFurnacesMap = fData.furnaces;
+        totalLotsMTD = (typeof fData.totalLotsMTD === 'number') ? fData.totalLotsMTD : null;
       } else if (liveMonthDataCache[selectedMonth]) {
         let lData = liveMonthDataCache[selectedMonth];
         dataDaysCount = lData.daysCount;
         monthTarget = lData.monthTarget;
         totalTargetMTD = lData.totalTargetMTD;
         rawFurnacesMap = lData.furnaces;
+        totalLotsMTD = (typeof lData.totalLotsMTD === 'number') ? lData.totalLotsMTD : null;
       }
       // (agar dono mein se kuch na mile - jaise pehli hi baar page abhi load ho raha hai -
       // to upar wale default values se khaali/shuruaati board dikh jaata hai, error nahi aata)
@@ -906,7 +1015,7 @@
 
       tbodyHtml += `<tr class="cumulative-row" style="background:#111827 !important; font-weight:700; color:#f8fafc;">
         <td>CUMULATIVE TOTAL</td>
-        <td colspan="5">LOT MTD</td>
+        <td colspan="5"></td>
         ${cumuCells}
       </tr>`;
 
@@ -929,6 +1038,7 @@
       let varEl = document.getElementById('kpiVariance');
       varEl.innerText = `${variance} T`;
       varEl.style.color = variance >= 0 ? "#34d399" : "#f87171";
+      document.getElementById('kpiMtdLoads').innerText = (totalLotsMTD === null) ? '-' : totalLotsMTD.toLocaleString('en-IN');
       document.getElementById('dwmTableTitle').innerText = `📋 DWM Matrix - ${selectedMonth}`;
 
       // Charts Render
@@ -1023,6 +1133,53 @@
       });
     }
 
+    // Kai operator MS No ke aage kuch na kuch likh dete hain - "MS18000", "BG18000",
+    // ya sirf "18000" - asal mein ye teeno EK hi part hain, lekin app inhe alag-alag
+    // (duplicate) maan raha tha. MS No hamesha sirf NUMBER hota hai, isliye safest fix:
+    // shuru mein jo bhi non-number cheez ho (MS, BG, AG, space, dash, kuch bhi) - hata do,
+    // pehla digit aane tak. Ye helper har jagah MS No padhte/likhte waqt use hota hai
+    // taaki hamesha ek hi, saaf (sirf number-wala) form mein store/match/dikhe.
+    function normalizeMsNo(val) {
+      return (val || '').toString().trim().toUpperCase().replace(/^[^0-9]+/, '');
+    }
+
+    // ===================== PARTS MASTER (MS No -> Part Description + standard Wt/Pc) =====================
+    // Yeh list FIXED nahi hai - naya MS No jab bhi New Entry mein pehli baar save hota hai,
+    // Apps Script khud isme add kar deta hai. Isliye yahan sirf PADHNA hai; add/update seedha
+    // addBatchEntry ke through hota hai.
+    let partsMaster = {}; // normalized (UPPERCASE, trimmed, "MS" prefix hata ke) MS No -> { description, wtPc }
+
+    async function loadPartsMaster() {
+      try {
+        const sep = MS_LOG_CSV_URL.includes('?') ? '&' : '?';
+        const response = await fetch(`${MS_LOG_CSV_URL}${sep}action=getPartsMaster&_t=${new Date().getTime()}`);
+        if (!response.ok) return;
+        const csvText = await response.text();
+        const rows = parseCSV(csvText);
+        if (!rows.length) return;
+        const header = rows[0].map(h => h.trim().toLowerCase());
+        const findCol = (...keys) => header.findIndex(h => keys.some(k => h.includes(k)));
+        const idx = {
+          msNo: findCol('ms no', 'msno'),
+          desc: findCol('part description', 'description', 'part name'),
+          wtPc: findCol('weight/piece', 'wt/pc', 'wtpc')
+        };
+        if (idx.msNo === -1) return;
+        const map = {};
+        rows.slice(1).forEach(r => {
+          const msNo = normalizeMsNo(r[idx.msNo]);
+          if (!msNo) return;
+          map[msNo] = {
+            description: idx.desc > -1 ? (r[idx.desc] || '').trim() : '',
+            wtPc: idx.wtPc > -1 ? (parseFloat(r[idx.wtPc]) || 0) : 0
+          };
+        });
+        partsMaster = map;
+      } catch (err) {
+        console.warn('Parts master load nahi ho paya:', err.message);
+      }
+    }
+
     // ===================== MS NUMBER / SQF WISE SEARCH + DWM (EK HI CSV SE) =====================
     let msLogRows = [];
 
@@ -1062,7 +1219,13 @@
           wt: findCol('total wt', 'total weight'),
           wtPc: findCol('wt/pc', 'wt per pc', 'weight/pc', 'wtpc'),
           inTime: findCol('in time', 'intime'),
-          outTime: findCol('out time', 'outtime')
+          outTime: findCol('out time', 'outtime'),
+          description: findCol('part description', 'description'),
+          gapLoss: findCol('gap/loss time', 'gap loss time'),
+          reasonGap: findCol('reason of gap'),
+          chargeLoss: findCol('charge wt loss', 'charge weight loss'),
+          reasonLoss: findCol('reason of loss'),
+          remarks: findCol('remarks', 'remark')
         };
 
         if (idx.msno === -1 || idx.date === -1) {
@@ -1075,12 +1238,18 @@
             date: (r[idx.date] || "").trim(),
             sqf: (r[idx.sqf] || "").trim(),
             batch: (r[idx.batch] || "").trim(),
-            msNo: (r[idx.msno] || "").trim(),
+            msNo: normalizeMsNo(r[idx.msno]),
             qty: parseFloat(r[idx.qty]) || 0,
             wt: parseFloat(r[idx.wt]) || 0,
             wtPc: idx.wtPc > -1 ? (parseFloat(r[idx.wtPc]) || 0) : 0,
             inTime: idx.inTime > -1 ? (r[idx.inTime] || "").trim() : "",
-            outTime: idx.outTime > -1 ? (r[idx.outTime] || "").trim() : ""
+            outTime: idx.outTime > -1 ? (r[idx.outTime] || "").trim() : "",
+            description: idx.description > -1 ? (r[idx.description] || "").trim() : "",
+            gapLoss: idx.gapLoss > -1 ? (r[idx.gapLoss] || "").trim() : "",
+            reasonGap: idx.reasonGap > -1 ? (r[idx.reasonGap] || "").trim() : "",
+            chargeLoss: idx.chargeLoss > -1 ? (r[idx.chargeLoss] || "").trim() : "",
+            reasonLoss: idx.reasonLoss > -1 ? (r[idx.reasonLoss] || "").trim() : "",
+            remarks: idx.remarks > -1 ? (r[idx.remarks] || "").trim() : ""
           }));
 
         if (!msLogRows.length) throw new Error('Header mil gaye lekin neeche koi valid MS No wali row nahi mili - check karo sheet mein data hai ya nahi.');
@@ -1183,7 +1352,7 @@
     function renderMsDetailTable(matches) {
       const tbody = document.getElementById('msDetailTableBody');
       if (!matches.length) {
-        tbody.innerHTML = `<tr><td colspan="9" style="padding:14px; color:#94a3b8;">No matching records found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10" style="padding:14px; color:#94a3b8;">No matching records found.</td></tr>`;
         return;
       }
       tbody.innerHTML = matches.map((r, i) => {
@@ -1191,11 +1360,13 @@
         const actionCell = !missing.length
           ? '<span style="color:#34d399; font-size:10.5px;">✓ Done</span>'
           : `<button type="button" class="component-add-btn" style="padding:4px 10px; font-size:10.5px;" onclick="openPendingFieldEntry(${i})">⚠ Pending (${missing.length})</button>`;
+        const partDesc = r.description || (partsMaster[r.msNo.toUpperCase()] || {}).description || '-';
         return `
         <tr>
           <td>${r.date}</td>
           <td style="font-weight:700; color:#38bdf8;">SQF-${r.sqf}</td>
           <td style="font-weight:700;">${r.msNo}</td>
+          <td style="color:#94a3b8;">${partDesc}</td>
           <td>${r.batch || '-'}</td>
           <td>${r.qty ? r.qty.toLocaleString('en-IN') : '-'}</td>
           <td>${r.wt ? r.wt.toFixed(2) : '-'}</td>
@@ -1297,7 +1468,12 @@
         <div class="component-row" data-comp-id="${id}">
           <div class="entry-field comp-msno-wrap">
             <label>MS No</label>
-            <input type="text" class="comp-msno" placeholder="MS Number">
+            <input type="text" class="comp-msno" placeholder="Sirf Number likho (jaise 18000)" oninput="onComponentMsNoInput(this)" onblur="this.value = normalizeMsNo(this.value); onComponentMsNoInput(this);">
+            <div class="comp-part-info" style="display:none; font-size:10px; color:#34d399; margin-top:2px;"></div>
+          </div>
+          <div class="entry-field comp-desc-wrap" style="display:none;">
+            <label>⚠ Naya Part - Description</label>
+            <input type="text" class="comp-desc" placeholder="Part ka naam (jaise BULL GEAR)">
           </div>
           <div class="entry-field comp-qty-wrap">
             <label>Qty (Nos)</label>
@@ -1313,6 +1489,35 @@
           </div>
           <button type="button" class="component-remove-btn" onclick="removeComponentRow(this)" title="Remove">✖</button>
         </div>`;
+    }
+
+    // MS No master list se match karta hai - milte hi Wt/Pc khud bhar deta hai (agar khaali hai)
+    // aur part ka naam dikha deta hai. Nahi milta to "naya part" maan ke Description maangta hai -
+    // isi tarah list khud badhti rehti hai, kisi ko alag se maintain nahi karna padta.
+    function onComponentMsNoInput(inputEl) {
+      const row = inputEl.closest('.component-row');
+      const msNo = normalizeMsNo(inputEl.value);
+      const descWrap = row.querySelector('.comp-desc-wrap');
+      const infoDiv = row.querySelector('.comp-part-info');
+      const wtpcInput = row.querySelector('.comp-wtpc');
+      if (!msNo) {
+        descWrap.style.display = 'none';
+        infoDiv.style.display = 'none';
+        return;
+      }
+      const known = partsMaster[msNo];
+      if (known) {
+        descWrap.style.display = 'none';
+        infoDiv.style.display = 'block';
+        infoDiv.innerText = `✓ ${known.description || 'Known part'}${known.wtPc ? ' · ' + known.wtPc + ' Kg/pc' : ''}`;
+        if (known.wtPc && !wtpcInput.value) {
+          wtpcInput.value = known.wtPc;
+          updateComponentTotal(wtpcInput);
+        }
+      } else {
+        infoDiv.style.display = 'none';
+        descWrap.style.display = 'flex';
+      }
     }
 
     function addComponentRow() {
@@ -1334,16 +1539,20 @@
       row.querySelector('.comp-total').value = (qty * wtPc).toFixed(2);
     }
 
-    // Sirf wo rows lo jinmein MS No bhara ho
+    // Sirf wo rows lo jinmein MS No bhara ho. Agar MS No Parts Master mein nahi hai (naya part),
+    // uska Description bhi saath bhejte hain - server isse master list mein add kar dega.
     function collectComponents() {
       const rows = document.querySelectorAll('#entryComponentsList .component-row');
       const components = [];
       rows.forEach(row => {
-        const msNo = row.querySelector('.comp-msno').value.trim();
+        const msNo = normalizeMsNo(row.querySelector('.comp-msno').value);
         if (!msNo) return;
         const qty = parseFloat(row.querySelector('.comp-qty').value) || 0;
         const wtPc = parseFloat(row.querySelector('.comp-wtpc').value) || 0;
-        components.push({ msNo, qty, wtPc });
+        const isKnown = !!partsMaster[msNo];
+        const descInput = row.querySelector('.comp-desc');
+        const description = isKnown ? '' : (descInput ? descInput.value.trim() : '');
+        components.push({ msNo, qty, wtPc, description, isNewPart: !isKnown });
       });
       return components;
     }
@@ -1383,11 +1592,12 @@
         if (!document.getElementById('entryComponentsList').children.length) {
           resetComponentRows();
         }
+        loadPartsMaster(); // fresh list, taaki naye add hue parts turant dikhein
       }
     }
 
     function clearEntryForm() {
-      ['entryBatch','entryCode','entryInTime','entryOutTime']
+      ['entryBatch','entryCode','entryInTime','entryOutTime','entryGapLoss','entryReasonGap','entryChargeLoss','entryReasonLoss','entryRemarks']
         .forEach(id => { document.getElementById(id).value = ''; });
       document.getElementById('entrySqf').value = '1';
       resetComponentRows();
@@ -1413,6 +1623,7 @@
           <td style="padding:4px 6px; border-top:1px solid #1e293b;">SQF-${r.sqf}</td>
           <td style="padding:4px 6px; border-top:1px solid #1e293b;">${r.batch || '-'}</td>
           <td style="padding:4px 6px; border-top:1px solid #1e293b; font-weight:700;">${r.msNo}</td>
+          <td style="padding:4px 6px; border-top:1px solid #1e293b; color:#94a3b8;">${r.description || '-'}</td>
           <td style="padding:4px 6px; border-top:1px solid #1e293b;">${r.qty}</td>
           <td style="padding:4px 6px; border-top:1px solid #1e293b;">${(r.wtPc || 0).toFixed(2)}</td>
           <td style="padding:4px 6px; border-top:1px solid #1e293b;">${r.wt.toFixed(2)}</td>
@@ -1425,7 +1636,7 @@
           <table style="width:100%; border-collapse:collapse; font-size:10.5px;">
             <thead><tr style="color:#94a3b8; text-align:left;">
               <th style="padding:4px 6px;">Date</th><th style="padding:4px 6px;">SQF</th><th style="padding:4px 6px;">Batch</th>
-              <th style="padding:4px 6px;">MS No</th><th style="padding:4px 6px;">Qty</th><th style="padding:4px 6px;">Wt/Pc</th>
+              <th style="padding:4px 6px;">MS No</th><th style="padding:4px 6px;">Part</th><th style="padding:4px 6px;">Qty</th><th style="padding:4px 6px;">Wt/Pc</th>
               <th style="padding:4px 6px;">Total Wt</th><th style="padding:4px 6px;">In</th><th style="padding:4px 6px;">Out</th>
             </tr></thead>
             <tbody>${body}</tbody>
@@ -1464,6 +1675,11 @@
       const batch = document.getElementById('entryBatch').value.trim();
       const inTime = document.getElementById('entryInTime').value.trim();
       const outTime = document.getElementById('entryOutTime').value.trim();
+      const gapLoss = document.getElementById('entryGapLoss').value.trim();
+      const reasonGap = document.getElementById('entryReasonGap').value.trim();
+      const chargeLoss = document.getElementById('entryChargeLoss').value.trim();
+      const reasonLoss = document.getElementById('entryReasonLoss').value.trim();
+      const remarks = document.getElementById('entryRemarks').value.trim();
       const components = collectComponents();
 
       if (!dateVal) {
@@ -1484,13 +1700,21 @@
         statusEl.style.display = 'block';
         return;
       }
+      const missingDesc = components.filter(c => c.isNewPart && !c.description);
+      if (missingDesc.length) {
+        statusEl.className = 'entry-status fail';
+        statusEl.innerText = `⚠ ${missingDesc.map(c => c.msNo).join(', ')} — yeh naya MS No hai, iska Part Description bharna zaroori hai.`;
+        statusEl.style.display = 'block';
+        return;
+      }
 
-      pendingEntry = { dateVal, sqf, batch, inTime, outTime, components, code };
+      pendingEntry = { dateVal, sqf, batch, inTime, outTime, gapLoss, reasonGap, chargeLoss, reasonLoss, remarks, components, code };
 
       const sqfDigits = String(sqf).replace(/\D/g, '');
       const displayDate = toDisplayDate(dateVal);
       const previewRows = components.map(comp => ({
         date: displayDate, sqf: sqfDigits, batch, msNo: comp.msNo,
+        description: comp.description || (partsMaster[comp.msNo.toUpperCase()] || {}).description || '',
         qty: comp.qty, wtPc: comp.wtPc, wt: comp.qty * comp.wtPc,
         inTime, outTime
       }));
@@ -1517,7 +1741,7 @@
     // option nahi hai, sirf admin Sheet mein seedha jaake change kar sakta hai.
     async function performActualSubmit() {
       if (!pendingEntry) return;
-      const { dateVal, sqf, batch, inTime, outTime, components, code } = pendingEntry;
+      const { dateVal, sqf, batch, inTime, outTime, gapLoss, reasonGap, chargeLoss, reasonLoss, remarks, components, code } = pendingEntry;
       const statusEl = document.getElementById('entryStatus');
 
       // fetch() se seedha Apps Script ke URL par GET bhejne par "null origin" CORS error aata hai
@@ -1532,6 +1756,11 @@
       document.getElementById('hfInTime').value = inTime;
       document.getElementById('hfOutTime').value = outTime;
       document.getElementById('hfComponents').value = JSON.stringify(components);
+      document.getElementById('hfGapLoss').value = gapLoss;
+      document.getElementById('hfReasonGap').value = reasonGap;
+      document.getElementById('hfChargeLoss').value = chargeLoss;
+      document.getElementById('hfReasonLoss').value = reasonLoss;
+      document.getElementById('hfRemarks').value = remarks;
       document.getElementById('hfAction').value = 'addBatchEntry';
 
       const confirmBtn = document.getElementById('entryConfirmBtn');
@@ -1572,6 +1801,7 @@
             clearEntryForm();
             document.getElementById('entryDate').value = keepDate; // agla entry usi din ka ho sakta hai
             document.getElementById('entrySqf').value = keepSqf;
+            loadPartsMaster(); // koi naya part add hua ho to list turant refresh ho jaaye
           } else {
             statusEl.className = 'entry-status fail';
             statusEl.innerHTML = `⚠ ${missing.length}/${components.length} MS No confirm nahi ho paye (${missing.map(m => m.msNo).join(', ')}) — Sheet mein jaake check karo. Agar nahi gaye, Apps Script deploy check karo.` + buildReviewTableHtml(savedRows);
@@ -1740,19 +1970,229 @@
       }, 3500);
     }
 
+    // ===================== PART-WISE SUMMARY (MS No-wise total - DWM Furnace-wise jaisa hi,
+    // bas MS No se group hota hai. Sirf LIVE mahino ke liye - purane "fixed" mahino ka MS-No
+    // level raw data nahi hai) =====================
+    // Kisi MS No ki row par click karo to niche uska Date-wise / Batch Code-wise breakup khul
+    // jaata hai (kis din kitna piece hardened hua, kis batch mein) - wahi msLogRows ka data
+    // hai jo already New Entry se capture ho raha hai, koi alag sheet/tab nahi banayi.
+    let expandedPartMsNo = null;
+
+    function togglePartSummaryPanel() {
+      const panel = document.getElementById('partSummaryModal');
+      const willShow = !panel.classList.contains('open');
+      panel.classList.toggle('open', willShow);
+      if (willShow) {
+        const dropdown = document.getElementById('partSummaryMonth');
+        const liveKeys = Object.keys(liveMonthDataCache).sort((a, b) => {
+          const pa = monthKeyToParts(a), pb = monthKeyToParts(b);
+          return (pb.year * 12 + pb.month) - (pa.year * 12 + pa.month);
+        });
+        dropdown.innerHTML = liveKeys.length
+          ? liveKeys.map(key => `<option value="${key}">${monthKeyToLabel(key, 'Live')}</option>`).join('')
+          : `<option value="">Koi live mahina nahi mila</option>`;
+        document.getElementById('partSummarySearch').value = '';
+        expandedPartMsNo = null;
+        renderPartSummary();
+      }
+    }
+
+    function togglePartDetailRow(msNoKey) {
+      expandedPartMsNo = (expandedPartMsNo === msNoKey) ? null : msNoKey;
+      renderPartSummary();
+    }
+
+    // Ek MS No ke liye, selected mahine ke andar Date + Batch Code wise breakup nikaalta hai
+    function buildPartDetailRows(msNoKey, year, month) {
+      const details = [];
+      msLogRows.forEach(row => {
+        const dp = parseLogDateParts(row.date);
+        if (!dp || dp.month !== month || dp.year !== year) return;
+        if (row.msNo.trim().toUpperCase() !== msNoKey) return;
+        details.push({
+          date: row.date,
+          dp: dp,
+          batch: (row.batch || '').trim() || '-',
+          sqf: row.sqf || '-',
+          qty: row.qty || 0,
+          wt: row.wt || 0
+        });
+      });
+      details.sort((a, b) => {
+        const ka = a.dp.year * 10000 + a.dp.month * 100 + a.dp.day;
+        const kb = b.dp.year * 10000 + b.dp.month * 100 + b.dp.day;
+        if (ka !== kb) return ka - kb;
+        return a.batch.localeCompare(b.batch);
+      });
+      return details;
+    }
+
+    function renderPartSummary() {
+      const selectedMonth = document.getElementById('partSummaryMonth').value;
+      const searchQ = document.getElementById('partSummarySearch').value.trim().toUpperCase();
+      const tbody = document.getElementById('partSummaryTableBody');
+      if (!selectedMonth) {
+        tbody.innerHTML = `<tr><td colspan="5" style="padding:14px; color:#94a3b8;">Koi live mahina nahi mila - New Entry se data aane ke baad yahan dikhega.</td></tr>`;
+        return;
+      }
+      const { year, month } = monthKeyToParts(selectedMonth);
+
+      // MS No-wise jodna - Qty/Weight sum karo, aur kitne alag Batch (SQF ke saath) mein aaya
+      // wo "Lots" count karo (Unique Batch flag ki tarah, alag Batch+SQF ek Lot maana)
+      const agg = {};
+      msLogRows.forEach(row => {
+        const dp = parseLogDateParts(row.date);
+        if (!dp || dp.month !== month || dp.year !== year) return;
+        const key = row.msNo.trim().toUpperCase();
+        if (!key) return;
+        if (!agg[key]) agg[key] = { msNo: row.msNo.trim(), qty: 0, wt: 0, lots: new Set() };
+        agg[key].qty += row.qty;
+        agg[key].wt += row.wt;
+        agg[key].lots.add((row.batch || '').trim().toUpperCase() + '|' + row.sqf + '|' + row.date);
+      });
+
+      let rows = Object.values(agg).map(a => ({
+        msNo: a.msNo,
+        description: (partsMaster[a.msNo.toUpperCase()] || {}).description || '-',
+        qty: a.qty,
+        wt: a.wt,
+        lots: a.lots.size
+      }));
+
+      if (searchQ) {
+        rows = rows.filter(r => r.msNo.toUpperCase().includes(searchQ) || r.description.toUpperCase().includes(searchQ));
+      }
+      rows.sort((a, b) => b.wt - a.wt); // sabse zyada produce hua part sabse upar
+
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="5" style="padding:14px; color:#94a3b8;">Is mahine/search ka koi data nahi mila.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = rows.map(r => {
+        const key = r.msNo.trim().toUpperCase();
+        const isOpen = expandedPartMsNo === key;
+        const mainRow = `
+        <tr onclick="togglePartDetailRow('${key}')" style="cursor:pointer;" title="Date / Batch Code wise breakup dekhne ke liye click karo">
+          <td style="font-weight:700; color:#38bdf8;">${isOpen ? '▼' : '▶'} ${r.msNo}</td>
+          <td style="color:#94a3b8;">${r.description}</td>
+          <td>${r.lots}</td>
+          <td>${r.qty.toLocaleString('en-IN')}</td>
+          <td>${r.wt.toFixed(2)} Kg <span style="color:#94a3b8; font-size:10px;">(${(r.wt / 1000).toFixed(3)} T)</span></td>
+        </tr>`;
+        if (!isOpen) return mainRow;
+
+        const details = buildPartDetailRows(key, year, month);
+        const detailBody = details.length
+          ? details.map(d => `
+              <tr style="border-top:1px solid #334155;">
+                <td style="padding:4px 8px;">${d.date}</td>
+                <td style="padding:4px 8px;">${d.batch}</td>
+                <td style="padding:4px 8px;">${d.sqf}</td>
+                <td style="padding:4px 8px; text-align:right;">${d.qty.toLocaleString('en-IN')}</td>
+                <td style="padding:4px 8px; text-align:right;">${d.wt.toFixed(2)}</td>
+              </tr>`).join('')
+          : `<tr><td colspan="5" style="padding:6px 8px; color:#94a3b8; font-size:12px;">Koi detail nahi mili.</td></tr>`;
+        const detailRow = `
+        <tr>
+          <td colspan="5" style="background:#0f172a; padding:8px 12px; border-bottom:2px solid #334155;">
+            <table style="width:100%; border-collapse:collapse;">
+              <thead>
+                <tr style="color:#94a3b8; font-size:11px;">
+                  <th style="text-align:left; padding:4px 8px;">Date</th>
+                  <th style="text-align:left; padding:4px 8px;">Batch Code</th>
+                  <th style="text-align:left; padding:4px 8px;">SQF</th>
+                  <th style="text-align:right; padding:4px 8px;">Qty (Nos)</th>
+                  <th style="text-align:right; padding:4px 8px;">Weight (Kg)</th>
+                </tr>
+              </thead>
+              <tbody>${detailBody}</tbody>
+            </table>
+          </td>
+        </tr>`;
+        return mainRow + detailRow;
+      }).join('');
+    }
+
+    // ===================== DAILY NOTE (poore din ki ek chhoti summary - kitne Furnace chale,
+    // koi remark. Batch-entry se ALAG hai, isliye alag chhoti Sheet mein jaata hai) =====================
+    // Production entries ke ulat, ye HAMESHA overwrite ho sakta hai - koi "ek baar bhara to lock"
+    // wala rule nahi, kyunki ye sirf ek observational note hai, confidential production data nahi.
+    function toggleDailyNotePanel() {
+      const panel = document.getElementById('dailyNoteModal');
+      const willShow = !panel.classList.contains('open');
+      panel.classList.toggle('open', willShow);
+      if (willShow) {
+        const dateInput = document.getElementById('dnDate');
+        if (!dateInput.value) dateInput.value = new Date().toISOString().slice(0, 10);
+        document.getElementById('dnCode').value = '';
+        document.getElementById('dnStatus').style.display = 'none';
+      }
+    }
+
+    async function submitDailyNote() {
+      const statusEl = document.getElementById('dnStatus');
+      statusEl.style.display = 'none';
+
+      const code = document.getElementById('dnCode').value.trim();
+      if (code !== '2020') {
+        statusEl.className = 'entry-status fail';
+        statusEl.innerText = '⚠ Galat code — sahi code daal ke dobara try karo.';
+        statusEl.style.display = 'block';
+        return;
+      }
+      const dateVal = document.getElementById('dnDate').value;
+      if (!dateVal) {
+        statusEl.className = 'entry-status fail';
+        statusEl.innerText = '⚠ Date bharna zaroori hai.';
+        statusEl.style.display = 'block';
+        return;
+      }
+      const furnaceRunning = document.getElementById('dnFurnaceRunning').value.trim();
+      const remark = document.getElementById('dnRemark').value.trim();
+
+      document.getElementById('hfAction').value = 'setDailyNote';
+      document.getElementById('hfCode').value = code;
+      document.getElementById('hfDate').value = dateVal;
+      document.getElementById('hfFurnaceRunning').value = furnaceRunning;
+      document.getElementById('hfDailyRemark').value = remark;
+
+      const submitBtn = document.getElementById('dnSubmitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Saving...';
+      statusEl.className = 'entry-status';
+      statusEl.style.color = '#f59e0b';
+      statusEl.innerHTML = '⏳ Google Sheet mein save ho raha hai...';
+      statusEl.style.display = 'block';
+
+      const hiddenForm = document.getElementById('hiddenEntryForm');
+      hiddenForm.action = MS_LOG_CSV_URL;
+      hiddenForm.submit();
+
+      setTimeout(() => {
+        statusEl.className = 'entry-status ok';
+        statusEl.innerHTML = '✅ Daily Note save ho gaya!';
+        statusEl.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.innerText = '✅ Save Karo';
+      }, 2000);
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       // onMonthChange -> fetchLiveSheet already loads MS PRODUCTION LOG CSV (September = live month by default),
       // jisse DWM board aur MS/SQF search dono ka data ek hi jagah se aa jata hai
       onMonthChange();
+      loadPartsMaster();
     });
 
-    // Popup (New Entry / TD Production) khula ho to Escape dabane se bhi band ho jaaye
+    // Popup (New Entry / TD Production / Daily Note) khula ho to Escape dabane se bhi band ho jaaye
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'Escape') return;
       const entryModal = document.getElementById('entryFormModal');
       const tdModal = document.getElementById('tdProductionModal');
+      const dnModal = document.getElementById('dailyNoteModal');
       if (entryModal && entryModal.classList.contains('open')) toggleEntryPanel();
       else if (tdModal && tdModal.classList.contains('open')) toggleTdPanel();
+      else if (dnModal && dnModal.classList.contains('open')) toggleDailyNotePanel();
     });
   </script>
 </body>
