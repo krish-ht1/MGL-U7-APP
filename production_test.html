@@ -1518,14 +1518,6 @@
             <label>⚠ Naya Part - Description</label>
             <input type="text" class="comp-desc" placeholder="Part ka naam (jaise BULL GEAR)">
           </div>
-          <div class="entry-field comp-unit-wrap" style="display:none;">
-            <label>⚠ Naya Part - Unit (kahan se aaya)</label>
-            <select class="comp-unit">
-              <option value="">-- Select --</option>
-              <option value="UNIT 4">Unit 4</option>
-              <option value="UNIT 9">Unit 9</option>
-            </select>
-          </div>
           <div class="entry-field comp-qty-wrap">
             <label>Qty (Nos)</label>
             <input type="number" class="comp-qty" placeholder="0" oninput="updateComponentTotal(this)">
@@ -1549,21 +1541,18 @@
       const row = inputEl.closest('.component-row');
       const msNo = normalizeMsNo(inputEl.value);
       const descWrap = row.querySelector('.comp-desc-wrap');
-      const unitWrap = row.querySelector('.comp-unit-wrap');
       const infoDiv = row.querySelector('.comp-part-info');
       const wtpcInput = row.querySelector('.comp-wtpc');
       if (!msNo) {
         descWrap.style.display = 'none';
-        unitWrap.style.display = 'none';
         infoDiv.style.display = 'none';
         return;
       }
       const known = partsMaster[msNo];
       if (known) {
         descWrap.style.display = 'none';
-        unitWrap.style.display = 'none';
         infoDiv.style.display = 'block';
-        infoDiv.innerText = `✓ ${known.description || 'Known part'}${known.wtPc ? ' · ' + known.wtPc + ' Kg/pc' : ''}${known.unit ? ' · ' + known.unit : ''}`;
+        infoDiv.innerText = `✓ ${known.description || 'Known part'}${known.wtPc ? ' · ' + known.wtPc + ' Kg/pc' : ''}`;
         if (known.wtPc && !wtpcInput.value) {
           wtpcInput.value = known.wtPc;
           updateComponentTotal(wtpcInput);
@@ -1571,7 +1560,6 @@
       } else {
         infoDiv.style.display = 'none';
         descWrap.style.display = 'flex';
-        unitWrap.style.display = 'flex';
       }
     }
 
@@ -1606,10 +1594,8 @@
         const wtPc = parseFloat(row.querySelector('.comp-wtpc').value) || 0;
         const isKnown = !!partsMaster[msNo];
         const descInput = row.querySelector('.comp-desc');
-        const unitInput = row.querySelector('.comp-unit');
         const description = isKnown ? '' : (descInput ? descInput.value.trim() : '');
-        const unit = isKnown ? '' : (unitInput ? unitInput.value.trim() : '');
-        components.push({ msNo, qty, wtPc, description, unit, isNewPart: !isKnown });
+        components.push({ msNo, qty, wtPc, description, isNewPart: !isKnown });
       });
       return components;
     }
@@ -1764,14 +1750,6 @@
         statusEl.style.display = 'block';
         return;
       }
-      const missingUnit = components.filter(c => c.isNewPart && !c.unit);
-      if (missingUnit.length) {
-        statusEl.className = 'entry-status fail';
-        statusEl.innerText = `⚠ ${missingUnit.map(c => c.msNo).join(', ')} — yeh naya MS No hai, iska Unit (Unit 4 / Unit 9) select karna zaroori hai.`;
-        statusEl.style.display = 'block';
-        return;
-      }
-
       pendingEntry = { dateVal, sqf, batch, inTime, outTime, gapLoss, reasonGap, chargeLoss, reasonLoss, remarks, components, code };
 
       const sqfDigits = String(sqf).replace(/\D/g, '');
