@@ -748,7 +748,6 @@
               <th>CORE</th>
               <th>ECD</th>
               <th>REMARKS</th>
-              <th>AG</th>
               <th>EQUALISE<span class="th-sub-box">Temp * Time * CP</span></th>
               <th>CARBURISING<span class="th-sub-box">Temp * Time * CP</span></th>
               <th>DIFFUSION<span class="th-sub-box">Temp * Time * CP</span></th>
@@ -760,7 +759,7 @@
           </thead>
           <tbody id="tableBody">
             <tr>
-              <td colspan="21" class="no-data">Loading process logs from Google Sheets...</td>
+              <td colspan="19" class="no-data">Loading process logs from Google Sheets...</td>
             </tr>
           </tbody>
         </table>
@@ -1230,7 +1229,7 @@
         : `${total} records`;
 
       if (rows.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="21" class="no-data">🔍 No matching records found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="19" class="no-data">🔍 No matching records found.</td></tr>`;
         return;
       }
 
@@ -1259,7 +1258,7 @@
 
         html += `
           <tr class="month-divider-row">
-            <td colspan="21">
+            <td colspan="19">
               <div class="month-divider-content">
                 <span class="month-title">📅 ${monthTitle}</span>
                 <span class="month-stat">🔢 Total Lots: <strong>${mLots}</strong></span>
@@ -1285,14 +1284,12 @@
             <td>${r[m.core] || '-'}</td>
             <td>${r[m.ecd] || '-'}</td>
             <td>${r[m.remark] || '-'}</td>
-            <td>${r[m.grind] || '-'}</td>
             <td>${r[m.equal] || '-'}</td>
             <td>${r[m.carb] || '-'}</td>
             <td>${r[m.diff] || '-'}</td>
             <td>${r[m.hard] || '-'}</td>
             <td>${r[m.quench] || '-'}</td>
             <td>${r[m.temper] || '-'}</td>
-            <td>${r[m.loading] || '-'}</td>
           </tr>`;
         });
       }
