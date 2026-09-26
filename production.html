@@ -1318,6 +1318,14 @@
       msSearchDebounceTimer = setTimeout(runMsSearch, 300);
     }
 
+    // (v-perf fix) Sheet ab 12-13 hazaar+ rows tak badh chuki hai - agar search bahut broad ho
+    // (jaise sirf 1 letter type kiya, ya koi filter hi na laga), to hazaaron rows ka match aa
+    // sakta hai. Poori list ek saath DOM mein daalne se (innerHTML) browser kaafi der ke liye
+    // hang/freeze ho jaata hai - isliye table mein sirf pehle MAX_DETAIL_ROWS hi dikhate hain,
+    // KPI totals (Qty/Weight/Lots) hamesha SAARE matches par hi calculate hote hain (wo sirf
+    // math hai, DOM nahi banata, isliye fast rehta hai chahe match 10 ho ya 10,000).
+    const MAX_DETAIL_ROWS = 250;
+
     function runMsSearch() {
       const q = document.getElementById('msSearchInput').value.trim().toUpperCase();
       const sqfFilter = document.getElementById('msSearchSQF').value;
@@ -1329,7 +1337,6 @@
         const matchDate = !dateFilter || normalizeDateForCompare(row.date) === dateFilter;
         return matchMs && matchSqf && matchDate;
       });
-      msDetailMatches = matches;
 
       const totalQty = matches.reduce((a, r) => a + r.qty, 0);
       const totalWt = matches.reduce((a, r) => a + r.wt, 0);
@@ -1342,9 +1349,16 @@
 
       document.getElementById('msSearchKpiGrid').style.display = 'grid';
       document.getElementById('msSearchDetailWrap').style.display = 'block';
-      document.getElementById('msSearchSummary').innerText = `${matches.length} record(s) found`;
 
-      renderMsDetailTable(matches);
+      // Table mein sirf capped list dikhao (Pending button ka index bhi isi capped list se
+      // match hona chahiye), lekin summary line mein bata do ki total kitne mile the.
+      const shown = matches.slice(0, MAX_DETAIL_ROWS);
+      msDetailMatches = shown;
+      document.getElementById('msSearchSummary').innerText = (matches.length > MAX_DETAIL_ROWS)
+        ? `${matches.length} record(s) found — pehle ${MAX_DETAIL_ROWS} dikhaye ja rahe hain, poori list ke liye MS No/Date se aur search narrow karo`
+        : `${matches.length} record(s) found`;
+
+      renderMsDetailTable(shown);
       // agar table pehle se khuli thi to naye search par bhi khuli rahe
       const tableWrap = document.getElementById('msDetailTableWrap');
       if (tableWrap.style.display === 'block') { /* keep open */ }

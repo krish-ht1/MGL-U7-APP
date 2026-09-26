@@ -570,11 +570,11 @@
       <div class="search-row">
         <div class="search-input-wrap">
           <span class="search-icon">🔍</span>
-          <input 
-            type="text" 
-            id="searchBox" 
-            placeholder="Search MS No / Part No (e.g. 459/50205, 33003), Batch, Heat Code, Customer..." 
-            oninput="applyAllFilters()"
+          <input
+            type="text"
+            id="searchBox"
+            placeholder="Search MS No / Part No (e.g. 459/50205, 33003), Batch, Heat Code, Customer..."
+            oninput="debouncedApplyFilters()"
           >
         </div>
         <button class="btn-reset" onclick="resetAllFilters()">🔄 Reset</button>
@@ -800,6 +800,21 @@
     let isSectionUnlocked = false;
     let currentActivePart = "";
     let currentActivePdfLink = "";
+
+    // (v-perf fix) Sheet ab 12-13 hazaar+ rows tak badh chuki hai. Pehle searchBox har
+    // keystroke par TURANT applyAllFilters() chala deta tha, aur agar search bahut broad ho
+    // (ya khaali ho) to filtered list mein hazaaron rows aa jaati thi - poori list ek saath
+    // DOM mein (innerHTML) daalne se browser kaafi der ke liye hang/freeze ho jaata tha.
+    // Fix: (1) search par 300ms ka debounce, taaki fast typing mein har letter par na chale.
+    // (2) Table mein sirf pehle MAX_DETAIL_ROWS hi render hote hain - KPI totals (Pieces/
+    // Weight/Lots) hamesha SAARE matching rows par calculate hote hain (sirf math hai, DOM
+    // nahi banata - isliye fast rehta hai chahe match 10 ho ya 10,000).
+    let searchDebounceTimer = null;
+    function debouncedApplyFilters() {
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(applyAllFilters, 300);
+    }
+    const MAX_DETAIL_ROWS = 250;
 
     const AUTHORIZED_USERS = {
       "ADMIN": "admin@123",
@@ -1201,13 +1216,18 @@
       updateKPIsAndSIP(filtered);
 
       if (isSectionUnlocked) {
-        renderTable(filtered);
+        // Table sirf pehle MAX_DETAIL_ROWS hi render karta hai (perf fix) - KPI totals upar
+        // hamesha poore "filtered" par ban chuke hain, isliye wo affect nahi hote.
+        renderTable(filtered.slice(0, MAX_DETAIL_ROWS), filtered.length);
       }
     }
 
-    function renderTable(rows) {
+    function renderTable(rows, totalCount) {
       const tbody = document.getElementById('tableBody');
-      document.getElementById('recordStatus').innerText = `${rows.length} records`;
+      const total = (typeof totalCount === 'number') ? totalCount : rows.length;
+      document.getElementById('recordStatus').innerText = (total > rows.length)
+        ? `${total} records — showing first ${rows.length} (narrow search/filter for full list)`
+        : `${total} records`;
 
       if (rows.length === 0) {
         tbody.innerHTML = `<tr><td colspan="21" class="no-data">🔍 No matching records found.</td></tr>`;
